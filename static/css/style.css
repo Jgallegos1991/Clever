@@ -1,0 +1,104 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0a0e1a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #e0e6f0;
+}
+
+#starfield, #farGrid, #nearGrid {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#farGrid {
+    z-index: 1;
+    opacity: 0.18;
+}
+
+#nearGrid {
+    z-index: 2;
+    opacity: 0.28;
+}
+
+#cloud-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#particleCloud {
+    width: 420px;
+    height: 420px;
+    background: transparent;
+    display: block;
+}
+
+#mainInput {
+    margin-top: 24px;
+    width: 340px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    border: none;
+    font-size: 1.2rem;
+    background: rgba(20, 24, 40, 0.92);
+    color: #e0e6f0;
+    outline: none;
+    box-shadow: 0 2px 16px 0 #0a0e1a44;
+    transition: box-shadow 0.2s;
+}
+#mainInput:focus {
+    box-shadow: 0 2px 32px 0 #1a2a4a88;
+}
+
+#analysis-panel {
+    position: fixed;
+    right: 32px;
+    bottom: 32px;
+    width: 340px;
+    min-height: 60px;
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 10;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.analysis-bubble {
+    padding: 12px 18px;
+    border-radius: 16px;
+    margin-bottom: 4px;
+    font-size: 1rem;
+    max-width: 100%;
+    opacity: 0.96;
+    animation: fadeIn 0.3s;
+    pointer-events: auto;
+}
+.analysis-bubble.system {
+    background: linear-gradient(90deg, #1a2a4a 60%, #2a3a6a 100%);
+    color: #b0e0ff;
+}
+.analysis-bubble.user {
+    background: linear-gradient(90deg, #2a4a2a 60%, #3a6a4a 100%);
+    color: #e0ffe0;
+}
+.analysis-bubble.error {
+    background: linear-gradient(90deg, #4a1a1a 60%, #6a2a2a 100%);
+    color: #ffd0d0;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 0.96; transform: translateY(0); }
+}

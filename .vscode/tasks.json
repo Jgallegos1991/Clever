@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Clever: setup",
+      "type": "shell",
+      "command": "make setup",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clever: run",
+      "type": "shell",
+      "command": "make run",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": [
+          { "regexp": "." }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Clever",
+          "endsPattern": "Running on http"
+        }
+      }
+    }
+  ]
+}
