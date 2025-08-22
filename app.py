@@ -32,7 +32,8 @@ if not SAFE_MODE:
     try:
         upgrade_configurations()
         finalize_configurations()
-    except Exception as e:
+    import os
+    import time
         print(f"[WARN] upgrade/finalize failed: {e}")
     print("✅ Clever's NLP Core is Online.")
 
@@ -43,72 +44,77 @@ def index():
 
 @app.route("/favicon.ico")
 def favicon():
-    # silence 404 spam
-    return ("", 204)
+    return app.send_static_file("img/favicon.svg")
 
-@app.route("/health")
+@app.get("/health")
 def health():
-    return jsonify(ok=True, ts=time.time(), safe_mode=SAFE_MODE)
+    return jsonify({"status": "ok"}), 200
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    start = time.time()
-    data = request.get_json(silent=True) or {}
-    msg = (data.get("message") or "").strip()
-    if not msg:
-        return jsonify(error="No message received."), 400
+    try:
+        start = time.time()
+        data = request.get_json(silent=True) or {}
+        msg = (data.get("message") or "").strip()
+        if not msg:
+            return jsonify(ok=False, error="No message received."), 400
 
-    if SAFE_MODE:
-        # Keep UI responsive while you iterate
-        reply = f"Echo: “{msg}”. (Safe Mode reply.)"
-        analysis = {
-            "intent": ["general"],
-            "sentiment": {"overall_mood": "neutral"},
-            "keywords": [{"word": w} for w in msg.split()[:3]],
-        }
-        active_persona = "core"
-        try:
-            with open("conversations.json", "a", encoding="utf-8") as fh:
-                ts = datetime.now().isoformat(timespec="seconds")
-                fh.write(f'{ts}\tUSER:{msg}\tCLEVER:{reply}\n')
-        except Exception as e:
-            print(f"[WARN] could not append conversation log: {e}")
-    else:
-        # Full pipeline with graceful fallbacks
-        try:
-            analysis = nlp_processor.process(msg)
-            reply = clever_persona.generate_response(analysis)
-            try:
-                db_manager.add_conversation(msg, reply)
-            except Exception as e:
-                print(f"[WARN] DB persist failed: {e}")
-            active_persona = getattr(clever_persona, "last_used_trait", "core")
-        except Exception as e:
-            print(f"[WARN] NLP pipeline failed: {e}")
-            reply = f"I heard: “{msg}”. (Fallback reply.)"
-            analysis = {"intent": ["general"], "sentiment": {"overall_mood": "neutral"}, "keywords": []}
+        if SAFE_MODE:
+            # Keep UI responsive while you iterate
+            reply = f"Echo: “{msg}”. (Safe Mode reply.)"
+            analysis = {
+                "intent": ["general"],
+                "sentiment": {"overall_mood": "neutral"},
+                "keywords": [{"word": w} for w in msg.split()[:3]],
+            }
             active_persona = "core"
+            try:
+                with open("conversations.json", "a", encoding="utf-8") as fh:
+                    ts = datetime.now().isoformat(timespec="seconds")
+                    fh.write(f'{ts}\tUSER:{msg}\tCLEVER:{reply}\n')
+            except Exception as e:
+                print(f"[WARN] could not append conversation log: {e}")
+        else:
+            # Full pipeline with graceful fallbacks
+            try:
+                analysis = nlp_processor.process(msg)
+                reply = clever_persona.generate_response(analysis)
+                try:
+    @app.get("/health")
+    def health():
+        return jsonify({"status": "ok"}), 200
+                    db_manager.add_conversation(msg, reply)
+                except Exception as e:
+                    print(f"[WARN] DB persist failed: {e}")
+                active_persona = getattr(clever_persona, "last_used_trait", "core")
+            except Exception as e:
+                print(f"[WARN] NLP pipeline failed: {e}")
+                reply = f"I heard: “{msg}”. (Fallback reply.)"
+                analysis = {"intent": ["general"], "sentiment": {"overall_mood": "neutral"}, "keywords": []}
+                active_persona = "core"
 
-    return jsonify(
-        reply=reply,
-        analysis={
-            "user_input": msg,
-            "active_mode": "safe" if SAFE_MODE else "full",
-            "detected_intent": (analysis.get("intent") or ["general"])[0],
-            "user_mood": (analysis.get("sentiment") or {}).get("overall_mood"),
-            "key_topics": [kw.get("word") for kw in (analysis.get("keywords") or [])[:3]],
-            "full_nlp_analysis": analysis,
-            "activePersona": active_persona,
-            "responseTime": round((time.time() - start) * 1000),
-        },
-    )
+        return jsonify(
+            reply=reply,
+            analysis={
+                "user_input": msg,
+                "active_mode": "safe" if SAFE_MODE else "full",
+                "detected_intent": (analysis.get("intent") or ["general"])[0],
+                "user_mood": (analysis.get("sentiment") or {}).get("overall_mood"),
+                "key_topics": [kw.get("word") for kw in (analysis.get("keywords") or [])[:3]],
+                "full_nlp_analysis": analysis,
+                "activePersona": active_persona,
+                "responseTime": round((time.time() - start) * 1000),
+            },
+        )
+    except Exception as e:
+        return jsonify(ok=False, error=str(e)), 500
 
 @app.route("/ingest", methods=["POST"])
 def ingest():
     try:
         f = request.files.get("file")
         if not f or not f.filename:
-            return jsonify(error="No selected file."), 400
+            return jsonify(ok=False, error="No selected file."), 400
 
         save_dir = Path(app.config.get("UPLOAD_FOLDER") or UPLOAD_DIR)
         save_dir.mkdir(parents=True, exist_ok=True)
@@ -138,8 +144,7 @@ def ingest():
 
         return jsonify(message="File uploaded and ingested successfully.", filename=filename)
     except Exception as e:
-        print(f"[ERR] /ingest failed: {e}")
-        return jsonify(error="An error occurred while ingesting the file."), 500
+        return jsonify(ok=False, error=str(e)), 500
 
 # ---- The missing endpoints that broke url_for ----
 @app.route("/generator_page")
@@ -163,22 +168,3 @@ if __name__ == "__main__":
     print("🔗 http://127.0.0.1:5000")
     app.run(host="0.0.0.0", port=5000, debug=True)
 
-{
-  "configurations": [
-    {
-      "type": "debugpy",
-      "request": "launch",
-      "name": "Launch Clever Flask App",
-      "program": "${workspaceFolder}/${input:mainScript}",
-      "args": [],
-      "justMyCode": true
-    }
-  ],
-  "inputs": [
-    {
-      "type": "promptString",
-      "id": "mainScript",
-      "description": "Enter the path to your main Python script (e.g., app.py)"
-    }
-  ]
-}
