@@ -1,0 +1,158 @@
+[
+  {
+    "timestamp": "2025-08-06T16:00:57.168905",
+    "user_message": "Hello, I'm excited to learn coding today!",
+    "ai_response": "I hear you saying: 'Hello, I'm excited to learn coding today!'. I'm here to help! Can you tell me more about what you need?",
+    "analysis": {
+      "detected_mood": "neutral",
+      "detected_intent": "general",
+      "key_topics": [],
+      "response_tone": "helpful",
+      "confidence": "medium"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T16:09:14.100908",
+    "user_message": "Hello, I'm excited to learn coding today!",
+    "ai_response": "Hello! I'm excited to help you today! What would you like to work on?",
+    "analysis": {
+      "detected_mood": "positive",
+      "detected_intent": "greeting",
+      "key_topics": [
+        "excited",
+        "learn",
+        "coding",
+        "today"
+      ],
+      "response_tone": "enthusiastic_and_engaging",
+      "confidence": "high"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T16:10:52.274995",
+    "user_message": "hello",
+    "ai_response": "Hi there! I'm here to help. What can I assist you with?",
+    "analysis": {
+      "detected_mood": "neutral",
+      "detected_intent": "greeting",
+      "key_topics": [],
+      "response_tone": "friendly_and_professional",
+      "confidence": "medium"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T16:11:46.076964",
+    "user_message": "hello I'm excited to learn code today",
+    "ai_response": "Hello! I'm excited to help you today! What would you like to work on?",
+    "analysis": {
+      "detected_mood": "positive",
+      "detected_intent": "greeting",
+      "key_topics": [
+        "excited",
+        "learn",
+        "code",
+        "today"
+      ],
+      "response_tone": "enthusiastic_and_engaging",
+      "confidence": "high"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T16:58:01.016155",
+    "user_message": "curl -X POST http://127.0.0.1:5000/chat \\   -H \"Content-Type: application/json\" \\   -d '{\"message\": \"hello test\"}'",
+    "ai_response": "Hi there! I'm here to help. What can I assist you with?",
+    "analysis": {
+      "detected_mood": "neutral",
+      "detected_intent": "greeting",
+      "key_topics": [
+        "http://127.0.0.1:5000",
+        "chat",
+        "application",
+        "json",
+        "message"
+      ],
+      "response_tone": "friendly_and_professional",
+      "confidence": "high"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T16:58:15.798022",
+    "user_message": "hello test",
+    "ai_response": "Hi there! I'm here to help. What can I assist you with?",
+    "analysis": {
+      "detected_mood": "neutral",
+      "detected_intent": "greeting",
+      "key_topics": [
+        "test"
+      ],
+      "response_tone": "friendly_and_professional",
+      "confidence": "high"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T20:10:59.704897",
+    "user_message": "yo",
+    "ai_response": "I'm here and ready to help! What would you like to discuss or work on?",
+    "analysis": {
+      "detected_mood": "neutral",
+      "detected_intent": "general",
+      "key_topics": [],
+      "response_tone": "friendly_and_professional",
+      "confidence": "medium"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T20:11:32.523190",
+    "user_message": "hello, I'm ready to learn code!",
+    "ai_response": "Hello! I'm excited to help you today! What would you like to work on?",
+    "analysis": {
+      "detected_mood": "positive",
+      "detected_intent": "greeting",
+      "key_topics": [
+        "ready",
+        "learn",
+        "code"
+      ],
+      "response_tone": "enthusiastic_and_engaging",
+      "confidence": "high"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T20:15:07.829772",
+    "user_message": "hi",
+    "ai_response": "Hi there! I'm here to help. What can I assist you with?",
+    "analysis": {
+      "detected_mood": "neutral",
+      "detected_intent": "greeting",
+      "key_topics": [],
+      "response_tone": "friendly_and_professional",
+      "confidence": "medium"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T20:19:48.313910",
+    "user_message": "hi",
+    "ai_response": "Hi there! I'm here to help. What can I assist you with?",
+    "analysis": {
+      "detected_mood": "neutral",
+      "detected_intent": "greeting",
+      "key_topics": [],
+      "response_tone": "friendly_and_professional",
+      "confidence": "medium"
+    }
+  },
+  {
+    "timestamp": "2025-08-06T20:31:55.329637",
+    "user_message": "hi",
+    "ai_response": "Hi there! I'm here to help. What can I assist you with?",
+    "analysis": {
+      "detected_mood": "neutral",
+      "detected_intent": "greeting",
+      "key_topics": [],
+      "response_tone": "friendly_and_professional",
+      "confidence": "medium"
+    }
+  }
+]
+2025-08-21T14:16:22	USER:hey clev	CLEVER:Echo: “hey clev”. (Safe Mode reply.)
+2025-08-21T14:16:40	USER:form a cube	CLEVER:Echo: “form a cube”. (Safe Mode reply.)
