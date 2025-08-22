@@ -1,0 +1,17 @@
+{
+  "recommendations": [],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-node-azure-pack",
+    "ms-azuretools.vscode-azurecontainerapps",
+    "ms-azuretools.vscode-azurefunctions",
+    "ms-azuretools.vscode-docker",
+    "ms-vscode.powershell",
+    "ms-vscode.js-debug-nightly",
+    "ms-vscode-remote.remote-ssh",
+    "ms-vscode-remote.remote-wsl",
+    "ms-vscode-remote.remote-containers",
+    "devsense.phptools-vscode",
+    "hbenl.vscode-test-explorer",
+    "ms-python.vscode-pylance"
+  ]
+}
