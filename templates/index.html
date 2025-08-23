@@ -8,6 +8,13 @@
     <script type="module" src="/static/js/three-bridge.js"></script>
 </head>
 <body>
+    <script>
+    // If THREE bridge doesn’t fire quickly, enable accessible fallback
+    (function(){
+        const timer = setTimeout(() => document.body.classList.add('no-3d'), 1800);
+        window.addEventListener('three-ready', () => { clearTimeout(timer); document.body.classList.remove('no-3d'); }, { once:true });
+    })();
+    </script>
     <!-- 3D scene and CSS3D panels will be injected by orb_engine.js -->
     <div id="synaptic-hub-card" class="css3d-panel">
         <div class="hub-title">Synaptic Hub</div>

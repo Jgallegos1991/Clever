@@ -19,6 +19,19 @@ let gridRipple = {active: false, t: 0, origin: [0,0]};
 let swirl = { active: false, start: 0, duration: 600, strength: 0.06 };
 let dissolve = { active: false, start: 0, duration: 900 };
 
+// Pixel mode state
+let pixelMode = false;
+let particleMaterial = null;
+const original = {
+    dpr: (window.devicePixelRatio || 1),
+    material: {
+        size: 2.2,
+        sizeAttenuation: true,
+        blending: null, // to be filled after material creation
+        opacity: 0.9
+    }
+};
+
 function init3D() {
     // Scene and camera
     scene = new THREE.Scene();
@@ -65,8 +78,9 @@ function init3D() {
         positions[i + 2] = (Math.random() - 0.5) * 0.2;
     }
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const material = new THREE.PointsMaterial({ color: 0x69eacb, size: 2.2, transparent: true, opacity: 0.9, sizeAttenuation: true, blending: THREE.AdditiveBlending, depthWrite: false });
-    particleSystem = new THREE.Points(geometry, material);
+    particleMaterial = new THREE.PointsMaterial({ color: 0x69eacb, size: 2.2, transparent: true, opacity: 0.9, sizeAttenuation: true, blending: THREE.AdditiveBlending, depthWrite: false });
+    original.material.blending = THREE.AdditiveBlending;
+    particleSystem = new THREE.Points(geometry, particleMaterial);
     scene.add(particleSystem);
 
     // Morph targets
@@ -246,6 +260,29 @@ function floatPanel(domId, x, y, z) {
 window.Clever3D = {
     setMorph,
     init3D,
+    // Pixel mode: chunky look with nearest-neighbor upscaling
+    pixelMode: function(mode) {
+        if (!renderer || !particleMaterial) return;
+        const want = mode === 'toggle' ? !pixelMode : !!mode && mode !== 'off' && mode !== false;
+        pixelMode = want;
+        if (pixelMode) {
+            renderer.setPixelRatio(0.6);
+            renderer.domElement.style.imageRendering = 'pixelated';
+            particleMaterial.sizeAttenuation = false;
+            particleMaterial.size = 4.0;
+            particleMaterial.opacity = 1.0;
+            particleMaterial.blending = THREE.NormalBlending;
+            particleMaterial.needsUpdate = true;
+        } else {
+            renderer.setPixelRatio(Math.min(original.dpr, 1.5));
+            renderer.domElement.style.imageRendering = '';
+            particleMaterial.sizeAttenuation = original.material.sizeAttenuation;
+            particleMaterial.size = original.material.size;
+            particleMaterial.opacity = original.material.opacity;
+            particleMaterial.blending = original.material.blending;
+            particleMaterial.needsUpdate = true;
+        }
+    },
     // Summon: swirl then condense to a sphere
     summon: function() {
         swirl.active = true; swirl.start = performance.now();

@@ -34,6 +34,22 @@
             window.CleverUI.pushLog('Clever', 'Forms return to the flow.');
             return;
         }
+        // Pixel Mode command: "pixel on", "pixel off", "pixel mode"
+        if (/\bpixel(\s+mode)?\b/i.test(msg)) {
+            const on = /\b(on|enable|start)\b/i.test(msg);
+            const off = /\b(off|disable|stop)\b/i.test(msg);
+            if (on) {
+                window.Clever3D.pixelMode(true);
+                window.CleverUI.pushLog('Clever', 'Pixel mode enabled.');
+            } else if (off) {
+                window.Clever3D.pixelMode(false);
+                window.CleverUI.pushLog('Clever', 'Pixel mode disabled.');
+            } else {
+                window.Clever3D.pixelMode('toggle');
+                window.CleverUI.pushLog('Clever', 'Toggled pixel mode.');
+            }
+            return;
+        }
         // Summon microcopy
         window.CleverUI.showMicrocopy('Energy takes shape.');
         fetch('/chat', {
