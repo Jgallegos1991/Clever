@@ -96,22 +96,51 @@ def initialize_nlp_model():
         raise RuntimeError(f"Unexpected error while loading spaCy model '{SPACY_MODEL}': {e}")
 
 # Process text input using the NLP model
+def _normalize_key(key: str) -> str:
+    key = (key or '').strip().lower()
+    # remove trailing punctuation
+    if key.endswith('?') or key.endswith('.'):
+        key = key[:-1]
+    # strip common determiners/pronouns
+    for prefix in ('my ', 'the ', 'your '):
+        if key.startswith(prefix):
+            key = key[len(prefix):]
+            break
+    return key.strip()
+
 def process_text_input(nlp_model, text):
-    """Analyze text input and extract intents, sentiments, and keywords."""
+    """Analyze text and detect core intents (teach_fact, ask_question); return minimal schema.
+    Schema expected by upstream: { intent: str|None, data: dict|None }
+    """
     if not text or not isinstance(text, str):
-        return {"intents": [], "sentiments": None, "keywords": []}
+        return {"intent": None, "data": None}
 
-    doc = nlp_model(text)
+    t = text.strip()
+    tl = t.lower()
 
-    # Extract keywords (using named entities and noun chunks as an example)
-    keywords = list(set(ent.text for ent in doc.ents) | set(chunk.text for chunk in doc.noun_chunks))
+    # Teach fact: "remember that <key> is <value>" or "remember my <key> is <value>"
+    import re
+    teach = re.search(r"\bremember(?:\s+that)?\s+(.*?)\s+is\s+(.+)$", tl)
+    if teach:
+        raw_key, value = teach.group(1), teach.group(2)
+        key = _normalize_key(raw_key)
+        value = value.strip().rstrip('.')
+        if key and value:
+            return {"intent": "teach_fact", "data": {"key": key, "value": value}}
 
-    # Placeholder for intents and sentiments (to be implemented with custom logic)
-    intents = []
-    sentiments = None
+    # Ask fact: "what is <key>" / "what's <key>" / "what is my <key>"
+    ask = re.search(r"\bwhat(?:'s|\s+is)\s+(.*?)[?]*$", tl)
+    if ask:
+        raw_key = ask.group(1)
+        key = _normalize_key(raw_key)
+        if key:
+            return {"intent": "ask_question", "data": {"key": key}}
 
-    return {
-        "intents": intents,
-        "sentiments": sentiments,
-        "keywords": keywords
-    }
+    # Fallback: expose some extracted keywords for context; no core intent
+    try:
+        doc = nlp_model(t)
+        keywords = list(set(ent.text for ent in doc.ents) | set(chunk.text for chunk in doc.noun_chunks))
+    except Exception:
+        keywords = []
+
+    return {"intent": None, "data": {"keywords": keywords} if keywords else None}
