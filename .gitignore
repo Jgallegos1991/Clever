@@ -1,4 +1,36 @@
+# Python
+__pycache__/
 .venv/
+*.pyc
+
+# Local data/artifacts
+uploads/
+*.db
+conversations.json
+
+# OS/editor
+.DS_Store
+.vscode/
+
+# Generated/vendor cache
+node_modules/
+dist/
+build/
+
+# Screenshots and large binaries at repo root
+Screenshot*.png
+*.docx
+
+# Sync folders
+Clever_Sync/
+synaptic_hub_sync/
+
+# Accidental files
+static/js/tailwindcss.js
+static/js/CSS3DRenderer.min.js
+static/js/MeshSurfaceSampler.min.js
+static/js/MeshSurfaceSampler.js
+static/js/!grep -rnw . -e 'def process_text'.venv/
 __pycache__/
 *.pyc
 .env
