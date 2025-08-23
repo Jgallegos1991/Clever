@@ -5,6 +5,7 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 import re
+from collections import defaultdict, Counter
 from datetime import datetime
 import os
 
@@ -49,6 +50,34 @@ class UnifiedNLPProcessor:
             self.nlp = None
             self.sia = None
             self.stop_words = set()
+        # Lightweight emotion lexicon (compact, no external downloads)
+        # Categories: joy, sadness, anger, fear, trust, surprise, disgust, anticipation
+        self.emotion_lexicon = {
+            'joy': {
+                'happy','joy','delight','pleased','glad','excited','grateful','love','lovely','wonderful','awesome','great','amazing'
+            },
+            'sadness': {
+                'sad','unhappy','down','depressed','melancholy','lonely','sorry','regret','mourning','tearful','disappointed'
+            },
+            'anger': {
+                'angry','mad','furious','irritated','annoyed','outraged','resentful','hate','hating','rage','frustrated','upset'
+            },
+            'fear': {
+                'afraid','scared','fear','terrified','anxious','nervous','worried','panic','alarmed','frightened','concerned'
+            },
+            'trust': {
+                'trust','secure','confident','reliable','dependable','faith','assure','assured','support','supported','safe'
+            },
+            'surprise': {
+                'surprised','astonished','amazed','startled','whoa','wow','unexpected','shocked','suddenly','gasp'
+            },
+            'disgust': {
+                'disgust','gross','nasty','revolting','repulsed','ugh','yuck','vile','dislike','horrible','awful'
+            },
+            'anticipation': {
+                'anticipate','expect','hope','eager','ready','waiting','soon','upcoming','looking forward','prepare','planning'
+            }
+        }
 
     def process(self, text):
         """
@@ -79,6 +108,11 @@ class UnifiedNLPProcessor:
             else:
                 final_intent = self._detect_general_intent(text)
 
+        # 3b) Enrich with keyphrases and emotions
+        keyphrases = self._extract_keyphrases_rake(text)
+        emotions = self._detect_emotions(text)
+        primary_emotion = max(emotions, key=emotions.get) if emotions else None
+
         analysis = {
             "original_text": text,
             "timestamp": datetime.now().isoformat(),
@@ -87,6 +121,9 @@ class UnifiedNLPProcessor:
             "entities": self._extract_entities(doc),
             "intent": final_intent,
             "keywords": self._extract_keywords(doc),
+            "top_phrases": keyphrases[:7],
+            "emotions": emotions,
+            "primary_emotion": primary_emotion,
             "language_stats": self._get_language_stats(text),
             "response_suggestions": self._generate_response_suggestions(text),
             "core_data": core_analysis.get('data') if is_core_command else None
@@ -145,6 +182,93 @@ class UnifiedNLPProcessor:
         if not doc: return []
         return [{"word": token.text, "lemma": token.lemma_, "pos": token.pos_} for token in doc if token.pos_ in ['NOUN', 'VERB', 'ADJ', 'PROPN'] and not token.is_stop and not token.is_punct and len(token.text) > 2]
 
+    def _extract_keyphrases_rake(self, text):
+        """Simple RAKE-like keyphrase extraction without external deps.
+        1) Split text into candidate phrases on stopwords/punct
+        2) Score words by degree/frequency
+        3) Score phrases as sum of word scores
+        Returns ranked phrases (lowercased), deduped.
+        """
+        try:
+            # Tokenize words and sentences
+            sw = self.stop_words or set(stopwords.words('english'))
+            # Use a regex to split on stopwords or non-word characters
+            words = [w.lower() for w in word_tokenize(text)]
+            separators = set(list(sw))
+            # Build candidate phrases: contiguous non-stopword sequences
+            phrases = []
+            current = []
+            for w in words:
+                if re.match(r"^\W+$", w) or w in sw:
+                    if current:
+                        phrases.append(current)
+                        current = []
+                else:
+                    current.append(w)
+            if current:
+                phrases.append(current)
+
+            # Compute word degree (co-occurrence) and frequency
+            freq = Counter()
+            degree = Counter()
+            for ph in phrases:
+                unique = set(ph)
+                for w in ph:
+                    freq[w] += 1
+                    # degree counts co-occurrence with others in phrase
+                    degree[w] += (len(unique) - 1)
+            # Word score = (degree + freq) / freq
+            word_score = {}
+            for w in freq:
+                word_score[w] = (degree[w] + freq[w]) / float(freq[w])
+
+            # Phrase score = sum(word scores)
+            phrase_scores = []
+            for ph in phrases:
+                if not ph: continue
+                # Filter very short phrases
+                if len(" ".join(ph)) < 4: continue
+                score = sum(word_score.get(w, 0) for w in ph)
+                phrase_scores.append((" ".join(ph), score))
+
+            # Rank and dedupe while preserving order
+            phrase_scores.sort(key=lambda x: x[1], reverse=True)
+            seen = set()
+            ranked = []
+            for ph, _ in phrase_scores:
+                if ph in seen: continue
+                seen.add(ph)
+                ranked.append(ph)
+            return ranked
+        except Exception:
+            return []
+
+    def _detect_emotions(self, text):
+        """Lightweight lexicon-based emotion scoring. Returns normalized scores 0..1."""
+        try:
+            tokens = [t.lower() for t in word_tokenize(text)]
+            scores = defaultdict(int)
+            total_hits = 0
+            for emo, vocab in self.emotion_lexicon.items():
+                for t in tokens:
+                    # match exact words; also allow simple bigrams in vocab
+                    if ' ' in t:
+                        continue
+                    if t in vocab:
+                        scores[emo] += 1
+                        total_hits += 1
+            # Normalize
+            if total_hits > 0:
+                for k in list(scores.keys()):
+                    scores[k] = round(scores[k] / total_hits, 3)
+            else:
+                # default neutral distribution
+                for emo in self.emotion_lexicon.keys():
+                    scores[emo] = 0.0
+            return dict(scores)
+        except Exception:
+            return {emo: 0.0 for emo in self.emotion_lexicon.keys()}
+
     def _get_language_stats(self, text):
         words = word_tokenize(text)
         sentences = sent_tokenize(text)
@@ -189,7 +313,9 @@ class UnifiedNLPProcessor:
             "key_topics": [kw["word"] for kw in analysis["keywords"][:5]],
             "complexity_level": analysis["language_stats"]["complexity_score"],
             "response_tone": self._suggest_response_tone(analysis),
-            "suggested_actions": analysis["response_suggestions"]
+            "suggested_actions": analysis["response_suggestions"],
+            "primary_emotion": analysis.get("primary_emotion"),
+            "top_phrases": analysis.get("top_phrases", [])[:5]
         }
 
     def _suggest_response_tone(self, analysis):

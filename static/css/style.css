@@ -12,6 +12,18 @@ body {
 	background-size: 40px 40px;
 	background-position: center center;
 }
+/* Hide panels by default; they will emerge via CSS3D float */
+.css3d-panel {
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* Accessible fallback: if 3D not ready, show panels as normal UI */
+.no-3d .css3d-panel {
+	opacity: 1;
+	pointer-events: auto;
+}
+
 
 
 /* Remove starfield/farGrid/nearGrid overlays for a clean grid look */
