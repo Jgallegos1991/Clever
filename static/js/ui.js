@@ -3,6 +3,14 @@
     const input = document.getElementById('mainInput');
     // Remove static analysis panel usage
     let fileInput = null;
+    // Panel stack container (bottom-right, non-overlapping)
+    let panelStack = document.getElementById('panel-stack');
+    if (!panelStack) {
+        panelStack = document.createElement('div');
+        panelStack.id = 'panel-stack';
+        panelStack.className = 'panel-stack';
+        document.body.appendChild(panelStack);
+    }
 
     // Hide input until focused
         input.style.opacity = '0'; 
@@ -66,39 +74,21 @@
         setTimeout(() => card.remove(), 700);
     }
 
-    // Microcopy animation
-    function showMicrocopy(text) {
-        let el = document.getElementById('microcopy');
-        if (!el) {
-            el = document.createElement('div');
-            el.id = 'microcopy';
-            el.style.position = 'fixed';
-            el.style.left = '50%';
-            el.style.top = '12%';
-            el.style.transform = 'translate(-50%,0)';
-            el.style.fontSize = '1.3em';
-            el.style.color = '#9be7ff';
-            el.style.textShadow = '0 0 10px #69EACB66, 0 0 20px #FF6BFF33';
-            el.style.opacity = '0';
-            el.style.pointerEvents = 'none';
-            el.style.transition = 'opacity 0.7s cubic-bezier(.4,2,.6,1)';
-            document.body.appendChild(el);
-        }
-        el.textContent = text;
-        el.style.opacity = '1';
-        setTimeout(() => { el.style.opacity = '0'; }, 2200);
-    }
+    // Microcopy disabled per request (no top context banner)
+    function showMicrocopy(_) { return; }
 
     function pushLog(kind, text) {
         if (!text) return;
         const card = document.createElement('div');
         card.className = 'floating-panel';
-        card.style.right = (32 + Math.random() * 24) + 'px';
-        card.style.bottom = (100 + Math.random() * 40) + 'px';
         card.innerHTML = `
             <div class="panel-main"><span class="bubble-tag">${kind}</span> ${text}</div>
         `;
-        document.body.appendChild(card);
+        panelStack.appendChild(card);
+        // keep a bounded number of panels
+        while (panelStack.childElementCount > 5) {
+            panelStack.firstElementChild.remove();
+        }
         setTimeout(() => dissolvePanel(card), 7000);
     }
 
@@ -107,8 +97,6 @@
     function spawnPanel({message, context, source, confidence}) {
         const card = document.createElement('div');
         card.className = 'floating-panel';
-        card.style.right = (32 + Math.random() * 24) + 'px';
-        card.style.bottom = (100 + Math.random() * 40) + 'px';
         card.innerHTML = `
             <div class="panel-main">${message || ''}</div>
             <div class="panel-meta">
@@ -117,7 +105,10 @@
                 ${confidence ? `<span>Mood: ${confidence}</span>` : ''}
             </div>
         `;
-        document.body.appendChild(card);
+        panelStack.appendChild(card);
+        while (panelStack.childElementCount > 5) {
+            panelStack.firstElementChild.remove();
+        }
         setTimeout(() => dissolvePanel(card), 7000);
     }
 
