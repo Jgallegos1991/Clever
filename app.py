@@ -77,6 +77,17 @@ def index():
 def favicon():
     return app.send_static_file("img/favicon.svg")
 
+@app.route('/sw.js')
+def service_worker():
+    # Serve SW from root scope
+    return app.send_static_file('js/sw.js')
+
+@app.after_request
+def add_pwa_headers(resp):
+    # Basic headers to help installability and caching safety
+    resp.headers.setdefault('X-Content-Type-Options', 'nosniff')
+    return resp
+
 
 @app.get("/health")
 def health():
