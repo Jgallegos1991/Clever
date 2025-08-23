@@ -1,104 +1,174 @@
+
 body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background: #0a0e1a;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    color: #e0e6f0;
+	margin: 0;
+	padding: 0;
+	min-height: 100vh;
+	background: #0a0e1a;
+	font-family: 'Segoe UI', Arial, sans-serif;
+	color: #e0e6f0;
+	/* Neon grid background */
+	background-image: linear-gradient(0deg, rgba(45,224,255,0.08) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(45,224,255,0.08) 1px, transparent 1px);
+	background-size: 40px 40px;
+	background-position: center center;
 }
 
-#starfield, #farGrid, #nearGrid {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 0;
-}
 
-#farGrid {
-    z-index: 1;
-    opacity: 0.18;
-}
+/* Remove starfield/farGrid/nearGrid overlays for a clean grid look */
 
-#nearGrid {
-    z-index: 2;
-    opacity: 0.28;
-}
+/* Dramatic orb stage */
 
-#cloud-center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+/* Remove orb/particle-centric styling */
 
-#particleCloud {
-    width: 420px;
-    height: 420px;
-    background: transparent;
-    display: block;
-}
+/* Mic Button (see Button Enhancements below) */
 
+
+/* Neon Input Bar */
+#input-bar {
+	position: fixed;
+	left: 50%;
+	bottom: 40px;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	background: #151c24ee;
+	border-radius: 1em;
+	padding: 0.5em 1.2em;
+	z-index: 20;
+	min-width: 320px;
+	max-width: 90vw;
+	gap: 0.5em;
+	border: 2.5px solid #2de0ff;
+	box-shadow: 0 0 24px 2px #2de0ff99, 0 0 0 2px #2de0ff44;
+	transition: box-shadow 0.2s, border 0.2s;
+}
+#input-bar:focus-within {
+	box-shadow: 0 0 32px 4px #2de0ffcc, 0 0 0 2.5px #2de0ff88;
+	border: 2.5px solid #2de0ff;
+}
 #mainInput {
-    margin-top: 24px;
-    width: 340px;
-    padding: 14px 18px;
-    border-radius: 18px;
-    border: none;
-    font-size: 1.2rem;
-    background: rgba(20, 24, 40, 0.92);
-    color: #e0e6f0;
-    outline: none;
-    box-shadow: 0 2px 16px 0 #0a0e1a44;
-    transition: box-shadow 0.2s;
+	flex: 1;
+	background: transparent;
+	border: none;
+	outline: none;
+	color: #e0e6f0;
+	font-size: 1.1em;
+	padding: 0.7em 0.5em;
+	border-radius: 1em;
+	transition: background 0.2s;
 }
-#mainInput:focus {
-    box-shadow: 0 2px 32px 0 #1a2a4a88;
-}
-
-#analysis-panel {
-    position: fixed;
-    right: 32px;
-    bottom: 32px;
-    width: 340px;
-    min-height: 60px;
-    max-height: 60vh;
-    overflow-y: auto;
-    z-index: 10;
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 10px;
-    pointer-events: none;
+#mainInput::placeholder {
+	color: #2de0ffcc;
+	opacity: 1;
 }
 
-.analysis-bubble {
-    padding: 12px 18px;
-    border-radius: 16px;
-    margin-bottom: 4px;
-    font-size: 1rem;
-    max-width: 100%;
-    opacity: 0.96;
-    animation: fadeIn 0.3s;
-    pointer-events: auto;
+
+/* Neon Button Enhancements */
+#mic-btn, #download-btn {
+	background: #151c24;
+	border: 2px solid #2de0ff;
+	margin-left: 10px;
+	cursor: pointer;
+	padding: 7px 10px;
+	border-radius: 10px;
+	transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+	box-shadow: 0 0 12px 2px #2de0ff55;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
-.analysis-bubble.system {
-    background: linear-gradient(90deg, #1a2a4a 60%, #2a3a6a 100%);
-    color: #b0e0ff;
+#mic-btn:hover, #download-btn:hover {
+	background: #2de0ff22;
+	box-shadow: 0 0 24px 4px #2de0ffcc;
+	transform: translateY(-2px) scale(1.07);
 }
-.analysis-bubble.user {
-    background: linear-gradient(90deg, #2a4a2a 60%, #3a6a4a 100%);
-    color: #e0ffe0;
+#mic-btn:active, #download-btn:active {
+	background: #1a2233;
+	box-shadow: 0 0 8px 1px #2de0ff88;
+	transform: scale(0.97);
 }
-.analysis-bubble.error {
-    background: linear-gradient(90deg, #4a1a1a 60%, #6a2a2a 100%);
-    color: #ffd0d0;
+#mic-btn svg, #download-btn svg {
+	display: block;
 }
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 0.96; transform: translateY(0); }
+
+
+/* Neon Card Style for Synaptic Hub and Analysis */
+#synaptic-hub-card, .analysis-card, .clever-card {
+	position: fixed;
+	top: 30px;
+	right: 30px;
+	background: #151c24ee;
+	border-radius: 1em;
+	box-shadow: 0 0 32px 2px #2de0ff99, 0 0 0 2px #2de0ff44;
+	padding: 1.2em 2em;
+	z-index: 30;
+	min-width: 220px;
+	border: 2.5px solid #2de0ff;
+	transition: box-shadow 0.2s, border 0.2s;
+	color: #e0e6f0;
+}
+#synaptic-hub-card .hub-title {
+	font-size: 1.3em;
+	font-weight: 700;
+	color: #2de0ff;
+	margin-bottom: 0.7em;
+	letter-spacing: 0.04em;
+	text-shadow: 0 2px 8px #2de0ff33;
+}
+#synaptic-hub-card .hub-links {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+}
+#synaptic-hub-card .hub-links a {
+	color: #e0e6f0;
+	text-decoration: none;
+	font-size: 1.05em;
+	border-radius: 0.7em;
+	padding: 0.4em 0.8em;
+	transition: background 0.2s, color 0.2s;
+}
+#synaptic-hub-card .hub-links a:hover {
+	background: #2de0ff22;
+	color: #2de0ff;
+}
+
+/* Analysis and Clever cards (for chat/analysis info) */
+.analysis-card, .clever-card {
+	left: 30px;
+	right: auto;
+	top: auto;
+	bottom: 120px;
+	min-width: 260px;
+	max-width: 420px;
+	padding: 1.2em 1.5em;
+	font-size: 1.08em;
+	border-radius: 1em;
+	background: #151c24ee;
+	border: 2.5px solid #2de0ff;
+	box-shadow: 0 0 32px 2px #2de0ff99, 0 0 0 2px #2de0ff44;
+	color: #e0e6f0;
+}
+.clever-card {
+	top: 30px;
+	left: auto;
+	right: 30px;
+	bottom: auto;
+}
+
+
+/* Responsive Tweaks */
+@media (max-width: 600px) {
+	#input-bar {
+		min-width: 0;
+		max-width: 98vw;
+		padding: 0.3em 0.5em;
+	}
+	#synaptic-hub-card, .analysis-card, .clever-card {
+		top: 10px;
+		right: 10px;
+		left: 10px;
+		min-width: 120px;
+		padding: 0.7em 1em;
+	}
 }

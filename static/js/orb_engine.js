@@ -1,0 +1,213 @@
+// orb_engine.js - Core 3D engine for Clever UI
+// Three.js-based particle system with morph targets and 3D grid, CSS3D panels
+
+// --- Clever 3D UI Engine ---
+// Magical swarm, morphing, grid ripple, panel emergence, smooth enchanted transitions
+
+// Uses global THREE provided by /static/js/three-bridge.js (ES module)
+let scene, camera, renderer, cssRenderer, particleSystem, grid, fog;
+let morphTargets = {};
+let currentMorph = 'sphere';
+let morphProgress = 0;
+let morphDuration = 1.2; // seconds
+let morphStart, morphEnd, morphFrom, morphTo;
+const PARTICLE_COUNT = 1200;
+let positions, geometry;
+let gridRipple = {active: false, t: 0, origin: [0,0]};
+
+function init3D() {
+    // Scene and camera
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 18);
+    scene.fog = new THREE.FogExp2(0x0b0f14, 0.07);
+
+    // Renderer
+    if (!('WebGLRenderingContext' in window)) {
+        console.error('[Clever3D] WebGL not supported in this browser.');
+        return;
+    }
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setClearColor(0x0b0f14, 1);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.top = 0;
+    document.body.appendChild(renderer.domElement);
+
+    // CSS3DRenderer for panels
+    cssRenderer = new THREE.CSS3DRenderer();
+    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+    cssRenderer.domElement.style.position = 'absolute';
+    cssRenderer.domElement.style.top = 0;
+    cssRenderer.domElement.style.pointerEvents = 'none';
+    document.body.appendChild(cssRenderer.domElement);
+
+    // 3D Grid (holographic, rippling)
+    const gridGeo = new THREE.PlaneGeometry(40, 40, 20, 20);
+    const gridMat = new THREE.MeshBasicMaterial({ color: 0x69eacb, wireframe: true, opacity: 0.13, transparent: true });
+    grid = new THREE.Mesh(gridGeo, gridMat);
+    grid.rotation.x = -Math.PI/2;
+    grid.position.y = -6;
+    scene.add(grid);
+
+    // Particles (magical swarm)
+    geometry = new THREE.BufferGeometry();
+    positions = new Float32Array(PARTICLE_COUNT * 3);
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const material = new THREE.PointsMaterial({ color: 0x69eacb, size: 2.2, transparent: true, opacity: 0.9, sizeAttenuation: true, blending: THREE.AdditiveBlending, depthWrite: false });
+    particleSystem = new THREE.Points(geometry, material);
+    scene.add(particleSystem);
+
+    // Morph targets
+    morphTargets.sphere = createSphere(PARTICLE_COUNT, 5);
+    morphTargets.cube = createCube(PARTICLE_COUNT, 7);
+    morphTargets.torus = createTorus(PARTICLE_COUNT, 4, 1.5);
+    setMorph('sphere');
+
+    // Responsive
+    window.addEventListener('resize', onWindowResize);
+
+    animate();
+}
+
+function createSphere(count, radius) {
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+        const phi = Math.acos(2 * Math.random() - 1);
+        const theta = 2 * Math.PI * Math.random();
+        arr.push(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.sin(phi) * Math.sin(theta),
+            radius * Math.cos(phi)
+        );
+    }
+    return arr;
+}
+function createCube(count, size) {
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+        arr.push(
+            (Math.random() - 0.5) * size,
+            (Math.random() - 0.5) * size,
+            (Math.random() - 0.5) * size
+        );
+    }
+    return arr;
+}
+function createTorus(count, r, tube) {
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+        const u = Math.random() * 2 * Math.PI;
+        const v = Math.random() * 2 * Math.PI;
+        arr.push(
+            (r + tube * Math.cos(v)) * Math.cos(u),
+            (r + tube * Math.cos(v)) * Math.sin(u),
+            tube * Math.sin(v)
+        );
+    }
+    return arr;
+}
+
+function setMorph(target) {
+    morphFrom = geometry.attributes.position.array.slice();
+    morphTo = morphTargets[target];
+    morphStart = performance.now();
+    morphEnd = morphStart + morphDuration * 1000;
+    currentMorph = target;
+    morphProgress = 0;
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    // Morphing
+    if (morphTo && morphFrom) {
+        const now = performance.now();
+        morphProgress = Math.min(1, (now - morphStart) / (morphEnd - morphStart));
+        for (let i = 0; i < PARTICLE_COUNT * 3; i++) {
+            positions[i] = morphFrom[i] + (morphTo[i] - morphFrom[i]) * easeInOutCubic(morphProgress);
+        }
+        geometry.attributes.position.needsUpdate = true;
+    }
+    // Idle: magical stardust flow
+    if (!morphTo || morphProgress >= 1) {
+        for (let i = 0; i < PARTICLE_COUNT * 3; i+=3) {
+            positions[i+0] += Math.sin(performance.now()/900 + i) * 0.002;
+            positions[i+1] += Math.cos(performance.now()/1100 + i) * 0.002;
+            positions[i+2] += Math.sin(performance.now()/1300 + i) * 0.002;
+        }
+        geometry.attributes.position.needsUpdate = true;
+    }
+    // Grid ripple effect
+    if (gridRipple.active) {
+        gridRipple.t += 0.04;
+        let verts = grid.geometry.attributes.position;
+        for (let i = 0; i < verts.count; i++) {
+            let x = verts.getX(i), y = verts.getY(i), d = Math.sqrt(x*x + y*y);
+            let ripple = Math.sin(4*d - gridRipple.t*6) * Math.exp(-d*0.5 - gridRipple.t*1.2) * 0.7;
+            verts.setZ(i, ripple);
+        }
+        verts.needsUpdate = true;
+        if (gridRipple.t > 2.5) {
+            gridRipple.active = false;
+            for (let i = 0; i < verts.count; i++) verts.setZ(i, 0);
+            verts.needsUpdate = true;
+        }
+    }
+    renderer.render(scene, camera);
+    cssRenderer.render(scene, camera);
+}
+
+function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// --- Panel Emergence (CSS3D) ---
+function floatPanel(domId, x, y, z) {
+    // Make a DOM element float in 3D
+    const dom = document.getElementById(domId);
+    if (!dom) return;
+    dom.style.opacity = '0';
+    const obj = new THREE.CSS3DObject(dom);
+    obj.position.set(x, y, z);
+    scene.add(obj);
+    setTimeout(() => { dom.style.transition = 'opacity 0.7s cubic-bezier(.4,2,.6,1)'; dom.style.opacity = '1'; }, 100);
+    return obj;
+}
+
+// --- Event Hooks ---
+window.Clever3D = {
+    setMorph,
+    init3D,
+    gridRipple: function() {
+        gridRipple.active = true;
+        gridRipple.t = 0;
+    },
+    floatPanel
+};
+
+// Auto-init
+function tryStart() {
+    if (window.THREE && THREE.CSS3DRenderer) {
+        init3D();
+        return true;
+    }
+    return false;
+}
+
+// Start when DOM is ready and THREE is loaded (from the module bridge)
+window.addEventListener('DOMContentLoaded', () => {
+    if (!tryStart()) {
+        // Wait for bridge to finish loading
+        window.addEventListener('three-ready', tryStart, { once: true });
+    }
+});
+
+console.log('[Clever3D] orb_engine loaded; awaiting THREE bridge to init.');

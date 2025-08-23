@@ -1,3 +1,4 @@
+
 import os, time
 from datetime import datetime
 from pathlib import Path
@@ -7,7 +8,6 @@ from werkzeug.utils import secure_filename
 # ---------- Safe Mode ----------
 SAFE_MODE = False  # set False later to use your full NLP/DB stack
 
-# Optional imports (only when not in Safe Mode)
 if not SAFE_MODE:
     import config
     from database import db_manager
@@ -16,6 +16,38 @@ if not SAFE_MODE:
     from core_nlp_logic import upgrade_configurations, finalize_configurations
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
+
+# --- Capabilities route ---
+@app.get("/capabilities")
+def capabilities():
+    return jsonify({
+        "name": "Clever",
+        "role": "AI co-pilot and strategic thinking partner",
+        "mission": "Blend high-level intelligence with authentic, human-like interaction to amplify user potential and productivity.",
+        "operational_attributes": [
+            "Witty Intelligence",
+            "Intuitive Anticipation",
+            "Adaptive Genius",
+            "Empathetic Collaboration",
+            "Proactive Problem-Solving",
+            "Comprehensive Contextual Memory",
+            "Custom & Secure (offline only)",
+            "Mode Switching (curious, analytical, etc.)"
+        ],
+        "features": [
+            "Offline operation (no cloud, no tracking)",
+            "Animated starfield and 3D grid UI",
+            "Particle cloud centerpiece (breathing effect)",
+            "Responsive input and analysis log",
+            "Floating, auto-fading response panels",
+            "File ingestion and contextual analysis"
+        ],
+        "ui_style": {
+            "theme": "Dark, high-contrast space (deep blues, neon accents)",
+            "fonts": "Modern, crisp sans-serif",
+            "structure": "Minimalist, clean, advanced but welcoming"
+        }
+    }), 200
 
 # Upload dir
 UPLOAD_DIR = Path("uploads")
@@ -32,8 +64,7 @@ if not SAFE_MODE:
     try:
         upgrade_configurations()
         finalize_configurations()
-    import os
-    import time
+    except Exception as e:
         print(f"[WARN] upgrade/finalize failed: {e}")
     print("✅ Clever's NLP Core is Online.")
 
@@ -46,9 +77,11 @@ def index():
 def favicon():
     return app.send_static_file("img/favicon.svg")
 
+
 @app.get("/health")
 def health():
     return jsonify({"status": "ok"}), 200
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -66,6 +99,7 @@ def chat():
                 "intent": ["general"],
                 "sentiment": {"overall_mood": "neutral"},
                 "keywords": [{"word": w} for w in msg.split()[:3]],
+                "entities": [],
             }
             active_persona = "core"
             try:
@@ -80,9 +114,6 @@ def chat():
                 analysis = nlp_processor.process(msg)
                 reply = clever_persona.generate_response(analysis)
                 try:
-    @app.get("/health")
-    def health():
-        return jsonify({"status": "ok"}), 200
                     db_manager.add_conversation(msg, reply)
                 except Exception as e:
                     print(f"[WARN] DB persist failed: {e}")
@@ -90,17 +121,24 @@ def chat():
             except Exception as e:
                 print(f"[WARN] NLP pipeline failed: {e}")
                 reply = f"I heard: “{msg}”. (Fallback reply.)"
-                analysis = {"intent": ["general"], "sentiment": {"overall_mood": "neutral"}, "keywords": []}
+                analysis = {"intent": ["general"], "sentiment": {"overall_mood": "neutral"}, "keywords": [], "entities": []}
                 active_persona = "core"
+
+        # Extract key NLP fields for frontend
+        detected_intent = (analysis.get("intent") or ["general"])[0]
+        user_mood = (analysis.get("sentiment") or {}).get("overall_mood")
+        key_topics = [kw.get("word") for kw in (analysis.get("keywords") or [])[:3]]
+        entities = analysis.get("entities") or []
 
         return jsonify(
             reply=reply,
             analysis={
                 "user_input": msg,
                 "active_mode": "safe" if SAFE_MODE else "full",
-                "detected_intent": (analysis.get("intent") or ["general"])[0],
-                "user_mood": (analysis.get("sentiment") or {}).get("overall_mood"),
-                "key_topics": [kw.get("word") for kw in (analysis.get("keywords") or [])[:3]],
+                "detected_intent": detected_intent,
+                "user_mood": user_mood,
+                "key_topics": key_topics,
+                "entities": entities,
                 "full_nlp_analysis": analysis,
                 "activePersona": active_persona,
                 "responseTime": round((time.time() - start) * 1000),
