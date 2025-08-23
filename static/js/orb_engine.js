@@ -13,7 +13,7 @@ let morphDuration = 0.85; // faster transitions
 let morphStart, morphEnd, morphFrom, morphTo;
 const PARTICLE_COUNT = 8000; // more, thinner pixels
 let activeCount = PARTICLE_COUNT; // dynamic draw range for perf governor
-let positions, geometry;
+let positions, geometry, velocities;
 let gridRipple = {active: false, t: 0, origin: [0,0], strength: 0.8};
 
 // Swirl and dissolve states
@@ -77,14 +77,40 @@ function init3D() {
     // Particles (magical swarm)
     geometry = new THREE.BufferGeometry();
     positions = new Float32Array(PARTICLE_COUNT * 3);
+    velocities = new Float32Array(PARTICLE_COUNT * 3);
     // Seed initial particle positions with a small jitter so they are visible before morph completes
-    for (let i = 0; i < PARTICLE_COUNT * 3; i += 3) {
-        positions[i + 0] = (Math.random() - 0.5) * 0.2;
-        positions[i + 1] = (Math.random() - 0.5) * 0.2;
-        positions[i + 2] = (Math.random() - 0.5) * 0.2;
+    // Free-flowing cloud: wide cylinder above the grid, with gentle random drift
+    const R_MIN = 2.0, R_MAX = 9.5, H_HALF = 2.2;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = Math.sqrt(Math.random()) * (R_MAX - R_MIN) + R_MIN; // denser toward center but wide
+        const x = Math.cos(a) * r;
+        const z = Math.sin(a) * r;
+        const y = (Math.random() * 2 - 1) * H_HALF; // band above grid
+        const j = i * 3;
+        positions[j + 0] = x;
+        positions[j + 1] = y;
+        positions[j + 2] = z;
+        // small random drift
+        velocities[j + 0] = (Math.random() - 0.5) * 0.0035;
+        velocities[j + 1] = (Math.random() - 0.5) * 0.0030;
+        velocities[j + 2] = (Math.random() - 0.5) * 0.0035;
     }
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    particleMaterial = new THREE.PointsMaterial({ color: 0x69eacb, size: 0.75, transparent: true, opacity: 0.9, sizeAttenuation: true, blending: THREE.AdditiveBlending, depthWrite: false });
+    // Soft circular sprite to prevent solid fill and keep airy “pixels”
+    const spriteTex = makeSpriteTexture();
+    particleMaterial = new THREE.PointsMaterial({
+        color: 0x69eacb,
+        size: 0.65,
+        transparent: true,
+        opacity: 0.6,
+        sizeAttenuation: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        map: spriteTex,
+        alphaMap: spriteTex,
+        alphaTest: 0.08
+    });
     original.material.blending = THREE.AdditiveBlending;
     original.material.size = particleMaterial.size; // ensure pixel mode restore uses actual
     currentColor = new THREE.Color(0x69eacb);
@@ -94,10 +120,11 @@ function init3D() {
     scene.add(particleSystem);
 
     // Morph targets
-    morphTargets.sphere = createSphere(PARTICLE_COUNT, 5);
+    morphTargets.sphere = createSphere(PARTICLE_COUNT, 5.8); // spread slightly to avoid solid fill
     morphTargets.cube = createCube(PARTICLE_COUNT, 7);
     morphTargets.torus = createTorus(PARTICLE_COUNT, 4, 1.5);
-    setMorph('sphere');
+    // Start in free-flow; forms are summoned on command
+    // setMorph('sphere');
 
     // Responsive
     window.addEventListener('resize', onWindowResize);
@@ -114,6 +141,26 @@ function init3D() {
     }, 800);
 
     animate();
+}
+
+// Build a soft circular sprite texture for point rendering
+function makeSpriteTexture() {
+    const c = document.createElement('canvas');
+    const S = 64; c.width = c.height = S;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(S/2, S/2, 0, S/2, S/2, S/2);
+    g.addColorStop(0.0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.5, 'rgba(255,255,255,0.6)');
+    g.addColorStop(1.0, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(S/2, S/2, S/2, 0, Math.PI*2);
+    ctx.fill();
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.needsUpdate = true;
+    return tex;
 }
 
 function createSphere(count, radius) {
@@ -222,13 +269,37 @@ function animate() {
         }
         geometry.attributes.position.needsUpdate = true;
     }
-    // Idle: magical stardust flow
+    // Idle: free-flowing stardust with gentle drift and soft bounds
     if (!morphTo || morphProgress >= 1) {
+        const dt = Math.min(0.033, Math.max(0.001, (1000 / Math.max(1, (1000 / Math.max(1, 1000)))))); // cap unused fallback
+        // use measured frame delta
+        const dtMs = perf.last ? (now - perf.last) : 16.6;
+        const dtSec = Math.min(0.033, Math.max(0.001, dtMs / 1000));
+        const WIND = 0.002;
+        const RAD_MAX = 11.5, RAD_MIN = 1.4, Y_MAX = 2.6, Y_MIN = -2.6;
         for (let i = 0; i < activeCount * 3; i+=3) {
-            const targetY = -2.2; // play near the grid band
-            positions[i+0] += Math.sin(now/850 + i) * 0.0018;
-            positions[i+1] += (targetY - positions[i+1]) * 0.0025 + Math.cos(now/980 + i) * 0.0016;
-            positions[i+2] += Math.sin(now/1150 + i) * 0.0019;
+            // base drift
+            positions[i+0] += velocities[i+0];
+            positions[i+1] += velocities[i+1];
+            positions[i+2] += velocities[i+2];
+            // time-varying "wind" field (smooth sinusoidal nudges)
+            positions[i+0] += Math.sin(now/1200 + i*0.013) * WIND * dtSec;
+            positions[i+2] += Math.cos(now/1500 + i*0.017) * WIND * dtSec;
+            positions[i+1] += Math.sin(now/1800 + i*0.011) * (WIND*0.6) * dtSec;
+            // soft centripetal + expansion to avoid clumping
+            const x = positions[i], z = positions[i+2];
+            const r = Math.hypot(x, z) + 1e-6;
+            const outward = 0.0006 * (1 - Math.min(1, (r - RAD_MIN) / (RAD_MAX - RAD_MIN)));
+            positions[i+0] += (x / r) * outward;
+            positions[i+2] += (z / r) * outward;
+            // soft vertical bounds
+            if (positions[i+1] > Y_MAX) velocities[i+1] -= 0.0008; else if (positions[i+1] < Y_MIN) velocities[i+1] += 0.0008;
+            // soft radial bounds
+            if (r > RAD_MAX) { positions[i+0] *= 0.998; positions[i+2] *= 0.998; }
+            // gentle damping to keep motion calm
+            velocities[i+0] *= 0.995;
+            velocities[i+1] *= 0.995;
+            velocities[i+2] *= 0.995;
         }
         geometry.attributes.position.needsUpdate = true;
     }
