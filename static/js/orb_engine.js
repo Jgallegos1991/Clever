@@ -80,13 +80,14 @@ function init3D() {
     velocities = new Float32Array(PARTICLE_COUNT * 3);
     // Seed initial particle positions with a small jitter so they are visible before morph completes
     // Free-flowing cloud: wide cylinder above the grid, with gentle random drift
-    const R_MIN = 2.0, R_MAX = 9.5, H_HALF = 2.2;
+        const R_MIN = 2.0, R_MAX = 10.5;
+        const Y_MID = -4.5, Y_HALF = 0.9;
     for (let i = 0; i < PARTICLE_COUNT; i++) {
         const a = Math.random() * Math.PI * 2;
         const r = Math.sqrt(Math.random()) * (R_MAX - R_MIN) + R_MIN; // denser toward center but wide
         const x = Math.cos(a) * r;
         const z = Math.sin(a) * r;
-        const y = (Math.random() * 2 - 1) * H_HALF; // band above grid
+            const y = Y_MID + (Math.random() * 2 - 1) * Y_HALF; // hover above the grid band
         const j = i * 3;
         positions[j + 0] = x;
         positions[j + 1] = y;
@@ -101,9 +102,9 @@ function init3D() {
     const spriteTex = makeSpriteTexture();
     particleMaterial = new THREE.PointsMaterial({
         color: 0x69eacb,
-        size: 0.65,
+        size: 0.5,
         transparent: true,
-        opacity: 0.6,
+        opacity: 0.55,
         sizeAttenuation: true,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
@@ -275,17 +276,19 @@ function animate() {
         // use measured frame delta
         const dtMs = perf.last ? (now - perf.last) : 16.6;
         const dtSec = Math.min(0.033, Math.max(0.001, dtMs / 1000));
-        const WIND = 0.002;
-        const RAD_MAX = 11.5, RAD_MIN = 1.4, Y_MAX = 2.6, Y_MIN = -2.6;
+            const WIND = 0.0018;
+            const RAD_MAX = 12.0, RAD_MIN = 1.4, Y_MID = -4.5, Y_HALF = 1.1;
+            const Y_MAX = Y_MID + Y_HALF, Y_MIN = Y_MID - Y_HALF;
         for (let i = 0; i < activeCount * 3; i+=3) {
             // base drift
             positions[i+0] += velocities[i+0];
             positions[i+1] += velocities[i+1];
             positions[i+2] += velocities[i+2];
             // time-varying "wind" field (smooth sinusoidal nudges)
-            positions[i+0] += Math.sin(now/1200 + i*0.013) * WIND * dtSec;
-            positions[i+2] += Math.cos(now/1500 + i*0.017) * WIND * dtSec;
-            positions[i+1] += Math.sin(now/1800 + i*0.011) * (WIND*0.6) * dtSec;
+                positions[i+0] += Math.sin(now/1200 + i*0.013) * WIND * dtSec;
+                positions[i+2] += Math.cos(now/1500 + i*0.017) * WIND * dtSec;
+                // attract softly toward grid band
+                positions[i+1] += (Y_MID - positions[i+1]) * 0.0008 + Math.sin(now/1800 + i*0.011) * (WIND*0.5) * dtSec;
             // soft centripetal + expansion to avoid clumping
             const x = positions[i], z = positions[i+2];
             const r = Math.hypot(x, z) + 1e-6;
@@ -338,6 +341,15 @@ function animate() {
             for (let i = 0; i < verts.count; i++) verts.setZ(i, 0);
             verts.needsUpdate = true;
         }
+        } else {
+            // occasionally pulse a gentle ripple automatically
+            if (!window.__cleverAmbientRipple) window.__cleverAmbientRipple = { cooldown: 1200 + Math.random()*1200 };
+            const dtMs = perf.last ? (now - perf.last) : 16.6;
+            window.__cleverAmbientRipple.cooldown -= dtMs;
+            if (window.__cleverAmbientRipple.cooldown <= 0) {
+                gridRipple.active = true; gridRipple.t = 0; gridRipple.strength = 0.25;
+                window.__cleverAmbientRipple.cooldown = 1800 + Math.random()*1400;
+            }
     }
     renderer.render(scene, camera);
     cssRenderer.render(scene, camera);

@@ -173,9 +173,8 @@ body {
 
 /* Floating panel fallback (used when spawning transient UI cards) */
 .floating-panel {
-	position: fixed;
-	right: 30px;
-	bottom: 120px;
+	position: relative;
+	margin-top: 12px;
 	background: #151c24ee;
 	border: 1.5px solid #2de0ff88;
 	border-radius: 12px;
@@ -189,6 +188,16 @@ body {
 	backdrop-filter: blur(8px) saturate(1.05);
 	white-space: normal;
 	line-height: 1.35;
+}
+.panel-stack {
+	position: fixed;
+	right: 30px;
+	bottom: 120px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	z-index: 40;
+	max-width: 50vw;
 }
 .floating-panel .panel-main {
 	font-size: 1.02em;
