@@ -1,3 +1,7 @@
+# Compatibility wrapper for legacy code
+def process_text(nlp_model, text):
+    """Wrapper for process_text_input for backward compatibility."""
+    return process_text_input(nlp_model, text)
 import os
 import spacy
 

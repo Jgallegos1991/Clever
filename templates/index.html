@@ -5,17 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clever</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script type="module" src="/static/js/three-bridge.js"></script>
 </head>
 <body>
-    <canvas id="starfield"></canvas>
-    <canvas id="farGrid"></canvas>
-    <canvas id="nearGrid"></canvas>
-    <div id="cloud-center">
-        <canvas id="particleCloud"></canvas>
-        <input id="mainInput" type="text" autocomplete="off" placeholder="Type your message..." style="opacity:0;pointer-events:none;" />
+    <!-- 3D scene and CSS3D panels will be injected by orb_engine.js -->
+    <div id="synaptic-hub-card" class="css3d-panel">
+        <div class="hub-title">Synaptic Hub</div>
+        <div class="hub-links">
+            <a href="/generator_page">Output Generator</a>
+            <a href="/projects_page">Active Projects</a>
+        </div>
     </div>
-    <div id="analysis-panel"></div>
-    <script src="/static/js/background_particles.js"></script>
+    <div id="input-bar">
+        <input id="mainInput" type="text" autocomplete="off" placeholder="Talk to Clever..." />
+        <button id="mic-btn" title="Voice Input"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke="#2de0ff" stroke-width="2" fill="none"/><rect x="10" y="8" width="4" height="8" rx="2" fill="#2de0ff"/></svg></button>
+        <button id="download-btn" title="Download/Upload"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5v14m0 0l-5-5m5 5l5-5" stroke="#2de0ff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <!-- Offline/local callout is injected by JS -->
+    <script src="/static/js/orb_engine.js"></script>
     <script src="/static/js/ui.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
