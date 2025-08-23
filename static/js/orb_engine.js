@@ -15,6 +15,10 @@ const PARTICLE_COUNT = 1200;
 let positions, geometry;
 let gridRipple = {active: false, t: 0, origin: [0,0]};
 
+// Swirl and dissolve states
+let swirl = { active: false, start: 0, duration: 600, strength: 0.06 };
+let dissolve = { active: false, start: 0, duration: 900 };
+
 function init3D() {
     // Scene and camera
     scene = new THREE.Scene();
@@ -137,12 +141,31 @@ function setMorph(target) {
 
 function animate() {
     requestAnimationFrame(animate);
+    const now = performance.now();
+    
+    // Pre-morph swirl: accelerate and rotate the swarm inward before condensing
+    if (swirl.active) {
+        const p = Math.min(1, (now - swirl.start) / swirl.duration);
+        for (let i = 0; i < PARTICLE_COUNT * 3; i += 3) {
+            const x = positions[i], y = positions[i+1];
+            // rotate around Z and pull slightly to center
+            const angle = Math.atan2(y, x) + swirl.strength * (1.2 - p);
+            const radius = Math.sqrt(x*x + y*y) * (0.99 - 0.15 * (1 - p));
+            positions[i]   = Math.cos(angle) * radius;
+            positions[i+1] = Math.sin(angle) * radius;
+            // gentle z wobble
+            positions[i+2] += Math.sin((i + now)/900) * 0.003;
+        }
+        geometry.attributes.position.needsUpdate = true;
+        if (p >= 1) swirl.active = false;
+    }
+    
     // Morphing
     if (morphTo && morphFrom) {
-        const now = performance.now();
         morphProgress = Math.min(1, (now - morphStart) / (morphEnd - morphStart));
+        const ease = easeInOutCubic(morphProgress);
         for (let i = 0; i < PARTICLE_COUNT * 3; i++) {
-            positions[i] = morphFrom[i] + (morphTo[i] - morphFrom[i]) * easeInOutCubic(morphProgress);
+            positions[i] = morphFrom[i] + (morphTo[i] - morphFrom[i]) * ease;
         }
         geometry.attributes.position.needsUpdate = true;
     }
@@ -154,6 +177,26 @@ function animate() {
             positions[i+2] += Math.sin(performance.now()/1300 + i) * 0.002;
         }
         geometry.attributes.position.needsUpdate = true;
+    }
+
+    // Dissolve effect: shimmer and expand, then return to idle
+    if (dissolve.active) {
+        const pd = Math.min(1, (now - dissolve.start) / dissolve.duration);
+        const pulse = 0.6 + 0.4 * Math.sin(now / 80);
+        particleSystem.material.opacity = 0.9 * pulse;
+        for (let i = 0; i < PARTICLE_COUNT * 3; i += 3) {
+            const nx = (Math.random() - 0.5) * 0.02;
+            const ny = (Math.random() - 0.5) * 0.02;
+            const nz = (Math.random() - 0.5) * 0.02;
+            positions[i]   += nx * (0.5 + pd);
+            positions[i+1] += ny * (0.5 + pd);
+            positions[i+2] += nz * (0.5 + pd);
+        }
+        geometry.attributes.position.needsUpdate = true;
+        if (pd >= 1) {
+            dissolve.active = false;
+            particleSystem.material.opacity = 0.9;
+        }
     }
     // Grid ripple effect
     if (gridRipple.active) {
@@ -203,6 +246,16 @@ function floatPanel(domId, x, y, z) {
 window.Clever3D = {
     setMorph,
     init3D,
+    // Summon: swirl then condense to a sphere
+    summon: function() {
+        swirl.active = true; swirl.start = performance.now();
+        setTimeout(() => setMorph('sphere'), swirl.duration - 50);
+        gridRipple.active = true; gridRipple.t = 0;
+    },
+    // Dissolve: shimmer and merge back to swarm
+    dissolve: function() {
+        dissolve.active = true; dissolve.start = performance.now();
+    },
     gridRipple: function() {
         gridRipple.active = true;
         gridRipple.t = 0;

@@ -20,6 +20,20 @@
             window.CleverUI.pushLog('Clever', `Ideas crystallizing as a ${shape}...`);
             return;
         }
+        // Summon command
+        if (/\b(summon|appear|manifest)\b/i.test(msg)) {
+            window.Clever3D.summon();
+            window.CleverUI.showMicrocopy('Energy gathers…');
+            window.CleverUI.pushLog('Clever', 'Energy gathers…');
+            return;
+        }
+        // Dissolve command
+        if (/\b(dissolve|dismiss|vanish)\b/i.test(msg)) {
+            window.Clever3D.dissolve();
+            window.CleverUI.showMicrocopy('Forms return to the flow.');
+            window.CleverUI.pushLog('Clever', 'Forms return to the flow.');
+            return;
+        }
         // Summon microcopy
         window.CleverUI.showMicrocopy('Energy takes shape.');
         fetch('/chat', {
