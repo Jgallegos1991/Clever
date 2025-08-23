@@ -80,7 +80,16 @@ def favicon():
 
 @app.get("/health")
 def health():
-    return jsonify({"status": "ok"}), 200
+    details = {"status": "ok"}
+    try:
+        if not SAFE_MODE:
+            details.update({
+                "db": "up" if getattr(db_manager, 'conn', None) else "down",
+                "nlp": "loaded" if getattr(nlp_processor, 'nlp', None) else "missing",
+            })
+    except Exception as _:
+        pass
+    return jsonify(details), 200
 
 
 @app.route("/chat", methods=["POST"])
@@ -171,12 +180,9 @@ def ingest():
                 content = f"[binary file] {filename} ({path.stat().st_size} bytes)"
 
         if not SAFE_MODE:
-            # Your DB wants (filepath, content)
+            # Persist file into the knowledge base
             try:
-                db_manager.add_source(str(path), content)
-            except TypeError:
-                # fallback to legacy signature
-                db_manager.add_source(content)
+                db_manager.add_source(filename, str(path), content)
             except Exception as e:
                 print(f"[WARN] add_source failed: {e}")
 
