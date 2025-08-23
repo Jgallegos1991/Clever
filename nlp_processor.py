@@ -19,16 +19,18 @@ nltk.data.path.append(NLTK_DATA_PATH)
 
 def _download_nltk_data():
     """Checks for and downloads necessary NLTK corpora to a persistent location."""
-    nltk_packages = ["vader_lexicon", "punkt", "stopwords"]
+    nltk_packages = ["vader_lexicon", "punkt", "punkt_tab", "stopwords"]
     for package in nltk_packages:
         try:
             # A more robust check for different data types
             if package == "vader_lexicon":
-                nltk.data.find(f'sentiment/{package}.zip')
+                nltk.data.find('sentiment/vader_lexicon')
             elif package == "punkt":
-                 nltk.data.find(f'tokenizers/{package}.zip')
+                nltk.data.find('tokenizers/punkt')
+            elif package == "punkt_tab":
+                nltk.data.find('tokenizers/punkt_tab')
             elif package == "stopwords":
-                 nltk.data.find(f'corpora/{package}.zip')
+                nltk.data.find('corpora/stopwords')
         except LookupError:
             print(f"Downloading missing NLTK data: {package}...")
             nltk.download(package, quiet=True, download_dir=NLTK_DATA_PATH)
@@ -55,28 +57,27 @@ class UnifiedNLPProcessor:
         if not text or not self.nlp:
             return {"error": "Invalid input or NLP not loaded"}
 
-        # --- THIS IS THE ONE-LINE CHANGE ---
-        # 1. Use core_nlp_logic, passing the loaded spaCy model for efficiency.
-        core_analysis = core_nlp_logic.process_text(text, self.nlp)
-        
-        is_core_command = core_analysis and core_analysis.get('intent') not in ['chat', 'error', 'small_talk_greeting']
+        # 1) Core intent spotting (commands, questions)
+        core_analysis = core_nlp_logic.process_text(self.nlp, text) or {}
+        core_intent = core_analysis.get('intent')
+        is_core_command = bool(core_intent) and core_intent not in ['chat', 'error', 'small_talk_greeting']
 
-        # 2. Perform comprehensive analysis from this module.
+        # 2) Full NLP analysis
         doc = self.nlp(text)
         tokens = [token.text for token in doc]
         
-        # 3. Determine the final intent.
+        # 3) Determine the final intent
         final_intent = []
         if is_core_command:
             # Prioritize the specific command intent.
-            final_intent = [core_analysis.get('intent')]
+            final_intent = [core_intent]
         else:
             # If no command, use the broader intent detection.
             # We also check the core_analysis for a greeting.
-            if core_analysis.get('intent') == 'small_talk_greeting':
-                 final_intent = ['greeting']
+            if core_intent == 'small_talk_greeting':
+                final_intent = ['greeting']
             else:
-                 final_intent = self._detect_general_intent(text)
+                final_intent = self._detect_general_intent(text)
 
         analysis = {
             "original_text": text,
@@ -209,5 +210,4 @@ class UnifiedNLPProcessor:
         
         return "neutral_and_helpful"
 
-# --- This allows the file to be used by app.py by creating a default instance ---
-nlp_processor = UnifiedNLPProcessor()
+# Do not instantiate at import time to avoid duplicate model loads

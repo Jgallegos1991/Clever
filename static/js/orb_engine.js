@@ -20,7 +20,7 @@ function init3D() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
     camera.position.set(0, 0, 18);
-    scene.fog = new THREE.FogExp2(0x0b0f14, 0.07);
+    scene.fog = new THREE.FogExp2(0x0b0f14, 0.02);
 
     // Renderer
     if (!('WebGLRenderingContext' in window)) {
@@ -54,6 +54,12 @@ function init3D() {
     // Particles (magical swarm)
     geometry = new THREE.BufferGeometry();
     positions = new Float32Array(PARTICLE_COUNT * 3);
+    // Seed initial particle positions with a small jitter so they are visible before morph completes
+    for (let i = 0; i < PARTICLE_COUNT * 3; i += 3) {
+        positions[i + 0] = (Math.random() - 0.5) * 0.2;
+        positions[i + 1] = (Math.random() - 0.5) * 0.2;
+        positions[i + 2] = (Math.random() - 0.5) * 0.2;
+    }
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const material = new THREE.PointsMaterial({ color: 0x69eacb, size: 2.2, transparent: true, opacity: 0.9, sizeAttenuation: true, blending: THREE.AdditiveBlending, depthWrite: false });
     particleSystem = new THREE.Points(geometry, material);
@@ -67,6 +73,17 @@ function init3D() {
 
     // Responsive
     window.addEventListener('resize', onWindowResize);
+
+    // Kick a subtle grid ripple so the stage feels alive
+    gridRipple.active = true;
+    gridRipple.t = 0;
+
+    // Showcase the hub panel shortly after init
+    setTimeout(() => {
+        if (window.Clever3D && typeof window.Clever3D.floatPanel === 'function') {
+            window.Clever3D.floatPanel('synaptic-hub-card', 10, 6, 0);
+        }
+    }, 800);
 
     animate();
 }
