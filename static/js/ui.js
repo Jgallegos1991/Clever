@@ -77,8 +77,8 @@
             el.style.top = '12%';
             el.style.transform = 'translate(-50%,0)';
             el.style.fontSize = '1.3em';
-            el.style.color = '#69EACB';
-            el.style.textShadow = '0 0 16px #69EACB88, 0 0 32px #FF6BFF44';
+            el.style.color = '#9be7ff';
+            el.style.textShadow = '0 0 10px #69EACB66, 0 0 20px #FF6BFF33';
             el.style.opacity = '0';
             el.style.pointerEvents = 'none';
             el.style.transition = 'opacity 0.7s cubic-bezier(.4,2,.6,1)';

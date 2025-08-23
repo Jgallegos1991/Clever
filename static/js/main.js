@@ -70,8 +70,14 @@
                 // Dialogue microcopy
                 window.CleverUI.showMicrocopy('Your thought enters the flow.');
                 // Grid ripple and magical panel emergence
-                window.Clever3D.gridRipple();
+                window.Clever3D.gridRippleStrong && window.Clever3D.gridRippleStrong();
                 window.Clever3D.floatPanel('synaptic-hub-card', 10, 6, 0);
+                // Mood-based color shift
+                try {
+                    const mood = data.analysis?.user_mood;
+                    const emo = data.analysis?.full_nlp_analysis?.primary_emotion;
+                    if (window.Clever3D.setMood && mood) window.Clever3D.setMood(mood, emo);
+                } catch (_) {}
             } else if (data.error) {
                 window.CleverUI.pushLog('Error', data.error || 'Unknown error from backend.');
             }
