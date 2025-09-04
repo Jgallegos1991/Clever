@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Projects - Clever</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.webmanifest">
+    <meta name="theme-color" content="#0B0F14">
+    <script type="module" src="/static/js/three-bridge.js"></script>
+</head>
+<body>
+    <script>
+    // If THREE bridge doesn't fire quickly, enable accessible fallback
+    (function(){
+        const timer = setTimeout(() => document.body.classList.add('no-3d'), 1800);
+        window.addEventListener('three-ready', () => { clearTimeout(timer); document.body.classList.remove('no-3d'); }, { once:true });
+    })();
+    </script>
+    
+    <!-- Navigation panel -->
+    <div id="nav-panel" class="css3d-panel">
+        <div class="hub-title">Active Projects</div>
+        <div class="hub-links">
+            <a href="/">← Back to Hub</a>
+            <a href="/generator_page">Output Generator</a>
+        </div>
+    </div>
+
+    <!-- Projects Overview -->
+    <div id="projects-overview" class="css3d-panel">
+        <div class="panel-title">Project Dashboard</div>
+        <div class="projects-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalProjects">0</div>
+                <div class="stat-label">Total Projects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeProjects">0</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedProjects">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project List -->
+    <div id="projects-list" class="css3d-panel">
+        <div class="panel-title">Current Projects</div>
+        <div class="project-controls">
+            <button id="addProjectBtn" class="action-btn">+ New Project</button>
+            <select id="filterStatus">
+                <option value="all">All Projects</option>
+                <option value="planning">Planning</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="paused">Paused</option>
+            </select>
+        </div>
+        <div id="projectsList" class="projects-container">
+            <!-- Projects will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div id="addProjectModal" class="modal" style="display: none;">
+        <div class="modal-content css3d-panel">
+            <div class="modal-header">
+                <div class="panel-title">Create New Project</div>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label for="projectName">Project Name:</label>
+                    <input type="text" id="projectName" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectDescription">Description:</label>
+                    <textarea id="projectDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="projectStatus">Status:</label>
+                    <select id="projectStatus">
+                        <option value="planning">Planning</option>
+                        <option value="active">Active</option>
+                        <option value="paused">Paused</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="projectPriority">Priority:</label>
+                    <select id="projectPriority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="action-btn">Create Project</button>
+                    <button type="button" id="cancelBtn" class="action-btn secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/orb_engine.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script>
+    // Projects functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        let projects = JSON.parse(localStorage.getItem('cleverProjects') || '[]');
+
+        // Initialize sample projects if none exist
+        if (projects.length === 0) {
+            projects = [
+                {
+                    id: '1',
+                    name: 'Clever AI Enhancement',
+                    description: 'Improving the UI and adding new features to the Clever AI system',
+                    status: 'active',
+                    priority: 'high',
+                    created: new Date('2025-01-01').toISOString(),
+                    updated: new Date().toISOString()
+                },
+                {
+                    id: '2',
+                    name: 'Synaptic Hub Documentation',
+                    description: 'Creating comprehensive documentation for the Synaptic Hub platform',
+                    status: 'planning',
+                    priority: 'medium',
+                    created: new Date('2025-01-15').toISOString(),
+                    updated: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem('cleverProjects', JSON.stringify(projects));
+        }
+
+        const addProjectBtn = document.getElementById('addProjectBtn');
+        const addProjectModal = document.getElementById('addProjectModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const projectForm = document.getElementById('projectForm');
+        const filterStatus = document.getElementById('filterStatus');
+
+        function updateStats() {
+            const total = projects.length;
+            const active = projects.filter(p => p.status === 'active').length;
+            const completed = projects.filter(p => p.status === 'completed').length;
+            
+            document.getElementById('totalProjects').textContent = total;
+            document.getElementById('activeProjects').textContent = active;
+            document.getElementById('completedProjects').textContent = completed;
+        }
+
+        function renderProjects(filter = 'all') {
+            const filteredProjects = filter === 'all' ? projects : projects.filter(p => p.status === filter);
+            const projectsList = document.getElementById('projectsList');
+            
+            if (filteredProjects.length === 0) {
+                projectsList.innerHTML = '<div class="no-projects">No projects found. Create your first project!</div>';
+                return;
+            }
+
+            projectsList.innerHTML = filteredProjects.map(project => `
+                <div class="project-card" data-id="${project.id}">
+                    <div class="project-header">
+                        <h3 class="project-name">${project.name}</h3>
+                        <span class="project-status status-${project.status}">${project.status}</span>
+                    </div>
+                    <div class="project-description">${project.description}</div>
+                    <div class="project-meta">
+                        <span class="priority priority-${project.priority}">Priority: ${project.priority}</span>
+                        <span class="updated">Updated: ${new Date(project.updated).toLocaleDateString()}</span>
+                    </div>
+                    <div class="project-actions">
+                        <button class="action-btn small" onclick="editProject('${project.id}')">Edit</button>
+                        <button class="action-btn small secondary" onclick="deleteProject('${project.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Event listeners
+        addProjectBtn.addEventListener('click', () => {
+            addProjectModal.style.display = 'block';
+        });
+
+        closeModal.addEventListener('click', () => {
+            addProjectModal.style.display = 'none';
+            projectForm.reset();
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            addProjectModal.style.display = 'none';
+            projectForm.reset();
+        });
+
+        filterStatus.addEventListener('change', (e) => {
+            renderProjects(e.target.value);
+        });
+
+        projectForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newProject = {
+                id: Date.now().toString(),
+                name: document.getElementById('projectName').value,
+                description: document.getElementById('projectDescription').value,
+                status: document.getElementById('projectStatus').value,
+                priority: document.getElementById('projectPriority').value,
+                created: new Date().toISOString(),
+                updated: new Date().toISOString()
+            };
+
+            projects.push(newProject);
+            localStorage.setItem('cleverProjects', JSON.stringify(projects));
+            
+            addProjectModal.style.display = 'none';
+            projectForm.reset();
+            
+            updateStats();
+            renderProjects(filterStatus.value);
+        });
+
+        // Global functions for project actions
+        window.editProject = function(id) {
+            const project = projects.find(p => p.id === id);
+            if (project) {
+                // Fill form with existing data
+                document.getElementById('projectName').value = project.name;
+                document.getElementById('projectDescription').value = project.description;
+                document.getElementById('projectStatus').value = project.status;
+                document.getElementById('projectPriority').value = project.priority;
+                
+                // Remove the project and show modal for editing
+                projects = projects.filter(p => p.id !== id);
+                addProjectModal.style.display = 'block';
+            }
+        };
+
+        window.deleteProject = function(id) {
+            if (confirm('Are you sure you want to delete this project?')) {
+                projects = projects.filter(p => p.id !== id);
+                localStorage.setItem('cleverProjects', JSON.stringify(projects));
+                updateStats();
+                renderProjects(filterStatus.value);
+            }
+        };
+
+        // Initialize
+        updateStats();
+        renderProjects();
+    });
+    </script>
+
+    <script>
+    // Register service worker for PWA install
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+    }
+    </script>
+</body>
+</html>

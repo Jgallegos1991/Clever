@@ -150,6 +150,9 @@ def chat():
         key_topics = [kw.get("word") for kw in (analysis.get("keywords") or [])[:3]]
         entities = analysis.get("entities") or []
 
+        # Enhanced response for UI feedback
+        response_time_ms = round((time.time() - start) * 1000)
+        
         return jsonify(
             reply=reply,
             analysis={
@@ -161,11 +164,32 @@ def chat():
                 "entities": entities,
                 "full_nlp_analysis": analysis,
                 "activePersona": active_persona,
-                "responseTime": round((time.time() - start) * 1000),
+                "responseTime": response_time_ms,
             },
+            ui_state={
+                "orb_mood": user_mood or "neutral",
+                "orb_activity": "processing" if response_time_ms > 500 else "active",
+                "particle_color": get_mood_color(user_mood),
+                "grid_intensity": min(1.0, response_time_ms / 1000),
+            }
         )
     except Exception as e:
         return jsonify(ok=False, error=str(e)), 500
+
+
+def get_mood_color(mood):
+    """Convert mood to particle color for magical UI effects"""
+    mood_colors = {
+        "positive": "#00ff88",
+        "negative": "#ff4444", 
+        "neutral": "#2de0ff",
+        "excited": "#ff8800",
+        "calm": "#88ccff",
+        "curious": "#cc88ff",
+        "analytical": "#ffcc00"
+    }
+    return mood_colors.get(mood, "#2de0ff")
+
 
 @app.route("/ingest", methods=["POST"])
 def ingest():
@@ -216,6 +240,61 @@ def projects_page():
     if t.exists():
         return render_template("projects.html")
     return render_template_string("<h1>Active Projects</h1><p>Coming soon.</p>")
+
+
+@app.route("/api/system_status")
+def system_status():
+    """Provide real-time system status for UI particle effects"""
+    try:
+        status = {
+            "timestamp": datetime.now().isoformat(),
+            "mode": "safe" if SAFE_MODE else "full",
+            "orb_state": "idle",
+            "particle_count": 150,
+            "grid_activity": 0.3,
+            "ai_mood": "ready",
+            "system_health": "optimal"
+        }
+        
+        if not SAFE_MODE:
+            # Add more detailed status when full system is active
+            try:
+                status.update({
+                    "db_status": "connected" if getattr(db_manager, 'conn', None) else "disconnected",
+                    "nlp_status": "loaded" if getattr(nlp_processor, 'nlp', None) else "missing",
+                    "persona_active": hasattr(clever_persona, 'last_used_trait'),
+                })
+            except Exception:
+                pass
+                
+        return jsonify(status)
+    except Exception as e:
+        return jsonify({"error": str(e), "status": "error"}), 500
+
+
+@app.route("/api/orb_pulse", methods=["POST"])
+def orb_pulse():
+    """Trigger visual orb reactions for specific events"""
+    try:
+        data = request.get_json() or {}
+        pulse_type = data.get("type", "default")
+        intensity = data.get("intensity", 0.5)
+        
+        # Define pulse patterns for different events
+        pulse_patterns = {
+            "thinking": {"color": "#ffcc00", "pattern": "pulse", "duration": 2000},
+            "processing": {"color": "#2de0ff", "pattern": "ripple", "duration": 1500},
+            "success": {"color": "#00ff88", "pattern": "burst", "duration": 1000},
+            "error": {"color": "#ff4444", "pattern": "shake", "duration": 800},
+            "greeting": {"color": "#cc88ff", "pattern": "wave", "duration": 1200},
+        }
+        
+        pattern = pulse_patterns.get(pulse_type, pulse_patterns["thinking"])
+        pattern["intensity"] = min(1.0, max(0.1, intensity))
+        
+        return jsonify({"pulse_pattern": pattern, "status": "triggered"})
+    except Exception as e:
+        return jsonify({"error": str(e)}, 500)
 
 # ---------- Run ----------
 if __name__ == "__main__":
