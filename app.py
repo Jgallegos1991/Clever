@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, render_template, render_template_stri
 from werkzeug.utils import secure_filename
 
 # ---------- Safe Mode ----------
-SAFE_MODE = False  # set False later to use your full NLP/DB stack
+SAFE_MODE = True  # set False later to use your full NLP/DB stack
 
 if not SAFE_MODE:
     import config
