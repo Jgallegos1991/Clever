@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Output Generator - Clever</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.webmanifest">
+    <meta name="theme-color" content="#0B0F14">
+    <script type="module" src="/static/js/three-bridge.js"></script>
+</head>
+<body>
+    <script>
+    // If THREE bridge doesn't fire quickly, enable accessible fallback
+    (function(){
+        const timer = setTimeout(() => document.body.classList.add('no-3d'), 1800);
+        window.addEventListener('three-ready', () => { clearTimeout(timer); document.body.classList.remove('no-3d'); }, { once:true });
+    })();
+    </script>
+    
+    <!-- Navigation panel -->
+    <div id="nav-panel" class="css3d-panel">
+        <div class="hub-title">Output Generator</div>
+        <div class="hub-links">
+            <a href="/">← Back to Hub</a>
+            <a href="/projects_page">Active Projects</a>
+        </div>
+    </div>
+
+    <!-- Generator Interface -->
+    <div id="generator-panel" class="css3d-panel">
+        <div class="generator-title">Clever Content Generator</div>
+        <div class="generator-form">
+            <div class="form-group">
+                <label for="contentType">Content Type:</label>
+                <select id="contentType">
+                    <option value="markdown">Markdown Document</option>
+                    <option value="code">Code Snippet</option>
+                    <option value="analysis">Analysis Report</option>
+                    <option value="summary">Summary</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="generatorPrompt">Generation Prompt:</label>
+                <textarea id="generatorPrompt" placeholder="Describe what you want Clever to generate..." rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="contextData">Context/Data (Optional):</label>
+                <textarea id="contextData" placeholder="Provide any additional context or data..." rows="3"></textarea>
+            </div>
+            <button id="generateBtn" class="action-btn">Generate Content</button>
+        </div>
+    </div>
+
+    <!-- Output Display -->
+    <div id="output-panel" class="css3d-panel" style="display: none;">
+        <div class="panel-title">Generated Output</div>
+        <div id="generatedContent" class="output-content"></div>
+        <div class="output-actions">
+            <button id="copyBtn" class="action-btn">Copy to Clipboard</button>
+            <button id="downloadBtn" class="action-btn">Download</button>
+            <button id="newGenerationBtn" class="action-btn">New Generation</button>
+        </div>
+    </div>
+
+    <script src="/static/js/orb_engine.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script>
+    // Generator-specific functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const generateBtn = document.getElementById('generateBtn');
+        const outputPanel = document.getElementById('output-panel');
+        const generatedContent = document.getElementById('generatedContent');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const newGenerationBtn = document.getElementById('newGenerationBtn');
+
+        generateBtn.addEventListener('click', async function() {
+            const contentType = document.getElementById('contentType').value;
+            const prompt = document.getElementById('generatorPrompt').value;
+            const context = document.getElementById('contextData').value;
+
+            if (!prompt.trim()) {
+                alert('Please provide a generation prompt.');
+                return;
+            }
+
+            generateBtn.textContent = 'Generating...';
+            generateBtn.disabled = true;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: `Generate ${contentType}: ${prompt}${context ? '\n\nContext: ' + context : ''}`
+                    })
+                });
+
+                const result = await response.json();
+                generatedContent.innerHTML = `<pre>${result.reply}</pre>`;
+                outputPanel.style.display = 'block';
+            } catch (error) {
+                alert('Error generating content: ' + error.message);
+            } finally {
+                generateBtn.textContent = 'Generate Content';
+                generateBtn.disabled = false;
+            }
+        });
+
+        copyBtn.addEventListener('click', function() {
+            const text = generatedContent.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => { copyBtn.textContent = 'Copy to Clipboard'; }, 2000);
+            });
+        });
+
+        downloadBtn.addEventListener('click', function() {
+            const text = generatedContent.textContent;
+            const contentType = document.getElementById('contentType').value;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `clever-generated.${contentType === 'code' ? 'txt' : contentType === 'markdown' ? 'md' : 'txt'}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        newGenerationBtn.addEventListener('click', function() {
+            outputPanel.style.display = 'none';
+            document.getElementById('generatorPrompt').value = '';
+            document.getElementById('contextData').value = '';
+        });
+    });
+    </script>
+
+    <script>
+    // Register service worker for PWA install
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+    }
+    </script>
+</body>
+</html>
