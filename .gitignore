@@ -1,46 +1,40 @@
-# Python
+# --- Python / Flask ---
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
 .venv/
-*.pyc
+venv/
+env/
+pip-wheel-metadata/
 
-# Local data/artifacts
+# --- Local data & artifacts (keep these out of git) ---
 uploads/
-*.db
-conversations.json
-
-# OS/editor
-# Python
-__pycache__/
-.venv/
-*.pyc
-
-# Local data/artifacts
-uploads/
+backups/
 *.db
 *.sqlite3
+clever_memory.db
 conversations.json
 
-# OS/editor
-.DS_Store
-.vscode/
-.cache/
+# --- Environment files ---
+.env
+*.env
 
-# Generated/vendor cache
+# --- Frontend / build caches ---
 node_modules/
 dist/
 build/
+.cache/
 
-# Screenshots and large binaries at repo root
+# --- OS / Editor junk ---
+.DS_Store
+.vscode/
+.idea/
+
+# --- Screenshots / large binaries at repo root ---
 Screenshot*.png
 *.docx
 
-# Sync folders (keep out of git)
+# --- Local sync folders (never commit) ---
 Clever_Sync/
 synaptic_hub_sync/
-
-# Env
-.env
-
-# Local databases and backups
-clever_memory.db
-backups/
