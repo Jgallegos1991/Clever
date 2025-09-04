@@ -1,0 +1,90 @@
+nohup: ignoring input
+Starting ingestion process for directory: /workspaces/projects/Clever_Sync
+ * Serving Flask app 'app'
+Ingestion complete. inserted=0 updated=0 unchanged=0 failed=0
+Starting ingestion process for directory: /workspaces/projects/synaptic_hub_sync
+Ingestion complete. inserted=0 updated=0 unchanged=0 failed=0
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.0.0.53:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [29/Aug/2025 15:27:00] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:01] "[36mGET /static/style.css?v=2 HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:27:01] "[36mGET /static/quantum-scene.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:27:01] "[36mGET /static/einstein-engine.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:27:01] "[36mGET /static/performance-dashboard.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:27:01] "[36mGET /static/app.js?v=7 HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:27:01] "GET /chat/history?limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:01] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:01] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:04] "[36mGET /sw.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:27:16] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:16] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:16] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:16] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:16] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:16] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:18] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:32] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:32] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:47] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:27:47] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:02] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:02] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:10] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:16] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:16] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:16] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:16] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:16] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:16] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:32] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:32] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:47] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:28:47] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:14] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:14] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:16] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:16] "[36mGET /static/quantum-scene.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:16] "[36mGET /static/performance-dashboard.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:16] "[36mGET /static/style.css?v=2 HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:16] "[36mGET /static/app.js?v=7 HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:16] "[36mGET /static/einstein-engine.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:17] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:17] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:17] "GET /chat/history?limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "[36mGET /static/style.css?v=2 HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "[36mGET /static/performance-dashboard.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "[36mGET /static/einstein-engine.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "[36mGET /static/app.js?v=7 HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "[36mGET /static/quantum-scene.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:19] "GET /chat/history?limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:23] "[36mGET /sw.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:34] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:34] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:36] "[36mGET /static/style.css?v=2 HTTP/1.1[0m" 304 -
+127.0.0.1 - - [29/Aug/2025 15:29:36] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:49] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:29:49] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:30:05] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:30:05] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:30:20] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:30:20] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:30:35] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:30:35] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:30:50] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:30:50] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:31:05] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:31:05] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:32:06] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:32:06] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:33:07] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:33:07] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:34:08] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:34:08] "GET /context/notes HTTP/1.1" 200 -
+127.0.0.1 - - [29/Aug/2025 15:34:19] "GET / HTTP/1.1" 200 -

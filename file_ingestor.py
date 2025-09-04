@@ -1,5 +1,7 @@
 import os
 import json
+import hashlib
+import time
 
 # --- CHANGE 1: Import the shared instances and config ---
 from database import db_manager
@@ -18,7 +20,7 @@ class FileIngestor:
     def ingest_all_files(self):
         """Walks through the base directory and ingests each file."""
         print(f"Starting ingestion process for directory: {self.base_dir}")
-        ingested_count = 0
+        inserted = updated = unchanged = failed = 0
         for root, _, files in os.walk(self.base_dir):
             for file in files:
                 # We want to ignore hidden files like .DS_Store
@@ -26,9 +28,22 @@ class FileIngestor:
                     continue
                 
                 file_path = os.path.join(root, file)
-                if self.ingest_file(file_path):
-                    ingested_count += 1
-        print(f"Ingestion complete. Added {ingested_count} new sources to memory.")
+                try:
+                    status = self.ingest_file(file_path)
+                    if status == "inserted":
+                        inserted += 1
+                    elif status == "updated":
+                        updated += 1
+                    elif status == "unchanged":
+                        unchanged += 1
+                    else:
+                        failed += 1
+                except Exception as e:
+                    print(f"Error ingesting {file_path}: {e}")
+                    failed += 1
+        print(
+            f"Ingestion complete. inserted={inserted} updated={updated} unchanged={unchanged} failed={failed}"
+        )
     
     def ingest_file(self, file_path):
         """
@@ -36,29 +51,41 @@ class FileIngestor:
         """
         if not os.path.exists(file_path):
             print(f"File not found: {file_path}")
-            return False
+            return "failed"
         
+        # Compute metadata early for quick-skip check
+        filename = os.path.basename(file_path)
+        size = os.path.getsize(file_path)
+        modified_ts = os.path.getmtime(file_path)
+
+        # Quick-skip: if DB has same size and mtime, assume unchanged (avoids read/hash)
+        existing = db_manager.get_source_by_path(file_path)
+        if existing and existing.size == size and existing.modified_ts == modified_ts:
+            print(f"unchanged: {filename} (fast-skip)")
+            return "unchanged"
+
+        # Read content and compute hash
         try:
-            # For now, we attempt to read all files as text.
-            # We can add handlers for .docx, .pdf etc. later.
             with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                 content = f.read()
         except Exception as e:
             print(f"Error reading {file_path}: {e}")
-            return False
+            return "failed"
+
+        content_hash = hashlib.sha256(content.encode("utf-8", errors="ignore")).hexdigest()
+
+        # Upsert into DB; skip if unchanged
+        id_, status = db_manager.add_or_update_source(
+            filename,
+            file_path,
+            content,
+            content_hash=content_hash,
+            size=size,
+            modified_ts=modified_ts,
+        )
         
-        # --- CHANGE 3: Use the refactored database manager ---
-        # We now use the add_source method, which is designed for this purpose.
-        # It stores the filename, the full path, and the content.
-        filename = os.path.basename(file_path)
-        db_manager.add_source(filename, file_path, content)
-        
-        # We could use nlp_processor here to get a summary or keywords in the future,
-        # but for now, the primary goal is to get the source content into the database.
-        # analysis = nlp_processor.process(content[:500]) # Example: analyze first 500 chars
-        
-        print(f"Successfully ingested: {filename}")
-        return True
+        print(f"{status}: {filename} (id={id_})")
+        return status
 
 # --------------------------
 # Example usage

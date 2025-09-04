@@ -13,15 +13,17 @@
       "command": "make run",
       "isBackground": true,
       "problemMatcher": {
-        "owner": "custom",
+        "owner": "clever-run",
         "fileLocation": ["relative", "${workspaceFolder}"],
-        "pattern": [
-          { "regexp": "." }
-        ],
+        "pattern": {
+          "regexp": "^\\s*File \\\"(.+)\\\", line (\\d+).*$",
+          "file": 1,
+          "line": 2
+        },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "Starting Clever",
-          "endsPattern": "Running on http"
+          "beginsPattern": "^\\*\\s+Serving Flask app",
+          "endsPattern": "^\\*\\s+Running on http"
         }
       }
     }
