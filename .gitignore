@@ -40,3 +40,7 @@ synaptic_hub_sync/
 
 # Env
 .env
+
+# Local databases and backups
+clever_memory.db
+backups/
