@@ -38,3 +38,11 @@ __pycache__/
 .DS_Store
 .cache/
 node_modules/
+
+# Local databases and backups
+clever_memory.db
+backups/
+
+# Local databases and backups
+clever_memory.db
+backups/
