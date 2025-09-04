@@ -1,53 +1,68 @@
+"""
+Central configuration for Clever.
+
+Edit these defaults as needed or override via environment variables.
+"""
 import os
+from pathlib import Path
 
-# Get the absolute path of the directory where this file is located
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# Base directories
+ROOT_DIR = Path(__file__).resolve().parent
 
-# --------------------------
-# Paths
-# --------------------------
-# Using BASE_DIR for project path as it's more robust for different environments.
-PROJECT_PATH = BASE_DIR  # Assuming BASE_DIR is the project root
+# Minimal .env loader (offline, no extra deps)
+def _load_dotenv(path: Path):
+	if not path.exists():
+		return
+	try:
+		for line in path.read_text().splitlines():
+			line = line.strip()
+			if not line or line.startswith('#'):
+				continue
+			if '=' not in line:
+				continue
+			k, v = line.split('=', 1)
+			k = k.strip(); v = v.strip().strip('"').strip("'")
+			os.environ.setdefault(k, v)
+	except Exception:
+		pass
 
-BACKUP_DIR = os.path.join(PROJECT_PATH, "backups")
-MEMORY_DB_PATH = os.path.join(PROJECT_PATH, "clever_memory.db")
-SYNC_DIR = os.path.join(PROJECT_PATH, "Clever_Sync")
+_load_dotenv(ROOT_DIR / ".env")
 
-# --- Database Configuration ---
-# Changed DATABASE_NAME to point to the new database file as per your analysis.
-# Keeping DATABASE_NAME for consistency with existing code if it references it,
-# but MEMORY_DB_PATH is now the primary definition based on proposed structure.
-DATABASE_NAME = MEMORY_DB_PATH
+# Directories to sync/ingest from
+# Restrict file system operations to your two ingestion roots
+from pathlib import Path
+SYNC_DIR = str(Path("Clever_Sync").resolve())
+SYNAPTIC_HUB_DIR = str(Path("synaptic_hub_sync").resolve())
 
-# --- File Upload Configuration ---
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-ALLOWED_EXTENSIONS = {'txt', 'md', 'pdf'}  # Added PDF based on mind map
+# SQLite database file path
+DB_PATH = os.environ.get("CLEVER_DB_PATH", str(ROOT_DIR / "clever.db"))
 
-# --- AI Model Configuration ---
-# This allows us to easily swap models in the future
-SPACY_MODEL = "en_core_web_sm"
+# Server config
+APP_HOST = "0.0.0.0"
+APP_PORT = 5000
+DEBUG = False
 
-# --------------------------
-# UI Options
-# --------------------------
-UI_PIXELS_ENABLED = True
-UI_DEFAULT_COLOR = "#FFFFFF"
-UI_DEFAULT_EXPRESSION = "idle"
+# rclone settings (optional)
+RCLONE_REMOTE = os.environ.get("RCLONE_REMOTE", "")
+# By default, target the CLEVER_AI folder on the remote
+RCLONE_SRC = os.environ.get("RCLONE_SRC", "CLEVER_AI")
+RCLONE_DST = os.environ.get("RCLONE_DST", "CLEVER_AI")
+RCLONE_EXTRA = os.environ.get("RCLONE_EXTRA", "--fast-list --checkers 8 --transfers 8 --copy-links")
 
-# --------------------------
-# Operational Modes
-# --------------------------
-MODES = ["deep_dive", "quick_hit", "creative", "support"]
-DEFAULT_MODE = "quick_hit"
+# Feature flags
+# Disable all cloud sync so Clever stays offline-only
+ENABLE_RCLONE = False
+AUTO_RCLONE_SCHEDULE = os.environ.get("AUTO_RCLONE_SCHEDULE", "false").lower() in {"1", "true", "yes", "on"}
+RCLONE_INTERVAL_MINUTES = int(os.environ.get("RCLONE_INTERVAL_MINUTES", "60"))
 
-# --------------------------
-# Offline Flags
-# --------------------------
-OFFLINE_ONLY = True
-ALLOW_REMOTE_SYNC = False  # Only enable if using rclone workarounds
+# Allowed filesystem roots for local operations (comma-separated paths)
+def _split_paths(val: str) -> list[str]:
+	return [p.strip() for p in val.split(',') if p.strip()]
 
-# --------------------------
-# Backup Options
-# --------------------------
-KEEP_LATEST_BACKUPS = 1
-BACKUP_ZIP_FORMAT = "backup_%Y-%m-%d_%H-%M-%S.zip"
+HOME_DIR = str(Path.home())
+DEFAULT_EXTRA = [HOME_DIR, "/mnt/chromeos/MyFiles", "/mnt/chromeos/GoogleDrive/MyDrive"]
+_defaults = [str(ROOT_DIR), str(SYNC_DIR), str(SYNAPTIC_HUB_DIR), *DEFAULT_EXTRA]
+ALLOWED_ROOTS = {SYNC_DIR, SYNAPTIC_HUB_DIR}
+
+# Auto-ingest cooldown (minutes) when grounding is weak
+AUTO_INGEST_COOLDOWN_MINUTES = int(os.environ.get("AUTO_INGEST_COOLDOWN_MINUTES", "20"))
