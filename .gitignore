@@ -1,40 +1,40 @@
-# Python
+# --- Python / Flask ---
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
 .venv/
-*.pyc
+venv/
+env/
+pip-wheel-metadata/
 
-# Local data/artifacts
+# --- Local data & artifacts (keep these out of git) ---
 uploads/
+backups/
 *.db
+*.sqlite3
+clever_memory.db
 conversations.json
 
-# OS/editor
-.DS_Store
-.vscode/
+# --- Environment files ---
+.env
+*.env
 
-# Generated/vendor cache
+# --- Frontend / build caches ---
 node_modules/
 dist/
 build/
+.cache/
 
-# Screenshots and large binaries at repo root
+# --- OS / Editor junk ---
+.DS_Store
+.vscode/
+.idea/
+
+# --- Screenshots / large binaries at repo root ---
 Screenshot*.png
 *.docx
 
-# Sync folders
+# --- Local sync folders (never commit) ---
 Clever_Sync/
 synaptic_hub_sync/
-
-# Accidental files
-static/js/tailwindcss.js
-static/js/CSS3DRenderer.min.js
-static/js/MeshSurfaceSampler.min.js
-static/js/MeshSurfaceSampler.js
-static/js/!grep -rnw . -e 'def process_text'.venv/
-__pycache__/
-*.pyc
-.env
-*.sqlite3
-.DS_Store
-.cache/
-node_modules/

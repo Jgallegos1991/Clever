@@ -1,0 +1,332 @@
+(async function(){
+  // Self-check banner + in  // Clean mode toggle
+  function setClean(on){ document.body.classList.toggle('clean', !!on); }
+  let clean = false;
+  window.__uiClean = (mode)=>{ if (mode==null){ return clean; } clean = !!mode; setClean(clean); };
+  // Keyboard: Ctrl/Cmd+M toggles clean
+  window.addEventListener('keydown', (e)=>{
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='m'){
+      clean = !clean; setClean(clean); e.preventDefault();
+    }
+  }, {passive:false});
+
+  function openSource(id){nner = document.createElement('div');
+  banner.id = 'selfcheck';
+  banner.textContent = 'Checking…';
+  banner.className = 'selfcheck';
+  document.documentElement && document.body ? document.body.prepend(banner) : null;
+  async function refreshSelfCheck(){
+    try{
+      const [h,c] = await Promise.all([
+        fetch('/health').then(r=>r.ok).catch(()=>false),
+        fetch('/context/notes').then(r=>r.ok).catch(()=>false),
+      ]);
+      const ok = h && c; banner.textContent = ok? '✓ Ready' : '… Starting';
+      banner.classList.toggle('ok', ok);
+    }catch{ banner.textContent = '… Starting'; banner.classList.remove('ok'); }
+  }
+  refreshSelfCheck(); setInterval(refreshSelfCheck, 15000);
+  const chatEl = document.getElementById('chat');
+  const inputEl = document.getElementById('chat-input');
+  const modeEl = document.getElementById('mode-select');
+  const pulseBtn = document.getElementById('pulse-btn');
+  const ingestBtn = document.getElementById('ingest-btn');
+
+  async function ingest(){
+    await fetch('/ingest', {method:'POST', headers:{'content-type':'application/json'}, body: '{}'});
+  }
+  if (ingestBtn) ingestBtn.onclick = ingest;
+  if (pulseBtn) pulseBtn.onclick = ()=> window.__orbPulse(0.35);
+
+  // Ingesting chip on chipline if present
+  const chiplineCandidate = document.querySelector('.chipline');
+  const ingestChip = document.createElement('span');
+  ingestChip.className = 'chip ingest';
+  ingestChip.textContent = 'Ingesting…';
+  ingestChip.style.display = 'none';
+  if (chiplineCandidate) {
+      chiplineCandidate.appendChild(ingestChip);
+      async function pollIngest(){
+        try{
+          const s = await fetch('/ingest/status').then(r=>r.json());
+          ingestChip.style.display = s && s.running ? '' : 'none';
+        }catch{ ingestChip.style.display = 'none'; }
+      }
+      setInterval(pollIngest, 5000); pollIngest();
+  }
+  // Clean mode toggle
+  function setClean(on){ document.body.classList.toggle('clean', !!on); }
+  let clean = false;
+  window.__uiClean = (mode)=>{ if (mode==null){ return clean; } clean = !!mode; setClean(clean); };
+  // Keyboard: Ctrl/Cmd+M toggles clean
+  window.addEventListener('keydown', (e)=>{
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='m'){
+      clean = !clean; setClean(clean); e.preventDefault();
+    }
+  }, {passive:false});
+
+  function makeMsg(role, text, meta){
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ' + (role === 'user' ? 'user' : 'assistant');
+    const body = document.createElement('div');
+    body.textContent = text;
+    wrap.appendChild(body);
+    if (meta && (meta.intent || meta.source || meta.mood !== undefined || meta.mode || (meta.citations && meta.citations.length))){
+      const chips = document.createElement('div'); chips.className = 'chipline';
+      const add = (label)=>{ const c=document.createElement('span'); c.className='chip'; c.textContent=label; chips.appendChild(c); };
+      if (meta.intent) add('Intent: ' + meta.intent);
+      if (meta.source) add('Source: ' + meta.source);
+      if (meta.mode) add('Mode: ' + meta.mode);
+    if (meta.validated) add('validated ✓');
+      if (typeof meta.mood === 'number') add('Mood: ' + (meta.mood>0? 'positive' : meta.mood<0? 'negative':'neutral'));
+      if (meta.citations && meta.citations.length){
+        meta.citations.slice(0,3).forEach(c => {
+          const btn = document.createElement('button');
+          btn.className = 'chip';
+          btn.textContent = c.filename;
+          btn.title = c.path;
+          btn.onclick = ()=> openSource(c.id);
+          chips.appendChild(btn);
+        });
+      }
+      wrap.appendChild(chips);
+    }
+    return wrap;
+  }
+
+  function renderHistory(items){
+    chatEl.innerHTML = '';
+    items.slice().reverse().forEach(it => {
+      chatEl.appendChild(makeMsg(it.role, it.text));
+    });
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  async function loadHistory(){
+    const res = await fetch('/chat/history?limit=50');
+    const j = await res.json();
+    renderHistory(j.items || []);
+  }
+  loadHistory(); // Changed from await to regular call
+
+  function detectShapeIntent(text){
+    const s = text.toLowerCase();
+  if (s.includes('cube') || s.includes('square') || s.includes('box') || s.includes('3d box') || s.includes('cone')) return 'cube';
+  if (s.includes('ring') || s.includes('circle') || s.includes('orb') || s.includes('torus')) return s.includes('torus') ? 'torus' : 'ring';
+  if (s.includes('wave') || s.includes('grid')) return 'wave';
+  if (s.includes('sphere') || s.includes('ball') || s.includes('globe')) return 'sphere';
+  if (s.includes('knot') || s.includes('trefoil')) return 'knot';
+  if (s.includes('pyramid') || s.includes('tetra')) return 'pyramid';
+    return null;
+  }
+
+  async function send(){
+    const text = inputEl.value.trim();
+    if(!text) return;
+    inputEl.value='';
+  if (window.__orbThinking) window.__orbThinking(true);
+    // Local command routing
+    const low = text.toLowerCase();
+    if (low.includes('clean mode')){
+      const on = !(clean);
+      clean = on; setClean(clean); if (window.__orbPulse) window.__orbPulse(0.15);
+      if (window.__orbThinking) window.__orbThinking(false);
+      return;
+    }
+    // Quick nav: files browser
+    if (
+      (low.includes('browse') && low.includes('context') && low.includes('files')) ||
+      (low.includes('browse') && low.includes('files')) ||
+      (low.includes('open') && low.includes('files')) ||
+      low.includes('open file browser') ||
+      low.includes('file browser') ||
+      low === 'files' ||
+      low.includes('context files')
+    ){
+      window.location.href = '/ui/files';
+      if (window.__orbThinking) window.__orbThinking(false);
+      return;
+    }
+    if (low === 'sources' || low.startsWith('open sources')){
+      window.location.href = '/ui/sources';
+      return;
+    }
+    if (low.includes('glow') && (low.includes('brighter') || low.includes('up'))){
+      window.__orbPulse(0.6);
+    }
+    if (low.includes('particles')){
+    window.__orbPulse(0.4);
+    if (low.includes('more') || low.includes('up')){ if (window.__sceneParticles) window.__sceneParticles('more'); }
+    if (low.includes('less') || low.includes('down')){ if (window.__sceneParticles) window.__sceneParticles('less'); }
+    }
+    const shape = detectShapeIntent(text);
+    if (shape) {
+      if (window.__sceneMorphForDialogue) window.__sceneMorphForDialogue({ shape, holdMs: 1500 });
+      else if (window.__sceneSetShape) window.__sceneSetShape(shape);
+    }
+    window.__orbPulse(0.4);
+    // Always use Auto mode since there's no mode selector
+    const selectedMode = 'Auto';
+    chatEl.appendChild(makeMsg('user', text, { mode: selectedMode }));
+    chatEl.scrollTop = chatEl.scrollHeight;
+
+  try {
+    const res = await fetch('/chat/send', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({text, mode: selectedMode || undefined})});
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
+    const j = await res.json();
+    
+    if (window.__orbThinking) window.__orbThinking(false);
+    if(j && typeof j.intensity === 'number') window.__orbPulse(j.intensity);
+    if(j && typeof j.sentiment === 'number') window.__orbSetMood(j.sentiment);
+    // Map intensity/sentiment to particle density/brightness
+    if (typeof window.__sceneSetParticleLevel === 'function' && typeof j.intensity === 'number'){
+      const lvl = Math.max(0.6, Math.min(2.4, 0.8 + j.intensity*1.6));
+      window.__sceneSetParticleLevel(lvl);
+    }
+    if (typeof window.__sceneSetParticleBrightness === 'function' && typeof j.sentiment === 'number'){
+      const b = 0.9 + Math.min(0.8, Math.abs(j.sentiment)*0.6);
+      window.__sceneSetParticleBrightness(b);
+    }
+    if(j && j.mode){ window.__orbSetMode(j.mode); }
+  const replyText = (j && j.reply) ? j.reply : 'On it — quick pass incoming.';
+    chatEl.appendChild(makeMsg('assistant', replyText, {mode: j.mode, intent: j.intent, mood: j.sentiment, citations: j.citations || [], validated: !!j.validated }));
+    // For short replies, briefly render a "pixel-born panel" using particles (perf-aware)
+    if (typeof window.__sceneSpeakText === 'function'){
+      const plain = (replyText || '').replace(/\s+/g, ' ').trim();
+      if (plain && plain.length > 0 && plain.length <= 80){
+        window.__sceneSpeakText(plain);
+      }
+    }
+    // If backend inferred a shape intent, ensure morph cycle occurs even without local detection
+    if (!shape && j && j.intent && /shape_request:(\w+)/.test(j.intent)){
+      const sh = j.intent.split(':')[1];
+      if (window.__sceneMorphForDialogue) window.__sceneMorphForDialogue({ shape: sh, holdMs: 1500 });
+    }
+    chatEl.scrollTop = chatEl.scrollHeight;
+  } catch (error) {
+    console.error('Chat send error:', error);
+    if (window.__orbThinking) window.__orbThinking(false);
+    
+    // Show error message to user
+    const errorMsg = error.message.includes('fetch') 
+      ? "I'm having trouble connecting. Check if Clever is running." 
+      : "Something went wrong. I'm still here though!";
+    
+    chatEl.appendChild(makeMsg('assistant', errorMsg, {mode: 'Error', error: true}));
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') send(); });
+  
+  // Voice input functionality
+  const micBtn = document.getElementById('mic-btn');
+  let recognition = null;
+  
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  
+  if (micBtn && SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    let isListening = false;
+    
+    micBtn.addEventListener('click', ()=>{
+      if (isListening) {
+        recognition.stop();
+        return;
+      }
+      
+      try {
+        recognition.start();
+        isListening = true;
+        micBtn.classList.add('listening');
+        micBtn.title = 'Listening... (click to stop)';
+        inputEl.placeholder = 'Listening for your voice...';
+      } catch(e) {
+        console.error('Speech recognition failed to start:', e);
+      }
+    });
+    
+    recognition.onresult = (e)=>{
+      if (e.results.length > 0) {
+        const transcript = e.results[0][0].transcript.trim();
+        inputEl.value = transcript;
+        send();
+      }
+    };
+    
+    recognition.onend = ()=>{
+      isListening = false;
+      micBtn.classList.remove('listening');
+      micBtn.title = 'Talk to Clever';
+      inputEl.placeholder = 'Talk to Clever...';
+    };
+    
+    recognition.onerror = (e)=>{
+      console.error('Speech recognition error:', e.error);
+      isListening = false;
+      micBtn.classList.remove('listening');
+      micBtn.title = 'Talk to Clever';
+      inputEl.placeholder = 'Talk to Clever...';
+    };
+  } else if (micBtn) {
+    // Graceful fallback for unsupported browsers
+    micBtn.addEventListener('click', ()=>{
+      alert('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.');
+    });
+  }
+  
+  // Remove mode selector dependencies since it's no longer in the UI
+  if (modeEl){
+    modeEl.addEventListener('change', ()=>{
+      const m = modeEl.value || 'Auto';
+      // simple visual feedback via mood/energy
+      if (m === 'Deep Dive') { window.__orbSetMood(-0.05); window.__orbPulse(0.2); }
+      else if (m === 'Creative') { window.__orbSetMood(0.15); window.__orbPulse(0.3); }
+      else if (m === 'Support') { window.__orbSetMood(0.1); window.__orbPulse(0.15); }
+      else if (m === 'Quick Hit') { window.__orbSetMood(0.0); window.__orbPulse(0.25); }
+      else { window.__orbSetMood(0.0); }
+    });
+  }
+  
+  // Global keyboard input - click anywhere and start typing to Clever
+  document.addEventListener('keydown', (e) => {
+    // Skip if already focused on input or if modifier keys are pressed
+    if (document.activeElement === inputEl || 
+        e.ctrlKey || e.metaKey || e.altKey || 
+        e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      return;
+    }
+    
+    // Skip special keys
+    if (['Enter', 'Escape', 'Tab', 'Shift', 'Control', 'Alt', 'Meta', 
+         'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'F1', 'F2', 'F3', 'F4', 'F5', 
+         'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'].includes(e.key)) {
+      return;
+    }
+    
+    // Focus input and let the character be typed naturally
+    if (e.key.length === 1) { // Only single characters (letters, numbers, symbols)
+      inputEl.focus();
+      // Don't prevent default - let the character be typed in the now-focused input
+    }
+  });
+  
+  // Also focus on click anywhere on the body (but not on specific elements)
+  document.body.addEventListener('click', (e) => {
+    // Don't focus if clicking on interactive elements
+    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || 
+        e.target.tagName === 'A' || e.target.closest('button') || 
+        e.target.closest('.chip') || e.target.closest('.msg')) {
+      return;
+    }
+    inputEl.focus();
+  });
+  
+})();
