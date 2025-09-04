@@ -9,8 +9,21 @@ uploads/
 conversations.json
 
 # OS/editor
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# Local data/artifacts
+uploads/
+*.db
+*.sqlite3
+conversations.json
+
+# OS/editor
 .DS_Store
 .vscode/
+.cache/
 
 # Generated/vendor cache
 node_modules/
@@ -21,20 +34,9 @@ build/
 Screenshot*.png
 *.docx
 
-# Sync folders
+# Sync folders (keep out of git)
 Clever_Sync/
 synaptic_hub_sync/
 
-# Accidental files
-static/js/tailwindcss.js
-static/js/CSS3DRenderer.min.js
-static/js/MeshSurfaceSampler.min.js
-static/js/MeshSurfaceSampler.js
-static/js/!grep -rnw . -e 'def process_text'.venv/
-__pycache__/
-*.pyc
+# Env
 .env
-*.sqlite3
-.DS_Store
-.cache/
-node_modules/
