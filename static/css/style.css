@@ -1,239 +1,621 @@
-
-body {
-	margin: 0;
-	padding: 0;
-	min-height: 100vh;
-	background: #0a0e1a;
-	font-family: 'Segoe UI', Arial, sans-serif;
-	color: #e0e6f0;
-	/* Neon grid background */
-	background-image: linear-gradient(0deg, rgba(45,224,255,0.08) 1px, transparent 1px),
-		linear-gradient(90deg, rgba(45,224,255,0.08) 1px, transparent 1px);
-	background-size: 40px 40px;
-	background-position: center center;
-}
-/* Hide panels by default; they will emerge via CSS3D float */
-.css3d-panel {
-	opacity: 0;
-	pointer-events: none;
+:root {
+  /* UI Brief core colors */
+  --bg-cosmic: #0B0F14;
+  --bg-cosmic-2: #121821;
+  --fg: #e9f1fb;
+  --muted: #95a3b3;
+  --neon-teal: #69EACB;
+  --neon-magenta: #FF6BFF;
+  --chip: #0f1b24;
+  --bubble: #101821;
+  --glow-teal: rgba(105, 234, 203, 0.35);
 }
 
-/* Accessible fallback: if 3D not ready, show panels as normal UI */
-.no-3d .css3d-panel {
-	opacity: 1;
-	pointer-events: auto;
+*{box-sizing:border-box}
+html,body{height:100%}
+
+body{
+  margin:0; color:var(--fg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  /* Dark cosmic background as per UI Brief */
+  background: 
+    radial-gradient(1000px 600px at 20% -10%, rgba(105, 234, 203, 0.06), transparent 60%),
+    radial-gradient(800px 500px at 120% 10%, rgba(255, 107, 255, 0.04), transparent 60%),
+    linear-gradient(180deg, var(--bg-cosmic) 0%, var(--bg-cosmic-2) 100%);
+}
+
+/* Self-check banner */
+.selfcheck{ 
+  position:fixed; top:8px; right:12px; font-size:12px; 
+  padding:6px 12px; border-radius:999px; 
+  background: rgba(11, 15, 20, 0.8); 
+  color: var(--muted); 
+  opacity:0.9; z-index:9999; 
+  border: 1px solid rgba(105, 234, 203, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.selfcheck.ok{ 
+  background: rgba(19, 52, 30, 0.8); 
+  color: #bff0c6; 
+  border-color: var(--neon-teal);
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.15);
+}
+
+.chip.ingest{ 
+  background: rgba(42, 49, 64, 0.6); 
+  border: 1px solid rgba(105, 234, 203, 0.1);
+}
+
+/* Full-screen particle canvas */
+#scene{position:fixed; inset:0; width:100%; height:100%; display:block; background:transparent; z-index:1;}
+
+/* Holographic grid - canvas of possibility */
+.grid-full::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image: 
+    linear-gradient(rgba(105, 234, 203, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(105, 234, 203, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px; 
+  transform: perspective(800px) rotateX(70deg) translateY(40%);
+  filter: blur(0.3px);
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+/* Grid ripple when thinking */
+.grid-full.thinking::before{
+  animation: grid-ripple 2.5s ease-in-out infinite;
+  background-size: 68px 68px, 68px 68px;
+  filter: blur(0.1px);
+  opacity: 0.8;
+}
+
+@keyframes grid-ripple {
+  0% { 
+    background-size: 60px 60px, 60px 60px;
+    opacity: 0.6;
+  }
+  50% { 
+    background-size: 72px 72px, 72px 72px;
+    opacity: 0.9;
+  }
+  100% { 
+    background-size: 60px 60px, 60px 60px;
+    opacity: 0.6;
+  }
+}
+
+/* HUD overlay */
+.hud{
+  position:fixed; inset:0; display:flex; flex-direction:column; 
+  justify-content:flex-end; padding:24px; z-index:2;
+}
+
+.chat-panel{
+  align-self:flex-end; max-width:560px; width:100%; margin-bottom:16px;
+}
+
+.chat{
+  max-height:45vh; overflow:auto; display:flex; flex-direction:column; 
+  gap:14px; padding:8px;
+}
+
+/* Messages - crystallized thoughts */
+.msg{
+  max-width:78%; padding:16px 18px; border-radius:16px; line-height:1.5; 
+  backdrop-filter: blur(12px); 
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.msg.user{
+  margin-left:auto; 
+  background: rgba(11, 15, 20, 0.7);
+  border: 1px solid var(--neon-teal);
+  box-shadow: 
+    0 0 32px var(--glow-teal),
+    inset 0 1px 0 rgba(105, 234, 203, 0.2);
+}
+
+.msg.assistant{
+  margin-right:auto; 
+  background: rgba(18, 24, 33, 0.4);
+  border: 1px solid rgba(105, 234, 203, 0.12);
+  box-shadow: 
+    0 0 24px rgba(105, 234, 203, 0.08),
+    inset 0 1px 0 rgba(105, 234, 203, 0.08);
+}
+
+.chipline{
+  font-size:12px; color:var(--muted); margin-top:8px; 
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+
+.chip{
+  background: rgba(15, 27, 36, 0.6); 
+  border: 1px solid rgba(105, 234, 203, 0.15); 
+  padding: 6px 12px; border-radius: 999px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.chip:hover {
+  border-color: var(--neon-teal);
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.2);
+  background: rgba(15, 27, 36, 0.8);
+}
+
+/* Entry bar */
+.entrybar{
+  display:flex; justify-content:center;
+}
+
+.entry{
+  display:flex; align-items:center; width:min(720px, 92vw); gap:12px; 
+  padding:14px 18px; 
+  background: rgba(11, 15, 20, 0.7);
+  border: 1px solid var(--neon-teal); 
+  border-radius:18px; 
+  backdrop-filter: blur(16px);
+  box-shadow: 
+    0 0 40px var(--glow-teal),
+    inset 0 1px 0 rgba(105, 234, 203, 0.15);
+}
+
+.entry:focus-within {
+  border-color: var(--neon-magenta);
+  box-shadow: 
+    0 0 48px rgba(255, 107, 255, 0.35),
+    inset 0 1px 0 rgba(255, 107, 255, 0.2);
+}
+
+.entry input{
+  flex:1; background:transparent; border:none; outline:none; 
+  color:var(--fg); font-size:16px;
+}
+
+.entry input::placeholder {
+  color: rgba(149, 163, 179, 0.7);
+}
+
+.entry:focus-within input::placeholder {
+  color: rgba(255, 107, 255, 0.6);
+}
+
+.entry select{
+  background: rgba(11, 15, 20, 0.8); color:var(--fg); 
+  border: 1px solid rgba(105, 234, 203, 0.3); 
+  border-radius:12px; padding:8px 12px; font-size:13px;
+  backdrop-filter: blur(8px);
+}
+
+.entry .icon{
+  background: rgba(11, 15, 20, 0.6); 
+  border: 1px solid rgba(105, 234, 203, 0.4); 
+  color: var(--fg); border-radius:12px; padding:10px 12px; 
+  cursor:pointer; backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.entry .icon:hover{
+  border-color: var(--neon-teal);
+  box-shadow: 0 0 20px var(--glow-teal);
+  background: rgba(11, 15, 20, 0.8);
+}
+
+/* Microphone */
+.mic-btn {
+  transition: all 0.4s ease;
+}
+
+.mic-btn.listening {
+  background: rgba(255, 107, 255, 0.2) !important;
+  border-color: var(--neon-magenta) !important;
+  box-shadow: 0 0 32px rgba(255, 107, 255, 0.5) !important;
+  animation: pulse-mic 2s infinite;
+}
+
+@keyframes pulse-mic {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* Scrollbars */
+.chat::-webkit-scrollbar{
+  width: 12px;
+}
+
+.chat::-webkit-scrollbar-track{
+  background: rgba(11, 15, 20, 0.3);
+  border-radius: 6px;
+}
+
+.chat::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, 
+    rgba(105, 234, 203, 0.15) 0%, 
+    rgba(105, 234, 203, 0.25) 50%,
+    rgba(255, 107, 255, 0.15) 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(105, 234, 203, 0.1);
+}
+
+.chat::-webkit-scrollbar-thumb:hover{
+  background: linear-gradient(180deg, 
+    rgba(105, 234, 203, 0.3) 0%, 
+    rgba(105, 234, 203, 0.4) 50%,
+    rgba(255, 107, 255, 0.25) 100%);
+}
+
+/* Clean mode */
+body.clean .chipline{display:none}
+body.clean .entry select{display:none}
+body.clean #files-btn,
+body.clean #ingest-btn{display:none}
+body.clean .entry{
+  box-shadow: 0 0 20px rgba(105, 234, 203, 0.1); 
+  border-color: rgba(105, 234, 203, 0.15);
+}
+body.clean .msg.user{
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.08);
+}
+body.clean .msg{
+  border-color: rgba(105, 234, 203, 0.08);
+}
+body.clean .grid-full::before{
+  opacity: 0.3;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--fg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  /* Dark cosmic background as per UI Brief */
+  background: 
+    radial-gradient(1200px 800px at 15% -20%, rgba(105, 234, 203, 0.08), transparent 70%),
+    radial-gradient(1000px 600px at 85% 120%, rgba(255, 107, 255, 0.06), transparent 70%),
+    linear-gradient(180deg, var(--bg-cosmic) 0%, var(--bg-cosmic-2) 100%);
+  /* Magical space ambient */
+  min-height: 100vh;
+  overflow: hidden;
+}
+/* Self-check banner - cosmic status indicator */
+.selfcheck{ 
+  position:fixed; top:8px; right:12px; font-size:12px; 
+  padding:6px 12px; border-radius:999px; 
+  background: rgba(11, 15, 20, 0.8); 
+  color: var(--muted); 
+  opacity:0.9; z-index:9999; 
+  border: 1px solid rgba(105, 234, 203, 0.08);
+  backdrop-filter: blur(8px);
+  transition: all 0.4s ease;
+}
+
+.selfcheck.ok{ 
+  background: rgba(19, 52, 30, 0.8); 
+  color: #bff0c6; 
+  border-color: var(--neon-teal);
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.15);
+}
+
+.chip.ingest{ 
+  background: rgba(42, 49, 64, 0.6); 
+  border: 1px solid rgba(105, 234, 203, 0.1);
+  animation: ingest-pulse 2s infinite;
+}
+
+@keyframes ingest-pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; border-color: rgba(105, 234, 203, 0.2); }
+  100% { opacity: 0.7; }
+}
+
+/* full-screen scene canvas */
+#scene{position:fixed; inset:0; width:100%; height:100%; display:block; background:transparent; z-index:1;}
+
+/* Holographic grid plane - canvas of possibility */
+.grid-full::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image: 
+    linear-gradient(rgba(105, 234, 203, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(105, 234, 203, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px; 
+  transform: perspective(800px) rotateX(70deg) translateY(40%);
+  filter: blur(0.3px);
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+/* Ripple effect when Clever thinks - alive canvas */
+.grid-full.thinking::before{
+  animation: magical-ripple 3s ease-in-out infinite;
+  background-size: 68px 68px, 68px 68px;
+  filter: blur(0.1px);
+  opacity: 0.9;
+}
+
+@keyframes magical-ripple {
+  0% { 
+    background-size: 60px 60px, 60px 60px;
+    opacity: 0.6;
+    background-image: 
+      linear-gradient(rgba(105, 234, 203, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(105, 234, 203, 0.04) 1px, transparent 1px);
+  }
+  33% { 
+    background-size: 72px 72px, 72px 72px;
+    opacity: 0.8;
+    background-image: 
+      linear-gradient(rgba(105, 234, 203, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(105, 234, 203, 0.08) 1px, transparent 1px);
+  }
+  66% { 
+    background-size: 76px 76px, 76px 76px;
+    opacity: 0.9;
+    background-image: 
+      linear-gradient(rgba(255, 107, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 107, 255, 0.06) 1px, transparent 1px);
+  }
+  100% { 
+    background-size: 60px 60px, 60px 60px;
+    opacity: 0.6;
+    background-image: 
+      linear-gradient(rgba(105, 234, 203, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(105, 234, 203, 0.04) 1px, transparent 1px);
+  }
+}
+
+/* Frosted glass messages - crystallized thoughts */
+.msg{
+  max-width:78%; padding:16px 18px; border-radius:16px; line-height:1.5; 
+  backdrop-filter: blur(12px); 
+  position: relative;
+  animation: msg-condense 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* User messages - electric teal glow */
+.msg.user{
+  margin-left:auto; 
+  background: var(--glass-bg);
+  border: 1px solid var(--neon-teal);
+  box-shadow: 
+    0 0 32px var(--glow-teal),
+    inset 0 1px 0 rgba(105, 234, 203, 0.2);
+}
+
+/* Assistant messages - soft cyan with frosted glass */
+.msg.assistant{
+  margin-right:auto; 
+  background: rgba(18, 24, 33, 0.4);
+  border: 1px solid rgba(105, 234, 203, 0.12);
+  box-shadow: 
+    0 0 24px rgba(105, 234, 203, 0.08),
+    inset 0 1px 0 rgba(105, 234, 203, 0.08);
+}
+
+/* Magical manifestation animation */
+@keyframes msg-condense {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    filter: blur(8px);
+    background: rgba(105, 234, 203, 0.02);
+  }
+  40% {
+    opacity: 0.6;
+    transform: scale(0.95) translateY(8px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+/* HUD overlay - interface emerges from the void */
+.hud{
+  position:fixed; inset:0; display:flex; flex-direction:column; 
+  justify-content:flex-end; padding:24px; z-index:2;
+}
+
+.chat-panel{
+  align-self:flex-end; max-width:560px; width:100%; margin-bottom:16px;
+  animation: panel-emerge 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.chat{
+  max-height:45vh; overflow:auto; display:flex; flex-direction:column; 
+  gap:14px; padding:8px;
+}
+
+@keyframes panel-emerge {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+.chipline{
+  font-size:12px; color:var(--muted); margin-top:8px; 
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+
+.chip{
+  background: rgba(15, 27, 36, 0.6); 
+  border: 1px solid rgba(105, 234, 203, 0.15); 
+  padding: 6px 12px; border-radius: 999px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.chip:hover {
+  border-color: var(--neon-teal);
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.2);
+  background: rgba(15, 27, 36, 0.8);
+}
+
+/* Entry bar - condensed from particle field */
+.entrybar{
+  display:flex; justify-content:center;
+  animation: entry-materialize 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.entry{
+  display:flex; align-items:center; width:min(720px, 92vw); gap:12px; 
+  padding:14px 18px; 
+  background: rgba(11, 15, 20, 0.7);
+  border: 1px solid var(--neon-teal); 
+  border-radius:18px; 
+  backdrop-filter: blur(16px);
+  box-shadow: 
+    0 0 40px var(--glow-teal),
+    inset 0 1px 0 rgba(105, 234, 203, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.entry:focus-within {
+  border-color: var(--neon-magenta);
+  box-shadow: 
+    0 0 48px var(--glow-magenta),
+    inset 0 1px 0 rgba(255, 107, 255, 0.2);
+}
+
+@keyframes entry-materialize {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.85);
+    filter: blur(8px);
+    background: rgba(105, 234, 203, 0.05);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-5px) scale(1.02);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+.entry input{
+  flex:1; background:transparent; border:none; outline:none; 
+  color:var(--fg); font-size:16px;
+  transition: color 0.3s ease;
+}
+
+.entry input::placeholder {
+  color: rgba(149, 163, 179, 0.7);
+  transition: color 0.3s ease;
+}
+
+.entry:focus-within input::placeholder {
+  color: rgba(255, 107, 255, 0.6);
+}
+
+.entry select{
+  background: rgba(11, 15, 20, 0.8); color:var(--fg); 
+  border: 1px solid rgba(105, 234, 203, 0.3); 
+  border-radius:12px; padding:8px 12px; font-size:13px;
+  backdrop-filter: blur(8px);
+}
+
+.entry .icon{
+  background: rgba(11, 15, 20, 0.6); 
+  border: 1px solid rgba(105, 234, 203, 0.4); 
+  color: var(--fg); border-radius:12px; padding:10px 12px; 
+  cursor:pointer; backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.entry .icon:hover{
+  border-color: var(--neon-teal);
+  box-shadow: 0 0 20px var(--glow-teal);
+  background: rgba(11, 15, 20, 0.8);
+}
+
+/* Microphone - magical voice activation */
+.mic-btn {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mic-btn.listening {
+  background: rgba(255, 107, 255, 0.2) !important;
+  border-color: var(--neon-magenta) !important;
+  box-shadow: 0 0 32px var(--glow-magenta) !important;
+  animation: pulse-magical 2s infinite;
+}
+
+@keyframes pulse-magical {
+  0% { 
+    transform: scale(1); 
+    box-shadow: 0 0 24px var(--glow-magenta);
+  }
+  50% { 
+    transform: scale(1.08); 
+    box-shadow: 0 0 40px rgba(255, 107, 255, 0.8);
+  }
+  100% { 
+    transform: scale(1);
+    box-shadow: 0 0 24px var(--glow-magenta);
+  }
+}
+
+/* Magical scrollbars - cosmic energy flows */
+.chat::-webkit-scrollbar{
+  width: 12px;
+}
+
+.chat::-webkit-scrollbar-track{
+  background: rgba(11, 15, 20, 0.3);
+  border-radius: 6px;
+}
+
+.chat::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, 
+    rgba(105, 234, 203, 0.15) 0%, 
+    rgba(105, 234, 203, 0.25) 50%,
+    rgba(255, 107, 255, 0.15) 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(105, 234, 203, 0.1);
+  transition: all 0.3s ease;
+}
+
+.chat::-webkit-scrollbar-thumb:hover{
+  background: linear-gradient(180deg, 
+    rgba(105, 234, 203, 0.3) 0%, 
+    rgba(105, 234, 203, 0.4) 50%,
+    rgba(255, 107, 255, 0.25) 100%);
+  box-shadow: 0 0 8px rgba(105, 234, 203, 0.2);
 }
 
 
 
-/* Remove starfield/farGrid/nearGrid overlays for a clean grid look */
-
-/* Dramatic orb stage */
-
-/* Remove orb/particle-centric styling */
-
-/* Mic Button (see Button Enhancements below) */
-
-
-/* Neon Input Bar */
-#input-bar {
-	position: fixed;
-	left: 50%;
-	bottom: 40px;
-	transform: translateX(-50%);
-	display: flex;
-	align-items: center;
-	background: #151c24ee;
-	border-radius: 1em;
-	padding: 0.5em 1.2em;
-	z-index: 20;
-	min-width: 320px;
-	max-width: 90vw;
-	gap: 0.5em;
-	border: 2.5px solid #2de0ff;
-	box-shadow: 0 0 24px 2px #2de0ff99, 0 0 0 2px #2de0ff44;
-	transition: box-shadow 0.2s, border 0.2s;
+/* Clean mode — minimal magical focus */
+body.clean .chipline{display:none}
+body.clean .entry select{display:none}
+body.clean #files-btn,
+body.clean #ingest-btn{display:none}
+body.clean .entry{
+  box-shadow: 0 0 20px rgba(105, 234, 203, 0.1); 
+  border-color: rgba(105, 234, 203, 0.15);
 }
-#input-bar:focus-within {
-	box-shadow: 0 0 32px 4px #2de0ffcc, 0 0 0 2.5px #2de0ff88;
-	border: 2.5px solid #2de0ff;
+body.clean .msg.user{
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.08);
 }
-#mainInput {
-	flex: 1;
-	background: transparent;
-	border: none;
-	outline: none;
-	color: #e0e6f0;
-	font-size: 1.1em;
-	padding: 0.7em 0.5em;
-	border-radius: 1em;
-	transition: background 0.2s;
+body.clean .msg{
+  border-color: rgba(105, 234, 203, 0.08);
 }
-#mainInput::placeholder {
-	color: #2de0ffcc;
-	opacity: 1;
-}
-
-
-/* Neon Button Enhancements */
-#mic-btn, #download-btn {
-	background: #151c24;
-	border: 2px solid #2de0ff;
-	margin-left: 10px;
-	cursor: pointer;
-	padding: 7px 10px;
-	border-radius: 10px;
-	transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-	box-shadow: 0 0 12px 2px #2de0ff55;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-#mic-btn:hover, #download-btn:hover {
-	background: #2de0ff22;
-	box-shadow: 0 0 24px 4px #2de0ffcc;
-	transform: translateY(-2px) scale(1.07);
-}
-#mic-btn:active, #download-btn:active {
-	background: #1a2233;
-	box-shadow: 0 0 8px 1px #2de0ff88;
-	transform: scale(0.97);
-}
-#mic-btn svg, #download-btn svg {
-	display: block;
-}
-
-
-/* Neon Card Style for Synaptic Hub and Analysis */
-#synaptic-hub-card, .analysis-card, .clever-card {
-	position: fixed;
-	top: 30px;
-	right: 30px;
-	background: #151c24ee;
-	border-radius: 12px;
-	box-shadow: 0 6px 24px rgba(0,0,0,0.35), 0 0 14px 2px #2de0ff40;
-	padding: 1.1em 1.4em;
-	z-index: 30;
-	min-width: 220px;
-	border: 1.5px solid #2de0ff88;
-	transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
-	color: #e0e6f0;
-	max-height: 40vh;
-	overflow: auto;
-}
-#synaptic-hub-card .hub-title {
-	font-size: 1.3em;
-	font-weight: 700;
-	color: #2de0ff;
-	margin-bottom: 0.7em;
-	letter-spacing: 0.04em;
-	text-shadow: 0 2px 8px #2de0ff33;
-}
-#synaptic-hub-card .hub-links {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5em;
-}
-#synaptic-hub-card .hub-links a {
-	color: #e0e6f0;
-	text-decoration: none;
-	font-size: 1.05em;
-	border-radius: 0.7em;
-	padding: 0.4em 0.8em;
-	transition: background 0.2s, color 0.2s;
-}
-#synaptic-hub-card .hub-links a:hover {
-	background: #2de0ff22;
-	color: #2de0ff;
-}
-
-/* Analysis and Clever cards (for chat/analysis info) */
-.analysis-card, .clever-card {
-	left: 30px;
-	right: auto;
-	top: auto;
-	bottom: 120px;
-	min-width: 280px;
-	max-width: 460px;
-	padding: 1.2em 1.5em;
-	font-size: 1.08em;
-	border-radius: 12px;
-	background: #151c24ee;
-	border: 1.5px solid #2de0ff88;
-	box-shadow: 0 6px 24px rgba(0,0,0,0.35), 0 0 14px 2px #2de0ff40;
-	color: #e0e6f0;
-	backdrop-filter: blur(8px) saturate(1.05);
-}
-.clever-card {
-	top: 30px;
-	left: auto;
-	right: 30px;
-	bottom: auto;
-}
-
-/* Floating panel fallback (used when spawning transient UI cards) */
-.floating-panel {
-	position: relative;
-	margin-top: 12px;
-	background: #151c24ee;
-	border: 1.5px solid #2de0ff88;
-	border-radius: 12px;
-	color: #e0e6f0;
-	padding: 0.9em 1.1em;
-	min-width: 220px;
-	max-width: 50vw;
-	z-index: 40;
-	box-shadow: 0 6px 24px rgba(0,0,0,0.35), 0 0 14px 2px #2de0ff40;
-	transition: opacity 0.5s cubic-bezier(.4,2,.6,1), filter 0.7s cubic-bezier(.4,2,.6,1);
-	backdrop-filter: blur(8px) saturate(1.05);
-	white-space: normal;
-	line-height: 1.35;
-}
-.panel-stack {
-	position: fixed;
-	right: 30px;
-	bottom: 120px;
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	z-index: 40;
-	max-width: 50vw;
-}
-.floating-panel .panel-main {
-	font-size: 1.02em;
-	line-height: 1.4;
-}
-.floating-panel .panel-meta {
-	margin-top: 0.5em;
-	opacity: 0.8;
-	display: flex;
-	gap: 0.6em;
-	flex-wrap: wrap;
-}
-.floating-panel .bubble-tag {
-	display: inline-block;
-	font-size: 0.82em;
-	padding: 0.1em 0.5em;
-	border-radius: 0.6em;
-	background: #2de0ff22;
-	color: #2de0ff;
-	margin-right: 0.4em;
-}
-
-
-/* Responsive Tweaks */
-@media (max-width: 600px) {
-	#input-bar {
-		min-width: 0;
-		max-width: 98vw;
-		padding: 0.3em 0.5em;
-	}
-	#synaptic-hub-card, .analysis-card, .clever-card {
-		top: 10px;
-		right: 10px;
-		left: 10px;
-		min-width: 120px;
-		padding: 0.7em 0.9em;
-		max-height: 50vh;
-	}
+body.clean .grid-full::before{
+  opacity: 0.3;
+  background-image: 
+    linear-gradient(rgba(105, 234, 203, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(105, 234, 203, 0.02) 1px, transparent 1px);
 }

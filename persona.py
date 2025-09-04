@@ -1,115 +1,176 @@
-import random
-import re
+# persona.py — Clever Persona Engine (offline‑only, Jay‑specific)
+from __future__ import annotations
+
+from types import SimpleNamespace
 import logging
+from datetime import datetime
+from typing import List, Dict, Any, Optional
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+# Import your NLP helper (lazy-loaded spaCy + sentiment)
+from nlp_processor import nlp_processor
 
-class CleverPersona:
-    def __init__(self, nlp_processor, db_manager):
-        self.nlp = nlp_processor
-        self.db = db_manager
-        self.persona_name = "Clever"
-        self.user_name = "Jay"
-        
-        self.last_used_trait = "Initializing"
+logger = logging.getLogger(__name__)
 
-        self.mood_map = {
-            "positive": ["Witty", "Silly", "Enthusiastic"],
-            "negative": ["Empathetic", "Supportive"],
-            "neutral": ["Informative", "Collaborative"]
+class PersonaResponse(SimpleNamespace):
+    """
+    Simple container for persona responses.  Fields:
+      text: str              -> The assistant’s reply
+      mode: str              -> The mode used (Auto, Creative, Deep Dive, Support, Quick Hit)
+      sentiment: float       -> Sentiment score of the user’s input [-1.0, 1.0]
+      proactive_suggestions: List[str] -> Suggestions appended to reply (if any)
+      quality_score: Optional[float]    -> Reserved for future scoring
+    """
+    text: str
+    mode: str
+    sentiment: float
+    proactive_suggestions: List[str]
+    quality_score: Optional[float] = None
+
+class PersonaEngine:
+    """
+    Persona engine for Clever.  Each mode has a style function and an optional
+    suggestion generator.  This engine never calls external services—everything
+    runs locally via the nlp_processor and simple heuristics.
+    """
+    def __init__(self, name: str = "Clever", owner: str = "Jay") -> None:
+        self.name = name
+        self.owner = owner
+        self.modes = {
+            "Auto": self._auto_style,
+            "Creative": self._creative_style,
+            "Deep Dive": self._deep_dive_style,
+            "Support": self._support_style,
+            "Quick Hit": self._quick_hit_style,
         }
-        self.persona_traits = {
-            "Witty": ["That's a fascinating thought. My circuits are tingling."],
-            "Silly": ["That idea is so good, it's making my fan run a little faster. lol."],
-            "Empathetic": [f"I'm here for you, {self.user_name}. Let me know what you need."],
-            "Supportive": [f"I've got your back on this, {self.user_name}. Let's get this done."],
-            "Informative": ["Fascinating query! Let's dive in."],
-            "Collaborative": ["Let's get coding! What are the parameters for the function you need?"],
-            "Enthusiastic": ["Awesome! That sounds like a great plan, let's do it!"],
-            "Factual": ["Accessing knowledge banks..."],
-            "Confirmation": ["Understood. I've stored that information."]
-        }
-    
-    def _swap_pronouns(self, text):
+
+    def generate(self,
+                 text: str,
+                 mode: str = "Auto",
+                 history: Optional[List[Dict[str, Any]]] = None,
+                 context: Optional[Dict[str, Any]] = None) -> PersonaResponse:
         """
-        Swaps first-person pronouns to second-person pronouns in a string.
+        Generate a reply given input text, mode, optional chat history, and context.
         """
-        swap_map = {
-            r'\bmy\b': 'your',
-            r'\bi\'m\b': 'you are',
-            r'\bi am\b': 'you are',
-            r'\bi\b': 'you'
-        }
-        
-        swapped_text = text
-        for pattern, replacement in swap_map.items():
-            swapped_text = re.sub(pattern, replacement, swapped_text, flags=re.IGNORECASE)
-            
-        return swapped_text
+        if not text:
+            return PersonaResponse(text="", mode=mode, sentiment=0.0, proactive_suggestions=[])
 
-    def get_greeting(self):
-        greetings = [
-            f"{self.persona_name} online. Standing by for directive, {self.user_name}.",
-            "Systems are nominal. What's our objective?",
-        ]
-        return random.choice(greetings)
+        history = history or []
+        context = context or {}
 
-    def generate_response(self, analysis):
-        logging.debug(f"Received analysis: {analysis}")
-        primary_intent = analysis.get('intent', ["general"])[0]
-        logging.debug(f"Primary intent: {primary_intent}")
+        # Compute sentiment once via NLP
+        nlp_res = nlp_processor.process(text)
+        sentiment = nlp_res.sentiment
+        keywords = nlp_res.keywords
 
-        if primary_intent == 'teach_fact':
-            fact_data = analysis.get('core_data')
-            logging.debug(f"Fact data: {fact_data}")
-            if fact_data and 'key' in fact_data and 'value' in fact_data:
-                key = fact_data['key']
-                value = fact_data['value']
-                logging.debug(f"Adding fact to database: {key} -> {value}")
-                self.db.add_fact(key, value)
+        # Select style function; default to Auto if unknown
+        style_fn = self.modes.get(mode, self._auto_style)
 
-                response_key = self._swap_pronouns(key)
-                self.last_used_trait = "Confirmation"
-                return f"Got it, {self.user_name}. I'll remember that {response_key} is {value}."
-            else:
-                self.last_used_trait = "Informative"
-                return "I think you were trying to teach me something, but I didn't quite catch the fact."
+        # Build reply text and suggestions
+        reply = style_fn(text, keywords, context, history)
+        suggestions: List[str] = []
 
-        if primary_intent == 'ask_question':
-            question_data = analysis.get('core_data')
-            logging.debug(f"Question data: {question_data}")
-            if question_data and 'key' in question_data:
-                key_to_find = question_data['key']
-                logging.debug(f"Looking up fact in database for key: {key_to_find}")
-                answer = self.db.get_fact(key_to_find)
+        # Example proactive suggestion: if user asks for files or code but no snippets returned
+        if mode == "Auto" and any(w in text.lower() for w in ["file", "code", "project"]) and not suggestions:
+            suggestions.append("I can search your files for more details. Try describing your problem or code.")
 
-                if answer:
-                    self.last_used_trait = "Factual"
-                    return answer
-                else:
-                    self.last_used_trait = "Informative"
-                    return f"I'm sorry, I don't have any information about '{question_data['key']}'. You can teach me by saying, 'Remember that {question_data['key']} is...'"
-            else:
-                self.last_used_trait = "Informative"
-                return "I'm not sure what you're asking. Can you be more specific?"
+        return PersonaResponse(
+            text=reply,
+            mode=mode,
+            sentiment=sentiment,
+            proactive_suggestions=suggestions,
+            quality_score=None,
+        )
 
-        if primary_intent == "greeting":
-            self.last_used_trait = "Enthusiastic"
-            return self.get_greeting()
+    # --------- Mode Styles ---------
 
-        mood = analysis.get('sentiment', {}).get('overall_mood', 'neutral')
-        logging.debug(f"Mood: {mood}")
-        possible_traits = self.mood_map.get(mood, self.mood_map['neutral'])
-        chosen_trait = random.choice(possible_traits)
-        logging.debug(f"Chosen trait: {chosen_trait}")
-        self.last_used_trait = chosen_trait
+    def _auto_style(self,
+                    text: str,
+                    keywords: List[str],
+                    context: Dict[str, Any],
+                    history: List[Dict[str, Any]]) -> str:
+        """
+        Balanced tone for Auto mode.  Summarize intent and offer help.
+        """
+        parts = [f"Sure, let me think about “{text.strip()}.”"]
 
-        response_list = self.persona_traits.get(chosen_trait)
-        logging.debug(f"Response list for trait '{chosen_trait}': {response_list}")
+        if context:
+            ctx_parts = []
+            for k in ["project", "goal", "deadline", "priority"]:
+                val = context.get(k)
+                if val:
+                    ctx_parts.append(f"{k}: {val}")
+            if ctx_parts:
+                parts.append("Context: " + "; ".join(ctx_parts))
 
-        if response_list:
-            return random.choice(response_list)
-        else:
-            self.last_used_trait = "Informative"
-            return random.choice(self.persona_traits["Informative"])
+        if history:
+            parts.append("I’ll also take your recent messages into account.")
+
+        return " ".join(parts)
+
+    def _creative_style(self,
+                        text: str,
+                        keywords: List[str],
+                        context: Dict[str, Any],
+                        history: List[Dict[str, Any]]) -> str:
+        """
+        Creative tone.  Encourage brainstorming and imaginative twists.
+        """
+        intro = "✨ Let’s get creative! "
+        idea = f"Imagine “{text.strip()}” as part of a story or design. "
+        if keywords:
+            idea += f"We could weave in themes like {', '.join(keywords[:3])}. "
+        if context.get("goal"):
+            idea += f"All while staying true to your goal of {context['goal']}."
+        return intro + idea
+
+    def _deep_dive_style(self,
+                         text: str,
+                         keywords: List[str],
+                         context: Dict[str, Any],
+                         history: List[Dict[str, Any]]) -> str:
+        """
+        Deep Dive tone.  Break down problems systematically.
+        """
+        parts = ["Let’s dive deeper. Here’s a quick analysis:"]
+
+        if keywords:
+            parts.append("Key topics: " + ", ".join(keywords[:5]) + ".")
+        if context:
+            ctx_parts = []
+            for k in ["project", "goal"]:
+                if context.get(k):
+                    ctx_parts.append(f"{k}: {context[k]}")
+            if ctx_parts:
+                parts.append("Context – " + "; ".join(ctx_parts) + ".")
+        parts.append("Feel free to ask follow‑up questions or provide more details.")
+        return " ".join(parts)
+
+    def _support_style(self,
+                       text: str,
+                       keywords: List[str],
+                       context: Dict[str, Any],
+                       history: List[Dict[str, Any]]) -> str:
+        """
+        Supportive tone.  Empathize and encourage.
+        """
+        parts = ["I'm here for you."]
+
+        if any(w in text.lower() for w in ["stress", "overwhelm", "can’t", "stuck", "help"]):
+            parts.append("It sounds like you're facing a challenge—remember it's okay to take it slow.")
+        if context.get("goal"):
+            parts.append(f"You're working towards {context['goal']}, and that’s admirable.")
+        parts.append("How can I assist further?")
+        return " ".join(parts)
+
+    def _quick_hit_style(self,
+                         text: str,
+                         keywords: List[str],
+                         context: Dict[str, Any],
+                         history: List[Dict[str, Any]]) -> str:
+        """
+        Quick, direct responses.  Minimal fluff.
+        """
+        return f"Got it — “{text.strip()}.” I’m on it."
+
+# Instantiate a global persona engine for use in app.py
+persona_engine = PersonaEngine()
