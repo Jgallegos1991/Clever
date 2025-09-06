@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clever</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=3" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self';">
+  </head>
+  <body class="grid-full">
+    <!-- Keep classic structure and styling -->
+    <canvas id="main-canvas"></canvas>
+    <div class="hud">
+      <div class="chat-panel">
+        <!-- Use fixed id so JS works -->
+        <div id="chat-log" class="chat"></div>
+      </div>
+      <div class="entrybar">
+        <!-- Wrap in a proper form so Enter submits -->
+        <form id="input-form" class="entry" autocomplete="off">
+          <button class="icon mic-btn" id="mic-btn" type="button" title="Talk to Clever" aria-label="Voice Input">🎤</button>
+          <select id="voice-select" title="Voice">
+            <option>Loading voices…</option>
+          </select>
+          <button class="icon" id="tts-toggle" type="button" aria-pressed="true" title="Voice On/Off">🔊</button>
+          <input id="chat-input" placeholder="Talk to Clever..." />
+          <button id="send-button" class="icon" title="Send" aria-label="Send" type="submit">➤</button>
+        </form>
+      </div>
+    </div>
+    <!-- Keep JS minimal and offline -->
+    <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
+  </body>
+  </html>

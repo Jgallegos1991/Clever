@@ -4,32 +4,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Clever</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=2" />
+    <link rel="stylesheet" href="/static/css/style.css?v=3" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self';">
   </head>
-  <body class="grid-full" data-enable-rclone="{{ '1' if ENABLE_RCLONE else '0' }}">
-    <canvas id="scene"></canvas>
+  <body class="grid-full">
+    <!-- Keep classic structure and styling -->
+    <canvas id="main-canvas"></canvas>
     <div class="hud">
       <div class="chat-panel">
-        <div id="chat" class="chat"></div>
+        <!-- Use fixed id so JS works -->
+        <div id="chat-log" class="chat"></div>
       </div>
       <div class="entrybar">
-        <div class="entry">
-          <button class="icon mic-btn" id="mic-btn" title="Talk to Clever" aria-label="Voice Input">🎤</button>
+        <!-- Wrap in a proper form so Enter submits -->
+        <form id="input-form" class="entry" autocomplete="off">
+          <button class="icon mic-btn" id="mic-btn" type="button" title="Talk to Clever" aria-label="Voice Input">🎤</button>
+          <select id="voice-select" title="Voice">
+            <option>Loading voices…</option>
+          </select>
+          <button class="icon" id="tts-toggle" type="button" aria-pressed="true" title="Voice On/Off">🔊</button>
           <input id="chat-input" placeholder="Talk to Clever..." />
-        </div>
+          <button id="send-button" class="icon" title="Send" aria-label="Send" type="submit">➤</button>
+        </form>
       </div>
     </div>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/static/js/core/sw.js').catch(() => {});
-        });
-      }
-    </script>
-    <script src="/static/js/engines/einstein-engine.js"></script>
-    <script src="/static/js/performance/clever-performance-quick.js"></script>
-    <script src="/static/js/engines/quantum-scene-simple.js"></script>
-    <script src="/static/js/performance/performance-dashboard.js"></script>
-    <script src="/static/js/core/app.js?v=11"></script>
+    <!-- Keep JS minimal and offline -->
+    <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='voice.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='orb_renderer.js') }}"></script>
   </body>
 </html>

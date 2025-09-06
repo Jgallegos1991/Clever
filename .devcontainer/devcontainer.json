@@ -1,4 +1,15 @@
 {
+  "name": "Clever DevContainer",
+  "postStartCommand": "bash -lc 'if [ -n \"${TAILSCALE_AUTHKEY:-}\" ]; then chmod +x .devcontainer/tailscale-up.sh && .devcontainer/tailscale-up.sh; else echo \"[devcontainer] Tailscale skipped (TAILSCALE_AUTHKEY not set)\"; fi'",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/workspaces/projects/.venv/bin/python"
+      }
+    }
+  }
+}
+{
   "name": "Clever – Minimal (Jay)",
   "image": "mcr.microsoft.com/devcontainers/python:3.12",
   "containerEnv": { "PORT": "5000" },
