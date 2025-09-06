@@ -6,7 +6,7 @@ from __future__ import annotations
 import threading
 from functools import lru_cache
 from types import SimpleNamespace
-from typing import List, Iterable, Optional
+from typing import List, Iterable, Optional, TYPE_CHECKING
 
 # Optional deps — everything must remain offline-safe.
 try:
@@ -19,6 +19,12 @@ try:
 except Exception:  # pragma: no cover
     TextBlob = None  # type: ignore
 
+if TYPE_CHECKING:
+    if spacy is not None:
+        from spacy.language import Language
+    else:
+        Language = None  # type: ignore
+
 # ---- Lazy, thread-safe singleton for spaCy -------------------------------------------------------
 
 _NLP = None
@@ -26,7 +32,7 @@ _NLP_LOCK = threading.Lock()
 _SPACY_MODEL_NAME = "en_core_web_sm"  # pinned in requirements, but we still guard
 
 
-def _load_spacy() -> Optional["spacy.language.Language"]:
+def _load_spacy() -> Optional["Language"]:
     """Load spaCy once, lazily. Never crash: return None if unavailable."""
     global _NLP
     if _NLP is not None:
@@ -196,3 +202,15 @@ class _NLPProcessor:
 
 # Singleton export used by the app
 nlp_processor = _NLPProcessor()
+
+# Public class alias for external imports
+class UnifiedNLPProcessor(_NLPProcessor):
+    """Public interface to the NLP processor. Alias for _NLPProcessor."""
+    
+    def __init__(self) -> None:
+        super().__init__()
+    
+    @property
+    def nlp(self):
+        """Provide access to the underlying spaCy model for compatibility checks."""
+        return self._ensure()

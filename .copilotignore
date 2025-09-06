@@ -1,0 +1,10 @@
+*.db
+conversations.json
+**/backups/**
+**/.venv/**
+**/__pycache__/**
+.env
+.env.*
+*.zip
+*.tar
+*.tar.gz

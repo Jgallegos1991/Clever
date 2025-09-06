@@ -372,6 +372,37 @@ class DatabaseManager:
                 })
             return out
 
+    # --- Compatibility: store user+assistant exchange and an interaction ---
+    def add_conversation(self, user_text: str, reply_text: str, *, meta: dict | None = None) -> None:
+        try:
+            self.add_utterance("user", user_text, mode=(meta or {}).get("detected_intent"))
+            self.add_utterance("assistant", reply_text, mode=(meta or {}).get("activePersona"))
+            self.add_interaction(
+                user_input=user_text,
+                active_mode=(meta or {}).get("activePersona"),
+                action_taken=(meta or {}).get("detected_intent"),
+                parsed_data=meta or {},
+            )
+        except Exception:
+            pass
+
 
 # Shared instance
 db_manager = DatabaseManager(config.DB_PATH)
+
+# --- Compatibility shim ---
+def add_conversation(user_text: str, reply_text: str, *, meta: dict | None = None) -> None:
+    """Back-compat function if callers import add_conversation directly.
+    Prefer database.db_manager.add_conversation, but keep this to avoid crashes.
+    """
+    try:
+        db_manager.add_utterance("user", user_text, mode=(meta or {}).get("detected_intent"))
+        db_manager.add_utterance("assistant", reply_text, mode=(meta or {}).get("activePersona"))
+        db_manager.add_interaction(
+            user_input=user_text,
+            active_mode=(meta or {}).get("activePersona"),
+            action_taken=(meta or {}).get("detected_intent"),
+            parsed_data=meta or {},
+        )
+    except Exception:
+        pass
