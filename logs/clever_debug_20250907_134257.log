@@ -1,0 +1,11 @@
+2025-09-07 13:42:57,937 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-07 13:42:57,937 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250907_134257
+2025-09-07 13:42:57,937 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-07 13:42:57,937 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-07 13:42:57,937 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-07 13:42:57,938 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-07 13:42:57,938 |     INFO | clever_ai | info:108 | [INTEGRATION_TEST] All systems integrated successfully
+2025-09-07 13:42:57,938 |    ERROR | clever_ai | error:128 | [ERROR_RECOVERY] Error occurred | Data: {"context": {"integration_test": true}} | Error: Integration test error
+2025-09-07 13:42:57,938 |    ERROR | clever_ai | error:129 | Traceback: NoneType: None
+
+2025-09-07 13:42:57,938 |  WARNING | clever_ai | warning:116 | [ERROR_RECOVERY] No recovery strategy found for error | {"error_type": "RuntimeError"}

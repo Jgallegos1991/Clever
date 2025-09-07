@@ -144,3 +144,5 @@ Ingestion complete. inserted=0 updated=0 unchanged=0 failed=0
 127.0.0.1 - - [31/Aug/2025 07:16:43] "GET /health HTTP/1.1" 200 -
 127.0.0.1 - - [31/Aug/2025 07:17:43] "GET /context/notes HTTP/1.1" 200 -
 127.0.0.1 - - [31/Aug/2025 07:17:43] "GET /health HTTP/1.1" 200 -
+
+
