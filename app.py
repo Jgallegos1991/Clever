@@ -152,19 +152,57 @@ def chat():
                 "blocked_request": True
             })
         
-        # Process with error recovery
+        # Process with enhanced conversation engine and error recovery
         try:
             # Get NLP analysis
             analysis = {}
             if nlp_processor:
                 analysis = nlp_processor.process(user_message)
             
-            # Get Clever's response
-            response = "I understand your message, but I'm running in minimal mode."
-            if clever_persona and analysis:
-                response = clever_persona.generate_response(user_message, USER_NAME, analysis)
+            # Use enhanced conversation engine for response
+            try:
+                from clever_conversation_engine import process_clever_conversation
+                
+                # Prepare context
+                context = {
+                    "user": USER_NAME,
+                    "timestamp": datetime.now().isoformat(),
+                    "session_id": request.environ.get('HTTP_X_SESSION_ID', 'default')
+                }
+                
+                # Get knowledge base if available
+                knowledge_base = None
+                try:
+                    from knowledge_base import get_knowledge_base
+                    knowledge_base = get_knowledge_base()
+                except Exception:
+                    pass  # Knowledge base not available
+                
+                # Process through enhanced conversation engine
+                conversation_result = process_clever_conversation(user_message, analysis, context, knowledge_base)
+                
+                response = conversation_result["response"]
+                
+                if debugger:
+                    debugger.info('conversation', f'Enhanced conversation processing - approach: {conversation_result.get("approach")}, mood: {conversation_result.get("mood")}')
+                
+            except Exception as conv_error:
+                if debugger:
+                    debugger.warning('conversation', f'Enhanced conversation engine failed, falling back: {conv_error}')
+                
+                # Fallback to basic persona
+                response = "I understand your message, but I'm running in minimal mode."
+                if clever_persona and analysis:
+                    response = clever_persona.generate_response(user_message, USER_NAME, analysis)
+                
+                conversation_result = {
+                    "response": response,
+                    "mood": "curious",
+                    "energy": 0.7,
+                    "approach": "fallback"
+                }
             
-            # Evolution learning
+            # Evolution learning with enhanced data
             try:
                 evolution_engine = get_evolution_engine()
                 evolution_engine.learn_from_interaction(user_message, response, analysis)
@@ -178,11 +216,23 @@ def chat():
             db_manager.add_conversation(user_message, response)
             
             if debugger:
-                debugger.info('app', 'Chat interaction completed successfully')
+                debugger.info('app', 'Enhanced chat interaction completed successfully')
             
+            # Return enhanced response data
             return jsonify({
                 "response": response,
                 "analysis": analysis,
+                "mood": conversation_result.get("mood", "curious"),
+                "energy": conversation_result.get("energy", 0.7),
+                "excitement": conversation_result.get("excitement", 0.5),
+                "creativity": conversation_result.get("creativity", 0.7),
+                "approach": conversation_result.get("approach", "curious_collaborator"),
+                "particle_intensity": conversation_result.get("particle_intensity", 0.6),
+                "ui_reactions": conversation_result.get("ui_reactions", {}),
+                "insights": conversation_result.get("insights", []),
+                "proactive_suggestions": conversation_result.get("proactive_suggestions", []),
+                "clever_state": conversation_result.get("clever_state", {}),
+                "conversation_context": conversation_result.get("conversation_context", {}),
                 "timestamp": datetime.now().isoformat()
             })
             
@@ -448,6 +498,68 @@ def evolution_status():
     """Get Clever's current evolution status"""
     try:
         evolution_engine = get_evolution_engine()
+        status = evolution_engine.get_evolution_status()
+        return jsonify(status)
+    except Exception as e:
+        if debugger:
+            debugger.error('app', f'Evolution status error: {e}')
+        return jsonify({"error": str(e)}), 500
+
+# -------- Enhanced Conversation Engine Endpoints --------
+
+@app.route('/api/clever-greeting')
+def clever_greeting():
+    """Get Clever's dynamic contextual greeting"""
+    try:
+        from clever_conversation_engine import get_clever_greeting
+        greeting_data = get_clever_greeting()
+        
+        if debugger:
+            debugger.info('conversation', f'Generated greeting: {greeting_data["greeting"][:50]}...')
+        
+        return jsonify(greeting_data)
+    except Exception as e:
+        if debugger:
+            debugger.error('conversation', f'Greeting generation error: {e}')
+        return jsonify({
+            "greeting": "Hey Jay! 🌟 Ready for some magical thinking together?",
+            "mood": "curious",
+            "energy": 0.7,
+            "particle_intensity": 0.6
+        })
+
+@app.route('/api/clever-state')
+def clever_state():
+    """Get Clever's current personality and system state"""
+    try:
+        from clever_conversation_engine import CleverConversationEngine
+        engine = CleverConversationEngine()
+        
+        # Get comprehensive state
+        state_data = {
+            "clever_state": engine.clever_state,
+            "conversation_patterns": engine._analyze_conversation_patterns(),
+            "session_insights": engine._generate_clever_insights({}, {}),
+            "greeting": engine.get_dynamic_greeting()["greeting"]
+        }
+        
+        if debugger:
+            debugger.info('conversation', f'State request - mood: {engine.clever_state["mood"]}, energy: {engine.clever_state["energy"]:.2f}')
+        
+        return jsonify(state_data)
+    except Exception as e:
+        if debugger:
+            debugger.error('conversation', f'State retrieval error: {e}')
+        return jsonify({
+            "clever_state": {
+                "mood": "curious",
+                "energy": 0.7,
+                "creativity": 0.7,
+                "focus": 0.6
+            },
+            "conversation_patterns": {"status": "State not available"},
+            "session_insights": ["Starting fresh conversation"]
+        })
         status = evolution_engine.get_evolution_status()
         return jsonify(status)
     except Exception as e:

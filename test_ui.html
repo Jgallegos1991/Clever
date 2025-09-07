@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clever UI Test</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        #main-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, rgba(0, 50, 100, 0.3) 0%, rgba(0, 0, 0, 1) 100%);
+            z-index: 1;
+        }
+        
+        .hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+        
+        .chat-panel {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            pointer-events: auto;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .chat {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .entrybar {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 25px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        #chat-input::placeholder {
+            color: #888;
+        }
+        
+        button {
+            background: #00ff88;
+            border: none;
+            color: #000;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        button:hover {
+            background: #00dd77;
+        }
+        
+        .status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 3px solid #00ff88;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="main-canvas"></canvas>
+    
+    <div class="status">
+        🟢 Clever UI Test - Interface Visible
+    </div>
+    
+    <div class="hud">
+        <div class="chat-panel">
+            <div id="chat-log" class="chat">
+                <div class="message">
+                    <strong>System:</strong> Welcome to Clever! This is what you should see:
+                </div>
+                <div class="message">
+                    <strong>✨ Features:</strong>
+                    <br>• Animated particles background (canvas)
+                    <br>• Chat interface with glowing borders
+                    <br>• Voice input button (🎤)
+                    <br>• Demo mode button (🎬)
+                    <br>• Type-anywhere functionality
+                </div>
+                <div class="message">
+                    <strong>How to use:</strong>
+                    <br>• Click anywhere to focus chat input
+                    <br>• Type your message and press Enter
+                    <br>• Click 🎤 for voice input
+                    <br>• Click 🎬 for demo mode
+                </div>
+            </div>
+            
+            <div class="entrybar">
+                <button title="Demo Mode">🎬</button>
+                <button title="Voice Input">🎤</button>
+                <input id="chat-input" placeholder="Talk to Clever..." />
+                <button title="Send">➤</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simple test to show interface is working
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const message = this.value.trim();
+                if (message) {
+                    const chatLog = document.getElementById('chat-log');
+                    chatLog.innerHTML += `<div class="message"><strong>You:</strong> ${message}</div>`;
+                    chatLog.innerHTML += `<div class="message"><strong>Clever:</strong> I received: "${message}". The interface is working!</div>`;
+                    this.value = '';
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                }
+            }
+        });
+        
+        // Click anywhere to focus
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+                document.getElementById('chat-input').focus();
+            }
+        });
+        
+        console.log('🎯 Clever UI Test: Interface loaded successfully!');
+    </script>
+</body>
+</html>

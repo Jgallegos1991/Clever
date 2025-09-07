@@ -1,0 +1,9 @@
+2025-09-07 13:45:44,048 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-07 13:45:44,048 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250907_134544
+2025-09-07 13:45:44,048 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-07 13:45:44,048 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-07 13:45:44,048 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-07 13:45:44,049 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-07 13:45:44,556 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] Starting full health check
+2025-09-07 13:45:45,557 |  WARNING | clever_ai | warning:116 | [HEALTH_MONITOR] System resource alerts | {"alerts": ["High memory usage: 6161.6MB"]}
+2025-09-07 13:45:46,180 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] Health check complete: 2/4 healthy | {"overall_status": "warning"}
