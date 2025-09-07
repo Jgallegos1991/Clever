@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Clever</title>
     <link rel="stylesheet" href="/static/css/style.css?v=3" />
+    <link rel="stylesheet" href="/static/css/magical_ui.css?v=1" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self';">
   </head>
   <body class="grid-full">
@@ -18,6 +19,7 @@
       <div class="entrybar">
         <!-- Wrap in a proper form so Enter submits -->
         <form id="input-form" class="entry" autocomplete="off">
+          <button class="icon demo-btn" id="demo-btn" type="button" title="Demo Mode" aria-label="Start Demo">🎬</button>
           <button class="icon mic-btn" id="mic-btn" type="button" title="Talk to Clever" aria-label="Voice Input">🎤</button>
           <select id="voice-select" title="Voice">
             <option>Loading voices…</option>
@@ -28,9 +30,13 @@
         </form>
       </div>
     </div>
+    <!-- BADASS Magical UI System -->
+    <script src="{{ url_for('static', filename='clever_magical_ui.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='demo_mode.js') }}"></script>
     <!-- Keep JS minimal and offline -->
     <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='voice.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='orb_renderer.js') }}"></script>
+    <script src="{{ url_for('static', filename='clever_evolution.js') }}"></script>
   </body>
 </html>
