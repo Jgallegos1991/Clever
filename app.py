@@ -3,19 +3,57 @@ from datetime import datetime
 from flask import Flask, request, jsonify, render_template
 from io import BytesIO
 import json as _json
+
 # Ensure repo root on path so utils.* resolves in tests and runtime
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 if APP_ROOT not in sys.path:
     sys.path.insert(0, APP_ROOT)
 
 from utils import offline_guard
+from evolution_engine import get_evolution_engine
 
-# -------- config (tolerate missing) ----------
+# Import debugging and monitoring systems
+try:
+    from debug_config import get_debugger, debug_method, performance_monitor
+    from health_monitor import get_health_monitor
+    from error_recovery import get_error_recovery, handle_error_with_recovery
+    from test_suite import get_test_suite
+    
+    # Initialize systems
+    debugger = get_debugger()
+    health_monitor = get_health_monitor()
+    error_recovery = get_error_recovery()
+    test_suite = get_test_suite()
+    
+    debugger.info('app', 'Debug and monitoring systems initialized')
+except Exception as e:
+    print(f"[WARN] Debug systems not available: {e}")
+    debugger = None
+    health_monitor = None
+    error_recovery = None
+    test_suite = None
+
+# -------- User & Config Integration ----------
 try:
     import config as user_config
+    from user_config import USER_NAME, USER_EMAIL, TAILSCALE_ENABLED, CLEVER_EXTERNAL_ACCESS
     DEBUG = getattr(user_config, "DEBUG", True)
-except Exception:
+    if debugger:
+        debugger.info('app', f'Clever AI configured for: {USER_NAME} ({USER_EMAIL})')
+    else:
+        print(f"🔧 Clever AI configured for: {USER_NAME} ({USER_EMAIL})")
+    if TAILSCALE_ENABLED:
+        print(f"🌐 Tailscale integration enabled")
+    if CLEVER_EXTERNAL_ACCESS:
+        print(f"🌍 External access enabled via Tailscale")
+except Exception as e:
     DEBUG = True
+    USER_NAME = "Jay"
+    USER_EMAIL = "user@example.com"
+    TAILSCALE_ENABLED = False
+    CLEVER_EXTERNAL_ACCESS = False
+    if error_recovery:
+        error_recovery.handle_error(e, {'context': 'user_config_loading'})
 
 # -------- database (tolerate missing) --------
 class _NullDB:
@@ -26,15 +64,27 @@ try:
     from database import db_manager as real_db
     db_manager = real_db or db_manager
 except Exception as e:
-    print(f"[WARN] DB not wired, running without persistence: {e}")
+    if debugger:
+        debugger.warning('app', 'DB not wired, running without persistence', e)
+    else:
+        print(f"[WARN] DB not wired, running without persistence: {e}")
+    if error_recovery:
+        error_recovery.handle_error(e, {'context': 'database_initialization'})
 
 # -------- NLP (tolerate missing) -------------
 nlp_processor = None
 try:
     from nlp_processor import UnifiedNLPProcessor
     nlp_processor = UnifiedNLPProcessor()
+    if debugger:
+        debugger.info('app', 'NLP processor initialized successfully')
 except Exception as e:
-    print(f"[WARN] NLP offline/unavailable: {e}")
+    if debugger:
+        debugger.warning('app', 'NLP offline/unavailable', e)
+    else:
+        print(f"[WARN] NLP offline/unavailable: {e}")
+    if error_recovery:
+        error_recovery.handle_error(e, {'context': 'nlp_initialization'})
 
 # -------- Persona (required, but degrade) ----
 class _FallbackPersona:
@@ -82,93 +132,91 @@ def service_worker_stub():
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    t0 = time.time()
-    payload = request.get_json(silent=True) or {}
-    user_message = (payload.get('message') or '').strip()
-    if not user_message:
-        return jsonify({"error": "No message received."}), 400
-
-    # analysis (offline safe)
-    analysis = {"user_input": user_message, "detected_intent": "chat", "intents": []}
-    if user_message.endswith("?"):
-        analysis["detected_intent"] = "ask_question"
-
-    if nlp_processor and hasattr(nlp_processor, "process"):
-        try:
-            # enrich, but never fail the request; coerce SimpleNamespace to dict
-            extra = nlp_processor.process(user_message) or {}
-            if hasattr(extra, "__dict__"):
-                extra = vars(extra)
-            if isinstance(extra, dict):
-                for k, v in extra.items():
-                    if k not in ("__dict__",):
-                        analysis[k] = v
-        except Exception as e:
-            print(f"[WARN] NLP process error: {e}")
-
-    # lightweight shape intent
+    """Main chat endpoint with debug integration"""
     try:
-        t = user_message.lower()
-        shape = None
-        if any(w in t for w in ("cube", "box")): shape = "cube"
-        elif any(w in t for w in ("sphere", "ball", "orb", "globe")): shape = "sphere"
-        elif any(w in t for w in ("torus", "ring", "donut")): shape = "torus"
-        elif any(w in t for w in ("pyramid", "cone")): shape = "cone"
-        elif "dodeca" in t: shape = "dodecahedron"
-        if shape:
-            analysis.setdefault("intents", []).append({
-                "name": "ui.shape",
-                "confidence": 0.9,
-                "details": {"shape": shape}
+        if debugger:
+            debugger.debug('app', 'Chat request received')
+        
+        data = request.get_json()
+        if not data or 'message' not in data:
+            return jsonify({"error": "No message provided"}), 400
+        
+        user_message = data['message'].strip()
+        if not user_message:
+            return jsonify({"error": "Empty message"}), 400
+        
+        # Apply offline guard
+        if offline_guard.contains_network_reference(user_message):
+            return jsonify({
+                "response": "I'm designed to work completely offline! I can't access external networks or services.",
+                "blocked_request": True
             })
-    except Exception:
-        pass
-
-    raw_reply = "I’m here with you, Jay."
-    try:
-        raw_reply = clever_persona.generate_response(analysis)
-    except Exception as e:
-        print(f"[WARN] Persona generate_response failed: {e}")
-
-    # Ensure frontend gets a plain text reply
-    reply_text = None
-    if isinstance(raw_reply, dict):
-        # common shapes: { text, analysis/meta, keywords, ... }
-        reply_text = str(raw_reply.get("text") or raw_reply.get("reply") or "")
-        extra = raw_reply.get("analysis") or raw_reply.get("meta") or None
-        if isinstance(extra, dict):
-            # non-destructive merge of any extra analysis
-            for k, v in extra.items():
-                analysis.setdefault(k, v)
-    else:
-        reply_text = str(raw_reply)
-
-    try:
-        # Enhanced logging with user context and timestamp
-        conversation_data = {
-            "user_message": user_message,
-            "ai_reply": reply_text,
-            "analysis": analysis,
-            "persona_trait": getattr(clever_persona, "last_used_trait", "Base"),
-            "timestamp": time.time()
-        }
-        db_manager.add_conversation(user_message, reply_text, meta=conversation_data)
-    except Exception as e:
-        print(f"[WARN] DB add_conversation failed: {e}")
-        # Log to file as backup
+        
+        # Process with error recovery
         try:
-            with open(os.path.join(APP_ROOT, 'logs', 'conversations_backup.log'), 'a') as f:
-                f.write(f"{time.time()}|{user_message}|{reply_text}\n")
-        except Exception:
-            pass
-
-    thought = {
-        "activePersona": getattr(clever_persona, "last_used_trait", "Base"),
-        "responseTime": int((time.time() - t0) * 1000),
-        "detected_intent": analysis.get("detected_intent", "chat"),
-        "intents": analysis.get("intents", []),
-    }
-    return jsonify({"reply": reply_text, "analysis": thought})
+            # Get NLP analysis
+            analysis = {}
+            if nlp_processor:
+                analysis = nlp_processor.process(user_message)
+            
+            # Get Clever's response
+            response = "I understand your message, but I'm running in minimal mode."
+            if clever_persona and analysis:
+                response = clever_persona.generate_response(user_message, USER_NAME, analysis)
+            
+            # Evolution learning
+            try:
+                evolution_engine = get_evolution_engine()
+                evolution_engine.learn_from_interaction(user_message, response, analysis)
+                if debugger:
+                    debugger.debug('app', 'Evolution learning completed')
+            except Exception as e:
+                if debugger:
+                    debugger.warning('app', 'Evolution learning failed', e)
+            
+            # Log conversation
+            db_manager.add_conversation(user_message, response)
+            
+            if debugger:
+                debugger.info('app', 'Chat interaction completed successfully')
+            
+            return jsonify({
+                "response": response,
+                "analysis": analysis,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            if error_recovery:
+                recovery_result = error_recovery.handle_error(e, {
+                    'endpoint': '/chat',
+                    'user_message': user_message[:100]  # Truncated for privacy
+                })
+                
+                # If recovery was attempted, try again
+                if recovery_result.get('recovery_successful'):
+                    if debugger:
+                        debugger.info('app', 'Retrying chat after successful recovery')
+                    # Simple retry logic here - in production, you might want more sophisticated retry
+                    response = "I had a brief moment of confusion, but I'm back now! How can I help you?"
+                else:
+                    response = "I'm experiencing some technical difficulties, but I'm still here to help as best I can."
+                
+                return jsonify({
+                    "response": response,
+                    "recovery_info": recovery_result,
+                    "timestamp": datetime.now().isoformat()
+                })
+            else:
+                raise e
+            
+    except Exception as e:
+        if debugger:
+            debugger.error('app', 'Chat endpoint failed', e)
+        return jsonify({
+            "error": "I'm having trouble processing your message right now. Please try again.",
+            "technical_error": str(e) if DEBUG else None
+        }), 500
 
 @app.post('/api/stt')
 def stt():
@@ -332,7 +380,130 @@ def ingest():
 
 @app.get('/health')
 def health():
-    return jsonify({"status": "ok"})
+    """Basic health check endpoint"""
+    try:
+        if health_monitor:
+            health_data = health_monitor.run_full_health_check()
+            return jsonify(health_data)
+        else:
+            return jsonify({"status": "ok", "monitoring": "disabled"})
+    except Exception as e:
+        if error_recovery:
+            recovery_result = error_recovery.handle_error(e, {'endpoint': '/health'})
+            return jsonify({
+                "status": "error", 
+                "error": str(e),
+                "recovery_attempted": recovery_result.get('recovery_attempted', False)
+            }), 500
+        else:
+            return jsonify({"status": "error", "error": str(e)}), 500
+
+@app.get('/debug/status')
+def debug_status():
+    """Debug system status endpoint"""
+    try:
+        if not debugger:
+            return jsonify({"error": "Debug system not available"}), 503
+        
+        status = {
+            "debug_enabled": True,
+            "health_monitor": health_monitor is not None,
+            "error_recovery": error_recovery is not None,
+            "test_suite": test_suite is not None,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        if health_monitor:
+            status["health_summary"] = health_monitor.get_health_summary()
+        
+        if error_recovery:
+            status["error_statistics"] = error_recovery.get_error_statistics()
+        
+        return jsonify(status)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.get('/debug/test')
+def debug_test():
+    """Run quick system tests"""
+    try:
+        if not test_suite:
+            return jsonify({"error": "Test suite not available"}), 503
+        
+        from test_suite import run_quick_tests
+        results = run_quick_tests()
+        return jsonify(results)
+    except Exception as e:
+        if error_recovery:
+            recovery_result = error_recovery.handle_error(e, {'endpoint': '/debug/test'})
+            return jsonify({
+                "error": str(e),
+                "recovery_attempted": recovery_result.get('recovery_attempted', False)
+            }), 500
+        else:
+            return jsonify({"error": str(e)}), 500
+
+@app.route('/evolution-status')
+def evolution_status():
+    """Get Clever's current evolution status"""
+    try:
+        evolution_engine = get_evolution_engine()
+        status = evolution_engine.get_evolution_status()
+        return jsonify(status)
+    except Exception as e:
+        return jsonify({"error": f"Evolution status unavailable: {e}"}), 500
+
+@app.route('/sync-status')
+def sync_status():
+    """API endpoint for sync status"""
+    try:
+        with open('./static/js/sync_status.json', 'r') as f:
+            status = _json.load(f)
+        return jsonify(status)
+    except FileNotFoundError:
+        return jsonify({"status": "no_sync_data", "timestamp": datetime.now().isoformat()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/pdf-knowledge')
+def pdf_knowledge():
+    """API endpoint to get processed PDF knowledge"""
+    try:
+        import sqlite3
+        conn = sqlite3.connect('clever.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT filename, processed_date, chunk_count, entities, keywords
+            FROM pdf_knowledge 
+            ORDER BY processed_date DESC
+            LIMIT 20
+        ''')
+        
+        pdfs = []
+        for row in cursor.fetchall():
+            filename, processed_date, chunk_count, entities_json, keywords_json = row
+            
+            try:
+                entities = _json.loads(entities_json) if entities_json else []
+                keywords = _json.loads(keywords_json) if keywords_json else []
+            except:
+                entities, keywords = [], []
+            
+            pdfs.append({
+                'filename': filename,
+                'processed_date': processed_date,
+                'chunk_count': chunk_count,
+                'entity_count': len(entities),
+                'keyword_count': len(keywords),
+                'entities': entities[:10],  # First 10 entities
+                'keywords': keywords[:20]   # First 20 keywords
+            })
+        
+        conn.close()
+        return jsonify(pdfs)
+    except Exception as e:
+        return jsonify({"error": f"PDF knowledge unavailable: {e}"}), 500
 
 @app.after_request
 def add_security_headers(resp):
@@ -344,7 +515,98 @@ def add_security_headers(resp):
     return resp
 
 if __name__ == '__main__':
+    """Main application startup with comprehensive system initialization"""
+    print("\n🧠 Clever AI - Advanced Personal Assistant")
+    print("=" * 50)
+    
+    # Run system initialization and health checks
+    if debugger:
+        debugger.info('app', 'Starting Clever AI system initialization')
+    
+    # Run startup health check
+    if health_monitor:
+        print("🔍 Running startup health check...")
+        health_status = health_monitor.run_full_health_check()
+        
+        if health_status['overall_status'] == 'healthy':
+            print("✅ All systems healthy")
+        elif health_status['overall_status'] == 'warning':
+            print("⚠️  Some systems have warnings")
+        else:
+            print("❌ System health issues detected")
+        
+        # Print health summary
+        for check_name, check_result in health_status['checks'].items():
+            status_icon = "✅" if check_result.get('status') == 'healthy' else "⚠️" if check_result.get('status') == 'warning' else "❌"
+            print(f"  {status_icon} {check_name}: {check_result.get('status', 'unknown')}")
+    
+    # Run quick tests
+    if test_suite:
+        print("\n🧪 Running quick system tests...")
+        from test_suite import run_quick_tests
+        test_results = run_quick_tests()
+        
+        print(f"  Tests: {test_results['passed_tests']}/{test_results['total_tests']} passed ({test_results['success_rate']:.1f}%)")
+        
+        if test_results['status'] == 'passed':
+            print("✅ All critical tests passed")
+        else:
+            print("⚠️  Some tests failed")
+    
+    # Check evolution engine
+    try:
+        evolution_engine = get_evolution_engine()
+        evolution_status = evolution_engine.get_evolution_status()
+        print(f"\n🧬 Evolution Engine: {evolution_status.get('concept_count', 0)} concepts learned")
+        print(f"   Evolution Score: {evolution_status.get('evolution_score', 0):.3f}")
+    except Exception as e:
+        print(f"⚠️  Evolution engine status unknown: {e}")
+    
+    print(f"\n🎯 Configured for: {USER_NAME}")
+    print(f"🐍 Debug Mode: {'Enabled' if DEBUG else 'Disabled'}")
+    print(f"🌐 External Access: {'Enabled' if CLEVER_EXTERNAL_ACCESS else 'Disabled'}")
+    
     print("🌟 Synaptic Hub Neural Interface Ready!")
-    print("🔗 Local: http://127.0.0.1:5000")
-    app.run(host='0.0.0.0', port=5000, debug=DEBUG)
+    print(f"🔗 Local: http://127.0.0.1:5000")
+    
+    # Show Tailscale access if available
+    if TAILSCALE_ENABLED:
+        try:
+            import subprocess
+            result = subprocess.run(['tailscale', 'ip', '-4'], capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                tailscale_ip = result.stdout.strip()
+                print(f"🌐 Tailscale: http://{tailscale_ip}:5000")
+                print(f"🔒 Secure remote access via Tailscale network")
+            else:
+                print("🌐 Tailscale: Not connected (run ./setup_tailscale.sh)")
+        except Exception:
+            print("🌐 Tailscale: Not available")
+    
+    print("=" * 50)
+    
+    host = user_config.APP_HOST if hasattr(user_config, 'APP_HOST') else '0.0.0.0'
+    port = user_config.APP_PORT if hasattr(user_config, 'APP_PORT') else 5000
+    
+    try:
+        if debugger:
+            debugger.info('app', 'Flask server starting')
+        
+        app.run(host=host, port=port, debug=DEBUG)
+        
+    except KeyboardInterrupt:
+        print("\n👋 Clever AI shutting down gracefully...")
+        if debugger:
+            debugger.info('app', 'Clever AI shutdown initiated by user')
+    except Exception as e:
+        print(f"\n❌ Server error: {e}")
+        if debugger:
+            debugger.error('app', 'Flask server error', e)
+        if error_recovery:
+            recovery_result = error_recovery.handle_error(e, {'context': 'flask_server_startup'})
+            if recovery_result.get('recovery_attempted'):
+                print(f"🔧 Recovery attempted: {recovery_result.get('recovery_message', 'Unknown')}")
+    finally:
+        if debugger:
+            debugger.info('app', 'Clever AI shutdown complete')
 

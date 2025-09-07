@@ -6,6 +6,16 @@ Edit these defaults as needed or override via environment variables.
 import os
 from pathlib import Path
 
+# Import user-specific configuration
+try:
+    from user_config import *
+except ImportError:
+    # Fallback defaults if user_config doesn't exist
+    USER_NAME = "Jay"
+    USER_EMAIL = "user@example.com"
+    TAILSCALE_ENABLED = False
+    CLEVER_EXTERNAL_ACCESS = False
+
 # Base directories
 ROOT_DIR = Path(__file__).resolve().parent
 
@@ -38,9 +48,9 @@ SYNAPTIC_HUB_DIR = str(Path("synaptic_hub_sync").resolve())
 DB_PATH = os.environ.get("CLEVER_DB_PATH", str(ROOT_DIR / "clever.db"))
 
 # Server config
-APP_HOST = "0.0.0.0"
-APP_PORT = 5000
-DEBUG = False
+APP_HOST = getattr(globals(), 'CLEVER_HOST', "0.0.0.0") if CLEVER_EXTERNAL_ACCESS else "127.0.0.1"
+APP_PORT = getattr(globals(), 'CLEVER_PORT', 5000)
+DEBUG = getattr(globals(), 'DEBUG_MODE', False)
 
 # rclone settings (optional)
 RCLONE_REMOTE = os.environ.get("RCLONE_REMOTE", "")
