@@ -1,0 +1,2 @@
+2025-09-07 13:42:54,868 | test.test_function | 0.0101s | avg: 0.0101s | {"success": true, "result_type": "str"}
+2025-09-07 13:42:55,929 | health_monitor.check_system_resources | 1.0009s | avg: 1.0009s
