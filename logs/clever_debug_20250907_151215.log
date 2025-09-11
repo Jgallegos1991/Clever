@@ -1,0 +1,151 @@
+2025-09-07 15:12:15,980 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-07 15:12:15,981 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250907_151215
+2025-09-07 15:12:15,981 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-07 15:12:15,982 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-07 15:12:15,982 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-07 15:12:15,984 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-07 15:12:15,984 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-07 15:12:15,986 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-07 15:12:16,445 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-07 15:12:35,040 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:12:35,040 |     INFO | clever_ai | info:108 | [CONVERSATION] Generated greeting: Hey Jay! Mid-day check-in - I can sense there's so...
+2025-09-07 15:12:41,519 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:12:41,519 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:12:49,521 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:12:49,521 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:12:57,526 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:12:57,526 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:13:05,526 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:13:05,527 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:13:13,533 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:13:13,534 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:13:21,528 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:13:21,529 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:13:29,561 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:13:29,561 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:13:37,518 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:13:37,518 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:13:45,563 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:13:45,563 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:13:53,264 |    ERROR | clever_ai | error:128 | [APP] Chat endpoint failed | Error: module 'utils.offline_guard' has no attribute 'contains_network_reference'
+2025-09-07 15:13:53,264 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/app.py", line 149, in chat
+    if offline_guard.contains_network_reference(user_message):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'utils.offline_guard' has no attribute 'contains_network_reference'
+
+2025-09-07 15:13:53,517 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:13:53,517 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:14:01,529 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:14:01,530 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:14:09,521 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:14:09,521 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:14:17,516 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:14:17,517 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:14:25,529 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:14:25,529 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:14:33,547 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:14:33,547 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:14:41,527 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:14:41,527 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:14:49,541 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:14:49,541 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:14:57,516 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:14:57,517 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:15:05,759 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:15:05,759 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:15:13,522 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:15:13,524 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:15:21,519 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:15:21,520 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:15:24,719 |    ERROR | clever_ai | error:128 | [APP] Chat endpoint failed | Error: module 'utils.offline_guard' has no attribute 'contains_network_reference'
+2025-09-07 15:15:24,719 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/app.py", line 149, in chat
+    if offline_guard.contains_network_reference(user_message):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'utils.offline_guard' has no attribute 'contains_network_reference'
+
+2025-09-07 15:15:29,527 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:15:29,527 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:15:37,521 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:15:37,521 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:15:45,629 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:15:45,630 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:15:53,520 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:15:53,520 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:16:01,529 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:16:01,530 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:16:09,521 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:16:09,521 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:16:17,519 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:16:17,520 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:16:25,519 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:16:25,519 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:16:33,539 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:16:33,540 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:16:42,071 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:16:42,071 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:16:51,048 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:16:51,048 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:16:58,239 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:16:58,240 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:17:06,951 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:17:06,951 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:17:14,247 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:17:14,248 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:17:22,309 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:17:22,309 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:17:30,132 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:17:30,133 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:17:38,289 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:17:38,289 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:17:57,264 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:17:57,265 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:18:57,447 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:18:57,447 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:19:57,561 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:19:57,562 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:20:57,504 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:20:57,504 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:21:57,433 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:21:57,434 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:22:57,448 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:22:57,449 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:23:57,465 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:23:57,465 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:24:20,835 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:24:20,836 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:24:25,689 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:24:25,690 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:24:29,536 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:24:29,537 |     INFO | clever_ai | info:108 | [CONVERSATION] Generated greeting: Afternoon vibes! *stretching digital neurons* What...
+2025-09-07 15:24:35,936 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:24:35,936 |     INFO | clever_ai | info:108 | [CONVERSATION] Generated greeting: Hey! Perfect timing - I was just analyzing some pa...
+2025-09-07 15:24:43,189 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:24:43,190 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:24:51,070 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:24:51,071 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:24:59,069 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:24:59,070 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:25:07,057 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:25:07,057 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:25:15,165 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:25:15,166 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:25:23,149 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:25:23,150 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:25:31,081 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:25:31,082 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:25:39,062 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:25:39,062 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:25:57,164 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:25:57,166 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:26:57,200 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:26:57,201 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:27:57,194 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:27:57,195 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:28:57,502 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:28:57,502 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:29:57,463 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:29:57,464 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70
+2025-09-07 15:30:57,508 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:30:57,509 |     INFO | clever_ai | info:108 | [CONVERSATION] State request - mood: curious, energy: 0.70

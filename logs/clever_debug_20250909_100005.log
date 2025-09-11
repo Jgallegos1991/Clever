@@ -1,0 +1,31 @@
+2025-09-09 10:00:05,903 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 10:00:05,904 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_100005
+2025-09-09 10:00:05,904 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 10:00:05,904 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-09 10:00:05,904 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-09 10:00:05,905 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-09 10:00:05,905 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 10:00:05,905 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 10:00:06,120 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-09 10:00:06,131 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 10:00:06,131 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 10:00:06,131 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-09 10:00:06,272 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] Starting full health check
+2025-09-09 10:00:07,273 |  WARNING | clever_ai | warning:116 | [HEALTH_MONITOR] System resource alerts | {"alerts": ["High memory usage: 6144.0MB"]}
+2025-09-09 10:00:07,706 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] Health check complete: 2/4 healthy | {"overall_status": "warning"}
+2025-09-09 10:00:08,246 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 10:00:08,246 |    ERROR | clever_ai | error:128 | [CONVERSATION] Error in process_conversation | Data: {"duration": "0.0001s", "args_count": 5, "kwargs": []} | Error: 'float' object has no attribute 'get'
+2025-09-09 10:00:08,247 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/debug_config.py", line 223, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 132, in process_conversation
+    "particle_intensity": self._calculate_particle_intensity(analysis, response_approach),
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 497, in _calculate_particle_intensity
+    sentiment = analysis.get('sentiment', {}).get('compound', 0)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'float' object has no attribute 'get'
+
+2025-09-09 10:00:08,247 |  WARNING | clever_ai | warning:116 | [CONVERSATION] Enhanced conversation engine failed, falling back: 'float' object has no attribute 'get'
+2025-09-09 10:00:08,380 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully

@@ -1,0 +1,4 @@
+2025-09-09 10:17:55,726 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 10:17:55,726 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_101755
+2025-09-09 10:17:55,726 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 10:17:55,726 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized

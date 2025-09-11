@@ -1,0 +1,33 @@
+{
+  "name": "Clever DevContainer",
+  "postStartCommand": "bash -lc 'if [ -n \"${TAILSCALE_AUTHKEY:-}\" ]; then chmod +x .devcontainer/tailscale-up.sh && .devcontainer/tailscale-up.sh; else echo \"[devcontainer] Tailscale skipped (TAILSCALE_AUTHKEY not set)\"; fi'",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/workspaces/projects/.venv/bin/python"
+      }
+    }
+  }
+}
+{
+  "name": "Clever – Minimal (Jay)",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "containerEnv": { "PORT": "5000" },
+  "forwardPorts": [5000],
+  "portsAttributes": {
+    "5000": { "label": "Clever (Flask)", "onAutoForward": "openBrowser" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [],
+      "settings": {
+        "extensions.ignoreRecommendations": true,
+        "workbench.startupEditor": "none",
+        "telemetry.telemetryLevel": "off",
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
+      }
+    }
+  },
+  "postCreateCommand": "bash -lc 'python -m venv .venv && source .venv/bin/activate && pip install -U pip && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi && { [ -f .env ] || echo PORT=5000 > .env; }'",
+  "postStartCommand": "bash -lc 'make setup || true'"
+}
