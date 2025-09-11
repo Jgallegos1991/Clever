@@ -1,28 +1,54 @@
 {
+  // General/editor
   "markdown.validate.enabled": true,
   "extensions.ignoreRecommendations": true,
   "workbench.startupEditor": "none",
   "telemetry.telemetryLevel": "off",
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-
-  // Use the built-in TS/JS formatter (offline-friendly)
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.rulers": [88],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
   "editor.defaultFormatter": "vscode.typescript-language-features",
   "editor.formatOnSave": false,
 
-  // JS/TS editor quality-of-life
+  // Python and testing
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "python.formatting.provider": "black",
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": ["--max-line-length=88"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["tests"],
+
+  // Optional features
+  "github.copilot.chat.codesearch.enabled": true,
+
+  // JS/TS
   "javascript.suggest.autoImports": true,
   "javascript.preferences.quoteStyle": "single",
   "javascript.validate.enable": true,
   "typescript.validate.enable": true,
 
-  // Don’t let giant vendor files slow IntelliSense
+  // Search and watcher excludes
   "search.exclude": {
     "**/.venv": true,
     "**/node_modules": true,
-    "static/js/tailwindcss.js": true
+    "**/backups/**": true,
+    "**/logs/**": true
   },
   "files.watcherExclude": {
     "**/.venv/**": true,
-    "**/node_modules/**": true
-  }
+    "**/node_modules/**": true,
+    "**/backups/**": true,
+    "**/logs/**": true
+  },
+
+  // Remote devcontainer nicety
+  "remote.autoForwardPortsFallback": 0
 }

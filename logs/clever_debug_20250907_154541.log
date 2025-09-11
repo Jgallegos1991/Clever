@@ -1,0 +1,61 @@
+2025-09-07 15:45:41,217 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-07 15:45:41,217 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250907_154541
+2025-09-07 15:45:41,217 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-07 15:45:41,217 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-07 15:45:41,217 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-07 15:45:41,218 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-07 15:45:41,218 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-07 15:45:41,219 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-07 15:45:41,408 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-07 15:53:17,580 |    ERROR | clever_ai | error:128 | [APP] Analysis failed | Error: 'types.SimpleNamespace' object has no attribute 'get'
+2025-09-07 15:53:17,597 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/app.py", line 451, in analyze
+    debugger.debug('app', f'Analysis completed: {analysis.get("intent", "unknown")}')
+                                                 ^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'get'
+
+2025-09-07 15:53:17,604 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-07 15:53:17,604 |    ERROR | clever_ai | error:128 | [CONVERSATION] Error in process_conversation | Data: {"duration": "0.0000s", "args_count": 5, "kwargs": []} | Error: 'types.SimpleNamespace' object has no attribute 'get'
+2025-09-07 15:53:17,607 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/debug_config.py", line 223, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 110, in process_conversation
+    response_approach = self._determine_response_approach(analysis, context)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 142, in _determine_response_approach
+    intent = analysis.get('intent', 'general')
+             ^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'get'
+
+2025-09-07 15:53:17,608 |  WARNING | clever_ai | warning:116 | [CONVERSATION] Enhanced conversation engine failed, falling back: 'types.SimpleNamespace' object has no attribute 'get'
+2025-09-07 15:53:17,609 |    ERROR | clever_ai | error:128 | [ERROR_RECOVERY] Error occurred | Data: {"context": {"endpoint": "/chat", "user_message": "Hey clever"}} | Error: CleverPersona.generate_response() takes 2 positional arguments but 4 were given
+2025-09-07 15:53:17,611 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/app.py", line 182, in chat
+    conversation_result = process_clever_conversation(user_message, analysis, context, knowledge_base)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 627, in process_clever_conversation
+    return engine.process_conversation(user_message, analysis, context, knowledge_base)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/debug_config.py", line 223, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 110, in process_conversation
+    response_approach = self._determine_response_approach(analysis, context)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 142, in _determine_response_approach
+    intent = analysis.get('intent', 'general')
+             ^^^^^^^^^^^^
+AttributeError: 'types.SimpleNamespace' object has no attribute 'get'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspaces/projects/app.py", line 196, in chat
+    response = clever_persona.generate_response(user_message, USER_NAME, analysis)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: CleverPersona.generate_response() takes 2 positional arguments but 4 were given
+
+2025-09-07 15:53:17,613 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Attempting recovery with strategy: file_system_error
+2025-09-07 15:53:17,613 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Recovery successful: file_system_error
+2025-09-07 15:53:17,615 |     INFO | clever_ai | info:108 | [APP] Retrying chat after successful recovery

@@ -1,0 +1,15 @@
+2025-09-09 07:37:15,257 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 07:37:15,257 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_073715
+2025-09-09 07:37:15,257 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 07:37:15,257 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-09 07:37:15,257 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-09 07:37:15,257 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-09 07:37:15,258 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 07:37:15,258 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 07:37:15,451 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-09 07:37:15,458 |     INFO | clever_ai | info:108 | [APP] Starting Clever AI system initialization
+2025-09-09 07:37:15,458 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] Starting full health check
+2025-09-09 07:37:16,459 |  WARNING | clever_ai | warning:116 | [HEALTH_MONITOR] System resource alerts | {"alerts": ["High memory usage: 6778.1MB"]}
+2025-09-09 07:37:17,125 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] Health check complete: 2/4 healthy | {"overall_status": "warning"}
+2025-09-09 07:37:20,297 |     INFO | clever_ai | info:108 | [APP] Flask server starting
+2025-09-09 07:47:20,346 |     INFO | clever_ai | info:108 | [APP] Clever AI shutdown complete

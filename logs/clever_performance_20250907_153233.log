@@ -1,0 +1,9 @@
+2025-09-07 15:32:33,232 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-07 15:32:33,232 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-07 15:32:33,233 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-07 15:32:33,233 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-07 15:32:33,233 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-07 15:32:57,613 | conversation.get_dynamic_greeting | 0.0000s | avg: 0.0000s
+2025-09-07 15:33:37,100 | error_recovery.handle_error | 0.0021s | avg: 0.0021s
+2025-09-07 15:34:10,684 | error_recovery.handle_error | 0.0061s | avg: 0.0041s
+2025-09-07 15:34:15,397 | error_recovery.handle_error | 0.0018s | avg: 0.0033s

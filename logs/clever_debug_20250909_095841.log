@@ -1,0 +1,19 @@
+2025-09-09 09:58:41,410 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 09:58:41,410 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_095841
+2025-09-09 09:58:41,410 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 09:58:41,411 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-09 09:58:41,411 |     INFO | clever_ai | info:108 | [TEST_SUITE] Starting comprehensive test suite
+2025-09-09 09:58:41,411 |     INFO | clever_ai | info:108 | [TEST_SUITE] Running database_tests
+2025-09-09 09:58:41,494 |     INFO | clever_ai | info:108 | [TEST_SUITE] Running nlp_tests
+2025-09-09 09:58:52,618 |     INFO | clever_ai | info:108 | [TEST_SUITE] Running evolution_tests
+2025-09-09 09:58:53,366 |     INFO | clever_ai | info:108 | [TEST_SUITE] Running persona_tests
+2025-09-09 09:58:53,367 |     INFO | clever_ai | info:108 | [TEST_SUITE] Running file_processing_tests
+2025-09-09 09:58:53,776 |     INFO | clever_ai | info:108 | [TEST_SUITE] Running api_tests
+2025-09-09 09:58:53,979 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-09 09:58:53,980 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-09 09:58:53,980 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 09:58:53,980 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 09:58:53,980 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-09 09:58:53,988 |     INFO | clever_ai | info:108 | [TEST_SUITE] Running ui_tooltip_tests
+2025-09-09 09:58:53,995 |     INFO | clever_ai | info:108 | [TEST_SUITE] Running integration_tests
+2025-09-09 09:58:53,995 |     INFO | clever_ai | info:108 | [TEST_SUITE] Test suite complete: 15/25 passed | {"success_rate": 60.0, "duration": 12.584647}
