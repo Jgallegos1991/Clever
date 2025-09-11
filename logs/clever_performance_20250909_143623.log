@@ -1,0 +1,11 @@
+2025-09-09 14:36:23,086 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-09 14:36:23,086 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-09 14:36:23,086 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-09 14:36:23,086 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-09 14:36:23,086 | error_recovery.register_strategy | 0.0000s | avg: 0.0000s
+2025-09-09 14:36:24,449 | health_monitor.check_system_resources | 1.0011s | avg: 1.0011s
+2025-09-09 14:36:24,450 | health_monitor.check_database_health | 0.0007s | avg: 0.0007s
+2025-09-09 14:36:25,057 | health_monitor.check_nlp_components | 0.6065s | avg: 0.6065s
+2025-09-09 14:36:25,062 | health_monitor.check_evolution_engine | 0.0049s | avg: 0.0049s
+2025-09-09 14:36:25,062 | health_monitor.run_full_health_check | 1.6147s | avg: 1.6147s
+2025-09-09 14:36:25,621 | conversation.process_conversation | 0.0001s | avg: 0.0001s

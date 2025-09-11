@@ -1,0 +1,13 @@
+2025-09-09 10:00:08,246 |    ERROR | clever_ai | error:128 | [CONVERSATION] Error in process_conversation | Data: {"duration": "0.0001s", "args_count": 5, "kwargs": []} | Error: 'float' object has no attribute 'get'
+2025-09-09 10:00:08,247 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/debug_config.py", line 223, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 132, in process_conversation
+    "particle_intensity": self._calculate_particle_intensity(analysis, response_approach),
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 497, in _calculate_particle_intensity
+    sentiment = analysis.get('sentiment', {}).get('compound', 0)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'float' object has no attribute 'get'
+

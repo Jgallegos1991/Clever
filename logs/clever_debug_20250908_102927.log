@@ -1,0 +1,25 @@
+2025-09-08 10:29:27,047 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-08 10:29:27,047 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250908_102927
+2025-09-08 10:29:27,047 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-08 10:29:27,047 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-08 10:29:27,047 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-08 10:29:27,048 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-08 10:29:27,048 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-08 10:29:27,049 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-08 10:29:28,098 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-08 10:30:09,084 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-08 10:30:09,085 |    ERROR | clever_ai | error:128 | [CONVERSATION] Error in process_conversation | Data: {"duration": "0.0000s", "args_count": 5, "kwargs": []} | Error: 'float' object has no attribute 'get'
+2025-09-08 10:30:09,128 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/debug_config.py", line 223, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/projects/clever_conversation_engine.py", line 113, in process_conversation
+    self._update_clever_emotional_state(analysis, response_approach)
+  File "/workspaces/projects/clever_conversation_engine.py", line 178, in _update_clever_emotional_state
+    sentiment = analysis.get('sentiment', {}).get('compound', 0)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'float' object has no attribute 'get'
+
+2025-09-08 10:30:09,128 |  WARNING | clever_ai | warning:116 | [CONVERSATION] Enhanced conversation engine failed, falling back: 'float' object has no attribute 'get'
+2025-09-08 10:30:09,132 |  WARNING | clever_ai | warning:116 | [APP] Evolution learning failed | "'CleverEvolutionEngine' object has no attribute 'learn_from_interaction'"
+2025-09-08 10:30:09,221 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully

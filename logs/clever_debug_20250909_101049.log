@@ -1,0 +1,4 @@
+2025-09-09 10:10:49,160 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 10:10:49,161 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_101049
+2025-09-09 10:10:49,161 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 10:10:49,161 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized

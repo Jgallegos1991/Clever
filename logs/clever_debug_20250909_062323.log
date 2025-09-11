@@ -1,0 +1,13 @@
+2025-09-09 06:23:23,225 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 06:23:23,225 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_062323
+2025-09-09 06:23:23,225 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 06:23:23,225 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-09 06:23:23,225 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-09 06:23:23,226 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-09 06:23:23,226 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 06:23:23,227 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 06:23:24,336 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-09 06:23:32,651 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 06:23:32,652 |     INFO | clever_ai | info:108 | [CONVERSATION] Generated greeting: Morning Jay! ☀️ Tuesday energy is hitting differen...
+2025-09-09 06:23:32,869 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 06:23:32,869 |     INFO | clever_ai | info:108 | [CONVERSATION] Generated greeting: Hey! *brain already buzzing with possibilities* ☕ ...

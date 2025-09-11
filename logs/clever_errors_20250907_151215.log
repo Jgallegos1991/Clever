@@ -1,0 +1,14 @@
+2025-09-07 15:13:53,264 |    ERROR | clever_ai | error:128 | [APP] Chat endpoint failed | Error: module 'utils.offline_guard' has no attribute 'contains_network_reference'
+2025-09-07 15:13:53,264 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/app.py", line 149, in chat
+    if offline_guard.contains_network_reference(user_message):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'utils.offline_guard' has no attribute 'contains_network_reference'
+
+2025-09-07 15:15:24,719 |    ERROR | clever_ai | error:128 | [APP] Chat endpoint failed | Error: module 'utils.offline_guard' has no attribute 'contains_network_reference'
+2025-09-07 15:15:24,719 |    ERROR | clever_ai | error:129 | Traceback: Traceback (most recent call last):
+  File "/workspaces/projects/app.py", line 149, in chat
+    if offline_guard.contains_network_reference(user_message):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'utils.offline_guard' has no attribute 'contains_network_reference'
+
