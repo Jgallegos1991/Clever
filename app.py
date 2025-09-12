@@ -48,33 +48,19 @@ nlp_processor = UnifiedNLPProcessor()
 DEBUG = getattr(config, "DEBUG", True)
 debugger.info('app', f'Clever AI configured for: {USER_NAME} ({USER_EMAIL})')
 
-if TAILSCALE_ENABLED:
-    print(f"🌐 Tailscale integration enabled")
-if CLEVER_EXTERNAL_ACCESS:
-    print(f"🌍 External access enabled via Tailscale")
-        debugger.info('app', 'NLP processor initialized successfully')
-except Exception as e:
-    if debugger:
-        debugger.warning('app', 'NLP offline/unavailable', e)
-    else:
-        print(f"[WARN] NLP offline/unavailable: {e}")
-    if error_recovery:
-        error_recovery.handle_error(e, {'context': 'nlp_initialization'})
+debugger.info('app', 'Debug and monitoring systems initialized')
+debugger.info('app', 'NLP processor initialized successfully')
 
-# -------- Persona (required, but degrade) ----
-class _FallbackPersona:
-    last_used_trait = "Base"
-    def generate_response(self, analysis):
-        msg = analysis.get("user_input","")
-        if msg.endswith("?"): self.last_used_trait = "Curious"
-        else: self.last_used_trait = "Calm"
-        return "Copy that. Tiny machines are on it."
-try:
-    from persona import CleverPersona
-    clever_persona = CleverPersona(nlp_processor, db_manager)
-except Exception as e:
-    print(f"[WARN] Persona fallback in use: {e}")
-    clever_persona = _FallbackPersona()
+# Enforce offline-first operation
+offline_guard.enable()
+debugger.info('app', 'Offline guard enabled - external network access blocked')
+
+# Initialize persona engine
+from persona import PersonaEngine
+clever_persona = PersonaEngine("Clever", USER_NAME)
+debugger.info('app', 'Persona engine initialized')
+
+# Initialize Flask application
 
 app = Flask(
     __name__,
