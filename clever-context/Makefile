@@ -58,11 +58,6 @@ lint:
 	$(ACTIVATE) && flake8 .
 
 test:
-	$(ACTIVATE) && pytest
-
-# Auto-generate file inventory
-file-inventory:
-	$(ACTIVATE) && python tools/generate_file_inventory.py
 	@test -d tests && ( $(ACTIVATE) && pytest -q ) || echo "No tests/ directory; skipping."
 
 ingest:

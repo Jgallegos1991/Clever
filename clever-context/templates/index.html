@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clever Synaptic Hub</title>
+  <!-- Use the existing stylesheet in /static/style.css -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self';">
+  </head>
+  <body>
+  <!-- Quick status chip (updated by JS) -->
+  <div id="selfcheck" class="selfcheck">Initializing…</div>
+    <!-- Particle canvas -->
+    <canvas id="particles"></canvas>
+    <!-- Grid overlay -->
+    <div class="grid-overlay"></div>
+    <!-- Main hub container -->
+    <div class="hub-container">
+      <div class="panel chat-panel">
+        <div id="chat-log" role="log" aria-live="polite" aria-label="Chat messages"></div>
+      </div>
+      <div class="panel analysis-panel">
+        <h3>Live Analysis</h3>
+        <div id="analysis-content">
+          <div id="intent">Intent: —</div>
+          <div id="sentiment">Sentiment: —</div>
+          <div id="entities">Entities: —</div>
+          <div id="keywords">Keywords: —</div>
+        </div>
+      </div>
+    </div>
+    <!-- Input bar -->
+    <div class="entrybar">
+      <input id="chat-input" type="text" placeholder="Your thought enters the flow..." autofocus />
+  <button id="send-btn" title="Send message" aria-label="Send">Send</button>
+    </div>
+    <!-- Load particle system and main logic -->
+    <!-- Minimal particles implementation (no-op safe) -->
+    <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>

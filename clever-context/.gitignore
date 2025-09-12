@@ -38,7 +38,3 @@ Screenshot*.png
 # --- Local sync folders (never commit) ---
 Clever_Sync/
 synaptic_hub_sync/
-
-# --- Logs ---
-logs/
-*.log

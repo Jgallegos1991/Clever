@@ -1,191 +1,168 @@
-# Project Clever AI: Core Instructions & Constraints
-
-## The Unbreakable Rules (Highest Priority)
-1.  **STRICTLY OFLINE:** The application MUST NOT contain any code that makes external network calls at runtime (e.g., to APIs, cloud services). All libraries and models must be local.
-2.  **EXCLUSIVELY PERSONAL (SINGLE-USER):** The system is built for a single user named "Jordan" or "Jay." Do not generate code for user accounts, logins, multi-tenancy, or public access. The persona is a female AI named "Clever."
-
-## Core Architecture
--   **Framework:** Python 3.12 with Flask.
--   **Database:** Local SQLite file named `clever.db`.
--   **Structure:** Monolithic application. Logic is primarily in `app.py`, `core_nlp_logic.py`, and `nlp_processor.py`.
--   **Frontend:** Standard HTML/CSS/JS served from `templates` and `static` directories.
-
-## Coding & Persona Style
--   **Persona:** Clever is a female AI co-pilot. Her persona is witty, empathetic, proactive, and highly intelligent. Responses should reflect this.
--   **Code Style:** Adhere to PEP 8 for Python. Code should be well-commented, explaining the "why" behind complex logic.
--   **Database Access:** All database interactions should be handled within a dedicated `database.py` module, using the standard `sqlite3` library.
--   **NLP:** Primary NLP tasks are handled in `nlp_processor.py` using local `spaCy` and `VADER` models.
-Step 2: Generate the Project Structure
-
-In the Copilot Chat, use this prompt:
-
-@workspace Using the information from `.github/copilot-instructions.md`, please scaffold the entire project structure for Clever. Create the following directories and empty files:
-
-- .gitignore
-- Makefile
-- requirements.txt
-- requirements.min.txt
-- config.py
-- persona.py
-- database.py
-- nlp_processor.py
-- core_nlp_logic.py
-- app.py
-- sync_watcher.py
-- file_ingestor.py
-- templates/
-  - index.html
-- static/
-  - css/
-    - style.css
-  - js/
-    - main.js
-Phase 2: Configuration & Automation
-Now, let's create the files that manage the project itself.
-
-Step 3: Create the .gitignore File
-
-Open the empty .gitignore file.
-
-In Copilot Chat, use this prompt:
-
-Based on the project architecture, generate the content for the `.gitignore` file. It should ignore the virtual environment (.venv), Python cache files, the SQLite database (clever.db and its journals), user upload folders, and any OS or IDE-specific files.
-Step 4: Create the Makefile
-
-Open the empty Makefile file.
-
-In Copilot Chat, use this prompt:
-
-Generate the content for the `Makefile`. It needs to have the following targets:
-- `setup`: Creates a venv and installs only `requirements.min.txt`.
-- `setup-full`: Creates a venv and installs the full `requirements.txt`, then downloads the spaCy model.
-- `run`: Runs the Flask app.
-- `test`: A placeholder for future tests.
-- `watch`: Runs the `sync_watcher.py` script.
-- `clean-venv`: Deletes the .venv directory.
-Ensure it uses a variable for the virtual environment directory.
-Step 5: Create the Dependency Files
-
-Open requirements.min.txt.
-
-Tell Copilot Chat: Generate the content for requirements.min.txt. It should only contain 'flask'.
-
-Open requirements.txt.
-
-Tell Copilot Chat: Generate the content for requirements.txt. It needs flask, spacy, textblob, vaderSentiment, and watchdog.
-
-Phase 3: Building Clever's Core Logic (The Backend)
-This is where Clever's brain comes to life.
-
-Step 6: config.py - The Settings
-
-Open config.py.
-
-Prompt: Generate the content for config.py. It should define the DATABASE_NAME as 'clever.db', the SPACY_MODEL as 'en_core_web_sm', and the paths for two sync directories: CLEVER_SYNC_DIR and SYNAPTIC_HUB_SYNC_DIR.
-
-Step 7: persona.py - The Soul
-
-Open persona.py.
-
-Prompt: Generate the content for persona.py. Create a dictionary named PERSONA that defines Clever's traits: witty intelligence, intuitive anticipation, adaptive genius, empathetic collaboration, and proactive problem-solving. Also, create a function get_greeting() that returns a dynamic, in-character greeting for me, Jay.
-
-Step 8: database.py - The Memory
-
-Open database.py.
-
-Prompt: `Generate the content for a dedicated database.py module. It needs:
-
-A function to get a database connection.
-
-An init_db() function that creates the 'user_utterances' table with columns for id, timestamp, user_message, clever_response, intent_detected, and sentiment_compound.
-
-A function log_interaction() that takes all the necessary arguments and writes a new row to the table.`
-
-Step 9: nlp_processor.py - The Senses
-
-Open nlp_processor.py.
-
-Prompt: Generate the NLP processor module in nlp_processor.py. It needs an analyze_text(text) function that uses spaCy for entity recognition, VADER for sentiment analysis, and TextBlob for polarity. The function must return a structured dictionary containing entities, sentiment scores, and extracted keywords.
-
-Step 10: core_nlp_logic.py - The Brain
-
-Open core_nlp_logic.py.
-
-Prompt: `Generate the core logic for core_nlp_logic.py. Create a function process_command(text) that:
-
-Calls analyze_text() from nlp_processor.
-
-Implements a simple, rule-based intent detection for intents like 'casual_chat', 'creative_mode', and 'deep_dive_mode'.
-
-Returns a dictionary containing a suggested response string and the full analysis payload.`
-
-Step 11: app.py - The Central Nervous System
-
-Open app.py.
-
-Prompt: `Generate the main Flask application in app.py. It must:
-
-Import all necessary modules (Flask, and our custom persona, database, core_nlp_logic modules).
-
-Create the Flask app instance.
-
-Define a root route '/' that renders index.html with a greeting from Clever.
-
-Define a '/chat' API endpoint that receives a user message, passes it to process_command(), logs the full interaction using the database module, and returns the response as JSON.
-
-Include the init_db() call under the if __name__ == '__main__': block.`
-
-Phase 4: Building Clever's Interface (The Frontend)
-Let's give Clever her face and voice.
-
-Step 12: index.html
-
-Open templates/index.html.
-
-Prompt: Generate the HTML for the Synaptic Hub interface in index.html. The design should be a sleek, futuristic dark theme. Key components: a header, a central AI chat panel with a message log and input bar, and a right-side panel for "Live Analysis". Use placeholders for dynamic content.
-
-Step 13: style.css
-
-Open static/css/style.css.
-
-Prompt: Generate the CSS for style.css. The aesthetic is a dark, futuristic "Synaptic Hub". Use a deep navy background with a subtle grid. Panels should have a "frosted glass" effect (translucent background with a backdrop-filter blur). Use neon cyan and pinkish-red for accents, borders, and text highlights. Ensure the chat interface is styled with distinct looks for user and AI messages.
-
-Step 14: main.js
-
-Open static/js/main.js.
-
-Prompt: `Generate the JavaScript for main.js. It needs to:
-
-Add event listeners to the send button and input field (for 'Enter' key).
-
-Have an async function to send the user's message to the '/chat' backend endpoint using fetch.
-
-Have functions to dynamically append the user's message and Clever's response to the chat log.
-
-Update the "Live Analysis" panel with the NLP data returned from the backend.`
-
-Phase 5: Activating Her Senses (File Ingestion)
-Final step: let's teach her to read files from the sync folders.
-
-Step 15: file_ingestor.py & sync_watcher.py
-
-Open file_ingestor.py.
-
-Prompt: Create a simple function in file_ingestor.py called process_text_file(filepath) that reads a .txt file and prints its content. This is a placeholder for future, more complex NLP processing.
-
-Open sync_watcher.py.
-
-Prompt: Generate the sync watcher script in sync_watcher.py using the 'watchdog' library. It should monitor the sync directories defined in config.py. When a new .txt file is created or modified, it should call the process_text_file function from file_ingestor.
-
-How to Execute This Plan
-Set up your VS Code with the project folder open.
-
-Go through each step in order. Create the file, then copy-paste the corresponding prompt into the Copilot Chat window.
-
-Let Copilot generate the code. Give it a quick read to make sure it looks right.
-
-Once all files are generated, run make setup-full in your terminal.
-
-Then run make run.
-
-Open your browser to http://localhost:5000.
+# Clever AI: Coding Agent Instructions
+
+## Unbreakable Rules
+1. **Strictly Offline:** Never add code that makes external network calls at runtime. All libraries and models must be local. Enforce with `utils.offline_guard.enable()`.
+2. **Single-User Only:** The system is for "Jordan" (Jay). No user accounts, logins, or multi-tenancy. Personalize via `user_config.py`. The persona is a witty, empathetic female AI named "Clever".
+
+## Architecture Overview
+- **Framework:** Python 3.12 + Flask (`app.py`)
+- **Database:** SQLite (`clever.db`, `clever_memory.db`) via `DatabaseManager` in `database.py`
+- **Modular Monolith:** Key modules:
+  - `app.py`: Flask routes, main logic
+  - `persona.py`: PersonaEngine, response modes
+  - `evolution_engine.py`: Self-learning, memory, growth metrics
+  - `nlp_processor.py`: Local NLP (spaCy, VADER, TextBlob)
+  - `debug_config.py`: Debugging, monitoring
+- **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), engines under `static/js/`, performance modules
+
+## Developer Workflows
+- **Setup:**
+  - `make setup` (base, offline)
+  - `make setup-full` (full, downloads spaCy model)
+  - `make run` (start Flask server)
+  - `make file-inventory` (auto-generate file inventory)
+- **Testing:**
+  - `make test` (pytest, see `pytest.ini`)
+  - `test-offline.sh` (validates offline operation)
+- **Debugging:**
+  - Use `debug_config.py` for logging, performance, error recovery
+
+## Project Conventions
+- **Config:** Always import user info from `user_config.py`
+- **Database:** Use `DatabaseManager` with thread safety (`_lock`)
+- **Error Handling:** Use debug system (`get_debugger`, `performance_monitor`)
+- **File Sync:**
+  - Sync dirs: `Clever_Sync/`, `synaptic_hub_sync/`
+  - Ingestion: `pdf_ingestor.py` (PDFs), `file_ingestor.py` (text)
+  - Watch: `sync_watcher.py` (uses watchdog)
+
+## Integration Points
+- **PersonaEngine:** Use established response modes (Auto, Creative, Deep Dive, Support, Quick Hit). Return `PersonaResponse` with `text`, `mode`, `sentiment`, `proactive_suggestions`.
+- **Evolution Engine:** Always call `evolution_engine.log_interaction()` after user interactions.
+- **Frontend:** Particle UI, frosted glass, neon accents. JS engines in `static/js/engines/`.
+- **Health Monitoring:** `health_monitor.py` for system status.
+
+## Source of Truth
+- **File Inventory:** See `file-inventory.md` for file types, counts, and structure.
+- **Documentation:** See `docs/` for architecture, API, UI, deployment.
+
+## Example Patterns
+
+**Thread-safe DB:**
+
+```python
+from database import DatabaseManager
+db = DatabaseManager(config.DB_PATH)
+# Always use with _lock for thread safety
+```
+
+**Debug Logging:**
+
+```python
+from debug_config import get_debugger
+debugger = get_debugger()
+debugger.info('module', 'Operation completed')
+```
+
+**Persona Response:**
+
+```python
+from persona import PersonaEngine
+response = PersonaEngine().respond("Hello", mode="Auto")
+```
+
+---
+
+*Update this file as the architecture evolves. For unclear or missing sections, ask Jay for clarification or review the latest `README.md` and `file-inventory.md`.*
+
+## Request lifecycle (server-side)
+- `app.py` wires debug systems, loads `user_config`, enforces offline via `utils.offline_guard.enable()`, initializes DB/NLP/persona with graceful fallbacks.
+- Typical flow: request → optional NLP (`UnifiedNLPProcessor`) → persona generate → DB/evolution logging → response.
+
+### Add a new Flask route (pattern)
+```python
+from flask import request, jsonify
+from debug_config import get_debugger
+from evolution_engine import get_evolution_engine
+
+debugger = get_debugger()
+evo = get_evolution_engine()
+
+@app.route('/api/analyze', methods=['POST'])
+def analyze():
+  data = request.get_json(force=True)
+  text = (data or {}).get('text', '')
+  if not text:
+    return jsonify({"error": "text required"}), 400
+  # persona + evolution telemetry
+  resp = clever_persona.generate(text, mode=data.get('mode', 'Auto'))
+  evo.log_interaction({"user_input": text, "active_mode": resp.mode})
+  debugger.info('api.analyze', 'analyzed text')
+  return jsonify({"reply": resp.text, "mode": resp.mode, "sentiment": resp.sentiment})
+```
+
+### Enforce offline guard early
+```python
+from utils import offline_guard
+offline_guard.enable()  # Allow loopback only; blocks external network
+```
+
+### Log interactions to evolution engine
+```python
+from evolution_engine import get_evolution_engine
+evo = get_evolution_engine()
+evo.log_interaction({"user_input": text, "active_mode": mode, "action_taken": "respond"})
+```
+
+### Database usage with thread safety
+```python
+from database import DatabaseManager
+import config
+
+db = DatabaseManager(config.DB_PATH)
+with db._connect() as con:  # internal helper; prefer high-level methods when available
+  con.execute('INSERT INTO utterances (role, text, mode, ts) VALUES (?,?,?,?)', ('user', text, mode, time.time()))
+```
+
+### File ingestion pipeline (outline)
+- Watch dirs: `Clever_Sync/`, `synaptic_hub_sync/` via `sync_watcher.py` (watchdog).
+- Ingest: `pdf_ingestor.py` for PDFs, `file_ingestor.py` for text → store in `sources` via `DatabaseManager.add_or_update_source()` with `content_hash`, `size`, `modified_ts`.
+
+```python
+from database import DatabaseManager
+from pathlib import Path
+import hashlib, time
+
+def ingest_text(db: DatabaseManager, path: Path):
+  content = path.read_text(errors='ignore')
+  h = hashlib.sha256(content.encode('utf-8')).hexdigest()
+  db.add_or_update_source(
+    filename=path.name,
+    path=str(path),
+    content=content,
+    content_hash=h,
+    size=path.stat().st_size,
+    modified_ts=path.stat().st_mtime,
+  )
+```
+
+### Performance monitoring wrapper
+```python
+from debug_config import performance_monitor
+
+@performance_monitor('app.generate_reply')
+def generate_reply(text: str):
+  return clever_persona.generate(text)
+```
+
+### Minimal pytest example
+```python
+def test_persona_auto_mode_smoke():
+  from persona import PersonaEngine
+  p = PersonaEngine()
+  resp = p.generate("hello", mode="Auto")
+  assert resp.text and resp.mode == "Auto"
+```
+
+### Frontend pattern (particles + core app)
+- Main UI at `templates/index.html`; JS entry `static/js/core/app.js` controls particle engines under `static/js/engines/` and performance modules under `static/js/performance/`.
