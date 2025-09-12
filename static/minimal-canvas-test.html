@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Canvas Test</title>
+    <style>
+        body { margin: 0; background: #000; }
+        #test-canvas { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(255,0,0,0.1);
+            z-index: 999999; 
+        }
+    </style>
+</head>
+<body>
+    <canvas id="test-canvas"></canvas>
+    <script>
+        console.log('🔥 MINIMAL TEST STARTING');
+        
+        const canvas = document.getElementById('test-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        console.log('📏 Canvas size:', canvas.width, 'x', canvas.height);
+        
+        // Draw massive white circle
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, 100, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw text
+        ctx.font = '48px Arial';
+        ctx.fillText('CANVAS WORKS!', 100, 200);
+        
+        console.log('✅ Drew test pattern');
+        
+        // Animate
+        let frame = 0;
+        function animate() {
+            frame++;
+            
+            // Clear
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Moving circle
+            const x = (Math.sin(frame * 0.02) * 0.4 + 0.5) * canvas.width;
+            const y = (Math.cos(frame * 0.02) * 0.4 + 0.5) * canvas.height;
+            
+            ctx.fillStyle = `hsl(${frame % 360}, 100%, 50%)`;
+            ctx.beginPath();
+            ctx.arc(x, y, 50, 0, Math.PI * 2);
+            ctx.fill();
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    </script>
+</body>
+</html>
