@@ -35,6 +35,9 @@ build/
 Screenshot*.png
 *.docx
 
+# --- Bundles & archives ---
+offline_bundle/**/*.tgz
+
 # --- Local sync folders (never commit) ---
 Clever_Sync/
 synaptic_hub_sync/
