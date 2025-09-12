@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 """
-Clever's Evolution Engine - Self-Learning Intelligence Core
-Creates cascading intelligence growth through interaction patterns
+Evolution Engine Module - Self-learning intelligence core for Clever AI.
+
+Why: Implements adaptive learning algorithms that analyze interaction patterns,
+     build concept networks, and continuously evolve Clever's knowledge and
+     response capabilities based on user feedback and usage patterns.
+
+Where: Used throughout the application to log interactions, analyze patterns,
+       build knowledge graphs, and provide learning-based insights for
+       persona adaptation and knowledge discovery.
+
+How: Combines database-backed interaction logging with concept mapping, pattern
+     recognition, and network analysis to create emergent intelligence through
+     cascading learning from conversation and content analysis.
 """
 
 import sqlite3
@@ -15,30 +26,32 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Set
 
-# Optional dependencies with graceful fallbacks
-try:
-    import numpy as np
-except ImportError:
-    np = None
-    print("Warning: numpy not available, using fallback math")
+# Required dependencies for mathematical and NLP processing
+import numpy as np
+import networkx as nx
+import spacy
 
-try:
-    import networkx as nx
-except ImportError:
-    nx = None
-    print("Warning: networkx not available, network analysis disabled")
+import config
 
-try:
-    import spacy
-    nlp = spacy.load("en_core_web_sm")
-except (ImportError, OSError):
-    spacy = None
-    nlp = None
-    print("Warning: spacy not available, using basic text processing")
+# Load spaCy model for text processing
+nlp = spacy.load("en_core_web_sm")
+
 
 @dataclass
 class ConceptNode:
-    """Represents a learned concept in Clever's mind"""
+    """
+    Represents a learned concept in Clever's evolving knowledge network.
+    
+    Why: Provides structured representation of discovered concepts with temporal
+         tracking, relationship mapping, and confidence scoring for adaptive
+         learning and knowledge graph construction.
+    
+    Where: Used throughout evolution engine to track learned concepts, build
+           semantic networks, and provide context for intelligent responses.
+    
+    How: Stores concept metadata including creation time, strength metrics,
+         related concepts as a network, and source interactions for traceability.
+    """
     concept_id: str
     name: str
     strength: float

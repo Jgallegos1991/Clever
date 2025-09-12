@@ -1,6 +1,16 @@
-# nlp_processor.py — Clever (offline-first, Jay-only)
-# Lazy singleton loader for spaCy; robust fallbacks; tiny LRU cache for quick hits.
+"""
+NLP Processor Module - Local natural language processing for Clever AI.
 
+Why: Provides offline-first NLP capabilities including sentiment analysis,
+     keyword extraction, and entity recognition using local spaCy models
+     without any external API calls or fallback dependencies.
+
+Where: Used by persona engine, knowledge base search, evolution engine,
+       and any component requiring text analysis and language processing.
+
+How: Implements singleton spaCy model loading with thread safety, LRU caching
+     for performance, and structured NLP result objects for consistent data flow.
+"""
 from __future__ import annotations
 
 import threading
@@ -8,51 +18,48 @@ from functools import lru_cache
 from types import SimpleNamespace
 from typing import List, Iterable, Optional, TYPE_CHECKING
 
-# Optional deps — everything must remain offline-safe.
-try:
-    import spacy  # type: ignore
-except Exception:  # pragma: no cover
-    spacy = None  # type: ignore
-
-try:
-    from textblob import TextBlob  # type: ignore
-except Exception:  # pragma: no cover
-    TextBlob = None  # type: ignore
+# Required dependencies - no fallbacks per architecture standards
+import spacy
+from textblob import TextBlob
 
 if TYPE_CHECKING:
-    if spacy is not None:
-        from spacy.language import Language
-    else:
-        Language = None  # type: ignore
+    from spacy.language import Language
 
-# ---- Lazy, thread-safe singleton for spaCy -------------------------------------------------------
-
+# Lazy, thread-safe singleton for spaCy
 _NLP = None
 _NLP_LOCK = threading.Lock()
-_SPACY_MODEL_NAME = "en_core_web_sm"  # pinned in requirements, but we still guard
+_SPACY_MODEL_NAME = "en_core_web_sm"
 
 
-def _load_spacy() -> Optional["Language"]:
-    """Load spaCy once, lazily. Never crash: return None if unavailable."""
+def _load_spacy() -> "Language":
+    """
+    Load spaCy model once with thread-safe lazy initialization.
+    
+    Why: Provides efficient spaCy model loading with singleton pattern to avoid
+         repeated model loading overhead while maintaining thread safety.
+    
+    Where: Called internally by NLP processing functions when spaCy analysis
+           is required for sentiment, entities, or language processing.
+    
+    How: Uses double-checked locking pattern for thread-safe initialization,
+         loads English model with optimized pipeline configuration.
+    """
     global _NLP
     if _NLP is not None:
         return _NLP
-    if spacy is None:
-        return None
+    
     with _NLP_LOCK:
         if _NLP is not None:
             return _NLP
-        try:
-            # Load small English model; disable heavyweight pipes we don't need.
-            _NLP = spacy.load(_SPACY_MODEL_NAME, disable=["tagger", "lemmatizer"])  # POS can be costly
-            # Ensure we have sentencizer for sentence boundaries
-            if "senter" not in _NLP.pipe_names and "sentencizer" not in _NLP.pipe_names:
-                _NLP.add_pipe("sentencizer")
-            return _NLP
-        except Exception:
-            # Model might not be present in some environments; gracefully degrade.
-            _NLP = None
-            return None
+        
+        # Load English model with optimized pipeline 
+        _NLP = spacy.load(_SPACY_MODEL_NAME, disable=["tagger", "lemmatizer"])
+        
+        # Ensure sentencizer for sentence boundaries
+        if "senter" not in _NLP.pipe_names and "sentencizer" not in _NLP.pipe_names:
+            _NLP.add_pipe("sentencizer")
+            
+        return _NLP
 
 
 # ---- Keyword extraction --------------------------------------------------------------------------
@@ -65,6 +72,18 @@ _STOPWORDS = set(
 
 
 def _normalize_token(t: str) -> str:
+    """
+    Normalize token by converting to lowercase and filtering special characters.
+    
+    Why: Provides consistent token normalization for keyword extraction and
+         text analysis, ensuring reliable comparison and deduplication.
+    
+    Where: Used internally by keyword extraction and token processing functions
+           to standardize text tokens before analysis and counting.
+    
+    How: Strips whitespace, converts to lowercase, and retains only alphanumeric
+         characters plus hyphens and underscores for clean token representation.
+    """
     t = t.strip().lower()
     return "".join(ch for ch in t if ch.isalnum() or ch in ("-", "_"))
 
