@@ -189,9 +189,9 @@ class CleverEvolutionEngine:
             )
 
             if nx:
-                self.concept_graph.add_node(concept_id, concept=concept)
+                self.concept_graph.add_node(concept_id, concept=concept)  # type: ignore
             else:
-                self.concept_graph[concept_id] = concept
+                self.concept_graph[concept_id] = concept  # type: ignore
 
         # Load connections if networkx available
         if nx:
@@ -523,7 +523,8 @@ class CleverEvolutionEngine:
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT frequency, effectiveness FROM interaction_patterns WHERE pattern_hash = ?",
+            """SELECT frequency, effectiveness FROM interaction_patterns
+               WHERE pattern_hash = ?""",
             (pattern_hash,),
         )
         existing = cursor.fetchone()
@@ -540,7 +541,8 @@ class CleverEvolutionEngine:
             cursor.execute(
                 """
                 UPDATE interaction_patterns
-                SET frequency = ?, effectiveness = ?, last_used = CURRENT_TIMESTAMP
+                SET frequency = ?, effectiveness = ?, 
+                    last_used = CURRENT_TIMESTAMP
                 WHERE pattern_hash = ?
             """,
                 (new_frequency, new_effectiveness, pattern_hash),
