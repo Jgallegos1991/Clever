@@ -501,3 +501,9 @@ git config --global user.name
 git config --global user.email
 */
 git commit -a --author="Jordan Gallegos <lapirfta@gmail.com>" -m "Clever AI: Codebase cleanup, performance monitoring, adaptive UI, and accessibility improvements. All main files and folders organized. See COPILOT_USAGE_GUIDE.md for standards."
+sudo apt-get update && sudo apt-get install git-lfs
+git lfs install
+git add .
+git commit -m "WIP: Staging all local changes before rebase"
+git pull --rebase
+git push
