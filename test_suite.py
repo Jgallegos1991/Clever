@@ -1,4 +1,5 @@
 """
+from database import DatabaseManager
 Automated Testing System - Comprehensive test runner and validation for Clever AI
 """
 
@@ -95,7 +96,7 @@ class CleverTestSuite:
         # Test 1: Database connection
         try:
             from config import DB_PATH
-            conn = sqlite3.connect(DB_PATH)
+            conn = with DatabaseManager(DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT 1')
             conn.close()
@@ -109,7 +110,7 @@ class CleverTestSuite:
             init_db()
             
             from config import DB_PATH
-            conn = sqlite3.connect(DB_PATH)
+            conn = with DatabaseManager(DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             required_tables = [

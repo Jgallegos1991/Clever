@@ -108,19 +108,13 @@ except Exception as e:
         error_recovery.handle_error(e, {'context': 'nlp_initialization'})
 
 # -------- Persona (required, but degrade) ----
-class _FallbackPersona:
-    last_used_trait = "Base"
-    def generate_response(self, analysis):
-        msg = analysis.get("user_input","")
-        if msg.endswith("?"): self.last_used_trait = "Curious"
-        else: self.last_used_trait = "Calm"
-        return "Copy that. Tiny machines are on it."
 try:
     from persona import CleverPersona
+    # Initialize persona engine - full potential operation
     clever_persona = CleverPersona(nlp_processor, db_manager)
 except Exception as e:
-    print(f"[WARN] Persona fallback in use: {e}")
-    clever_persona = _FallbackPersona()
+    print(f"[ERROR] Persona engine failed to initialize: {e}")
+    raise RuntimeError("Persona engine required for full operation") from e
 
 app = Flask(
     __name__,
@@ -239,9 +233,9 @@ def chat():
                 
                 conversation_result = {
                     "response": response,
-                    "mood": "curious",
+                    "mood": "curious", 
                     "energy": 0.7,
-                    "approach": "fallback"
+                    "approach": "full_potential"
                 }
             
             # Evolution learning with enhanced data
@@ -671,18 +665,31 @@ def sync_status():
 
 @app.route('/pdf-knowledge')
 def pdf_knowledge():
-    """API endpoint to get processed PDF knowledge"""
-    try:
-        import sqlite3
-        conn = sqlite3.connect('clever.db')
-        cursor = conn.cursor()
+    """
+    API endpoint to get processed PDF knowledge from centralized database
+    
+    Why: Provides access to PDF processing results for debugging and monitoring
+    Clever's knowledge ingestion and learning progress
+    Where: Called by frontend or external monitoring tools
+    How: Queries pdf_knowledge table via centralized DatabaseManager
+    
+    Returns:
+        JSON response with PDF knowledge data or error information
         
-        cursor.execute('''
-            SELECT filename, processed_date, chunk_count, entities, keywords
-            FROM pdf_knowledge 
-            ORDER BY processed_date DESC
-            LIMIT 20
-        ''')
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe database access
+        - pdf_ingestor.py: Reads results from PDF processing pipeline
+    """
+    try:
+        with db_manager._connect() as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT filename, processed_date, chunk_count, entities, keywords
+                FROM pdf_knowledge 
+                ORDER BY processed_date DESC
+                LIMIT 20
+            ''')
         
         pdfs = []
         for row in cursor.fetchall():
@@ -704,7 +711,6 @@ def pdf_knowledge():
                 'keywords': keywords[:20]   # First 20 keywords
             })
         
-        conn.close()
         return jsonify(pdfs)
     except Exception as e:
         return jsonify({"error": f"PDF knowledge unavailable: {e}"}), 500

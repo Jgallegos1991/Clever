@@ -30,6 +30,7 @@ import numpy as np
 import networkx as nx
 import spacy
 from config import DB_PATH
+from database import DatabaseManager
 
 # Load spaCy model - required for full operation
 nlp = spacy.load("en_core_web_sm")
@@ -50,10 +51,27 @@ class ConceptNode:
 
 
 class CleverEvolutionEngine:
-    """Autonomous intelligence growth system - Full potential, no fallbacks"""
+    """
+    Autonomous intelligence growth system - Full potential, no fallbacks
+    
+    Why: Drives autonomous intelligence growth for Clever by learning from user
+    interactions, extracting concepts, and forming connections. Operates at full
+    potential with no fallbacks, leveraging advanced NLP and network analysis.
+    Where: Used by app.py, file_ingestor.py, persona.py, and other modules for
+    self-learning, memory, and growth metrics.
+    How: Implements concept graph, learning algorithms, evolution triggers, and
+    centralized database integration via DatabaseManager.
+    
+    Connects to:
+        - app.py: Main application, logs interactions via log_interaction()
+        - file_ingestor.py, pdf_ingestor.py: Knowledge ingestion pipeline
+        - database.py: Centralized persistence via DatabaseManager
+        - persona.py: Persona engine for context and capabilities
+        - config.py: Centralized configuration and DB_PATH
+    """
 
     def __init__(self):
-        self.db_path = DB_PATH
+        self.db_manager = DatabaseManager(DB_PATH)
         self.learning_threshold = 0.3
         self.evolution_log = []
         self.concept_cache = {}
@@ -65,150 +83,169 @@ class CleverEvolutionEngine:
         self.load_existing_knowledge()
 
     def init_evolution_database(self):
-        """Initialize evolution tracking tables"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-
-        # Concept network table
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS concept_network (
-                concept_id TEXT PRIMARY KEY,
-                name TEXT,
-                strength REAL DEFAULT 0.1,
-                creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                last_reinforced TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                related_concepts TEXT,
-                source_interactions TEXT,
-                confidence REAL DEFAULT 0.1,
-                evolution_score REAL DEFAULT 0.0
-            )
         """
-        )
-
-        # Interaction patterns table
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS interaction_patterns (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pattern_hash TEXT UNIQUE,
-                pattern_type TEXT,
-                frequency INTEGER DEFAULT 1,
-                effectiveness REAL DEFAULT 0.5,
-                first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                context_tags TEXT
-            )
+        Initialize evolution tracking tables in the centralized database
+        
+        Why: Sets up necessary tables for concept storage, interaction patterns,
+        knowledge connections, and evolution events tracking
+        Where: Called during CleverEvolutionEngine initialization
+        How: Uses centralized DatabaseManager for thread-safe table creation
+        
+        Connects to:
+            - database.py: Uses DatabaseManager._connect() for database operations
+            - config.py: Database location via DB_PATH
         """
-        )
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
-        # Knowledge connections table
-        cursor.execute(
+            # Concept network table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS concept_network (
+                    concept_id TEXT PRIMARY KEY,
+                    name TEXT,
+                    strength REAL DEFAULT 0.1,
+                    creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_reinforced TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    related_concepts TEXT,
+                    source_interactions TEXT,
+                    confidence REAL DEFAULT 0.1,
+                    evolution_score REAL DEFAULT 0.0
+                )
             """
-            CREATE TABLE IF NOT EXISTS knowledge_connections (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                concept_a TEXT,
-                concept_b TEXT,
-                connection_strength REAL DEFAULT 0.1,
-                connection_type TEXT,
-                discovered_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                reinforcement_count INTEGER DEFAULT 1
             )
-        """
-        )
 
-        # Evolution events table
-        cursor.execute(
+            # Interaction patterns table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS interaction_patterns (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    pattern_hash TEXT UNIQUE,
+                    pattern_type TEXT,
+                    frequency INTEGER DEFAULT 1,
+                    effectiveness REAL DEFAULT 0.5,
+                    first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    context_tags TEXT
+                )
             """
-            CREATE TABLE IF NOT EXISTS evolution_events (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                event_type TEXT,
-                description TEXT,
-                trigger_data TEXT,
-                impact_score REAL,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """
-        )
 
-        # Capability tracking table
-        cursor.execute(
+            # Knowledge connections table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS knowledge_connections (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    concept_a TEXT,
+                    concept_b TEXT,
+                    connection_strength REAL DEFAULT 0.1,
+                    connection_type TEXT,
+                    discovered_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    reinforcement_count INTEGER DEFAULT 1
+                )
             """
-            CREATE TABLE IF NOT EXISTS capability_evolution (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                capability_name TEXT,
-                current_level REAL DEFAULT 0.1,
-                growth_rate REAL DEFAULT 0.01,
-                last_exercise TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                mastery_indicators TEXT,
-                next_evolution_target REAL DEFAULT 0.2
             )
-        """
-        )
 
-        conn.commit()
-        conn.close()
+            # Evolution events table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS evolution_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    event_type TEXT,
+                    description TEXT,
+                    trigger_data TEXT,
+                    impact_score REAL,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """
+            )
+
+            # Capability tracking table  
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS capability_evolution (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    capability_name TEXT,
+                    current_level REAL DEFAULT 0.1,
+                    growth_rate REAL DEFAULT 0.01,
+                    last_exercise TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    mastery_indicators TEXT,
+                    next_evolution_target REAL DEFAULT 0.2
+                )
+            """
+            )
+
+            conn.commit()
 
     def load_existing_knowledge(self):
-        """Load existing concepts into the graph"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT * FROM concept_network")
-        for row in cursor.fetchall():
-            (
-                concept_id,
-                name,
-                strength,
-                creation_time,
-                last_reinforced,
-                related_json,
-                source_json,
-                confidence,
-                evolution_score,
-            ) = row
-
-            related_concepts = set(
-                json.loads(related_json) if related_json else []
-            )
-            source_interactions = (
-                json.loads(source_json) if source_json else []
-            )
-
-            concept = ConceptNode(
-                concept_id=concept_id,
-                name=name,
-                strength=strength,
-                creation_time=datetime.fromisoformat(creation_time),
-                last_reinforced=datetime.fromisoformat(last_reinforced),
-                related_concepts=related_concepts,
-                source_interactions=source_interactions,
-                confidence=confidence,
-            )
-
-            self.concept_cache[concept_id] = concept
-            self.concept_graph.add_node(concept_id, concept=concept)
-
-        # Load all concept connections
-        cursor.execute(
-            """
-            SELECT concept_a, concept_b, connection_strength,
-                   connection_type FROM knowledge_connections
         """
-        )
-        for concept_a, concept_b, strength, conn_type in cursor.fetchall():
-            if (
-                concept_a in self.concept_graph
-                and concept_b in self.concept_graph
-            ):
-                self.concept_graph.add_edge(
-                    concept_a,
-                    concept_b,
-                    weight=strength,
-                    connection_type=conn_type,
+        Load existing concepts into the concept graph for analysis
+        
+        Why: Rebuilds the in-memory concept graph from persisted database state
+        to enable network analysis and connection discovery
+        Where: Called during CleverEvolutionEngine initialization  
+        How: Queries concept_network table and knowledge_connections via DatabaseManager
+        
+        Connects to:
+            - database.py: Uses DatabaseManager for thread-safe database access
+            - NetworkX: Builds concept_graph for network analysis
+        """
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT * FROM concept_network")
+            for row in cursor.fetchall():
+                (
+                    concept_id,
+                    name,
+                    strength,
+                    creation_time,
+                    last_reinforced,
+                    related_json,
+                    source_json,
+                    confidence,
+                    evolution_score,
+                ) = row
+
+                related_concepts = set(
+                    json.loads(related_json) if related_json else []
+                )
+                source_interactions = (
+                    json.loads(source_json) if source_json else []
                 )
 
-        conn.close()
+                concept = ConceptNode(
+                    concept_id=concept_id,
+                    name=name,
+                    strength=strength,
+                    creation_time=datetime.fromisoformat(creation_time),
+                    last_reinforced=datetime.fromisoformat(last_reinforced),
+                    related_concepts=related_concepts,
+                    source_interactions=source_interactions,
+                    confidence=confidence,
+                )
+
+                self.concept_cache[concept_id] = concept
+                self.concept_graph.add_node(concept_id, concept=concept)
+
+            # Load all concept connections
+            cursor.execute(
+                """
+                SELECT concept_a, concept_b, connection_strength,
+                       connection_type FROM knowledge_connections
+            """
+            )
+            for concept_a, concept_b, strength, conn_type in cursor.fetchall():
+                if (
+                    concept_a in self.concept_graph
+                    and concept_b in self.concept_graph
+                ):
+                    self.concept_graph.add_edge(
+                        concept_a,
+                        concept_b,
+                        weight=strength,
+                        connection_type=conn_type,
+                    )
 
     def log_interaction(self, interaction_data: Dict):
         """Main entry point for logging interactions and triggering learning
@@ -552,8 +589,8 @@ class CleverEvolutionEngine:
         ).hexdigest()[:16]
 
         # Update pattern frequency
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
         cursor.execute(
             """SELECT frequency, effectiveness FROM interaction_patterns
@@ -597,7 +634,6 @@ class CleverEvolutionEngine:
             )
 
         conn.commit()
-        conn.close()
 
         return {"pattern_hash": pattern_hash, "data": pattern_data}
 
@@ -626,8 +662,8 @@ class CleverEvolutionEngine:
         elif intent == "support_mode":
             capability_updates["empathy"] = 0.008
 
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
         for capability, growth in capability_updates.items():
             cursor.execute(
@@ -682,7 +718,6 @@ class CleverEvolutionEngine:
                 )
 
         conn.commit()
-        conn.close()
 
         return capabilities_growth
 
@@ -934,9 +969,20 @@ class CleverEvolutionEngine:
             return []
 
     def update_response_generation(self):
-        """Update response generation based on learned patterns"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        """
+        Update response generation capabilities based on recent interactions
+        
+        Why: Tracks and improves Clever's response quality over time through
+        learning from interaction patterns and effectiveness metrics
+        Where: Called by analyze_interaction after processing user conversations
+        How: Updates capability scores in database via DatabaseManager
+        
+        Connects to:
+            - database.py: Uses DatabaseManager for thread-safe updates
+            - analyze_interaction: Called as part of learning pipeline
+        """
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
         # Get most effective patterns
         cursor.execute(
@@ -978,12 +1024,30 @@ class CleverEvolutionEngine:
             )
 
         conn.commit()
-        conn.close()
 
     def get_evolution_status(self) -> Dict:
+        """
+        Get comprehensive status of evolution engine's learning progress
+        
+        Why: Provides real-time insights into Clever's learning state, network
+        complexity, and capability growth for monitoring and debugging
+        Where: Called by app.py for status endpoints and debug interfaces
+        How: Analyzes concept graph, queries capability scores via DatabaseManager
+        
+        Args:
+            None
+            
+        Returns:
+            Dict containing evolution metrics, network stats, and capability scores
+            
+        Connects to:
+            - database.py: Queries capability_evolution table via DatabaseManager
+            - NetworkX: Analyzes concept_graph for network metrics
+            - app.py: Status reporting and monitoring endpoints
+        """
         """Get current evolution status"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
         # Network analysis with full NetworkX capabilities
         concept_count = len(self.concept_graph.nodes())
@@ -1028,7 +1092,6 @@ class CleverEvolutionEngine:
         )
         recent_events = cursor.fetchall()
 
-        conn.close()
 
         return {
             "concept_count": concept_count,
@@ -1076,8 +1139,8 @@ class CleverEvolutionEngine:
                 centrality_score = 0.1
 
         # Capability progression analysis
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
         cursor.execute("SELECT AVG(current_level) FROM capability_evolution")
         avg_capability = cursor.fetchone()[0] or 0.1
 
@@ -1087,7 +1150,6 @@ class CleverEvolutionEngine:
             WHERE last_exercise > datetime('now', '-7 days')
         """)
         recent_growth = cursor.fetchone()[0] or 0.01
-        conn.close()
 
         # Comprehensive evolution score with advanced weighting
         evolution_score = (
@@ -1153,9 +1215,24 @@ class CleverEvolutionEngine:
         return max(0.1, 1.0 - (hours_passed / 168))  # Decay over week
 
     def save_concept(self, concept: ConceptNode):
+        """
+        Persist concept node to the centralized database
+        
+        Why: Ensures learned concepts survive across application restarts
+        and enables persistent knowledge accumulation
+        Where: Called by analyze_interaction after creating new concepts
+        How: Serializes ConceptNode data and stores via DatabaseManager
+        
+        Args:
+            concept: ConceptNode instance with learned concept data
+            
+        Connects to:
+            - database.py: Uses DatabaseManager for thread-safe persistence
+            - concept_network table: Stores concept data with JSON serialization
+        """
         """Save concept to database"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
         cursor.execute(
             """
@@ -1177,14 +1254,13 @@ class CleverEvolutionEngine:
         )
 
         conn.commit()
-        conn.close()
 
     def save_connection(
         self, concept_a: str, concept_b: str, strength: float, conn_type: str
     ):
         """Save connection to database"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
         cursor.execute(
             """
@@ -1196,14 +1272,13 @@ class CleverEvolutionEngine:
         )
 
         conn.commit()
-        conn.close()
 
     def update_connection_strength(
         self, concept_a: str, concept_b: str, new_strength: float
     ):
         """Update existing connection strength"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
         cursor.execute(
             """
@@ -1217,7 +1292,6 @@ class CleverEvolutionEngine:
         )
 
         conn.commit()
-        conn.close()
 
     def log_evolution_event(
         self,
@@ -1226,9 +1300,27 @@ class CleverEvolutionEngine:
         trigger_data: Dict,
         impact_score: float,
     ):
+        """
+        Log significant learning events for evolution tracking
+        
+        Why: Records major learning milestones and capability improvements
+        for debugging and understanding Clever's growth patterns
+        Where: Called by analyze_interaction when significant learning occurs
+        How: Persists event data to evolution_events table via DatabaseManager
+        
+        Args:
+            event_type: Category of evolution event (e.g., "learning_event")
+            description: Human-readable description of the event
+            trigger_data: Context data that triggered the evolution
+            impact_score: Numerical significance of the event (0.0-1.0)
+            
+        Connects to:
+            - database.py: Uses DatabaseManager for event persistence
+            - evolution_events table: Stores chronological learning history
+        """
         """Log evolution event"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self.db_manager._connect() as conn:
+            cursor = conn.cursor()
 
         cursor.execute(
             """
@@ -1240,7 +1332,6 @@ class CleverEvolutionEngine:
         )
 
         conn.commit()
-        conn.close()
 
         self.evolution_log.append(
             {
