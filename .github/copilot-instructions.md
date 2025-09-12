@@ -18,7 +18,7 @@
   - `evolution_engine.py`: Self-learning, memory, growth metrics
   - `nlp_processor.py`: Local NLP (spaCy, VADER, TextBlob)
   - `debug_config.py`: Debugging, monitoring
-- **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), engines under `static/js/`, performance modules
+- **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), `static/js/holographic-chamber.js` (particle engine)
 
 ## Code Documentation Standards
 Every function, class, and significant code block MUST include:
@@ -204,4 +204,4 @@ def test_persona_auto_mode_smoke():
 ```
 
 ### Frontend pattern (particles + core app)
-- Main UI at `templates/index.html`; JS entry `static/js/core/app.js` controls particle engines under `static/js/engines/` and performance modules under `static/js/performance/`.
+- Main UI at `templates/index.html`; JS entry `static/js/main.js` loads `static/js/holographic-chamber.js` particle engine. Performance modules under `static/js/performance/` loaded only in debug mode.

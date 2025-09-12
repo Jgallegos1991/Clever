@@ -23,8 +23,8 @@ def test_index_has_core_elements():
 def test_assets_wired_locally():
     html = INDEX.read_text(encoding='utf-8')
     assert "url_for('static', filename='style.css')" in html
-    assert "url_for('static', filename='js/particles.js')" in html
-    assert "url_for('static', filename='js/main.js')" in html
+    assert "url_for('static', filename='js/holographic-chamber.js')" in html
+    assert "url_for('static', filename='js/core/app.js')" in html
 
 
 def test_microcopy_placeholders():

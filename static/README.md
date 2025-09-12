@@ -38,11 +38,11 @@ static/
 ## 🚀 Active Components
 
 ### Currently Used Files:
-- **CSS**: `css/style.css` - All styling for Clever's interface
-- **Core**: `js/core/app.js` - Main application logic and chat interface
-- **Engine**: `js/engines/quantum-scene-simple.js` - Active particle system
-- **Performance**: `js/performance/performance-dashboard.js` - Performance monitoring
-- **Service Worker**: `js/core/sw.js` - Offline functionality
+- **CSS**: `css/style.css` - All styling for Clever's interface  
+- **Core**: `js/main.js` - Main application logic and chat interface
+- **Engine**: `js/holographic-chamber.js` - ACTIVE particle system (morphing formations)
+- **Performance**: `js/performance/performance-dashboard.js` - Performance monitoring (debug mode)
+- **Service Worker**: `js/core/sw.js` - Offline functionality (NOT currently loaded)
 
 ### Key Features:
 - **Quantum Particle System**: Beautiful, responsive particle animations

@@ -31,11 +31,11 @@ class CleverConversationEngine:
         
         # Jay-specific communication patterns Clever has learned
         self.jay_patterns = {
-            "communication_style": "direct but creative",
-            "energy_level": "high", 
+            "communication_style": "intelligent and direct",
+            "energy_level": "engaged", 
             "interests": ["tech", "creative projects", "strategic thinking", "AI development"],
-            "preferred_slang": ["no cap", "fire", "lowkey", "bet", "fr", "that hits different"],
-            "response_preferences": "witty but supportive, proactive insights"
+            "preferred_tone": "helpful, insightful, and genuinely curious",
+            "response_preferences": "substantive content with practical value"
         }
         
         self.debugger.info('conversation', 'Enhanced Clever conversation engine initialized')
@@ -349,57 +349,135 @@ class CleverConversationEngine:
         return starter + knowledge_section + framework + random.choice(conclusions)
     
     def _witty_quick_hit_response(self, message: str, analysis: Dict, kb) -> str:
-        """Clever's quick but personality-rich response"""
-        quick_starters = [
-            "Bet! Quick answer:",
-            "No cap, here's what's up:",
-            "Real quick:",
-            "Straight up:",
-            "Lowkey, here's the deal:"
-        ]
+        """Clever's intelligent and helpful quick response"""
         
-        starter = random.choice(quick_starters)
+        # Analyze the user's actual intent and provide meaningful responses
+        message_lower = message.lower()
+        keywords = analysis.get('keywords', [])
         
-        # Get quick knowledge if available
+        # Shape formation requests
+        if any(shape in message_lower for shape in ['cube', 'sphere', 'galaxy', 'torus', 'shape', 'form']):
+            shape_name = self._extract_shape_from_message(message_lower)
+            return f"Forming that shape now! Watch the particles dance into a beautiful {shape_name}. What else would you like to explore?"
+        
+        # Creative requests
+        if any(word in message_lower for word in ['create', 'make', 'build', 'design', 'generate']):
+            return f"I love creative challenges! Let me help you {message_lower.split()[0]} something amazing. What specific aspects are you thinking about?"
+        
+        # Questions
+        if message.strip().endswith('?') or any(word in message_lower for word in ['how', 'what', 'why', 'when', 'where']):
+            if kb:
+                relevant = kb.search_knowledge(message, limit=2)
+                if relevant:
+                    return f"Here's what I found: {relevant[0]['chunk_text'][:150]}... Would you like me to elaborate on any part of this?"
+            return f"That's an interesting question about {', '.join(keywords[:3]) if keywords else 'this topic'}. Let me search my knowledge base for relevant information."
+        
+        # General conversation
         if kb:
             relevant = kb.search_knowledge(message, limit=1)
             if relevant:
-                quick_answer = f" {relevant[0]['chunk_text'][:80]}..."
-            else:
-                quick_answer = " Let me think on that and get back to you with something solid."
+                return f"Based on what I know: {relevant[0]['chunk_text'][:120]}... Want to explore this further?"
+        
+        # Intelligent fallback responses - no more generic replies!
+        return self._generate_intelligent_fallback_response(message, keywords, analysis)
+    
+    def _generate_intelligent_fallback_response(self, message: str,
+                                                keywords: List,
+                                                analysis: Dict) -> str:
+        """
+        Generate varied, intelligent responses instead of generic fallbacks
+        
+        Why: Prevents repetitive responses that frustrate users
+        Where: Called when no specific pattern matches in witty_quick_hit
+        How: Uses multiple response templates with randomization
+        """
+        
+        # Determine message characteristics
+        is_short = len(message.split()) <= 3
+        has_keywords = len(keywords) > 0
+        
+        # Varied intelligent responses based on context
+        if is_short and has_keywords:
+            keyword = keywords[0]
+            responses = [
+                f"Ah, {keyword}! That's a topic with many angles. "
+                f"What specific part interests you most?",
+                f"Interesting - {keyword} is something I've been thinking about. "
+                f"What's your take?",
+                f"Love that you brought up {keyword}. Are you looking to "
+                f"understand it better or apply it?",
+                f"{keyword.title()} is fascinating! What got you curious "
+                f"about this aspect?",
+                f"Great topic! With {keyword}, I wonder about the practical "
+                f"implications. What's your perspective?"
+            ]
+        elif has_keywords:
+            topic_list = ', '.join(keywords[:3])
+            responses = [
+                f"You've touched on interesting concepts: {topic_list}. "
+                f"Which resonates most right now?",
+                f"I see you're thinking about {topic_list}. There's a lot "
+                f"to unpack - what's driving your curiosity?",
+                f"Those are meaty topics - {topic_list}. What's the "
+                f"connection you're seeing?",
+                f"Excellent thinking around {topic_list}. I'm curious about "
+                f"your angle - what stands out?",
+                f"The intersection of {topic_list} is compelling. What "
+                f"challenge are you exploring?"
+            ]
         else:
-            quick_answer = " Working on that - give me a sec to pull together the best info."
+            # No clear keywords - engage conversationally
+            responses = [
+                "I'm intrigued by what you're thinking about. Want to dive "
+                "deeper into any particular aspect?",
+                "That's an interesting perspective! What's got you reflecting "
+                "on this today?",
+                "I can sense there's more to explore here. What direction "
+                "feels most important to you?",
+                "Your thoughts are sparking ideas for me too. What would be "
+                "most helpful to focus on?",
+                "I love where your mind is going. What questions are you "
+                "wrestling with?",
+                "There's definitely something worth exploring here. What angle "
+                "interests you most?",
+                "That's got me thinking too. What would make this conversation "
+                "most valuable for you?"
+            ]
         
-        # Clever's quick personality touch with follow-up
-        endings = [
-            " That help? Want me to dive deeper?",
-            " Make sense? Happy to expand on any part.",
-            " Sound about right? I can break it down more if needed.",
-            " That cover it? Always down to explore further!",
-            " Does that hit different? Let me know if you want more details."
-        ]
-        
-        return starter + quick_answer + random.choice(endings)
+        return random.choice(responses)
+    
+    def _extract_shape_from_message(self, message_lower: str) -> str:
+        """Extract the shape name from user message"""
+        if 'cube' in message_lower or 'box' in message_lower:
+            return 'cube'
+        elif 'sphere' in message_lower or 'ball' in message_lower:
+            return 'sphere'
+        elif 'galaxy' in message_lower or 'spiral' in message_lower:
+            return 'galaxy spiral'
+        elif 'torus' in message_lower or 'donut' in message_lower:
+            return 'torus'
+        else:
+            return 'geometric pattern'
     
     def _celebration_amplifier_response(self, message: str, analysis: Dict) -> str:
-        """Clever amplifying positive energy authentically"""
+        """Clever responding to positive achievements thoughtfully"""
         celebration_starters = [
-            "YOOO! That's what I'm talking about! 🚀",
-            "NO CAP that's absolutely fire! 🔥",
-            "LETS GOOO! *particles exploding with excitement*",
-            "You're literally the shit for that! ✨",
-            "BRO! *virtual high five* That hits different! 🙌"
+            "That's excellent work!",
+            "Really impressive progress there.",
+            "Great approach to that challenge.",
+            "Nice breakthrough!",
+            "That's solid execution."
         ]
         
         starter = random.choice(celebration_starters)
         
-        # Clever's authentic amplification
+        # Thoughtful recognition
         amplifiers = [
-            " I'm genuinely proud of you for that.",
-            " That's the Jay magic in action right there!",
-            " You should feel really good about that execution.",
-            " That's exactly the kind of thinking that sets you apart.",
-            " The way your mind works on this stuff is honestly impressive."
+            " I can see the strategic thinking behind this.",
+            " The way you approached this shows real insight.", 
+            " This demonstrates excellent problem-solving skills.",
+            " You're building some serious momentum here.",
+            " That's the kind of progress that compounds."
         ]
         
         amplifier = random.choice(amplifiers)
@@ -465,10 +543,15 @@ class CleverConversationEngine:
             if random.random() < 0.2:  # 20% chance  
                 response += " *locked in analytical mode*"
         
-        # Add Jay-specific slang occasionally for authenticity
-        if approach in ["witty_quick_hit", "celebration_amplifier", "creative_catalyst"] and random.random() < 0.4:
-            slang_additions = [" No cap!", " That hits different!", " For real though.", " Period!", " Fr fr."]
-            response += random.choice(slang_additions)
+        # Add thoughtful follow-ups occasionally 
+        if approach in ["witty_quick_hit", "curious_collaborator"] and random.random() < 0.3:
+            thoughtful_additions = [
+                " What's your take on this?", 
+                " Does this align with what you're thinking?", 
+                " Want to explore this further?",
+                " How does this connect to your project?"
+            ]
+            response += random.choice(thoughtful_additions)
         
         return response
     

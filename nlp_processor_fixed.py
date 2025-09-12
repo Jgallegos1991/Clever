@@ -1,4 +1,3 @@
-copilot/vscode1757710923326
 """
 NLP Processor for Clever AI - Full Potential Operation
 
@@ -16,11 +15,6 @@ Connects to:
     - app.py: Request analysis and NLP pipeline
     - config.py: Centralized configuration
 """
-
-# nlp_processor.py — Clever (offline-first, Jay-only)
-# Unified NLP processing - full potential operation, no fallbacks
-
- copilot/fix-ef8724e1-2840-44ac-b7a8-1c03100454b0
 from __future__ import annotations
 
 import threading
@@ -157,12 +151,6 @@ def _keywords_spacy(doc) -> List[str]:
     return deduped[:10]
 
 
- copilot/vscode1757710923326
-
-
-# ---- Sentiment -----------------------------------------------------------------------------------
-
- copilot/fix-ef8724e1-2840-44ac-b7a8-1c03100454b0
 def _sentiment(text: str) -> float:
     """
     Analyze sentiment using TextBlob at full capability.
@@ -184,26 +172,6 @@ def _sentiment(text: str) -> float:
     blob = TextBlob(text)
     return float(blob.sentiment.polarity)
 
- copilot/vscode1757710923326
-
-# ---- Public Processor ----------------------------------------------------------------------------
-
-class _NLPProcessor:
-    """
-    Full-potential NLP processor for Clever AI
-    
-    Why: Provides centralized, high-quality text analysis capabilities for
-    keyword extraction and sentiment analysis with no compromise fallbacks
-    Where: Used throughout Clever for understanding user input and content
-    How: Lazy-loads spaCy model, caches results, operates at full potential
-    
-    Connects to:
-        - evolution_engine.py: Concept extraction for learning
-        - persona.py: Understanding user intent and context
-        - app.py: Processing user messages and responses
-        - file_ingestor.py: Content analysis for knowledge base
-    """
- copilot/fix-ef8724e1-2840-44ac-b7a8-1c03100454b0
 
 class UnifiedNLPProcessor:
     """
@@ -225,7 +193,6 @@ class UnifiedNLPProcessor:
     """
     
     def __init__(self) -> None:
- copilot/vscode1757710923326
         """Initialize NLP processor with lazy loading."""
         self._nlp = None
 
@@ -236,25 +203,6 @@ class UnifiedNLPProcessor:
         Why: Provides thread-safe access to spaCy model for all NLP operations.
         Where: Called internally by all NLP methods to ensure model availability.
         How: Uses lazy loading pattern to initialize spaCy model once per instance.
-
-        self._nlp = None  # lazy
-
-    def _ensure(self):
-        """
-        Ensure spaCy model is loaded for full-potential operation
-        
-        Why: Provides lazy loading of spaCy model to avoid startup overhead
-        while ensuring it's available when needed for text processing
-        Where: Called by _process_uncached before NLP operations
-        How: Uses _load_spacy() singleton pattern with thread safety
-        
-        Returns:
-            Loaded spaCy Language model or None if unavailable
-            
-        Connects to:
-            - _load_spacy(): Global singleton spaCy model loader
-            - _process_uncached(): Main text processing entry point
-copilot/fix-ef8724e1-2840-44ac-b7a8-1c03100454b0
         """
         if self._nlp is None:
             self._nlp = _load_spacy()
@@ -288,7 +236,7 @@ copilot/fix-ef8724e1-2840-44ac-b7a8-1c03100454b0
         return self._process_uncached(text)
 
     def _process_uncached(self, text: str) -> SimpleNamespace:
-        """copilot/vscode1757710923326
+        """
         Process text with full NLP capabilities - no fallbacks.
         
         Why: Provides core text processing for keywords and entities using
@@ -309,50 +257,6 @@ copilot/fix-ef8724e1-2840-44ac-b7a8-1c03100454b0
         
         return SimpleNamespace(keywords=keywords, sentiment=sentiment)
 
-
-        Process text using full potential NLP capabilities
-        
-        Why: Provides high-quality NLP analysis using spaCy and TextBlob
-        for Clever's understanding and response generation at full potential
-        Where: Used by cached analyze_text method for actual text processing
-        How: Uses loaded spaCy model for advanced NLP with no fallback patterns
-        
-        Args:
-            text: Input text to analyze for keywords and sentiment
-            
-        Returns:
-            SimpleNamespace with keywords (List[str]) and sentiment (float)
-            
-        Connects to:
-            - _load_spacy(): Ensures spaCy model is loaded
-            - _keywords_spacy(): Extracts keywords using spaCy NER and POS
-            - _sentiment(): Calculates sentiment using TextBlob
-        """
-        nlp = self._ensure()
-        if nlp is None:
-            raise RuntimeError("spaCy not available - install required dependencies for full operation")
-            
-        try:
-            doc = nlp(text)
-            kws = _keywords_spacy(doc)
-        except Exception as e:
-            raise RuntimeError(f"spaCy processing failed: {e}")
-
-        sent = _sentiment(text)
-        return SimpleNamespace(keywords=kws, sentiment=sent)
-
-
-# Singleton export used by the app
-nlp_processor = _NLPProcessor()
-
-# Public class alias for external imports
-class UnifiedNLPProcessor(_NLPProcessor):
-    """Public interface to the NLP processor. Alias for _NLPProcessor."""
-    
-    def __init__(self) -> None:
-        super().__init__()
-    
-copilot/fix-ef8724e1-2840-44ac-b7a8-1c03100454b0
     @property
     def nlp(self) -> Language:
         """

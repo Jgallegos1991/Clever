@@ -179,7 +179,7 @@ Clever's interface is a **3D holographic chamber** where:
 ├── debug_config.py          # Debug infrastructure
 ├── backup_system.py         # Backup and restoration
 ├── templates/               # UI templates (index.html)
-├── static/                  # UI assets (style.css, js/particles.js, js/main.js)
+├── static/                  # UI assets (css/style.css, js/holographic-chamber.js, js/main.js)
 ├── docs/                    # Comprehensive documentation
 └── tests/                   # Automated test suite
 ```
