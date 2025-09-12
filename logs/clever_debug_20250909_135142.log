@@ -1,0 +1,42 @@
+2025-09-09 13:51:42,106 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 13:51:42,106 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_135142
+2025-09-09 13:51:42,106 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 13:51:42,106 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-09 13:51:42,106 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-09 13:51:42,107 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-09 13:51:42,107 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 13:51:42,107 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 13:51:42,301 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-09 13:52:03,024 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 13:52:03,024 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 13:52:03,330 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 13:59:23,816 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 13:59:23,816 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 13:59:24,184 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 13:59:53,459 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 13:59:53,460 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: excited
+2025-09-09 13:59:53,789 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 14:00:01,262 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 14:00:01,262 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 14:00:01,734 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 14:00:06,942 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 14:00:06,942 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 14:00:07,375 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 14:00:11,438 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 14:00:11,438 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 14:00:11,844 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 14:00:25,973 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 14:00:25,973 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: strategic_deep_dive, mood: excited
+2025-09-09 14:00:28,051 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 14:00:48,956 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 14:00:48,956 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: strategic_deep_dive, mood: excited
+2025-09-09 14:00:52,282 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 14:01:05,953 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 14:01:05,954 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 14:01:06,077 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 14:01:23,903 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 14:01:23,904 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 14:01:24,138 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully
+2025-09-09 14:01:35,159 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 14:01:35,159 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 14:01:35,303 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully

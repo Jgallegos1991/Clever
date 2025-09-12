@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Clever: setup",
+      "type": "shell",
+      "command": "make setup",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clever: run",
+      "type": "shell",
+      "command": "make run",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "clever-run",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^\\s*File \\\"(.+)\\\", line (\\d+).*$",
+          "file": 1,
+          "line": 2
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Clever|^\\*\\s+Serving Flask app",
+          "endsPattern": "Running on http|^\\*\\s+Running on http"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+2025-09-09 22:44:20,114 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 22:44:20,114 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_224420
+2025-09-09 22:44:20,115 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 22:44:20,115 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-09 22:44:20,115 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-09 22:44:20,115 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-09 22:44:20,115 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 22:44:20,116 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 22:44:20,310 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-09 22:44:20,320 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 22:44:20,320 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 22:44:20,320 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
+2025-09-09 22:44:20,443 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] Starting full health check
+2025-09-09 22:44:21,444 |  WARNING | clever_ai | warning:116 | [HEALTH_MONITOR] System resource alerts | {"alerts": ["High memory usage: 3479.2MB"]}
+2025-09-09 22:44:22,353 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] Health check complete: 2/4 healthy | {"overall_status": "warning"}
+2025-09-09 22:44:22,862 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced Clever conversation engine initialized
+2025-09-09 22:44:22,862 |     INFO | clever_ai | info:108 | [CONVERSATION] Enhanced conversation processing - approach: witty_quick_hit, mood: curious
+2025-09-09 22:44:22,915 |     INFO | clever_ai | info:108 | [APP] Enhanced chat interaction completed successfully

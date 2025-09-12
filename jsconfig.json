@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ES2020",
+        "checkJs": true,
+        "allowJs": true,
+        "baseUrl": "./",
+        "paths": {
+            "*": ["static/js/*", "static/js/engines/*", "static/js/core/*", "static/js/performance/*"]
+        },
+        "typeRoots": ["./types"]
+    },
+    "include": [
+        "static/**/*.js",
+        "templates/**/*.html",
+        "types/**/*.d.ts",
+        "*.html"
+    ],
+    "exclude": [
+        "node_modules",
+        ".venv",
+        "static/js/tailwindcss.js"
+    ]
+}
