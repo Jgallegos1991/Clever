@@ -509,7 +509,10 @@ class CleverEvolutionEngine:
                     confidence=concept['confidence']
                 )
                 
-                self.concept_graph.add_node(concept_id, concept=new_concept)
+                if hasattr(self.concept_graph, "add_node"):
+                    self.concept_graph.add_node(concept_id, concept=new_concept)
+                else:
+                    self.concept_graph[concept_id] = new_concept
                 self.save_concept(new_concept)
                 learning_results['concepts_learned'] += 1
                 
