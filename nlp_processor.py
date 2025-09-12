@@ -1,5 +1,5 @@
 # nlp_processor.py — Clever (offline-first, Jay-only)
-# Lazy singleton loader for spaCy; robust fallbacks; tiny LRU cache for quick hits.
+# Unified NLP processing - full potential operation, no fallbacks
 
 from __future__ import annotations
 
@@ -132,14 +132,6 @@ def _keywords_spacy(doc) -> List[str]:
     return deduped[:10]
 
 
-def _keywords_fallback(text: str) -> List[str]:
-    # No spaCy? No problem — cheap regex + frequency.
-    import re
-
-    toks = re.findall(r"[A-Za-z0-9_\-]+", text.lower())
-    toks = [t for t in toks if len(t) > 2 and t not in _STOPWORDS]
-    return _top_tokens(toks, k=8)
-
 
 # ---- Sentiment -----------------------------------------------------------------------------------
 
@@ -158,12 +150,40 @@ def _sentiment(text: str) -> float:
 # ---- Public Processor ----------------------------------------------------------------------------
 
 class _NLPProcessor:
-    """Small façade with a stable, testable API."""
+    """
+    Full-potential NLP processor for Clever AI
+    
+    Why: Provides centralized, high-quality text analysis capabilities for
+    keyword extraction and sentiment analysis with no compromise fallbacks
+    Where: Used throughout Clever for understanding user input and content
+    How: Lazy-loads spaCy model, caches results, operates at full potential
+    
+    Connects to:
+        - evolution_engine.py: Concept extraction for learning
+        - persona.py: Understanding user intent and context
+        - app.py: Processing user messages and responses
+        - file_ingestor.py: Content analysis for knowledge base
+    """
 
     def __init__(self) -> None:
         self._nlp = None  # lazy
 
     def _ensure(self):
+        """
+        Ensure spaCy model is loaded for full-potential operation
+        
+        Why: Provides lazy loading of spaCy model to avoid startup overhead
+        while ensuring it's available when needed for text processing
+        Where: Called by _process_uncached before NLP operations
+        How: Uses _load_spacy() singleton pattern with thread safety
+        
+        Returns:
+            Loaded spaCy Language model or None if unavailable
+            
+        Connects to:
+            - _load_spacy(): Global singleton spaCy model loader
+            - _process_uncached(): Main text processing entry point
+        """
         if self._nlp is None:
             self._nlp = _load_spacy()
         return self._nlp
@@ -186,15 +206,34 @@ class _NLPProcessor:
 
     # ---- internals ----
     def _process_uncached(self, text: str) -> SimpleNamespace:
+        """
+        Process text using full potential NLP capabilities
+        
+        Why: Provides high-quality NLP analysis using spaCy and TextBlob
+        for Clever's understanding and response generation at full potential
+        Where: Used by cached analyze_text method for actual text processing
+        How: Uses loaded spaCy model for advanced NLP with no fallback patterns
+        
+        Args:
+            text: Input text to analyze for keywords and sentiment
+            
+        Returns:
+            SimpleNamespace with keywords (List[str]) and sentiment (float)
+            
+        Connects to:
+            - _load_spacy(): Ensures spaCy model is loaded
+            - _keywords_spacy(): Extracts keywords using spaCy NER and POS
+            - _sentiment(): Calculates sentiment using TextBlob
+        """
         nlp = self._ensure()
-        if nlp is not None:
-            try:
-                doc = nlp(text)
-                kws = _keywords_spacy(doc)
-            except Exception:
-                kws = _keywords_fallback(text)
-        else:
-            kws = _keywords_fallback(text)
+        if nlp is None:
+            raise RuntimeError("spaCy not available - install required dependencies for full operation")
+            
+        try:
+            doc = nlp(text)
+            kws = _keywords_spacy(doc)
+        except Exception as e:
+            raise RuntimeError(f"spaCy processing failed: {e}")
 
         sent = _sentiment(text)
         return SimpleNamespace(keywords=kws, sentiment=sent)

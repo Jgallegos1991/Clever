@@ -6,15 +6,8 @@ Edit these defaults as needed or override via environment variables.
 import os
 from pathlib import Path
 
-# Import user-specific configuration
-try:
-    from user_config import *
-except ImportError:
-    # Fallback defaults if user_config doesn't exist
-    USER_NAME = "Jay"
-    USER_EMAIL = "user@example.com"
-    TAILSCALE_ENABLED = False
-    CLEVER_EXTERNAL_ACCESS = False
+# Import user-specific configuration - required for full operation
+from user_config import *
 
 # Base directories
 ROOT_DIR = Path(__file__).resolve().parent
