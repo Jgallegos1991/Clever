@@ -8,10 +8,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const analysisPanel = document.querySelector('.analysis-panel');
   const modeBtn = document.getElementById('mode-btn');
 
-  // Initialize particle canvas if present
+  // Initialize holographic chamber with debugging
   const canvasElem = document.getElementById('particles');
-  if (canvasElem instanceof HTMLCanvasElement && typeof window.startParticles === 'function') {
-    window.startParticles(canvasElem, { count: 4000 });
+  console.log('🔧 Main.js initializing holographic chamber...');
+  console.log('🎯 Canvas element found:', canvasElem);
+  console.log('🎨 Canvas dimensions:', canvasElem?.offsetWidth, 'x', canvasElem?.offsetHeight);
+  
+  if (canvasElem instanceof HTMLCanvasElement && typeof window['startHolographicChamber'] === 'function') {
+    console.log('🚀 Starting holographic chamber from main.js...');
+    window['holographicChamber'] = window['startHolographicChamber'](canvasElem);
+    console.log('✅ Holographic chamber initialized:', window['holographicChamber']);
+  } else {
+    console.error('❌ Cannot initialize holographic chamber:', {
+      canvas: canvasElem,
+      startFunction: typeof window['startHolographicChamber']
+    });
   }
 
   // Send on click or Enter
@@ -39,6 +50,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.triggerPulse === 'function') window.triggerPulse(0.5);
   });
 
+  // Click anywhere to focus input (immersive mode)
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    // Don't interfere with actual clickable elements
+    if (target instanceof Element && 
+        target.matches('input, button, select, textarea, a, [contenteditable], .message, .chip')) {
+      return;
+    }
+    // Focus the input field when clicking anywhere else
+    if (userInput instanceof HTMLInputElement) {
+      userInput.focus();
+      // Trigger the same grid ripple effect as manual focus
+      const grid = document.querySelector('.grid-overlay');
+      if (grid) {
+        grid.classList.add('ripple');
+        setTimeout(() => grid.classList.remove('ripple'), 600);
+      }
+      if (typeof window.triggerPulse === 'function') window.triggerPulse(0.3);
+    }
+  });
+
+  // Auto-focus input on any keypress when no other element is focused
+  document.addEventListener('keydown', (e) => {
+    const target = e.target;
+    // Don't interfere if user is already typing in an input
+    if (target instanceof Element && 
+        target.matches('input, textarea, [contenteditable]')) {
+      return;
+    }
+    // Don't interfere with special keys
+    if (e.ctrlKey || e.altKey || e.metaKey || e.key === 'Tab' || e.key === 'Escape') {
+      return;
+    }
+    // Focus input and let the character through
+    if (userInput instanceof HTMLInputElement) {
+      userInput.focus();
+    }
+  });
+
   // Mode button is a status chip, not a toggle (auto-inferred mode)
   if (modeBtn) {
     modeBtn.addEventListener('click', () => {
@@ -64,6 +114,11 @@ async function sendMessage() {
   // Update status indicator (thinking) and mode chip based on initial guess
   setSelfcheckState('thinking', 'Thinking…');
   updateModeChip(inferModeFromAnalysis({ intent: guessIntentFromText(text) }, text));
+  
+  // Trigger particle summon state
+  if (window.holographicChamber) {
+    window.holographicChamber.summon();
+  }
   // Try to morph shape immediately from user request (e.g., "form a cube")
   const preShape = inferShapeFromTextAndAnalysis(text, null);
   if (preShape && typeof window.morphForIntent === 'function') {
@@ -86,16 +141,19 @@ async function sendMessage() {
     const data = await res.json();
     const reply = data.response || '...';
   const aiEl = appendMessage('ai', reply);
+  
+    // Switch to dialogue state when receiving response
+    if (window.holographicChamber) {
+      window.holographicChamber.dialogue();
+    }
     if (data && typeof data === 'object') {
       updateAnalysis(data.analysis || {});
       // Update adaptive mode chip from analysis + reply semantics
       const mode = inferModeFromAnalysis(data.analysis || {}, reply);
       updateModeChip(mode);
-      // Morph field based on detected shape intent
-      const shape = inferShapeFromTextAndAnalysis(null, data.analysis || {});
-      if (shape && typeof window.morphForIntent === 'function') {
-        window.morphForIntent(shape);
-      }
+      // Morph holographic chamber based on shape intent
+      
+      // Show/hide glass panels based on conversation state
       // Snap analysis panel under the latest AI message and animate highlight
       if (aiEl) {
         lastAiEl = aiEl;
@@ -126,6 +184,13 @@ async function sendMessage() {
     }
   // Mark done and show copy
   setSelfcheckState('ok', 'Done');
+  
+    // Return to idle state after a delay
+    setTimeout(() => {
+      if (window.holographicChamber) {
+        window.holographicChamber.idle();
+      }
+    }, 3000);
   showStatus('Energy takes shape.');
     // After a delay, return to idle microcopy
     setTimeout(() => {
