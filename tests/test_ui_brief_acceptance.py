@@ -6,6 +6,16 @@ INDEX = ROOT / 'templates' / 'index.html'
 
 
 def test_index_has_core_elements():
+    """
+    Validate presence of essential UI elements in the index template.
+    
+    Why: Ensures the main interface contains all required components
+         for Clever AI's 3D holographic chamber experience.
+    Where: UI acceptance test verifying template structure meets
+           design specifications for particle UI and grid overlay.
+    How: Parses index.html with BeautifulSoup, searches for specific
+         elements by ID and class, asserts their existence.
+    """
     html = INDEX.read_text(encoding='utf-8')
     soup = BeautifulSoup(html, 'html.parser')
     # Particle canvas present
@@ -21,6 +31,16 @@ def test_index_has_core_elements():
 
 
 def test_assets_wired_locally():
+    """
+    Verify all static assets are properly wired for local serving.
+    
+    Why: Ensures offline-first operation by confirming no external
+         CDN dependencies and all assets use Flask's url_for routing.
+    Where: Asset validation test supporting Clever AI's strict
+           offline-only architecture requirements.
+    How: Searches index.html content for Flask url_for template
+         syntax in CSS and JavaScript asset references.
+    """
     html = INDEX.read_text(encoding='utf-8')
     assert "url_for('static', filename='style.css')" in html
     assert "url_for('static', filename='js/particles.js')" in html
@@ -28,6 +48,16 @@ def test_assets_wired_locally():
 
 
 def test_microcopy_placeholders():
+    """
+    Confirm presence of appropriate UI microcopy matching design brief.
+    
+    Why: Validates user experience elements align with Clever AI's
+         ambient creativity and thought flow design philosophy.
+    Where: Microcopy validation ensuring UI text reflects the intended
+           magical, fluid interface aesthetic.
+    How: Searches HTML content for specific placeholder text that
+         matches the creative, ambient UI tone requirements.
+    """
     html = INDEX.read_text(encoding='utf-8')
     # Presence of placeholder copy that matches the brief tone
     assert 'Ambient creativity' in html or 'Your thought enters the flow' in html
