@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Clever</title>
   <!-- Load main stylesheet ONLY -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self';"><!--Relaxed for debugging-->
   </head>
   <body>
@@ -39,9 +39,9 @@
     <input id="chat-input" type="text" placeholder="Talk to Clever..." autocomplete="off" autofocus />
     <button class="icon-btn" id="send-btn" title="Send" aria-label="Send">➤</button>
   </div>
-    <!-- Emergency particle system - guaranteed to work -->
-  <script src="{{ url_for('static', filename='js/emergency-particles.js') }}"></script>
-  <!-- Ultimate diagnostic to analyze deeper issues -->
-  <script src="{{ url_for('static', filename='js/ultimate-diagnostic.js') }}"></script>
+    <!-- Holographic Chamber - Advanced Particle System -->
+  <script src="{{ url_for('static', filename='js/holographic-chamber.js') }}"></script>
+  <!-- Main application logic -->
+  <script src="{{ url_for('static', filename='js/core/app.js') }}"></script>
   </body>
 </html>

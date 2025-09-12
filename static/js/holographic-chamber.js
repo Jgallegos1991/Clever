@@ -271,53 +271,64 @@ class HolographicChamber {
   }
 
   draw() {
-    // Clear canvas with darker trail for better visibility
-    this.ctx.fillStyle = 'rgba(5, 8, 12, 0.08)';
+    // Clear canvas with much more visible trail effect
+    this.ctx.fillStyle = 'rgba(11, 15, 20, 0.02)'; // Less aggressive clearing
     this.ctx.fillRect(0, 0, this.width, this.height);
     
-    // Add debug info to confirm canvas is drawing
-    this.ctx.fillStyle = 'rgba(105, 234, 203, 0.1)';
-    this.ctx.fillText(`Particles: ${this.particles.length}`, 10, 20);
+    // Add visible debug info
+    this.ctx.font = 'bold 16px Arial';
+    this.ctx.fillStyle = 'rgba(105, 234, 203, 1.0)'; // FULLY OPAQUE debug text
+    this.ctx.fillText(`🌊 PARTICLES: ${this.particles.length} | STATE: ${this.state}`, 20, 30);
+    this.ctx.fillText(`🎯 CANVAS: ${this.width}x${this.height}`, 20, 50);
     
     this.particles.forEach(particle => {
-      const pulse = Math.sin(particle.phase) * 0.5 + 0.5; // More dramatic pulse
+      const pulse = Math.sin(particle.phase) * 0.3 + 0.7; // Strong pulse
       const energyPulse = Math.sin(particle.phase * 2) * particle.energy;
-      const finalAlpha = Math.max(0.8, particle.alpha * (0.8 + pulse * 0.2)); // Higher minimum alpha
-      const finalSize = particle.size * (1.0 + energyPulse * 0.6); // Larger base size
+      const finalAlpha = 1.0; // MAXIMUM ALPHA - no transparency!
+      const finalSize = Math.max(8, particle.size * (1.5 + energyPulse * 0.8)); // Guaranteed large size
       
-      // Massive outer glow (EXTREMELY visible)
+      // MEGA OUTER GLOW (impossible to miss)
       this.ctx.save();
-      this.ctx.globalAlpha = finalAlpha * 0.4;
-      this.ctx.fillStyle = `hsl(${particle.hue}, 100%, 50%)`;
+      this.ctx.globalAlpha = 0.8; // Very visible
+      this.ctx.fillStyle = `hsl(${particle.hue}, 100%, 60%)`; // Brighter
       this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, finalSize * 6, 0, Math.PI * 2);
+      this.ctx.arc(particle.x, particle.y, finalSize * 8, 0, Math.PI * 2);
       this.ctx.fill();
       
-      // Large middle glow
-      this.ctx.globalAlpha = finalAlpha * 0.7;
-      this.ctx.fillStyle = `hsl(${particle.hue}, 100%, 65%)`;
+      // LARGE MIDDLE GLOW
+      this.ctx.globalAlpha = 0.9;
+      this.ctx.fillStyle = `hsl(${particle.hue}, 100%, 75%)`;
       this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, finalSize * 3, 0, Math.PI * 2);
+      this.ctx.arc(particle.x, particle.y, finalSize * 4, 0, Math.PI * 2);
       this.ctx.fill();
       
-      // Particle core (BRIGHT WHITE CENTER)
-      this.ctx.globalAlpha = finalAlpha;
-      this.ctx.fillStyle = `hsl(${particle.hue}, 100%, 95%)`;
+      // PARTICLE CORE (BRILLIANT WHITE CENTER)
+      this.ctx.globalAlpha = 1.0; // Full opacity
+      this.ctx.fillStyle = 'white'; // Pure white, no HSL
       this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, finalSize * 1.5, 0, Math.PI * 2);
+      this.ctx.arc(particle.x, particle.y, finalSize * 2, 0, Math.PI * 2);
       this.ctx.fill();
+      
+      // Extra bright center dot
+      this.ctx.fillStyle = 'cyan';
+      this.ctx.beginPath();
+      this.ctx.arc(particle.x, particle.y, finalSize * 0.8, 0, Math.PI * 2);
+      this.ctx.fill();
+      
       this.ctx.restore();
     });
     
-    // Draw brighter connections between nearby particles
+    // Draw much brighter connections
     this.drawConnections();
   }
 
   drawConnections() {
-    const maxDistance = 120;
+    const maxDistance = 100;
     
-    this.ctx.strokeStyle = 'rgba(105, 234, 203, 0.3)'; // Brighter connections
-    this.ctx.lineWidth = 2; // Thicker lines
+    this.ctx.save();
+    this.ctx.strokeStyle = 'rgba(105, 234, 203, 0.8)'; // Much brighter connections
+    this.ctx.lineWidth = 3; // Even thicker lines
+    this.ctx.globalAlpha = 1.0;
     
     for (let i = 0; i < this.particles.length; i++) {
       for (let j = i + 1; j < this.particles.length; j++) {
@@ -329,19 +340,17 @@ class HolographicChamber {
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         if (distance < maxDistance) {
-          const alpha = (1 - distance / maxDistance) * 0.5; // Much more visible
+          const alpha = (1 - distance / maxDistance) * 0.9; // Maximum visibility
           
-          this.ctx.save();
           this.ctx.globalAlpha = alpha;
           this.ctx.beginPath();
           this.ctx.moveTo(p1.x, p1.y);
           this.ctx.lineTo(p2.x, p2.y);
           this.ctx.stroke();
-          this.ctx.restore();
         }
       }
     }
-    this.ctx.globalAlpha = 1;
+    this.ctx.restore();
   }
 
   animate() {
