@@ -31,12 +31,37 @@ build/
 .vscode/
 .idea/
 
-# --- Screenshots / large binaries at repo root ---
+# --- Screenshots, images, and temporary media files ---
 Screenshot*.png
-*.docx
+*.png
+*.jpg
+*.jpeg
+*.gif
+Gemini_Generated_Image*.png
+UI\ Jordan*.png
+NotebookLM*.png
 
-# --- Bundles & archives ---
-offline_bundle/**/*.tgz
+# --- Bundles, archives, and backup files ---
+offline_bundle/
+clever-context/
+copilot/
+backups/
+*.bundle
+*.zip
+*.tgz
+*.tar.gz
+
+# --- Demo and temporary documentation ---
+*DEMO*.md
+*IMPLEMENTATION*.md
+*COMPLETE*.md
+*CHECKLIST*.md
+*STATUS*.md
+*SETUP*.md
+test_*.py
+test_*.sh
+test_*.html
+test_*.json
 
 # --- Local sync folders (never commit) ---
 Clever_Sync/

@@ -22,8 +22,8 @@
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^\\*\\s+Serving Flask app",
-          "endsPattern": "^\\*\\s+Running on http"
+          "beginsPattern": "Starting Clever|^\\*\\s+Serving Flask app",
+          "endsPattern": "Running on http|^\\*\\s+Running on http"
         }
       }
     }
