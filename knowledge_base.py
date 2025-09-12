@@ -1,39 +1,65 @@
 """
-Knowledge Base Module - Wrapper for database functionality with extended capabilities
+Knowledge Base Module - Centralized data management for Clever AI
+
+Why: Provides advanced database operations beyond basic DatabaseManager including
+chat history, knowledge sources, content chunks, user preferences, and personality
+state management. Enables Clever to build comprehensive memory and learning.
+Where: Used by app.py for chat interactions, evolution_engine for learning,
+and sync modules for knowledge ingestion. Acts as high-level database API.
+How: Extends DatabaseManager functionality with specialized tables and operations
+for Clever's specific data needs while maintaining single database architecture.
+
+Connects to:
+    - database.py: Uses centralized DatabaseManager for all database operations
+    - config.py: Uses DB_PATH for single database configuration
+    - app.py: Chat history logging and user preference management
+    - evolution_engine.py: Knowledge storage and personality state tracking
+    - sync modules: Knowledge source and content chunk management
 """
 
-import sqlite3
 import json
 import threading
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
-# Import existing database functionality
-try:
-    from database import DatabaseManager, Source
-    HAS_DATABASE = True
-except ImportError:
-    HAS_DATABASE = False
+from database import DatabaseManager
+import config
 
-# Thread-safe database operations
+# Thread-safe database operations - reuse from DatabaseManager
 _db_lock = threading.RLock()
 
 # Global database instance
 _db_manager = None
 
-def init_db(db_path: str = "clever.db") -> bool:
-    """Initialize the knowledge base database"""
+def init_db() -> bool:
+    """
+    Initialize the knowledge base database with extended tables
+    
+    Why: Creates specialized tables for chat history, knowledge sources, user
+    preferences, and personality state that extend beyond basic DatabaseManager
+    functionality for comprehensive Clever AI memory and learning.
+    Where: Called at module import to ensure database schema is ready for
+    knowledge base operations used by app.py and evolution_engine.py.
+    How: Uses centralized DatabaseManager to create tables with proper schema
+    for advanced Clever AI functionality while maintaining single DB architecture.
+    
+    Returns:
+        bool: True if initialization successful, False otherwise
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe database operations
+        - config.py: Uses centralized DB_PATH configuration
+    """
     global _db_manager
     
     try:
         with _db_lock:
-            # Use existing DatabaseManager if available
-            if HAS_DATABASE:
-                _db_manager = DatabaseManager(db_path)
+            # Use centralized DatabaseManager - no direct sqlite3 connections
+            _db_manager = DatabaseManager(config.DB_PATH)
             
-            # Ensure required tables exist
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
+            # Use DatabaseManager's connection for table creation
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             # Create interactions table for chat history
             cursor.execute('''
@@ -108,7 +134,6 @@ def init_db(db_path: str = "clever.db") -> bool:
             ''')
             
             conn.commit()
-            conn.close()
             
             return True
             
@@ -118,31 +143,54 @@ def init_db(db_path: str = "clever.db") -> bool:
 
 def log_interaction(user_message: str, clever_response: str, intent_detected: str = None,
                    sentiment_compound: float = None, nlp_analysis: Dict = None) -> int:
-    """Log a chat interaction"""
+    """
+    Log a chat interaction to the knowledge base
+    
+    Why: Stores chat interactions for learning, memory, and conversation history
+    that enables Clever to build context and improve responses over time.
+    Where: Called by app.py after each user interaction to maintain complete
+    conversation history and enable evolution_engine learning.
+    How: Uses centralized DatabaseManager to insert interaction data into the
+    interactions table with structured metadata for NLP analysis.
+    
+    Args:
+        user_message: The user's input message
+        clever_response: Clever's generated response
+        intent_detected: Optional detected intent category
+        sentiment_compound: Optional sentiment score [-1.0, 1.0]
+        nlp_analysis: Optional dictionary of NLP analysis results
+        
+    Returns:
+        int: Interaction ID if successful, -1 if failed
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe database operations
+        - app.py: Receives interaction data from main application flow
+        - evolution_engine.py: Provides data for learning analysis
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
-            # Use the existing schema with user_input and action_taken columns
-            cursor.execute('''
-                INSERT INTO interactions 
-                (timestamp, user_input, action_taken, active_mode, parsed_data)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (
-                datetime.now().isoformat(),
-                user_message,
-                clever_response,  # Store response in action_taken
-                intent_detected or 'chat',  # Store intent in active_mode
-                json.dumps({
-                    'sentiment_compound': sentiment_compound,
-                    'nlp_analysis': nlp_analysis
-                }) if (sentiment_compound is not None or nlp_analysis) else None
-            ))
+                # Use the existing schema with user_input and action_taken columns
+                cursor.execute('''
+                    INSERT INTO interactions 
+                    (timestamp, user_input, action_taken, active_mode, parsed_data)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (
+                    datetime.now().isoformat(),
+                    user_message,
+                    clever_response,  # Store response in action_taken
+                    intent_detected or 'chat',  # Store intent in active_mode
+                    json.dumps({
+                        'sentiment_compound': sentiment_compound,
+                        'nlp_analysis': nlp_analysis
+                    }) if (sentiment_compound is not None or nlp_analysis) else None
+                ))
             
             interaction_id = cursor.lastrowid
             conn.commit()
-            conn.close()
             
             return interaction_id
             
@@ -151,53 +199,98 @@ def log_interaction(user_message: str, clever_response: str, intent_detected: st
         return -1
 
 def get_recent_interactions(limit: int = 10) -> List[Dict]:
-    """Get recent chat interactions"""
+    """
+    Retrieve recent chat interactions from the knowledge base
+    
+    Why: Provides conversation history for context building and memory recall
+    that enables Clever to maintain conversation continuity and reference
+    previous interactions for more coherent responses.
+    Where: Used by app.py for context building and evolution_engine for
+    analyzing interaction patterns and learning opportunities.
+    How: Queries the interactions table using DatabaseManager with proper
+    field mapping to return structured conversation history data.
+    
+    Args:
+        limit: Maximum number of recent interactions to retrieve
+        
+    Returns:
+        List[Dict]: List of interaction dictionaries with conversation data
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe database queries
+        - app.py: Provides context for response generation
+        - evolution_engine.py: Supplies data for learning analysis
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                SELECT timestamp, user_input, action_taken, active_mode, parsed_data
-                FROM interactions 
-                ORDER BY timestamp DESC 
-                LIMIT ?
-            ''', (limit,))
-            
-            interactions = []
-            for row in cursor.fetchall():
-                timestamp, user_input, action_taken, active_mode, parsed_data_json = row
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
                 
-                parsed_data = {}
-                if parsed_data_json:
-                    try:
-                        parsed_data = json.loads(parsed_data_json)
-                    except:
-                        pass
+                cursor.execute('''
+                    SELECT timestamp, user_input, action_taken, active_mode, parsed_data
+                    FROM interactions 
+                    ORDER BY timestamp DESC 
+                    LIMIT ?
+                ''', (limit,))
                 
-                interactions.append({
-                    'timestamp': timestamp,
-                    'user_message': user_input,  # Map to expected field name
-                    'clever_response': action_taken,  # Map to expected field name
-                    'intent_detected': active_mode,
-                    'sentiment_compound': parsed_data.get('sentiment_compound'),
-                    'nlp_analysis': parsed_data.get('nlp_analysis')
-                })
-            
-            conn.close()
-            return interactions
-            
+                interactions = []
+                for row in cursor.fetchall():
+                    timestamp, user_input, action_taken, active_mode, parsed_data_json = row
+                    
+                    parsed_data = {}
+                    if parsed_data_json:
+                        try:
+                            parsed_data = json.loads(parsed_data_json)
+                        except:
+                            pass
+                    
+                    interactions.append({
+                        'timestamp': timestamp,
+                        'user_message': user_input,  # Map to expected field name
+                        'clever_response': action_taken,  # Map to expected field name
+                        'intent_detected': active_mode,
+                        'sentiment_compound': parsed_data.get('sentiment_compound'),
+                        'nlp_analysis': parsed_data.get('nlp_analysis')
+                    })
+                
+                return interactions
+                
     except Exception as e:
         print(f"Failed to get recent interactions: {e}")
         return []
 
 def add_knowledge_source(filename: str, file_path: str = None, content_type: str = None,
                         file_size: int = None, content_hash: str = None) -> int:
-    """Add a knowledge source to the database"""
+    """
+    Add a knowledge source to the database
+    
+    Why: Tracks ingested files and documents to build Clever's knowledge base
+    and prevent duplicate processing while maintaining source attribution
+    for generated responses that reference learned material.
+    Where: Used by pdf_ingestor.py and file_ingestor.py during content
+    ingestion to register new sources before content chunking.
+    How: Inserts source metadata into knowledge_sources table using
+    DatabaseManager with timestamp and hash tracking for deduplication.
+    
+    Args:
+        filename: Name of the source file
+        file_path: Optional full path to source file
+        content_type: Optional MIME type or file type
+        file_size: Optional file size in bytes
+        content_hash: Optional hash for duplicate detection
+        
+    Returns:
+        int: Source ID if successful, -1 if failed
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe operations
+        - pdf_ingestor.py: Registers PDF sources during ingestion
+        - file_ingestor.py: Registers text file sources during ingestion
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             cursor.execute('''
                 INSERT INTO knowledge_sources 
@@ -214,7 +307,6 @@ def add_knowledge_source(filename: str, file_path: str = None, content_type: str
             
             source_id = cursor.lastrowid
             conn.commit()
-            conn.close()
             
             return source_id
             
@@ -224,11 +316,36 @@ def add_knowledge_source(filename: str, file_path: str = None, content_type: str
 
 def add_content_chunk(source_id: int, chunk_index: int, content: str,
                      keywords: List[str] = None, entities: List[str] = None) -> int:
-    """Add a content chunk to the database"""
+    """
+    Add a content chunk to the database for a knowledge source
+    
+    Why: Breaks down large documents into searchable chunks with extracted
+    keywords and entities to enable efficient retrieval and context-aware
+    responses based on ingested knowledge.
+    Where: Called by ingestor modules after processing documents to store
+    processed content chunks with NLP-extracted metadata for retrieval.
+    How: Stores content chunks with JSON-serialized keywords and entities
+    using DatabaseManager, linked to parent source via foreign key.
+    
+    Args:
+        source_id: ID of the parent knowledge source
+        chunk_index: Index of this chunk within the source
+        content: The text content of the chunk
+        keywords: Optional list of extracted keywords
+        entities: Optional list of extracted entities
+        
+    Returns:
+        int: Chunk ID if successful, -1 if failed
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe operations
+        - nlp_processor.py: Receives processed keywords and entities
+        - ingestor modules: Stores processed content chunks
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             cursor.execute('''
                 INSERT INTO content_chunks 
@@ -244,7 +361,6 @@ def add_content_chunk(source_id: int, chunk_index: int, content: str,
             
             chunk_id = cursor.lastrowid
             conn.commit()
-            conn.close()
             
             return chunk_id
             
@@ -253,11 +369,33 @@ def add_content_chunk(source_id: int, chunk_index: int, content: str,
         return -1
 
 def search_content(query: str, limit: int = 5) -> List[Dict]:
-    """Search content chunks for relevant information"""
+    """
+    Search content chunks for relevant information
+    
+    Why: Enables Clever to find and reference relevant knowledge from ingested
+    documents to provide informed responses based on learned material rather
+    than relying solely on pre-trained knowledge.
+    Where: Used by app.py during response generation when user queries might
+    benefit from referencing ingested documents and knowledge sources.
+    How: Performs text search across content chunks, keywords, and entities
+    using DatabaseManager with JOIN to include source attribution.
+    
+    Args:
+        query: Search query text to match against content and metadata
+        limit: Maximum number of results to return
+        
+    Returns:
+        List[Dict]: Search results with content, metadata, and source info
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe search queries
+        - app.py: Provides knowledge retrieval for response generation
+        - persona.py: Supplies context for knowledge-aware responses
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             # Simple text search - in production, would use embeddings
             cursor.execute('''
@@ -289,7 +427,6 @@ def search_content(query: str, limit: int = 5) -> List[Dict]:
                     'source_filename': filename
                 })
             
-            conn.close()
             return results
             
     except Exception as e:
@@ -297,15 +434,35 @@ def search_content(query: str, limit: int = 5) -> List[Dict]:
         return []
 
 def get_user_preference(key: str) -> Optional[str]:
-    """Get a user preference value"""
+    """
+    Retrieve a user preference value
+    
+    Why: Enables personalization by storing and retrieving Jay's preferences
+    for response style, behavior settings, and custom configurations that
+    make Clever more tailored to the single user's needs.
+    Where: Used by app.py and persona.py to customize behavior based on
+    stored preferences, ensuring consistent personalized experience.
+    How: Queries user_preferences table using DatabaseManager to retrieve
+    preference value by key for runtime behavior customization.
+    
+    Args:
+        key: Preference key identifier
+        
+    Returns:
+        Optional[str]: Preference value if found, None otherwise
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe preference queries
+        - app.py: Retrieves preferences for behavior customization
+        - persona.py: Adapts response generation based on user preferences
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             cursor.execute('SELECT preference_value FROM user_preferences WHERE preference_key = ?', (key,))
             result = cursor.fetchone()
-            conn.close()
             
             return result[0] if result else None
             
@@ -314,11 +471,33 @@ def get_user_preference(key: str) -> Optional[str]:
         return None
 
 def set_user_preference(key: str, value: str) -> bool:
-    """Set a user preference value"""
+    """
+    Set a user preference value
+    
+    Why: Stores Jay's preferences and settings to enable personalization
+    and consistent behavior across sessions, allowing Clever to adapt
+    to user preferences and maintain customized experience.
+    Where: Used by app.py when user configures settings or when persona.py
+    learns preferred interaction styles during conversations.
+    How: Uses INSERT OR REPLACE with DatabaseManager to update user_preferences
+    table with timestamp tracking for preference management.
+    
+    Args:
+        key: Preference key identifier
+        value: Preference value to store
+        
+    Returns:
+        bool: True if successful, False otherwise
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe preference updates
+        - app.py: Stores user configuration changes
+        - persona.py: Learns and stores interaction preferences
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             cursor.execute('''
                 INSERT OR REPLACE INTO user_preferences (preference_key, preference_value, last_updated)
@@ -326,7 +505,6 @@ def set_user_preference(key: str, value: str) -> bool:
             ''', (key, value, datetime.now().isoformat()))
             
             conn.commit()
-            conn.close()
             
             return True
             
@@ -335,11 +513,34 @@ def set_user_preference(key: str, value: str) -> bool:
         return False
 
 def update_personality_state(emotional_state: str, mood_score: float, interaction_count: int) -> bool:
-    """Update Clever's personality state"""
+    """
+    Update Clever's personality state
+    
+    Why: Tracks Clever's evolving personality and emotional state to enable
+    consistent personality development and mood-aware responses that create
+    a more engaging and empathetic user experience.
+    Where: Used by evolution_engine.py during learning analysis and by
+    persona.py to adjust response generation based on current personality state.
+    How: Updates personality_state table using DatabaseManager with fixed ID
+    for singleton personality tracking with timestamp for state evolution.
+    
+    Args:
+        emotional_state: Current emotional state description
+        mood_score: Numerical mood score for quantitative tracking
+        interaction_count: Current total interaction count
+        
+    Returns:
+        bool: True if successful, False otherwise
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe state updates
+        - evolution_engine.py: Updates personality based on learning analysis
+        - persona.py: Retrieves state for mood-aware response generation
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             cursor.execute('''
                 INSERT OR REPLACE INTO personality_state 
@@ -348,7 +549,6 @@ def update_personality_state(emotional_state: str, mood_score: float, interactio
             ''', (emotional_state, mood_score, interaction_count, datetime.now().isoformat()))
             
             conn.commit()
-            conn.close()
             
             return True
             
@@ -357,15 +557,32 @@ def update_personality_state(emotional_state: str, mood_score: float, interactio
         return False
 
 def get_personality_state() -> Optional[Dict]:
-    """Get Clever's current personality state"""
+    """
+    Retrieve Clever's current personality state
+    
+    Why: Provides current personality and emotional state data for mood-aware
+    response generation and personality consistency across interactions,
+    enabling Clever to maintain coherent character development.
+    Where: Used by persona.py for response generation and evolution_engine.py
+    for personality analysis and development tracking.
+    How: Queries personality_state table using DatabaseManager for singleton
+    personality record with structured state data return.
+    
+    Returns:
+        Optional[Dict]: Personality state data if available, None otherwise
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe state queries
+        - persona.py: Retrieves state for personality-aware responses
+        - evolution_engine.py: Analyzes personality development patterns
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             cursor.execute('SELECT emotional_state, mood_score, interaction_count, last_updated FROM personality_state WHERE id = 1')
             result = cursor.fetchone()
-            conn.close()
             
             if result:
                 return {
@@ -382,11 +599,34 @@ def get_personality_state() -> Optional[Dict]:
         return None
 
 def log_system_metric(metric_name: str, metric_value: float, metric_data: Dict = None) -> bool:
-    """Log a system metric"""
+    """
+    Log a system performance or behavior metric
+    
+    Why: Tracks system performance, behavior patterns, and operational metrics
+    to enable monitoring, debugging, and performance optimization for
+    continuous improvement of Clever's operation.
+    Where: Used by debug_config.py for performance tracking and health_monitor.py
+    for system status monitoring with metric aggregation.
+    How: Inserts metric data into system_metrics table using DatabaseManager
+    with JSON serialization for complex metric data structures.
+    
+    Args:
+        metric_name: Name/identifier of the metric being logged
+        metric_value: Numerical value of the metric
+        metric_data: Optional additional metric metadata
+        
+    Returns:
+        bool: True if successful, False otherwise
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe metric logging
+        - debug_config.py: Logs performance and debugging metrics
+        - health_monitor.py: Records system health and status metrics
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             cursor.execute('''
                 INSERT INTO system_metrics (metric_name, metric_value, metric_data, timestamp)
@@ -399,7 +639,6 @@ def log_system_metric(metric_name: str, metric_value: float, metric_data: Dict =
             ))
             
             conn.commit()
-            conn.close()
             
             return True
             
@@ -408,11 +647,29 @@ def log_system_metric(metric_name: str, metric_value: float, metric_data: Dict =
         return False
 
 def get_database_stats() -> Dict[str, Any]:
-    """Get database statistics"""
+    """
+    Retrieve comprehensive database statistics
+    
+    Why: Provides system monitoring data for database usage, table sizes,
+    and storage metrics to enable performance monitoring and capacity
+    planning for Clever's knowledge and interaction storage.
+    Where: Used by health_monitor.py for system status reporting and
+    debug_config.py for performance analysis and troubleshooting.
+    How: Queries table counts across all knowledge base tables using
+    DatabaseManager and calculates database file size for storage metrics.
+    
+    Returns:
+        Dict[str, Any]: Database statistics including table counts and file size
+        
+    Connects to:
+        - database.py: Uses DatabaseManager for thread-safe statistics queries
+        - health_monitor.py: Reports database health and usage metrics
+        - debug_config.py: Provides debugging and performance data
+    """
     try:
         with _db_lock:
-            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
+            with _db_manager._connect() as conn:
+                cursor = conn.cursor()
             
             stats = {}
             
@@ -426,17 +683,16 @@ def get_database_stats() -> Dict[str, Any]:
                 except:
                     stats[f'{table}_count'] = 0
             
-            # Database file size
+            # Database file size using centralized config
             import os
-            if os.path.exists("clever.db"):
-                stats['database_size_mb'] = os.path.getsize("clever.db") / (1024 * 1024)
+            if os.path.exists(config.DB_PATH):
+                stats['database_size_mb'] = os.path.getsize(config.DB_PATH) / (1024 * 1024)
             
-            conn.close()
             return stats
             
     except Exception as e:
         print(f"Failed to get database stats: {e}")
         return {}
 
-# Initialize database on import
+# Initialize database on import - no parameters needed, uses config.DB_PATH
 init_db()

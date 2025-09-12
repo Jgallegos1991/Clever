@@ -1,7 +1,20 @@
 #!/usr/bin/env python3
 """
-Clever AI Backup System
-Comprehensive backup and restoration for all Clever components
+Clever AI Backup System - Comprehensive backup and restoration
+
+Why: Provides complete data protection and disaster recovery for all Clever
+components including databases, configurations, knowledge sources, and logs
+to prevent data loss and enable system restoration.
+Where: Used by system administrators and automated backup processes to create
+scheduled backups and perform disaster recovery operations.
+How: Implements comprehensive backup creation with manifest tracking, integrity
+verification, and restoration capabilities for all Clever system components.
+
+Connects to:
+    - database.py: Backs up database files and validates integrity
+    - config.py: Backs up configuration files and settings
+    - knowledge sources: Protects ingested documents and processed content
+    - logs: Preserves system logs and debugging information
 """
 
 import os
@@ -15,15 +28,59 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 
 class CleverBackupSystem:
-    """Complete backup system for Clever AI"""
+    """
+    Complete backup system for Clever AI with comprehensive data protection
+    
+    Why: Ensures data safety and enables disaster recovery for all Clever
+    components including databases, configurations, and knowledge sources
+    to protect against data loss and system failures.
+    Where: Used for scheduled backups, manual system protection, and
+    disaster recovery operations in production environments.
+    How: Creates timestamped backup archives with manifest tracking and
+    integrity verification for reliable restoration capabilities.
+    """
     
     def __init__(self, backup_dir: str = "./backups"):
+        """
+        Initialize the backup system
+        
+        Why: Sets up backup directory structure and timestamp for organized
+        backup management and easy identification of backup versions.
+        Where: Called when creating backup instances for scheduled or manual
+        backup operations throughout the system lifecycle.
+        How: Creates backup directory structure and generates timestamp-based
+        naming for backup identification and chronological organization.
+        
+        Args:
+            backup_dir: Directory path for storing backup files
+            
+        Connects to:
+            - File system: Creates backup storage directory structure
+        """
         self.backup_dir = Path(backup_dir)
         self.backup_dir.mkdir(exist_ok=True, parents=True)
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
     def create_full_backup(self) -> str:
-        """Create comprehensive backup of entire Clever system"""
+        """
+        Create comprehensive backup of entire Clever system
+        
+        Why: Provides complete system protection by backing up all critical
+        components including databases, configurations, logs, and knowledge
+        sources for comprehensive disaster recovery capability.
+        Where: Used for scheduled full system backups and before major
+        system updates or maintenance operations.
+        How: Creates structured backup archive with manifest tracking and
+        integrity verification for each backed up component.
+        
+        Returns:
+            str: Backup name identifier for restoration reference
+            
+        Connects to:
+            - database.py: Backs up database files with integrity checks
+            - config.py: Preserves configuration files and settings
+            - File system: Archives logs and knowledge sources
+        """
         print("🔄 Creating Clever AI Full System Backup...")
         print("=" * 50)
         
