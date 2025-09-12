@@ -31,6 +31,24 @@ body {
   overflow: hidden;
 }
 
+/* Particle Canvas - legacy Clever UI */
+#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 1;
+  background: transparent;
+}
+
+#particles.active {
+  opacity: 1;
+  filter: none;
+}
+
 /* Status indicator - cosmic status */
 .selfcheck { 
   position: fixed; 
@@ -247,26 +265,59 @@ body {
     transform: scale(1.05);
 }
 
-/* Magical grid overlay effect */
+/* Holographic Grid Stage - Reactive Energy Field */
 .grid-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.1;
+    opacity: 0.08;
     background-image: 
-        linear-gradient(rgba(105, 234, 203, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(105, 234, 203, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: gridPulse 4s ease-in-out infinite;
+        linear-gradient(rgba(105, 234, 203, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(105, 234, 203, 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridPulse 6s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
+    transform-style: preserve-3d;
+    perspective: 800px;
 }
 
 @keyframes gridPulse {
-    0%, 100% { opacity: 0.05; }
-    50% { opacity: 0.15; }
+    0%, 100% { 
+        opacity: 0.06; 
+        transform: perspective(800px) rotateX(0deg);
+    }
+    50% { 
+        opacity: 0.12; 
+        transform: perspective(800px) rotateX(1deg);
+    }
+}
+
+/* Grid ripple effect when Clever is active */
+.grid-overlay.ripple {
+    animation: gridRipple 1.5s ease-out;
+}
+
+@keyframes gridRipple {
+    0% { 
+        transform: perspective(800px) rotateX(0deg) scale(1);
+        opacity: 0.08;
+    }
+    30% { 
+        transform: perspective(800px) rotateX(2deg) scale(1.02);
+        opacity: 0.25;
+        filter: brightness(1.5) saturate(1.3);
+    }
+    70% {
+        transform: perspective(800px) rotateX(-1deg) scale(0.98);
+        opacity: 0.15;
+    }
+    100% { 
+        transform: perspective(800px) rotateX(0deg) scale(1);
+        opacity: 0.08;
+    }
 }
 
 /* Enhanced button with magical effects */
@@ -385,121 +436,178 @@ body {
   }
 }
 
-/* HUD overlay - interface emerges from the void */
+/* Clean modern layout - centered conversation */
 .hud {
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 24px;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
   z-index: 2;
+  pointer-events: none;
 }
 
 .chat-panel {
-  align-self: flex-end;
-  max-width: 560px;
   width: 100%;
-  margin-bottom: 16px;
-  animation: panel-emerge 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  max-width: 700px;
+  margin-bottom: 80px;
+  pointer-events: auto;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .chat {
-  max-height: 45vh;
-  overflow: auto;
+  max-height: 60vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 8px;
+  gap: 16px;
+  padding: 0;
+  /* Clean scrolling */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* Neon chat bubbles like screenshot */
+.chat::-webkit-scrollbar {
+  display: none;
+}
+
+/* Clean modern message bubbles */
 .message { 
-  max-width: 85%;
-  padding: 12px 14px; 
-  border-radius: 12px; 
-  background: var(--bubble);
-  border: 1px solid rgba(105, 234, 203, 0.18);
-  box-shadow: 0 0 18px rgba(105, 234, 203, 0.15);
-  backdrop-filter: blur(8px);
-}
-.message .chip {
-  display: inline-block;
-  font-size: 12px;
-  color: #69EACB;
-  border: 1px solid rgba(105, 234, 203, 0.35);
-  padding: 2px 8px;
-  border-radius: 999px;
-  margin-bottom: 6px;
-  background: rgba(16, 24, 33, 0.6);
-}
-.message .bubble {
-  font-size: 15px;
-  line-height: 1.4;
-  color: var(--fg);
-}
-.message.user { 
-  align-self: flex-end; 
-  border-color: rgba(105, 234, 203, 0.35);
-  box-shadow: 0 0 22px rgba(105, 234, 203, 0.25);
-}
-.message.ai { 
-  align-self: flex-start; 
-  border-color: rgba(255, 107, 255, 0.35);
-  box-shadow: 0 0 22px rgba(255, 107, 255, 0.25);
+  max-width: 80%;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  animation: messageSlideIn 0.3s ease-out;
 }
 
-/* Frosted bottom entry bar */
+.message .chip {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.message .bubble {
+  padding: 16px 20px;
+  border-radius: 20px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--fg);
+  word-wrap: break-word;
+}
+
+.message.user { 
+  align-self: flex-end;
+}
+
+.message.user .chip {
+  text-align: right;
+  color: rgba(105, 234, 203, 0.8);
+}
+
+.message.user .bubble {
+  background: linear-gradient(135deg, rgba(105, 234, 203, 0.2), rgba(105, 234, 203, 0.1));
+  border: 1px solid rgba(105, 234, 203, 0.3);
+  backdrop-filter: blur(20px);
+}
+
+.message.ai { 
+  align-self: flex-start;
+}
+
+.message.ai .chip {
+  color: rgba(255, 107, 255, 0.8);
+}
+
+.message.ai .bubble {
+  background: rgba(16, 24, 33, 0.4);
+  border: 1px solid rgba(255, 107, 255, 0.2);
+  backdrop-filter: blur(20px);
+}
+
+/* Clean modern input bar */
 .entrybar {
   position: fixed;
   left: 50%;
-  bottom: 28px;
+  bottom: 24px;
   transform: translateX(-50%);
-  width: min(860px, 92vw);
-  display: grid;
-  grid-template-columns: 44px 1fr 44px;
+  width: min(700px, 90vw);
+  display: flex;
+  align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  background: rgba(16, 24, 33, 0.6);
-  border: 1px solid rgba(105, 234, 203, 0.25);
-  border-radius: 18px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 28px rgba(105, 234, 203, 0.15);
+  padding: 6px;
+  background: rgba(11, 15, 20, 0.8);
+  border: 1px solid rgba(105, 234, 203, 0.2);
+  border-radius: 25px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   z-index: 3;
-}
-.entrybar input {
-  width: 100%;
-  background: rgba(10, 14, 20, 0.5);
-  border: 1px solid rgba(105, 234, 203, 0.25);
-  border-radius: 12px;
-  padding: 12px 14px;
-  color: var(--fg);
-  outline: none;
-}
-.entrybar .icon-btn {
-  height: 44px;
-  width: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(105, 234, 203, 0.16), rgba(255, 107, 255, 0.12));
-  border: 1px solid rgba(105, 234, 203, 0.35);
-  color: var(--fg);
-}
-.entrybar .icon-btn:hover {
-  box-shadow: 0 0 16px rgba(105, 234, 203, 0.25);
+  transition: all 0.2s ease;
 }
 
-/* Analysis card floating under chat */
+.entrybar:focus-within {
+  border-color: rgba(105, 234, 203, 0.4);
+  box-shadow: 0 4px 30px rgba(105, 234, 203, 0.15);
+}
+
+.entrybar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 16px 20px;
+  color: var(--fg);
+  font-size: 15px;
+  outline: none;
+}
+
+.entrybar input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.entrybar .icon-btn {
+  height: 38px;
+  width: 38px;
+  border-radius: 50%;
+  background: rgba(105, 234, 203, 0.1);
+  border: 1px solid rgba(105, 234, 203, 0.3);
+  color: var(--neon-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.entrybar .icon-btn:hover {
+  background: rgba(105, 234, 203, 0.2);
+  transform: scale(1.05);
+}
+
+/* Subtle analysis panel */
 .analysis-panel {
   position: fixed;
+  top: 24px;
   right: 24px;
-  bottom: 108px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(16, 24, 33, 0.65);
-  border: 1px solid rgba(105, 234, 203, 0.2);
-  backdrop-filter: blur(10px);
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(11, 15, 20, 0.6);
+  border: 1px solid rgba(105, 234, 203, 0.1);
+  backdrop-filter: blur(15px);
   z-index: 2;
-  max-width: 420px;
+  max-width: 280px;
+  font-size: 12px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.analysis-panel:hover {
+  opacity: 1;
 }
 .analysis-panel h3 { margin: 0 0 8px 0; font-size: 14px; color: var(--muted); }
 
@@ -513,16 +621,26 @@ body {
   flex-direction: column; 
 }
 
-@keyframes panel-emerge {
-  0% {
+/* Modern smooth animations */
+@keyframes fadeInUp {
+  from {
     opacity: 0;
-    transform: translateY(60px) scale(0.9);
-    filter: blur(6px);
+    transform: translateY(20px);
   }
-  100% {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
     opacity: 1;
     transform: translateY(0) scale(1);
-    filter: blur(0);
   }
 }
 
@@ -825,49 +943,76 @@ body.clean .grid-full::before {
 }
 
 /* Responsive design */
+/* Responsive design */
 @media (max-width: 768px) {
   .hud {
-    padding: 16px;
+    padding: 12px;
   }
   
   .chat-panel {
     max-width: 100%;
+    margin-bottom: 100px;
   }
   
-  .entry {
-    width: 100%;
-    gap: 8px;
-    padding: 12px 16px;
+  .entrybar {
+    width: calc(100vw - 24px);
+    bottom: 12px;
   }
   
-  .entry input {
+  .entrybar input {
+    padding: 14px 16px;
     font-size: 16px; /* Prevent zoom on iOS */
   }
   
-  .msg {
-    max-width: 85%;
+  .message .bubble {
     padding: 14px 16px;
+    font-size: 14px;
+  }
+  
+  .analysis-panel {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+    font-size: 11px;
   }
   
   .selfcheck {
-    top: 4px;
-    right: 4px;
-    font-size: 11px;
-    padding: 6px 12px;
+    top: 8px;
+    right: 8px;
+    font-size: 10px;
+    padding: 4px 8px;
   }
 }
 
 @media (max-width: 480px) {
-  .entry .icon {
-    padding: 8px 10px;
-  }
-  
-  .entry select {
-    display: none; /* Hide voice select on small screens */
-  }
-  
-  .msg {
+  .message {
     max-width: 90%;
+  }
+  
+  .message .bubble {
     padding: 12px 14px;
+    border-radius: 16px;
+  }
+  
+  .entrybar {
+    padding: 4px;
+  }
+  
+  .entrybar .icon-btn {
+    height: 34px;
+    width: 34px;
+    font-size: 14px;
   }
 }
+
+@media (max-height: 600px) {
+  .chat {
+    max-height: 50vh;
+  }
+  
+  .chat-panel {
+    margin-bottom: 60px;
+  }
+}
+
