@@ -12,6 +12,7 @@
     "ms-vscode-remote.remote-containers",
     "devsense.phptools-vscode",
     "hbenl.vscode-test-explorer",
-    "ms-python.vscode-pylance"
+    "ms-python.vscode-pylance",
+    "github.vscode-github-actions"
   ]
 }
