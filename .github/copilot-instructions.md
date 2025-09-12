@@ -3,6 +3,11 @@
 ## Unbreakable Rules
 1. **Strictly Offline:** Never add code that makes external network calls at runtime. All libraries and models must be local. Enforce with `utils.offline_guard.enable()`.
 2. **Single-User Only:** The system is for "Jordan" (Jay). No user accounts, logins, or multi-tenancy. Personalize via `user_config.py`. The persona is a witty, empathetic female AI named "Clever".
+3. **Single Database:** Use only ONE database file (`clever.db` via `config.DB_PATH`). NO fallbacks, placeholders, or multiple database files.
+4. **Mandatory Code Documentation:** ALL code must include comments explaining:
+   - **Why:** Purpose and reasoning for the code
+   - **Where:** How it connects to other parts of the system  
+   - **How:** Technical implementation details
 
 ## Architecture Overview
 - **Framework:** Python 3.12 + Flask (`app.py`)
@@ -15,22 +20,56 @@
   - `debug_config.py`: Debugging, monitoring
 - **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), engines under `static/js/`, performance modules
 
+## Code Documentation Standards
+Every function, class, and significant code block MUST include:
+
+```python
+def example_function(param1: str, param2: int) -> str:
+    """
+    Brief description of what this function does
+    
+    Why: Explains the business/technical reason this code exists
+    Where: Describes how this connects to other system components  
+    How: Details the technical implementation approach
+    
+    Args:
+        param1: Description of parameter and its purpose
+        param2: Description of parameter and its purpose
+        
+    Returns:
+        Description of return value and its purpose
+        
+    Connects to:
+        - module_name.py: Specific connection and data flow
+        - another_module.py: How data/control flows between modules
+    """
+    # Inline comments explaining complex logic
+    # Why: This step is necessary because...
+    result = complex_operation(param1, param2)
+    
+    # Where: This connects to database.py for persistence
+    save_result(result)
+    
+    return result
+```
+
 ## Developer Workflows
 - **Setup:**
-  - `make setup` (base, offline)
+  - `make setup` (base, offline, single database)
   - `make setup-full` (full, downloads spaCy model)
-  - `make run` (start Flask server)
+  - `make run` (start Flask server with evolution engine)
   - `make file-inventory` (auto-generate file inventory)
 - **Testing:**
   - `make test` (pytest, see `pytest.ini`)
-  - `test-offline.sh` (validates offline operation)
+  - `test-offline.sh` (validates offline operation and single DB)
 - **Debugging:**
   - Use `debug_config.py` for logging, performance, error recovery
 
 ## Project Conventions
-- **Config:** Always import user info from `user_config.py`
-- **Database:** Use `DatabaseManager` with thread safety (`_lock`)
+- **Config:** Always import from centralized `config.py` - uses `DB_PATH` for single database
+- **Database:** Use `DatabaseManager` with thread safety (`_lock`) - ONLY `clever.db` file
 - **Error Handling:** Use debug system (`get_debugger`, `performance_monitor`)
+- **Documentation:** Every function must explain Why/Where/How connections
 - **File Sync:**
   - Sync dirs: `Clever_Sync/`, `synaptic_hub_sync/`
   - Ingestion: `pdf_ingestor.py` (PDFs), `file_ingestor.py` (text)

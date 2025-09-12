@@ -94,7 +94,8 @@ class CleverTestSuite:
         
         # Test 1: Database connection
         try:
-            conn = sqlite3.connect('clever.db')
+            from config import DB_PATH
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             cursor.execute('SELECT 1')
             conn.close()
@@ -107,7 +108,8 @@ class CleverTestSuite:
             from knowledge_base import init_db
             init_db()
             
-            conn = sqlite3.connect('clever.db')
+            from config import DB_PATH
+            conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             
             required_tables = [

@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 """
 Clever AI Test Runner
-Comprehensive test suite runner that includes UI tooltip tests
+
+Why: Provides a unified entry point for running all test suites, including UI
+tooltip tests, to ensure system reliability and feature coverage.
+Where: Connects to tests/test_ui_functionality.py and other test modules.
+How: Imports test modules, runs specific test functions, aggregates and prints
+results for developer review.
+
+Connects to:
+    - tests/test_ui_functionality.py: Runs UI tooltip tests
+    - Other test modules as imported
 """
 
 import sys

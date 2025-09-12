@@ -1,3 +1,22 @@
+
+"""
+Database Manager for Clever AI
+
+Why: Provides thread-safe, centralized access to the single SQLite database
+(clever.db) for all persistence and retrieval operations. Ensures data integrity
+and enforces single-database architecture.
+Where: Used by all modules requiring data storage or retrieval, including
+ingestors, evolution engine, persona, and app.
+How: Implements a thread-safe DatabaseManager class, dataclasses for sources,
+and connection helpers. All database operations route through this module.
+
+Connects to:
+    - config.py: Uses DB_PATH for database location
+    - file_ingestor.py, pdf_ingestor.py: Ingestion modules
+    - evolution_engine.py: Self-learning core
+    - persona.py: Persona engine
+    - app.py: Main application
+"""
 from __future__ import annotations
 
 import sqlite3

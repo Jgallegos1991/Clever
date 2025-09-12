@@ -1,4 +1,21 @@
 # persona.py — Clever Persona Engine (offline‑only, Jay‑specific)
+"""
+Persona Engine for Clever AI
+
+Why: Generates context-aware, empathetic responses in various modes (Auto,
+Creative, Deep Dive, Support, Quick Hit) for the single user. Operates fully
+offline, leveraging local NLP and heuristics.
+Where: Used by app.py for user interactions, connects to nlp_processor for
+language analysis and database for memory.
+How: Implements PersonaEngine class with multiple response modes, integrates
+sentiment and suggestion generation, and returns PersonaResponse objects.
+
+Connects to:
+    - nlp_processor.py: NLP and sentiment analysis
+    - database.py: Memory and context storage
+    - app.py: Main application for user interaction
+"""
+# persona.py — Clever Persona Engine (offline‑only, Jay‑specific)
 from __future__ import annotations
 
 from types import SimpleNamespace

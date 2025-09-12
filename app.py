@@ -1,3 +1,23 @@
+"""
+Clever AI Main Application
+
+Why: Serves as the entry point and orchestrator for all Clever AI operations,
+including web server, API endpoints, and system integrations. Ensures offline
+operation, single-user focus, and centralized control.
+Where: Connects to evolution_engine, persona, database, debug_config,
+health_monitor, error_recovery, and user_config modules.
+How: Initializes Flask app, loads config, sets up debugging/monitoring,
+handles requests, and manages system lifecycle.
+
+Connects to:
+    - evolution_engine.py: Self-learning intelligence core
+    - persona.py: Persona engine for responses
+    - database.py: Database manager
+    - debug_config.py: Debugging and monitoring
+    - health_monitor.py: System health checks
+    - error_recovery.py: Error handling and recovery
+    - user_config.py: User-specific settings
+"""
 import os, sys, time
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
