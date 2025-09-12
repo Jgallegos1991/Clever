@@ -1,106 +1,66 @@
-import os, sys, time
+"""
+Flask Application Module - Main web server for Clever AI assistant.
+
+Why: Provides HTTP interface for Clever AI with chat endpoints, file uploads,
+     and system management while enforcing offline-first architecture and
+     integrating all core components including persona, NLP, and database.
+
+Where: Main application entry point that coordinates all system components,
+       serves web interface, and handles user interactions through REST API.
+
+How: Implements Flask web server with offline guard enforcement, centralized
+     configuration, comprehensive error handling, and integration with persona
+     engine, evolution engine, and knowledge management systems.
+"""
+import os
+import sys
+import time
 from datetime import datetime
-from flask import Flask, request, jsonify, render_template
-from flask import redirect, url_for
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 from io import BytesIO
 import json as _json
 
-# Ensure repo root on path so utils.* resolves in tests and runtime
+# Ensure repo root on path for module resolution
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 if APP_ROOT not in sys.path:
     sys.path.insert(0, APP_ROOT)
 
+# Core imports - no fallbacks per architecture standards
+import config
 from utils import offline_guard
+from database import db_manager
 from evolution_engine import get_evolution_engine
+from debug_config import get_debugger, debug_method, performance_monitor
+from health_monitor import get_health_monitor
+from error_recovery import get_error_recovery, handle_error_with_recovery
+from test_suite import get_test_suite
+from nlp_processor import UnifiedNLPProcessor
+from user_config import USER_NAME, USER_EMAIL, TAILSCALE_ENABLED, CLEVER_EXTERNAL_ACCESS
 
-# Import debugging and monitoring systems
-try:
-    from debug_config import get_debugger, debug_method, performance_monitor
-    from health_monitor import get_health_monitor
-    from error_recovery import get_error_recovery, handle_error_with_recovery
-    from test_suite import get_test_suite
-    
-    # Initialize systems
-    debugger = get_debugger()
-    health_monitor = get_health_monitor()
-    error_recovery = get_error_recovery()
-    test_suite = get_test_suite()
-    
-    debugger.info('app', 'Debug and monitoring systems initialized')
-except Exception as e:
-    print(f"[WARN] Debug systems not available: {e}")
-    debugger = None
-    health_monitor = None
-    error_recovery = None
-    test_suite = None
+# Initialize core systems
+debugger = get_debugger()
+health_monitor = get_health_monitor()
+error_recovery = get_error_recovery()
+test_suite = get_test_suite()
+nlp_processor = UnifiedNLPProcessor()
 
-# -------- User & Config Integration ----------
-try:
-    import config as user_config
-    from user_config import USER_NAME, USER_EMAIL, TAILSCALE_ENABLED, CLEVER_EXTERNAL_ACCESS
-    DEBUG = getattr(user_config, "DEBUG", True)
-    if debugger:
-        debugger.info('app', f'Clever AI configured for: {USER_NAME} ({USER_EMAIL})')
-    else:
-        print(f"🔧 Clever AI configured for: {USER_NAME} ({USER_EMAIL})")
-    if TAILSCALE_ENABLED:
-        print(f"🌐 Tailscale integration enabled")
-    if CLEVER_EXTERNAL_ACCESS:
-        print(f"🌍 External access enabled via Tailscale")
-except Exception as e:
-    DEBUG = True
-    USER_NAME = "Jay"
-    USER_EMAIL = "user@example.com"
-    TAILSCALE_ENABLED = False
-    CLEVER_EXTERNAL_ACCESS = False
-    if error_recovery:
-        error_recovery.handle_error(e, {'context': 'user_config_loading'})
+# Configure application based on user settings
+DEBUG = getattr(config, "DEBUG", True)
+debugger.info('app', f'Clever AI configured for: {USER_NAME} ({USER_EMAIL})')
 
-# -------- database (tolerate missing) --------
-class _NullDB:
-    def add_conversation(self, *_args, **_kwargs): pass
-db_manager = _NullDB()
-try:
-    # if your database.py exposes DatabaseManager or a global db_manager, use it
-    from database import db_manager as real_db
-    db_manager = real_db or db_manager
-except Exception as e:
-    if debugger:
-        debugger.warning('app', 'DB not wired, running without persistence', e)
-    else:
-        print(f"[WARN] DB not wired, running without persistence: {e}")
-    if error_recovery:
-        error_recovery.handle_error(e, {'context': 'database_initialization'})
+debugger.info('app', 'Debug and monitoring systems initialized')
+debugger.info('app', 'NLP processor initialized successfully')
 
-# -------- NLP (tolerate missing) -------------
-nlp_processor = None
-try:
-    from nlp_processor import UnifiedNLPProcessor
-    nlp_processor = UnifiedNLPProcessor()
-    if debugger:
-        debugger.info('app', 'NLP processor initialized successfully')
-except Exception as e:
-    if debugger:
-        debugger.warning('app', 'NLP offline/unavailable', e)
-    else:
-        print(f"[WARN] NLP offline/unavailable: {e}")
-    if error_recovery:
-        error_recovery.handle_error(e, {'context': 'nlp_initialization'})
+# Enforce offline-first operation
+offline_guard.enable()
+debugger.info('app', 'Offline guard enabled - external network access blocked')
 
-# -------- Persona (required, but degrade) ----
-class _FallbackPersona:
-    last_used_trait = "Base"
-    def generate_response(self, analysis):
-        msg = analysis.get("user_input","")
-        if msg.endswith("?"): self.last_used_trait = "Curious"
-        else: self.last_used_trait = "Calm"
-        return "Copy that. Tiny machines are on it."
-try:
-    from persona import CleverPersona
-    clever_persona = CleverPersona(nlp_processor, db_manager)
-except Exception as e:
-    print(f"[WARN] Persona fallback in use: {e}")
-    clever_persona = _FallbackPersona()
+# Initialize persona engine
+from persona import PersonaEngine
+clever_persona = PersonaEngine("Clever", USER_NAME)
+debugger.info('app', 'Persona engine initialized')
+
+# Initialize Flask application
 
 app = Flask(
     __name__,
