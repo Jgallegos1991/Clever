@@ -26,13 +26,33 @@ import hashlib
 import re
 from dataclasses import dataclass
 from typing import Dict, List, Set, Optional
-import numpy as np
-import networkx as nx
-import spacy
-from config import DB_PATH
 
-# Load spaCy model - required for full operation
-nlp = spacy.load("en_core_web_sm")
+# Optional dependencies with graceful fallbacks
+try:
+    import numpy as np
+except ImportError:
+    np = None
+    print("Warning: numpy not available, using fallback math")
+
+try:
+    import networkx as nx
+except ImportError:
+    nx = None
+    print("Warning: networkx not available, using simple dict for concept graph")
+
+try:
+    import spacy
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except OSError:
+        nlp = None
+        print("Warning: spacy model not found, using basic text processing")
+except ImportError:
+    spacy = None
+    nlp = None
+    print("Warning: spacy not available, using basic text processing")
+
+from config import DB_PATH
 
 
 @dataclass
@@ -58,8 +78,11 @@ class CleverEvolutionEngine:
         self.evolution_log = []
         self.concept_cache = {}
 
-        # NetworkX graph for full network analysis capabilities
-        self.concept_graph = nx.DiGraph()
+        # Use networkx if available, otherwise simple dict
+        if nx:
+            self.concept_graph = nx.DiGraph()
+        else:
+            self.concept_graph = {}  # Fallback to dict structure
 
         self.init_evolution_database()
         self.load_existing_knowledge()
@@ -187,7 +210,11 @@ class CleverEvolutionEngine:
             )
 
             self.concept_cache[concept_id] = concept
-            self.concept_graph.add_node(concept_id, concept=concept)
+            
+            if nx and hasattr(self.concept_graph, 'add_node'):
+                self.concept_graph.add_node(concept_id, concept=concept)
+            else:
+                self.concept_graph[concept_id] = concept
 
         # Load all concept connections
         cursor.execute(
@@ -198,17 +225,78 @@ class CleverEvolutionEngine:
         )
         for concept_a, concept_b, strength, conn_type in cursor.fetchall():
             if (
-                concept_a in self.concept_graph
-                and concept_b in self.concept_graph
+                concept_a in self.concept_cache
+                and concept_b in self.concept_cache
             ):
-                self.concept_graph.add_edge(
-                    concept_a,
-                    concept_b,
-                    weight=strength,
-                    connection_type=conn_type,
-                )
+                if nx and hasattr(self.concept_graph, 'add_edge'):
+                    self.concept_graph.add_edge(
+                        concept_a,
+                        concept_b,
+                        weight=strength,
+                        connection_type=conn_type,
+                    )
+                else:
+                    # Fallback: store connections in concept cache
+                    if hasattr(self.concept_cache[concept_a], 'related_concepts'):
+                        self.concept_cache[concept_a].related_concepts.add(concept_b)
+                    if hasattr(self.concept_cache[concept_b], 'related_concepts'):
+                        self.concept_cache[concept_b].related_concepts.add(concept_a)
 
         conn.close()
+
+    def log_interaction(self, interaction_data: Dict):
+        """
+        Main entry point for logging interactions and triggering learning
+        
+        Why: Provides the primary interface for the evolution engine to learn
+             from user interactions, analyze patterns, and trigger growth
+        
+        Where: Called by app.py after user interactions to enable continuous
+               learning and intelligence evolution
+        
+        How: Extracts interaction components, analyzes for learning opportunities,
+             and logs evolution events when significant learning occurs
+        """
+        user_input = interaction_data.get('user_input', '')
+        response = interaction_data.get('response', '')
+        mode = interaction_data.get('active_mode', 'Auto')
+        sentiment = interaction_data.get('sentiment', 0.0)
+        
+        # Analyze this interaction for learning
+        analysis = self.analyze_interaction(user_input, response, mode, sentiment)
+        
+        # Log the evolution event if significant learning occurred
+        if analysis['new_concepts'] or analysis['new_connections']:
+            self.log_evolution_event(
+                "learning_event",
+                f"Learned {len(analysis['new_concepts'])} concepts, {len(analysis['new_connections'])} connections",
+                interaction_data,
+                0.3
+            )
+
+    def learn_from_interaction(self, user_input: str, clever_response: str, context: Dict = None):
+        """
+        Learn from user interaction - compatibility method for test_suite.py
+        
+        Why: Provides test compatibility interface for the evolution engine
+             while maintaining the same learning functionality
+        
+        Where: Called by test_suite.py to validate learning capabilities
+        
+        How: Wraps the log_interaction method with a simpler interface
+             for testing purposes
+        """
+        if context is None:
+            context = {}
+            
+        interaction_data = {
+            'user_input': user_input,
+            'response': clever_response,
+            'active_mode': context.get('mode', 'Auto'),
+            'sentiment': context.get('sentiment', 0.0)
+        }
+        
+        self.log_interaction(interaction_data)
 
     def analyze_interaction(
         self,
@@ -277,33 +365,45 @@ class CleverEvolutionEngine:
         return analysis
 
     def extract_concepts(self, text: str) -> List[str]:
-        """Extract meaningful concepts from text using advanced NLP"""
+        """Extract meaningful concepts from text using advanced NLP or fallback"""
         concepts = []
-        doc = nlp(text)
+        
+        if nlp:
+            # Advanced NLP processing when spaCy is available
+            doc = nlp(text)
 
-        # Extract named entities with full coverage
-        entity_types = [
-            "PERSON", "ORG", "GPE", "EVENT", "WORK_OF_ART",
-            "LAW", "LANGUAGE", "PRODUCT", "NORP", "FAC"
-        ]
-        for ent in doc.ents:
-            if ent.label_ in entity_types and len(ent.text.strip()) > 2:
-                concepts.append(ent.text.lower().strip())
+            # Extract named entities with full coverage
+            entity_types = [
+                "PERSON", "ORG", "GPE", "EVENT", "WORK_OF_ART",
+                "LAW", "LANGUAGE", "PRODUCT", "NORP", "FAC"
+            ]
+            for ent in doc.ents:
+                if ent.label_ in entity_types and len(ent.text.strip()) > 2:
+                    concepts.append(ent.text.lower().strip())
 
-        # Extract sophisticated noun phrases
-        for chunk in doc.noun_chunks:
-            # Filter for meaningful chunks
-            if (2 <= len(chunk.text.split()) <= 4 and
-                chunk.root.pos_ in ["NOUN", "PROPN"] and
-                    not chunk.root.is_stop):
-                concepts.append(chunk.text.lower().strip())
+            # Extract sophisticated noun phrases
+            for chunk in doc.noun_chunks:
+                # Filter for meaningful chunks
+                if (2 <= len(chunk.text.split()) <= 4 and
+                    chunk.root.pos_ in ["NOUN", "PROPN"] and
+                        not chunk.root.is_stop):
+                    concepts.append(chunk.text.lower().strip())
 
-        # Extract key individual terms
-        for token in doc:
-            if (token.pos_ in ["NOUN", "PROPN", "ADJ"] and
-                not token.is_stop and not token.is_punct and
-                    len(token.text) > 3 and token.lemma_ != "-PRON-"):
-                concepts.append(token.lemma_.lower())
+            # Extract key individual terms
+            for token in doc:
+                if (token.pos_ in ["NOUN", "PROPN", "ADJ"] and
+                    not token.is_stop and not token.is_punct and
+                        len(token.text) > 3 and token.lemma_ != "-PRON-"):
+                    concepts.append(token.lemma_.lower())
+        else:
+            # Fallback: Basic text processing without spaCy
+            words = re.findall(r'\b[a-zA-Z]+\b', text)
+            # Filter for potential concepts (nouns, proper nouns, etc.)
+            for word in words:
+                if (len(word) > 3 and 
+                    word.lower() not in {'this', 'that', 'with', 'from', 'they', 'have', 'will', 'been', 'were', 'said', 'each', 'which', 'their', 'time', 'will', 'about', 'could', 'other', 'after', 'first', 'well', 'many'} and
+                    word.isalpha()):
+                    concepts.append(word.lower())
 
         # Advanced pattern extraction for technical terms
         tech_patterns = re.findall(r'\b[A-Z]{2,}(?:[A-Z][a-z]+)*\b', text)
@@ -351,20 +451,29 @@ class CleverEvolutionEngine:
             confidence=0.1,
         )
 
-        self.concept_graph.add_node(  # type: ignore
-            concept_id, concept=concept
-        )
+        self.concept_cache[concept_id] = concept
+        
+        if nx and hasattr(self.concept_graph, 'add_node'):
+            self.concept_graph.add_node(concept_id, concept=concept)  # type: ignore
+        else:
+            self.concept_graph[concept_id] = concept  # type: ignore
+        
         self.save_concept(concept)
 
         return concept
 
     def reinforce_concept(self, concept_id: str, sentiment_bonus: float = 0.0):
         """Strengthen existing concept"""
-        if concept_id in self.concept_graph:
-            # type: ignore
-            # type: ignore
-            concept = self.concept_graph.nodes[concept_id]["concept"]
-
+        concept = None
+        
+        if nx and hasattr(self.concept_graph, 'nodes') and concept_id in self.concept_graph:
+            concept = self.concept_graph.nodes[concept_id]["concept"]  # type: ignore
+        elif concept_id in self.concept_cache:
+            concept = self.concept_cache[concept_id]
+        elif concept_id in self.concept_graph:
+            concept = self.concept_graph[concept_id]  # type: ignore
+            
+        if concept:
             # Calculate reinforcement
             base_reinforcement = 0.05
             sentiment_multiplier = 1.0 + (sentiment_bonus * 0.5)
@@ -389,21 +498,31 @@ class CleverEvolutionEngine:
         id_a = self.generate_concept_id(concept_a)
         id_b = self.generate_concept_id(concept_b)
 
-        is_invalid = (
-            id_a == id_b
-            or (id_a not in self.concept_graph)
-            or (id_b not in self.concept_graph)
-        )
-        if is_invalid:
+        # Check if concepts exist in our graph/cache
+        has_a = (nx and hasattr(self.concept_graph, 'nodes') and id_a in self.concept_graph) or id_a in self.concept_cache or id_a in self.concept_graph
+        has_b = (nx and hasattr(self.concept_graph, 'nodes') and id_b in self.concept_graph) or id_b in self.concept_cache or id_b in self.concept_graph
+        
+        if id_a == id_b or not has_a or not has_b:
             return None
 
         # Check if connection already exists
-        if self.concept_graph.has_edge(id_a, id_b):  # type: ignore
+        connection_exists = False
+        if nx and hasattr(self.concept_graph, 'has_edge'):
+            connection_exists = self.concept_graph.has_edge(id_a, id_b)  # type: ignore
+        else:
+            # Check in concept cache for related concepts
+            if id_a in self.concept_cache and hasattr(self.concept_cache[id_a], 'related_concepts'):
+                connection_exists = id_b in self.concept_cache[id_a].related_concepts
+
+        if connection_exists:
             # Strengthen existing connection
-            current_weight = self.concept_graph[id_a][id_b]["weight"]
-            new_weight = min(1.0, current_weight + 0.1)
-            self.concept_graph[id_a][id_b]["weight"] = new_weight
-            self.update_connection_strength(id_a, id_b, new_weight)
+            if nx and hasattr(self.concept_graph, '__getitem__'):
+                current_weight = self.concept_graph[id_a][id_b]["weight"]  # type: ignore
+                new_weight = min(1.0, current_weight + 0.1)
+                self.concept_graph[id_a][id_b]["weight"] = new_weight  # type: ignore
+                self.update_connection_strength(id_a, id_b, new_weight)
+            else:
+                new_weight = 0.6  # Fallback weight
             return {
                 "type": "reinforced",
                 "concepts": [concept_a, concept_b],
@@ -416,22 +535,27 @@ class CleverEvolutionEngine:
             )
 
             if connection_strength > 0.2:  # Threshold for new connections
-                self.concept_graph.add_edge(  # type: ignore
-                    id_a,
-                    id_b,
-                    weight=connection_strength,
-                    connection_type="contextual",
-                )
+                if nx and hasattr(self.concept_graph, 'add_edge'):
+                    self.concept_graph.add_edge(  # type: ignore
+                        id_a,
+                        id_b,
+                        weight=connection_strength,
+                        connection_type="contextual",
+                    )
+                    
+                    # Add to related concepts in networkx
+                    if hasattr(self.concept_graph, 'nodes'):
+                        self.concept_graph.nodes[id_a]["concept"].related_concepts.add(id_b)  # type: ignore
+                        self.concept_graph.nodes[id_b]["concept"].related_concepts.add(id_a)  # type: ignore
+                else:
+                    # Fallback: update concept cache relationships
+                    if id_a in self.concept_cache and hasattr(self.concept_cache[id_a], 'related_concepts'):
+                        self.concept_cache[id_a].related_concepts.add(id_b)
+                    if id_b in self.concept_cache and hasattr(self.concept_cache[id_b], 'related_concepts'):
+                        self.concept_cache[id_b].related_concepts.add(id_a)
+                
                 self.save_connection(
                     id_a, id_b, connection_strength, "contextual"
-                )
-
-                # Add to related concepts
-                self.concept_graph.nodes[id_a]["concept"].related_concepts.add(  # type: ignore # type: ignore
-                    id_b
-                )
-                self.concept_graph.nodes[id_b]["concept"].related_concepts.add(  # type: ignore # type: ignore
-                    id_a
                 )
 
                 self.log_evolution_event(
@@ -467,20 +591,29 @@ class CleverEvolutionEngine:
         distance = abs(pos_a - pos_b)
         proximity_score = max(0, 1.0 - (distance / 100))  # Closer = stronger
 
-        # Advanced semantic similarity using spaCy vectors
+        # Advanced semantic similarity using spaCy vectors if available
+        semantic_score = 0.1  # Default fallback score
         try:
-            doc_a = nlp(concept_a)
-            doc_b = nlp(concept_b)
-            if doc_a.vector.any() and doc_b.vector.any():
-                semantic_score = doc_a.similarity(doc_b)
+            if nlp:
+                doc_a = nlp(concept_a)
+                doc_b = nlp(concept_b)
+                if doc_a.vector.any() and doc_b.vector.any():
+                    semantic_score = doc_a.similarity(doc_b)
+                else:
+                    # Calculate word-level similarity for out-of-vocab terms
+                    words_a = [token.text.lower()
+                               for token in doc_a if not token.is_stop]
+                    words_b = [token.text.lower()
+                               for token in doc_b if not token.is_stop]
+                    common_words = set(words_a) & set(words_b)
+                    total_words = set(words_a) | set(words_b)
+                    semantic_score = len(common_words) / max(1, len(total_words))
             else:
-                # Calculate word-level similarity for out-of-vocab terms
-                words_a = [token.text.lower()
-                           for token in doc_a if not token.is_stop]
-                words_b = [token.text.lower()
-                           for token in doc_b if not token.is_stop]
-                common_words = set(words_a) & set(words_b)
-                total_words = set(words_a) | set(words_b)
+                # Fallback: simple word overlap similarity
+                words_a = set(concept_a.lower().split())
+                words_b = set(concept_b.lower().split()) 
+                common_words = words_a & words_b
+                total_words = words_a | words_b
                 semantic_score = len(common_words) / max(1, len(total_words))
         except Exception:
             semantic_score = 0.1
@@ -688,14 +821,12 @@ class CleverEvolutionEngine:
                     confidence=concept["confidence"],
                 )
 
-                if hasattr(self.concept_graph, "add_node"):
+                if nx and hasattr(self.concept_graph, "add_node"):
                     self.concept_graph.add_node(  # type: ignore
                         concept_id, concept=new_concept
                     )
                 else:
-                    self.concept_graph[concept_id] = (  # type: ignore
-                        new_concept
-                    )
+                    self.concept_graph[concept_id] = new_concept  # type: ignore
                 self.save_concept(new_concept)
                 learning_results["concepts_learned"] += 1
 
@@ -824,82 +955,144 @@ class CleverEvolutionEngine:
 
     def strengthen_concept_network(self):
         """Strengthen the overall concept network"""
-        for node_id in self.concept_graph.nodes():  # type: ignore
-            concept = (
-                # type: ignore # type: ignore
-                self.concept_graph.nodes[node_id]["concept"]
-            )
+        if nx and hasattr(self.concept_graph, 'nodes'):
+            for node_id in self.concept_graph.nodes():  # type: ignore
+                concept = (
+                    # type: ignore # type: ignore
+                    self.concept_graph.nodes[node_id]["concept"]
+                )
 
-            # Boost concepts with many connections
-            connection_count = len(list(  # type: ignore
-                self.concept_graph.neighbors(node_id)  # type: ignore
-            ))
-            connection_bonus = min(0.2, connection_count * 0.02)
+                # Boost concepts with many connections
+                connection_count = len(list(  # type: ignore
+                    self.concept_graph.neighbors(node_id)  # type: ignore
+                ))
+                connection_bonus = min(0.2, connection_count * 0.02)
 
-            concept.strength = min(1.0, concept.strength + connection_bonus)
-            concept.confidence = min(
-                1.0, concept.confidence + connection_bonus * 0.5
-            )
+                concept.strength = min(1.0, concept.strength + connection_bonus)
+                concept.confidence = min(
+                    1.0, concept.confidence + connection_bonus * 0.5
+                )
 
-            self.save_concept(concept)
+                self.save_concept(concept)
+        else:
+            # Fallback: strengthen concepts based on their relationships in cache
+            for concept_id, concept in self.concept_cache.items():
+                connection_count = len(concept.related_concepts)
+                connection_bonus = min(0.2, connection_count * 0.02)
+
+                concept.strength = min(1.0, concept.strength + connection_bonus)
+                concept.confidence = min(
+                    1.0, concept.confidence + connection_bonus * 0.5
+                )
+
+                self.save_concept(concept)
 
     def optimize_connection_weights(self):
         """Optimize connection weights using network analysis"""
-        # Use PageRank to identify important concepts
-        try:
-            pagerank_scores = nx.pagerank(self.concept_graph)  # type: ignore
+        # Use PageRank to identify important concepts if networkx available
+        if nx and hasattr(self.concept_graph, 'nodes'):
+            try:
+                pagerank_scores = nx.pagerank(self.concept_graph)  # type: ignore
 
-            for node_id, score in pagerank_scores.items():
-                # type: ignore
-                # type: ignore
-                concept = self.concept_graph.nodes[node_id]["concept"]
-                importance_bonus = score * 0.1
-                concept.strength = min(
-                    1.0, concept.strength + importance_bonus
-                )
-                self.save_concept(concept)
-
-        except Exception as e:
-            print(f"PageRank optimization failed: {e}")
-
-    def identify_knowledge_clusters(self) -> List[Dict]:
-        """Identify clusters of related knowledge"""
-        try:
-            # Use community detection
-            undirected_graph = self.concept_graph.to_undirected()  # type: ignore
-            communities = nx.community.greedy_modularity_communities(  # type: ignore
-                undirected_graph
-            )
-
-            clusters = []
-            for i, community in enumerate(communities):
-                cluster_concepts = []
-                for node_id in community:
+                for node_id, score in pagerank_scores.items():
                     # type: ignore
                     # type: ignore
                     concept = self.concept_graph.nodes[node_id]["concept"]
-                    cluster_concepts.append(
-                        {
-                            "name": concept.name,
-                            "strength": concept.strength,
-                            "confidence": concept.confidence,
-                        }
+                    importance_bonus = score * 0.1
+                    concept.strength = min(
+                        1.0, concept.strength + importance_bonus
                     )
+                    self.save_concept(concept)
 
-                if len(cluster_concepts) > 2:  # Only meaningful clusters
-                    clusters.append(
-                        {
-                            "cluster_id": i,
-                            "concepts": cluster_concepts,
-                            "size": len(cluster_concepts),
-                        }
-                    )
+            except Exception as e:
+                print(f"PageRank optimization failed: {e}")
+        else:
+            # Fallback: simple importance scoring based on connection count
+            for concept_id, concept in self.concept_cache.items():
+                connection_count = len(concept.related_concepts)
+                # Simple importance score based on connections
+                importance_score = connection_count / max(1, len(self.concept_cache))
+                importance_bonus = importance_score * 0.1
+                concept.strength = min(1.0, concept.strength + importance_bonus)
+                self.save_concept(concept)
 
+    def identify_knowledge_clusters(self) -> List[Dict]:
+        """Identify clusters of related knowledge"""
+        if nx and hasattr(self.concept_graph, 'to_undirected'):
+            try:
+                # Use community detection
+                undirected_graph = self.concept_graph.to_undirected()  # type: ignore
+                communities = nx.community.greedy_modularity_communities(  # type: ignore
+                    undirected_graph
+                )
+
+                clusters = []
+                for i, community in enumerate(communities):
+                    cluster_concepts = []
+                    for node_id in community:
+                        # type: ignore
+                        # type: ignore
+                        concept = self.concept_graph.nodes[node_id]["concept"]
+                        cluster_concepts.append(
+                            {
+                                "name": concept.name,
+                                "strength": concept.strength,
+                                "confidence": concept.confidence,
+                            }
+                        )
+
+                    if len(cluster_concepts) > 2:  # Only meaningful clusters
+                        clusters.append(
+                            {
+                                "cluster_id": i,
+                                "concepts": cluster_concepts,
+                                "size": len(cluster_concepts),
+                            }
+                        )
+
+                return clusters
+
+            except Exception as e:
+                print(f"Cluster identification failed: {e}")
+                return []
+        else:
+            # Fallback: simple clustering based on shared connections
+            clusters = []
+            processed = set()
+            
+            for concept_id, concept in self.concept_cache.items():
+                if concept_id in processed:
+                    continue
+                    
+                # Find concepts with shared connections
+                cluster_concepts = [concept]
+                cluster_ids = {concept_id}
+                processed.add(concept_id)
+                
+                for related_id in concept.related_concepts:
+                    if related_id in self.concept_cache and related_id not in processed:
+                        related_concept = self.concept_cache[related_id]
+                        # Check if they have shared connections
+                        shared_connections = concept.related_concepts & related_concept.related_concepts
+                        if len(shared_connections) > 0:
+                            cluster_concepts.append(related_concept)
+                            cluster_ids.add(related_id)
+                            processed.add(related_id)
+                
+                if len(cluster_concepts) > 2:
+                    clusters.append({
+                        "cluster_id": len(clusters),
+                        "concepts": [
+                            {
+                                "name": c.name,
+                                "strength": c.strength,
+                                "confidence": c.confidence
+                            } for c in cluster_concepts
+                        ],
+                        "size": len(cluster_concepts)
+                    })
+            
             return clusters
-
-        except Exception as e:
-            print(f"Cluster identification failed: {e}")
-            return []
 
     def update_response_generation(self):
         """Update response generation based on learned patterns"""
@@ -953,21 +1146,28 @@ class CleverEvolutionEngine:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        # Network analysis with full NetworkX capabilities
-        concept_count = len(self.concept_graph.nodes())
-        connection_count = len(self.concept_graph.edges())
-        network_density = nx.density(
-            self.concept_graph) if concept_count > 0 else 0
+        # Network analysis with NetworkX if available, otherwise use concept cache
+        if nx and hasattr(self.concept_graph, 'nodes'):
+            concept_count = len(self.concept_graph.nodes())
+            connection_count = len(self.concept_graph.edges())
+            network_density = nx.density(self.concept_graph) if concept_count > 0 else 0
+            
+            # Advanced network metrics
+            clustering_coefficient = (
+                nx.average_clustering(self.concept_graph.to_undirected())
+                if concept_count > 0 else 0
+            )
+        else:
+            # Fallback analysis using concept cache
+            concept_count = len(self.concept_cache)
+            connection_count = sum(len(concept.related_concepts) 
+                                 for concept in self.concept_cache.values()) // 2  # Divide by 2 for undirected
+            network_density = connection_count / max(1, concept_count * (concept_count - 1) / 2) if concept_count > 1 else 0
+            clustering_coefficient = 0.0
 
-        # Advanced network metrics
-        clustering_coefficient = (
-            nx.average_clustering(self.concept_graph.to_undirected())
-            if concept_count > 0 else 0
-        )
-
-        # Calculate centrality measures for top concepts
+        # Calculate centrality measures for top concepts if networkx available
         centrality_scores = {}
-        if concept_count > 1:
+        if nx and hasattr(self.concept_graph, 'nodes') and concept_count > 1:
             try:
                 betweenness = nx.betweenness_centrality(self.concept_graph)
                 eigenvector = nx.eigenvector_centrality(self.concept_graph)
@@ -979,6 +1179,8 @@ class CleverEvolutionEngine:
                 }
             except Exception:
                 centrality_scores = {"error": "Unable to calculate centrality"}
+        else:
+            centrality_scores = {"fallback": "Basic concept tracking without network analysis"}
 
         # Get capability levels
         cursor.execute(
@@ -1005,56 +1207,95 @@ class CleverEvolutionEngine:
             "recent_events": recent_events,
             "network_density": network_density,
             "evolution_score": self.calculate_overall_evolution_score(),
+            "centrality_scores": centrality_scores,
+            "clustering_coefficient": clustering_coefficient
         }
 
     def calculate_overall_evolution_score(self) -> float:
         """Calculate comprehensive intelligence evolution score"""
-        node_count = len(self.concept_graph.nodes())
-        if node_count == 0:
-            return 0.0
+        if nx and hasattr(self.concept_graph, 'nodes'):
+            node_count = len(self.concept_graph.nodes())
+            if node_count == 0:
+                return 0.0
 
-        # Advanced network complexity metrics
-        network_score = min(1.0, node_count / 1000)
-        density_score = nx.density(self.concept_graph)
+            # Advanced network complexity metrics
+            network_score = min(1.0, node_count / 1000)
+            density_score = nx.density(self.concept_graph)
 
-        # Calculate average concept strength using numpy for efficiency
-        concept_strengths = [
-            self.concept_graph.nodes[node_id]["concept"].strength
-            for node_id in self.concept_graph.nodes()
-            if node_id in self.concept_cache
-        ]
-        avg_strength = np.mean(concept_strengths) if concept_strengths else 0.0
+            # Calculate average concept strength using numpy if available
+            if np:
+                concept_strengths = [
+                    self.concept_graph.nodes[node_id]["concept"].strength
+                    for node_id in self.concept_graph.nodes()
+                    if "concept" in self.concept_graph.nodes[node_id]
+                ]
+                avg_strength = np.mean(concept_strengths) if concept_strengths else 0.0
+            else:
+                concept_strengths = [
+                    self.concept_graph.nodes[node_id]["concept"].strength
+                    for node_id in self.concept_graph.nodes()
+                    if "concept" in self.concept_graph.nodes[node_id]
+                ]
+                avg_strength = sum(concept_strengths) / len(concept_strengths) if concept_strengths else 0.0
 
-        # Advanced network analysis
-        clustering_score = 0.0
-        centrality_score = 0.0
+            # Advanced network analysis if available
+            clustering_score = 0.0
+            centrality_score = 0.0
 
-        if node_count > 1:
-            try:
-                # Clustering coefficient
-                clustering_score = nx.average_clustering(
-                    self.concept_graph.to_undirected()
-                )
+            if node_count > 1:
+                try:
+                    # Clustering coefficient
+                    clustering_score = nx.average_clustering(
+                        self.concept_graph.to_undirected()
+                    )
 
-                # Network centralization
-                betweenness = nx.betweenness_centrality(self.concept_graph)
-                centrality_score = np.std(list(betweenness.values()))
-            except Exception:
-                clustering_score = density_score * 0.5
-                centrality_score = 0.1
+                    # Network centralization
+                    betweenness = nx.betweenness_centrality(self.concept_graph)
+                    if np:
+                        centrality_score = np.std(list(betweenness.values()))
+                    else:
+                        values = list(betweenness.values())
+                        mean_val = sum(values) / len(values)
+                        variance = sum((x - mean_val) ** 2 for x in values) / len(values)
+                        centrality_score = variance ** 0.5
+                except Exception:
+                    clustering_score = density_score * 0.5
+                    centrality_score = 0.1
+        else:
+            # Fallback calculation using concept cache
+            node_count = len(self.concept_cache)
+            if node_count == 0:
+                return 0.0
+
+            network_score = min(1.0, node_count / 1000)
+            
+            # Calculate density from concept relationships
+            total_connections = sum(len(concept.related_concepts) for concept in self.concept_cache.values())
+            max_connections = node_count * (node_count - 1)
+            density_score = total_connections / max_connections if max_connections > 0 else 0
+
+            # Calculate average concept strength
+            strengths = [concept.strength for concept in self.concept_cache.values()]
+            avg_strength = sum(strengths) / len(strengths) if strengths else 0.0
+            
+            # Simplified network metrics for fallback
+            clustering_score = density_score * 0.5
+            centrality_score = 0.1
 
         # Capability progression analysis
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute("SELECT AVG(current_level) FROM capability_evolution")
-        avg_capability = cursor.fetchone()[0] or 0.1
+        result = cursor.fetchone()
+        avg_capability = result[0] if result and result[0] else 0.1
 
         # Learning velocity (recent growth trends)
         cursor.execute("""
             SELECT AVG(growth_rate) FROM capability_evolution
             WHERE last_exercise > datetime('now', '-7 days')
         """)
-        recent_growth = cursor.fetchone()[0] or 0.01
+        result = cursor.fetchone()
+        recent_growth = result[0] if result and result[0] else 0.01
         conn.close()
 
         # Comprehensive evolution score with advanced weighting
