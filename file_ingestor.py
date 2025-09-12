@@ -2,7 +2,7 @@ import os
 import json
 import hashlib
 import time
-import PyPDF2
+import pypdf as PyPDF2  # Import pypdf with PyPDF2 alias for compatibility
 import re
 
 # --- CHANGE 1: Import the shared instances and config ---
