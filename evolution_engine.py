@@ -16,7 +16,7 @@ Connects to:
     - persona.py: Persona engine for context
     - config.py: Centralized configuration
 """
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 
 import sqlite3
 import json
@@ -209,6 +209,38 @@ class CleverEvolutionEngine:
                 )
 
         conn.close()
+
+    def log_interaction(self, interaction_data: Dict):
+        """Main entry point for logging interactions and triggering learning
+        
+        Why: Serves as the primary interface for the rest of the application
+        to trigger learning from user interactions
+        Where: Called by app.py after generating responses to users
+        How: Extracts parameters from interaction_data dict and delegates
+        to analyze_interaction method for actual learning
+        
+        Connects to:
+        - app.py: Main caller after user interactions
+        - analyze_interaction: Core learning logic
+        """
+        user_input = interaction_data.get('user_input', '')
+        response = interaction_data.get('response', '')
+        mode = interaction_data.get('active_mode', 'Auto')
+        sentiment = interaction_data.get('sentiment', 0.0)
+        
+        # Analyze this interaction for learning
+        analysis = self.analyze_interaction(
+            user_input, response, mode, sentiment)
+        
+        # Log the evolution event if significant learning occurred
+        if analysis['new_concepts'] or analysis['new_connections']:
+            self.log_evolution_event(
+                "learning_event",
+                f"Learned {len(analysis['new_concepts'])} concepts, "
+                f"{len(analysis['new_connections'])} connections",
+                interaction_data,
+                0.3
+            )
 
     def analyze_interaction(
         self,
