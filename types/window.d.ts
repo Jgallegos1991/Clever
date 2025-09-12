@@ -8,6 +8,15 @@ declare global {
     // Particle system functions
     startParticles?: (canvas: HTMLCanvasElement, options?: {count?: number}) => any;
     triggerPulse?: (intensity?: number) => void;
+
+    // Holographic Chamber system
+    HolographicChamber: any;
+    holographicChamber?: any;
+    startHolographicChamber?: (canvas: HTMLCanvasElement) => any;
+    morphForIntent?: (intent: string) => void;
+    dissolveToSwarm?: () => void;
+    updateFieldMode?: (mode: string) => void;
+    testHolographicChamber?: () => void;
     updateFieldMode?: (mode: string) => void;
     morphForIntent?: (intent: any) => void;
 

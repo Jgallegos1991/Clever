@@ -276,8 +276,9 @@ class HolographicChamber {
     this.ctx.fillRect(0, 0, this.width, this.height);
     
     // Add debug info to confirm canvas is drawing
-    this.ctx.fillStyle = 'rgba(105, 234, 203, 0.1)';
-    this.ctx.fillText(`Particles: ${this.particles.length}`, 10, 20);
+    this.ctx.fillStyle = 'rgba(105, 234, 203, 0.8)';
+    this.ctx.font = '16px Arial';
+    this.ctx.fillText(`✨ Particles: ${this.particles.length} | Formation: ${this.targetFormation || 'whirlpool'}`, 10, 25);
     
     this.particles.forEach(particle => {
       const pulse = Math.sin(particle.phase) * 0.5 + 0.5; // More dramatic pulse

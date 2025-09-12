@@ -1,5 +1,20 @@
 """
 Debug Configuration - Comprehensive debugging and logging system for Clever AI
+
+Why: Provides centralized debugging, logging, and performance monitoring
+capabilities to enable effective troubleshooting, performance analysis,
+and system health monitoring across all Clever components.
+Where: Used by all modules for logging, debugging, and performance tracking
+with centralized configuration and structured output management.
+How: Implements comprehensive logging system with session tracking, performance
+monitoring, error reporting, and debug flag management for system observability.
+
+Connects to:
+    - app.py: Main application debugging and performance monitoring
+    - evolution_engine.py: Learning process debugging and metrics
+    - nlp_processor.py: NLP processing performance and error tracking
+    - database.py: Database operation monitoring and error reporting
+    - All modules: Centralized logging and debugging infrastructure
 """
 
 import os
@@ -12,9 +27,37 @@ import json
 from functools import wraps
 
 class CleverDebugger:
-    """Enhanced debugging system for Clever AI"""
+    """
+    Enhanced debugging system for Clever AI with comprehensive monitoring
+    
+    Why: Provides centralized debugging infrastructure to enable effective
+    troubleshooting, performance analysis, and system health monitoring
+    across all Clever components with structured logging and metrics.
+    Where: Instantiated once and used throughout the application for consistent
+    logging, performance tracking, and error reporting across all modules.
+    How: Implements structured logging with session tracking, performance
+    monitoring, debug flags, and comprehensive error reporting capabilities.
+    """
     
     def __init__(self, debug_level: str = "INFO"):
+        """
+        Initialize the debugging system
+        
+        Why: Sets up comprehensive debugging infrastructure with logging,
+        performance tracking, and error monitoring to enable effective
+        system observability and troubleshooting capabilities.
+        Where: Called once during application startup to establish debugging
+        infrastructure used throughout the application lifecycle.
+        How: Creates logging directory, configures logging system, initializes
+        debug flags and performance tracking with session identification.
+        
+        Args:
+            debug_level: Logging level for debug output control
+            
+        Connects to:
+            - File system: Creates logs directory for debug output
+            - All modules: Provides debugging infrastructure
+        """
         self.debug_level = debug_level
         self.debug_dir = "./logs"
         self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -42,7 +85,21 @@ class CleverDebugger:
         self.warning_count = 0
         
     def setup_logging(self):
-        """Setup comprehensive logging system"""
+        """
+        Setup comprehensive logging system
+        
+        Why: Creates structured logging infrastructure with file output and
+        console output to enable effective debugging and system monitoring
+        with proper log rotation and formatting.
+        Where: Called during debugger initialization to establish logging
+        infrastructure used throughout the application for debug output.
+        How: Configures Python logging with file handlers, formatters,
+        and log levels for comprehensive debug information capture.
+        
+        Connects to:
+            - File system: Creates log files for persistent debug storage
+            - Console: Provides real-time debug output during development
+        """
         
         # Main application logger
         self.logger = logging.getLogger('clever_ai')

@@ -1,0 +1,131 @@
+Attached HTML and CSS Context
+
+<body>
+  <!-- Quick status chip (updated by JS) -->
+  <div id="selfcheck" class="selfcheck">Ambient creativity waiting…</div>
+  <!-- Particle canvas and grid overlay -->
+  <canvas id="particles"></canvas>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <!-- HUD overlay with chat on the right like the screenshot -->
+  <div class="hud grid-full">
+    <section class="chat-panel">
+      <div id="chat-log" class="chat" role="log" aria-live="polite" aria-label="Chat messages"></div>
+    </section>
+  </div>
+
+  <!-- Compact analysis card (floats under reply) -->
+  <div class="panel analysis-panel appear" aria-label="Live Analysis" role="complementary">
+    <h3>Live Analysis</h3>
+    <div id="analysis-content">
+      <div id="intent">Intent: —</div>
+      <div id="sentiment">Sentiment: —</div>
+      <div id="entities">Entities: —</div>
+      <div id="keywords">Keywords: —</div>
+    </div>
+  </div>
+
+  <!-- Bottom entry bar (frosted, neon accents) -->
+  <div class="entrybar">
+    <button class="icon-btn" id="mode-btn" title="Modes" aria-label="Modes">○</button>
+    <input id="chat-input" type="text" placeholder="Talk to Clever..." autocomplete="off" autofocus="">
+    <button class="icon-btn" id="send-btn" title="Send" aria-label="Send">➤</button>
+  </div>
+    <!-- Load holographic chamber and main logic -->
+  <script src="/static/js/holographic-chamber.js"></script>
+  <script src="/static/js/main.js"></script>
+  
+</body>
+
+
+/* Matched Rule from user-agent */
+body {
+  display: block;
+  margin-top: 8px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  margin-left: 8px;
+}
+
+/* Matched Rule from regular */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Matched Rule from regular */
+html, body {
+  height: 100%;
+  height: 100%;
+}
+
+/* Matched Rule from regular */
+body {
+  margin: 0;
+  color: var(--fg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: radial-gradient(1200px 800px at 15% -20%, rgba(105, 234, 203, 0.08), transparent 70%),
+    radial-gradient(1000px 600px at 85% 120%, rgba(255, 107, 255, 0.06), transparent 70%),
+    linear-gradient(180deg, var(--bg-cosmic) 0%, var(--bg-cosmic-2) 100%);
+  min-height: 100vh;
+  overflow: hidden;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  color: var(--fg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+/* Inherited from ancestor level 1 (user-agent) */
+html {
+  display: block;
+}
+
+/* Inherited from ancestor level 1 (user-agent) */
+:root {
+  view-transition-name: root;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+* {
+  box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+html, body {
+  height: 100%;
+  height: 100%;
+}
+
+/* Inherited from ancestor level 1 (regular) */
+:root {
+  --bg-cosmic: #0B0F14;
+  --bg-cosmic-2: #121821;
+  --fg: #e9f1fb;
+  --muted: #95a3b3;
+  --neon-teal: #69EACB;
+  --neon-magenta: #FF6BFF;
+  --soft-cyan: #33ccff;
+  --chip: #0f1b24;
+  --bubble: #101821;
+  --glow-teal: rgba(105, 234, 203, 0.35);
+  --glow-magenta: rgba(255, 107, 255, 0.35);
+  --glass-bg: rgba(11, 15, 20, 0.7);
+  --bg-cosmic: #0B0F14;
+  --bg-cosmic-2: #121821;
+  --fg: #e9f1fb;
+  --muted: #95a3b3;
+  --neon-teal: #69EACB;
+  --neon-magenta: #FF6BFF;
+  --soft-cyan: #33ccff;
+  --chip: #0f1b24;
+  --bubble: #101821;
+  --glow-teal: rgba(105, 234, 203, 0.35);
+  --glow-magenta: rgba(255, 107, 255, 0.35);
+  --glass-bg: rgba(11, 15, 20, 0.7);
+}

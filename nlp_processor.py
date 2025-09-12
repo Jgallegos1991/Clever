@@ -1,20 +1,6 @@
-"""
-NLP Processor for Clever AI - Full Potential Operation
+# nlp_processor.py — Clever (offline-first, Jay-only)
+# Lazy singleton loader for spaCy; robust fallbacks; tiny LRU cache for quick hits.
 
-Why: Provides advanced natural language processing capabilities for Clever,
-including entity extraction, sentiment analysis, and keyword identification.
-Operates at full potential with no fallbacks or compromise modes.
-Where: Used by persona.py for response generation, evolution_engine.py for
-concept extraction, and app.py for request analysis.
-How: Implements UnifiedNLPProcessor class using spaCy en_core_web_sm model,
-VADER sentiment analysis, and TextBlob processing with thread-safe operations.
-
-Connects to:
-    - persona.py: Persona response generation and mode inference
-    - evolution_engine.py: Concept extraction and learning
-    - app.py: Request analysis and NLP pipeline
-    - config.py: Centralized configuration
-"""
 from __future__ import annotations
 
 import threading
@@ -151,6 +137,17 @@ def _keywords_spacy(doc) -> List[str]:
     return deduped[:10]
 
 
+def _keywords_fallback(text: str) -> List[str]:
+    # No spaCy? No problem — cheap regex + frequency.
+    import re
+
+    toks = re.findall(r"[A-Za-z0-9_\-]+", text.lower())
+    toks = [t for t in toks if len(t) > 2 and t not in _STOPWORDS]
+    return _top_tokens(toks, k=8)
+
+
+# ---- Sentiment -----------------------------------------------------------------------------------
+
 def _sentiment(text: str) -> float:
     """
     Analyze sentiment using TextBlob at full capability.
@@ -168,42 +165,24 @@ def _sentiment(text: str) -> float:
     """
     if not text:
         return 0.0
-    # Full potential operation - no fallbacks
-    blob = TextBlob(text)
-    return float(blob.sentiment.polarity)
+    if TextBlob is None:
+        return 0.0
+    try:
+        # Range is [-1.0, 1.0]
+        return float(TextBlob(text).sentiment.polarity)
+    except Exception:
+        return 0.0
 
 
-class UnifiedNLPProcessor:
-    """
-    Full-capability NLP processor for Clever AI operations.
-    
-    Why: Provides comprehensive natural language processing at full potential
-    for all text analysis needs including entities, sentiment, and keywords.
-    Where: Used throughout Clever by persona, evolution engine, and app for
-    all NLP operations requiring consistent, high-quality analysis.
-    How: Maintains thread-safe spaCy instance and provides unified interface
-    for all NLP operations with no fallback or compromise modes.
-    
-    Connects to:
-        - spacy: Core NLP processing pipeline
-        - TextBlob: Sentiment analysis capability
-        - persona.py: Response generation and analysis
-        - evolution_engine.py: Concept extraction and learning
-        - app.py: Request processing and analysis
-    """
-    
+# ---- Public Processor ----------------------------------------------------------------------------
+
+class _NLPProcessor:
+    """Small façade with a stable, testable API."""
+
     def __init__(self) -> None:
-        """Initialize NLP processor with lazy loading."""
-        self._nlp = None
+        self._nlp = None  # lazy
 
-    def _ensure_nlp(self) -> Language:
-        """
-        Ensure spaCy model is loaded and available.
-        
-        Why: Provides thread-safe access to spaCy model for all NLP operations.
-        Where: Called internally by all NLP methods to ensure model availability.
-        How: Uses lazy loading pattern to initialize spaCy model once per instance.
-        """
+    def _ensure(self):
         if self._nlp is None:
             self._nlp = _load_spacy()
         return self._nlp
@@ -236,27 +215,30 @@ class UnifiedNLPProcessor:
         return self._process_uncached(text)
 
     def _process_uncached(self, text: str) -> SimpleNamespace:
-        """
-        Process text with full NLP capabilities - no fallbacks.
-        
-        Why: Provides core text processing for keywords and entities using
-        spaCy at full potential for consistent, high-quality results.
-        Where: Called by process() method for all text analysis operations.
-        How: Uses spaCy model directly with no fallback or compromise modes.
-        
-        Connects to:
-            - spacy: Core NLP processing pipeline
-            - _keywords_spacy(): Keyword extraction using spaCy
-            - _sentiment(): Sentiment analysis using TextBlob
-        """
-        nlp = self._ensure_nlp()
-        # Full potential operation - no fallbacks
-        doc = nlp(text)
-        keywords = _keywords_spacy(doc)
-        sentiment = _sentiment(text)
-        
-        return SimpleNamespace(keywords=keywords, sentiment=sentiment)
+        nlp = self._ensure()
+        if nlp is not None:
+            try:
+                doc = nlp(text)
+                kws = _keywords_spacy(doc)
+            except Exception:
+                kws = _keywords_fallback(text)
+        else:
+            kws = _keywords_fallback(text)
 
+        sent = _sentiment(text)
+        return SimpleNamespace(keywords=kws, sentiment=sent)
+
+
+# Singleton export used by the app
+nlp_processor = _NLPProcessor()
+
+# Public class alias for external imports
+class UnifiedNLPProcessor(_NLPProcessor):
+    """Public interface to the NLP processor. Alias for _NLPProcessor."""
+    
+    def __init__(self) -> None:
+        super().__init__()
+    
     @property
     def nlp(self) -> Language:
         """
