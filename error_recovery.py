@@ -1,5 +1,19 @@
 """
 Error Recovery System - Intelligent error handling and self-healing for Clever AI
+
+Why: Provides intelligent error recovery and self-healing capabilities to maintain
+system stability and availability by automatically recovering from common failures
+without manual intervention, ensuring robust operation.
+Where: Used throughout the application for error handling, with automatic recovery
+strategies triggered by debug_config and integrated into all critical components.
+How: Implements strategy pattern for error recovery with attempt tracking, cooldown
+periods, and intelligent failure analysis to enable automatic self-healing.
+
+Connects to:
+    - debug_config.py: Integrates with debugging system for error tracking
+    - database.py: Handles database connection recovery strategies  
+    - nlp_processor.py: Recovers from NLP model loading failures
+    - app.py: Provides application-level error recovery and stability
 """
 
 import traceback
@@ -12,9 +26,34 @@ from typing import Dict, List, Any, Optional, Callable
 from debug_config import get_debugger, debug_method
 
 class ErrorRecoverySystem:
-    """Handles errors intelligently and attempts self-healing"""
+    """
+    Handles errors intelligently and attempts self-healing operations
+    
+    Why: Ensures system stability and availability by automatically detecting
+    and recovering from common error conditions without manual intervention,
+    reducing downtime and improving user experience.
+    Where: Instantiated by debug_config and used throughout the application
+    for centralized error handling and recovery strategy management.
+    How: Implements configurable recovery strategies with attempt tracking,
+    cooldown management, and intelligent error pattern recognition.
+    """
     
     def __init__(self):
+        """
+        Initialize the error recovery system
+        
+        Why: Sets up intelligent error recovery infrastructure with strategy
+        registration, attempt tracking, and debugging integration to enable
+        automatic self-healing capabilities throughout the application.
+        Where: Called during application startup to establish error recovery
+        infrastructure used by all components for failure handling.
+        How: Initializes recovery strategies, attempt tracking, cooldown
+        management, and debugging integration for comprehensive error handling.
+        
+        Connects to:
+            - debug_config.py: Integrates with centralized debugging system
+            - All modules: Provides error recovery for system components
+        """
         self.debugger = get_debugger()
         self.error_history = []
         self.recovery_strategies = {}
@@ -28,7 +67,22 @@ class ErrorRecoverySystem:
         self._register_default_strategies()
     
     def _register_default_strategies(self):
-        """Register default recovery strategies"""
+        """
+        Register default recovery strategies for common error types
+        
+        Why: Establishes automatic recovery capabilities for known failure
+        patterns including database connections, NLP models, and memory issues
+        to enable self-healing without manual intervention.
+        Where: Called during initialization to setup recovery strategies used
+        throughout the application lifecycle for automatic error handling.
+        How: Registers strategy functions with error pattern matching for
+        intelligent recovery selection based on error characteristics.
+        
+        Connects to:
+            - database.py: Database connection recovery strategies
+            - nlp_processor.py: NLP model loading recovery strategies  
+            - System resources: Memory and resource recovery strategies
+        """
         
         # Database connection errors
         self.register_strategy(

@@ -1,7 +1,20 @@
 """
-Central configuration for Clever.
+Central configuration for Clever AI
 
-Edit these defaults as needed or override via environment variables.
+Why: Provides centralized configuration management with environment variable
+support, user-specific settings, and default values to enable consistent
+configuration across all components while supporting customization.
+Where: Imported by all modules requiring configuration settings including
+database paths, server settings, sync directories, and operational parameters.
+How: Implements configuration hierarchy with environment variables, user config
+overrides, and sensible defaults with .env file support for development.
+
+Connects to:
+    - user_config.py: User-specific configuration overrides and personalization
+    - database.py: Uses DB_PATH for centralized database configuration
+    - sync modules: Uses SYNC_DIR and SYNAPTIC_HUB_DIR for file operations
+    - app.py: Server configuration including host, port, and debug settings
+    - All modules: Centralized configuration source for system-wide settings
 """
 import os
 from pathlib import Path
@@ -12,32 +25,52 @@ from user_config import *
 # Base directories
 ROOT_DIR = Path(__file__).resolve().parent
 
-# Minimal .env loader (offline, no extra deps)
 def _load_dotenv(path: Path):
-	if not path.exists():
-		return
-	try:
-		for line in path.read_text().splitlines():
-			line = line.strip()
-			if not line or line.startswith('#'):
-				continue
-			if '=' not in line:
-				continue
-			k, v = line.split('=', 1)
-			k = k.strip(); v = v.strip().strip('"').strip("'")
-			os.environ.setdefault(k, v)
-	except Exception:
-		pass
+    """
+    Minimal environment file loader for offline operation
+    
+    Why: Provides environment configuration loading without external dependencies
+    to maintain offline-first operation while supporting development configuration
+    through .env files with proper error handling.
+    Where: Called during configuration initialization to load development
+    settings from .env file if present without breaking offline requirements.
+    How: Implements simple .env parsing with error handling and environment
+    variable setting using only standard library for offline compatibility.
+    
+    Args:
+        path: Path to .env file to load
+        
+    Connects to:
+        - .env file: Development environment configuration
+        - os.environ: System environment variable integration
+    """
+    if not path.exists():
+        return
+    try:
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            if '=' not in line:
+                continue
+            k, v = line.split('=', 1)
+            k = k.strip(); v = v.strip().strip('"').strip("'")
+            os.environ.setdefault(k, v)
+    except Exception:
+        pass
 
 _load_dotenv(ROOT_DIR / ".env")
 
 # Directories to sync/ingest from
-# Restrict file system operations to your two ingestion roots
+# Why: Restrict file system operations to designated ingestion directories
+# Where: Used by sync modules and ingestors for file monitoring and processing
 from pathlib import Path
 SYNC_DIR = str(Path("Clever_Sync").resolve())
 SYNAPTIC_HUB_DIR = str(Path("synaptic_hub_sync").resolve())
 
-# SQLite database file path
+# SQLite database file path - SINGLE DATABASE ARCHITECTURE
+# Why: Centralized database path for single database enforcement across all components
+# Where: Used by DatabaseManager and all modules requiring database access
 DB_PATH = os.environ.get("CLEVER_DB_PATH", str(ROOT_DIR / "clever.db"))
 
 # Server config

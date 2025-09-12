@@ -1,5 +1,19 @@
 """
 System Health Monitor - Real-time monitoring for Clever AI components
+
+Why: Provides comprehensive system health monitoring and alerting to ensure
+optimal performance, resource management, and early detection of issues
+before they impact user experience or system stability.
+Where: Used by app.py and debug_config for continuous system monitoring
+with integration into dashboard and alerting systems.
+How: Implements real-time resource monitoring, component health checks,
+and intelligent alerting with threshold management and trend analysis.
+
+Connects to:
+    - debug_config.py: Integrates with debugging and logging systems
+    - app.py: Provides system status for health endpoints
+    - database.py: Monitors database performance and connectivity  
+    - System resources: Tracks CPU, memory, disk, and process metrics
 """
 
 import psutil
@@ -11,9 +25,35 @@ from typing import Dict, List, Any
 from debug_config import get_debugger, debug_method
 
 class SystemHealthMonitor:
-    """Monitors system health and component status"""
+    """
+    Monitors system health and component status with intelligent alerting
+    
+    Why: Ensures optimal system performance and reliability by continuously
+    monitoring resources, component health, and performance metrics with
+    proactive alerting and trend analysis capabilities.
+    Where: Instantiated during application startup and used continuously
+    throughout the application lifecycle for health monitoring and reporting.
+    How: Implements comprehensive monitoring with configurable thresholds,
+    alert management, and integration with debugging and logging systems.
+    """
     
     def __init__(self):
+        """
+        Initialize the system health monitoring
+        
+        Why: Sets up comprehensive health monitoring infrastructure with resource
+        tracking, component monitoring, and alerting capabilities to ensure
+        system reliability and performance optimization.
+        Where: Called during application startup to establish health monitoring
+        used throughout the application for continuous system observation.
+        How: Configures monitoring thresholds, initializes tracking systems,
+        and establishes debugging integration for comprehensive health management.
+        
+        Connects to:
+            - debug_config.py: Integrates with centralized debugging system
+            - psutil: System resource monitoring and process tracking
+            - Alerting systems: Health status reporting and notifications
+        """
         self.debugger = get_debugger()
         self.start_time = datetime.now()
         self.health_checks = {}
@@ -32,7 +72,25 @@ class SystemHealthMonitor:
     
     @debug_method('health_monitor')
     def check_system_resources(self) -> Dict[str, Any]:
-        """Check system resource usage"""
+        """
+        Check system resource usage and performance metrics
+        
+        Why: Provides real-time system resource monitoring to detect performance
+        issues, resource constraints, and potential problems before they impact
+        system stability or user experience.
+        Where: Called regularly by monitoring loops and health check endpoints
+        to provide current system status and resource utilization data.
+        How: Uses psutil to gather system metrics including memory, CPU, disk
+        usage, and process information with threshold comparison and alerting.
+        
+        Returns:
+            Dict[str, Any]: Comprehensive system resource metrics and status
+            
+        Connects to:
+            - psutil: System resource data collection
+            - debug_config.py: Performance metrics logging
+            - Alerting systems: Resource threshold monitoring
+        """
         try:
             # Memory usage
             memory = psutil.virtual_memory()
