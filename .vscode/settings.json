@@ -1,4 +1,5 @@
 {
+copilot/vscode1757417374680
   // General/editor
   "markdown.validate.enabled": true,
   "extensions.ignoreRecommendations": true,
@@ -55,3 +56,7 @@
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
   }
 }
+=======
+    "markdown.validate.enabled": true
+}
+main
