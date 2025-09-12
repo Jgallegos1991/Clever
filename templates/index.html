@@ -4,10 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Clever</title>
-  <!-- Load legacy styles then enhanced cosmic style sheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <!-- Load main stylesheet ONLY -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self';"><!--Relaxed for debugging-->
   </head>
   <body>
   <!-- Quick status chip (updated by JS) -->
@@ -17,14 +16,14 @@
   <div class="grid-overlay" aria-hidden="true"></div>
 
   <!-- HUD overlay with chat on the right like the screenshot -->
-  <div class="hud grid-full">
-    <section class="chat-panel">
+  <div class="hud grid-full glass-manifested">
+    <section class="chat-panel glass-manifested">
       <div id="chat-log" class="chat" role="log" aria-live="polite" aria-label="Chat messages"></div>
     </section>
   </div>
 
   <!-- Compact analysis card (floats under reply) -->
-  <div class="panel analysis-panel" aria-label="Live Analysis" role="complementary">
+  <div class="panel analysis-panel glass-manifested" aria-label="Live Analysis" role="complementary">
     <h3>Live Analysis</h3>
     <div id="analysis-content">
       <div id="intent">Intent: —</div>
@@ -40,9 +39,9 @@
     <input id="chat-input" type="text" placeholder="Talk to Clever..." autocomplete="off" autofocus />
     <button class="icon-btn" id="send-btn" title="Send" aria-label="Send">➤</button>
   </div>
-    <!-- Load particle system and main logic -->
-    <!-- Minimal particles implementation (no-op safe) -->
-  <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Emergency particle system - guaranteed to work -->
+  <script src="{{ url_for('static', filename='js/emergency-particles.js') }}"></script>
+  <!-- Ultimate diagnostic to analyze deeper issues -->
+  <script src="{{ url_for('static', filename='js/ultimate-diagnostic.js') }}"></script>
   </body>
 </html>

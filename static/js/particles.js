@@ -103,7 +103,7 @@
     const {ctx,w,h,pts} = state;
     if (!ctx) return;
     ctx.clearRect(0,0,w,h);
-    const base = 'rgba(105,234,203,'; // soft teal
+    
     const pulse = state.pulse;
     for (const p of pts){
       // integrate motion
@@ -113,22 +113,32 @@
         p.vx += dx*0.0025*state.speed; p.vy += dy*0.0025*state.speed;
       } else {
         // gentle drift
-        p.vx += (Math.random()-0.5)*0.02*state.speed;
-        p.vy += (Math.random()-0.5)*0.02*state.speed;
+        p.vx += (Math.random()-0.5)*0.015*state.speed;
+        p.vy += (Math.random()-0.5)*0.015*state.speed;
       }
       // damping
-      p.vx *= 0.965; p.vy *= 0.965;
+      p.vx *= 0.98; p.vy *= 0.98;
       p.x += p.vx; p.y += p.vy;
       if (p.x<0) p.x=w; else if (p.x>w) p.x=0;
       if (p.y<0) p.y=h; else if (p.y>h) p.y=0;
 
-      const a = Math.min(1, Math.max(0.06, p.a + pulse*0.35));
-      const s = (p.s + pulse*1.1);
-      ctx.fillStyle = base + a + ')';
-      ctx.fillRect(p.x, p.y, s, s);
+      // More subtle, elegant particles
+      const baseAlpha = Math.min(0.4, Math.max(0.02, p.a + pulse*0.2));
+      const size = Math.max(0.5, p.s * 0.8 + pulse*0.5);
+      
+      // Create gradient effect for more beauty
+      const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size*2);
+      gradient.addColorStop(0, `rgba(105,234,203,${baseAlpha})`);
+      gradient.addColorStop(0.7, `rgba(105,234,203,${baseAlpha*0.5})`);
+      gradient.addColorStop(1, 'rgba(105,234,203,0)');
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+      ctx.fill();
     }
     // decay pulse
-    state.pulse *= 0.92;
+    state.pulse *= 0.94;
   }
 
   function loop(){
