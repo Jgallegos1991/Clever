@@ -836,14 +836,13 @@ class CleverEvolutionEngine:
                     confidence=concept["confidence"],
                 )
 
-                if hasattr(self.concept_graph, "add_node"):
-                    self.concept_graph.add_node(  # type: ignore
-                        concept_id, concept=new_concept
-                    )
+                if HAS_NETWORKX:
+                    self.concept_graph.add_node(concept_id, concept=new_concept)
                 else:
-                    self.concept_graph[concept_id] = (  # type: ignore
-                        new_concept
-                    )
+                    # Fallback: Store in dict
+                    self.concept_graph[concept_id] = new_concept
+                    
+                self.concept_cache[concept_id] = new_concept
                 self.save_concept(new_concept)
                 learning_results["concepts_learned"] += 1
 
@@ -972,82 +971,142 @@ class CleverEvolutionEngine:
 
     def strengthen_concept_network(self):
         """Strengthen the overall concept network"""
-        for node_id in self.concept_graph.nodes():  # type: ignore
-            concept = (
-                # type: ignore # type: ignore
-                self.concept_graph.nodes[node_id]["concept"]
-            )
+        if HAS_NETWORKX:
+            for node_id in self.concept_graph.nodes():
+                concept = self.concept_graph.nodes[node_id]["concept"]
 
-            # Boost concepts with many connections
-            connection_count = len(list(  # type: ignore
-                self.concept_graph.neighbors(node_id)  # type: ignore
-            ))
-            connection_bonus = min(0.2, connection_count * 0.02)
+                # Boost concepts with many connections
+                connection_count = len(list(self.concept_graph.neighbors(node_id)))
+                connection_bonus = min(0.2, connection_count * 0.02)
 
-            concept.strength = min(1.0, concept.strength + connection_bonus)
-            concept.confidence = min(
-                1.0, concept.confidence + connection_bonus * 0.5
-            )
+                concept.strength = min(1.0, concept.strength + connection_bonus)
+                concept.confidence = min(
+                    1.0, concept.confidence + connection_bonus * 0.5
+                )
 
-            self.save_concept(concept)
+                self.save_concept(concept)
+        else:
+            # Fallback: Strengthen concepts based on their related_concepts
+            for concept_id, concept in self.concept_graph.items():
+                if hasattr(concept, 'related_concepts'):
+                    connection_count = len(concept.related_concepts)
+                    connection_bonus = min(0.2, connection_count * 0.02)
+
+                    concept.strength = min(1.0, concept.strength + connection_bonus)
+                    concept.confidence = min(
+                        1.0, concept.confidence + connection_bonus * 0.5
+                    )
+
+                    self.save_concept(concept)
 
     def optimize_connection_weights(self):
         """Optimize connection weights using network analysis"""
-        # Use PageRank to identify important concepts
-        try:
-            pagerank_scores = nx.pagerank(self.concept_graph)  # type: ignore
+        if HAS_NETWORKX:
+            # Use PageRank to identify important concepts
+            try:
+                pagerank_scores = nx.pagerank(self.concept_graph)
 
-            for node_id, score in pagerank_scores.items():
-                # type: ignore
-                # type: ignore
-                concept = self.concept_graph.nodes[node_id]["concept"]
-                importance_bonus = score * 0.1
-                concept.strength = min(
-                    1.0, concept.strength + importance_bonus
-                )
-                self.save_concept(concept)
+                for node_id, score in pagerank_scores.items():
+                    concept = self.concept_graph.nodes[node_id]["concept"]
+                    importance_bonus = score * 0.1
+                    concept.strength = min(
+                        1.0, concept.strength + importance_bonus
+                    )
+                    self.save_concept(concept)
 
-        except Exception as e:
-            print(f"PageRank optimization failed: {e}")
+            except Exception as e:
+                print(f"PageRank optimization failed: {e}")
+        else:
+            # Fallback: Simple importance based on number of connections
+            for concept_id, concept in self.concept_graph.items():
+                if hasattr(concept, 'related_concepts'):
+                    connection_count = len(concept.related_concepts)
+                    # Simple importance score based on connections
+                    importance_score = min(1.0, connection_count / 10.0)
+                    importance_bonus = importance_score * 0.05  # Smaller bonus for fallback
+                    concept.strength = min(1.0, concept.strength + importance_bonus)
+                    self.save_concept(concept)
 
     def identify_knowledge_clusters(self) -> List[Dict]:
         """Identify clusters of related knowledge"""
-        try:
-            # Use community detection
-            undirected_graph = self.concept_graph.to_undirected()  # type: ignore
-            communities = nx.community.greedy_modularity_communities(  # type: ignore
-                undirected_graph
-            )
+        if HAS_NETWORKX:
+            try:
+                # Use community detection
+                undirected_graph = self.concept_graph.to_undirected()
+                communities = nx.community.greedy_modularity_communities(
+                    undirected_graph
+                )
 
+                clusters = []
+                for i, community in enumerate(communities):
+                    cluster_concepts = []
+                    for node_id in community:
+                        concept = self.concept_graph.nodes[node_id]["concept"]
+                        cluster_concepts.append(
+                            {
+                                "name": concept.name,
+                                "strength": concept.strength,
+                                "confidence": concept.confidence,
+                            }
+                        )
+
+                    if len(cluster_concepts) > 2:  # Only meaningful clusters
+                        clusters.append(
+                            {
+                                "cluster_id": i,
+                                "concepts": cluster_concepts,
+                                "size": len(cluster_concepts),
+                            }
+                        )
+
+                return clusters
+
+            except Exception as e:
+                print(f"Cluster identification failed: {e}")
+                return []
+        else:
+            # Fallback: Simple clustering based on related concepts
             clusters = []
-            for i, community in enumerate(communities):
-                cluster_concepts = []
-                for node_id in community:
-                    # type: ignore
-                    # type: ignore
-                    concept = self.concept_graph.nodes[node_id]["concept"]
-                    cluster_concepts.append(
-                        {
-                            "name": concept.name,
-                            "strength": concept.strength,
-                            "confidence": concept.confidence,
-                        }
-                    )
-
+            processed = set()
+            
+            for concept_id, concept in self.concept_graph.items():
+                if concept_id in processed or not hasattr(concept, 'related_concepts'):
+                    continue
+                    
+                # Start a new cluster
+                cluster_concepts = [concept]
+                cluster_queue = [concept_id]
+                cluster_processed = {concept_id}
+                
+                # BFS to find related concepts
+                while cluster_queue:
+                    current_id = cluster_queue.pop(0)
+                    current_concept = self.concept_graph.get(current_id)
+                    
+                    if current_concept and hasattr(current_concept, 'related_concepts'):
+                        for related_id in current_concept.related_concepts:
+                            if related_id not in cluster_processed and related_id in self.concept_graph:
+                                related_concept = self.concept_graph[related_id]
+                                cluster_concepts.append(related_concept)
+                                cluster_queue.append(related_id)
+                                cluster_processed.add(related_id)
+                
+                processed.update(cluster_processed)
+                
                 if len(cluster_concepts) > 2:  # Only meaningful clusters
-                    clusters.append(
-                        {
-                            "cluster_id": i,
-                            "concepts": cluster_concepts,
-                            "size": len(cluster_concepts),
-                        }
-                    )
-
+                    clusters.append({
+                        "cluster_id": len(clusters),
+                        "concepts": [
+                            {
+                                "name": c.name,
+                                "strength": c.strength,
+                                "confidence": c.confidence,
+                            } for c in cluster_concepts
+                        ],
+                        "size": len(cluster_concepts),
+                    })
+            
             return clusters
-
-        except Exception as e:
-            print(f"Cluster identification failed: {e}")
-            return []
 
     def update_response_generation(self):
         """Update response generation based on learned patterns"""
