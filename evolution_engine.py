@@ -16,6 +16,7 @@ Connects to:
     - persona.py: Persona engine for context
     - config.py: Centralized configuration
 """
+
 # !/usr/bin/env python3
 
 import sqlite3
@@ -53,7 +54,7 @@ class ConceptNode:
 class CleverEvolutionEngine:
     """
     Autonomous intelligence growth system - Full potential, no fallbacks
-    
+
     Why: Drives autonomous intelligence growth for Clever by learning from user
     interactions, extracting concepts, and forming connections. Operates at full
     potential with no fallbacks, leveraging advanced NLP and network analysis.
@@ -61,7 +62,7 @@ class CleverEvolutionEngine:
     self-learning, memory, and growth metrics.
     How: Implements concept graph, learning algorithms, evolution triggers, and
     centralized database integration via DatabaseManager.
-    
+
     Connects to:
         - app.py: Main application, logs interactions via log_interaction()
         - file_ingestor.py, pdf_ingestor.py: Knowledge ingestion pipeline
@@ -85,12 +86,12 @@ class CleverEvolutionEngine:
     def init_evolution_database(self):
         """
         Initialize evolution tracking tables in the centralized database
-        
+
         Why: Sets up necessary tables for concept storage, interaction patterns,
         knowledge connections, and evolution events tracking
         Where: Called during CleverEvolutionEngine initialization
         How: Uses centralized DatabaseManager for thread-safe table creation
-        
+
         Connects to:
             - database.py: Uses DatabaseManager._connect() for database operations
             - config.py: Database location via DB_PATH
@@ -160,7 +161,7 @@ class CleverEvolutionEngine:
             """
             )
 
-            # Capability tracking table  
+            # Capability tracking table
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS capability_evolution (
@@ -180,12 +181,12 @@ class CleverEvolutionEngine:
     def load_existing_knowledge(self):
         """
         Load existing concepts into the concept graph for analysis
-        
+
         Why: Rebuilds the in-memory concept graph from persisted database state
         to enable network analysis and connection discovery
-        Where: Called during CleverEvolutionEngine initialization  
+        Where: Called during CleverEvolutionEngine initialization
         How: Queries concept_network table and knowledge_connections via DatabaseManager
-        
+
         Connects to:
             - database.py: Uses DatabaseManager for thread-safe database access
             - NetworkX: Builds concept_graph for network analysis
@@ -249,34 +250,35 @@ class CleverEvolutionEngine:
 
     def log_interaction(self, interaction_data: Dict):
         """Main entry point for logging interactions and triggering learning
-        
+
         Why: Serves as the primary interface for the rest of the application
         to trigger learning from user interactions
         Where: Called by app.py after generating responses to users
         How: Extracts parameters from interaction_data dict and delegates
         to analyze_interaction method for actual learning
-        
+
         Connects to:
         - app.py: Main caller after user interactions
         - analyze_interaction: Core learning logic
         """
-        user_input = interaction_data.get('user_input', '')
-        response = interaction_data.get('response', '')
-        mode = interaction_data.get('active_mode', 'Auto')
-        sentiment = interaction_data.get('sentiment', 0.0)
-        
+        user_input = interaction_data.get("user_input", "")
+        response = interaction_data.get("response", "")
+        mode = interaction_data.get("active_mode", "Auto")
+        sentiment = interaction_data.get("sentiment", 0.0)
+
         # Analyze this interaction for learning
         analysis = self.analyze_interaction(
-            user_input, response, mode, sentiment)
-        
+            user_input, response, mode, sentiment
+        )
+
         # Log the evolution event if significant learning occurred
-        if analysis['new_concepts'] or analysis['new_connections']:
+        if analysis["new_concepts"] or analysis["new_connections"]:
             self.log_evolution_event(
                 "learning_event",
                 f"Learned {len(analysis['new_concepts'])} concepts, "
                 f"{len(analysis['new_connections'])} connections",
                 interaction_data,
-                0.3
+                0.3,
             )
 
     def analyze_interaction(
@@ -322,7 +324,7 @@ class CleverEvolutionEngine:
 
         # Discover new connections
         for i, concept_a in enumerate(user_concepts + response_concepts):
-            for concept_b in (user_concepts + response_concepts)[i + 1:]:
+            for concept_b in (user_concepts + response_concepts)[i + 1 :]:
                 full_context = user_message + " " + clever_response
                 connection = self.analyze_concept_connection(
                     concept_a, concept_b, full_context
@@ -352,8 +354,16 @@ class CleverEvolutionEngine:
 
         # Extract named entities with full coverage
         entity_types = [
-            "PERSON", "ORG", "GPE", "EVENT", "WORK_OF_ART",
-            "LAW", "LANGUAGE", "PRODUCT", "NORP", "FAC"
+            "PERSON",
+            "ORG",
+            "GPE",
+            "EVENT",
+            "WORK_OF_ART",
+            "LAW",
+            "LANGUAGE",
+            "PRODUCT",
+            "NORP",
+            "FAC",
         ]
         for ent in doc.ents:
             if ent.label_ in entity_types and len(ent.text.strip()) > 2:
@@ -362,36 +372,56 @@ class CleverEvolutionEngine:
         # Extract sophisticated noun phrases
         for chunk in doc.noun_chunks:
             # Filter for meaningful chunks
-            if (2 <= len(chunk.text.split()) <= 4 and
-                chunk.root.pos_ in ["NOUN", "PROPN"] and
-                    not chunk.root.is_stop):
+            if (
+                2 <= len(chunk.text.split()) <= 4
+                and chunk.root.pos_ in ["NOUN", "PROPN"]
+                and not chunk.root.is_stop
+            ):
                 concepts.append(chunk.text.lower().strip())
 
         # Extract key individual terms
         for token in doc:
-            if (token.pos_ in ["NOUN", "PROPN", "ADJ"] and
-                not token.is_stop and not token.is_punct and
-                    len(token.text) > 3 and token.lemma_ != "-PRON-"):
+            if (
+                token.pos_ in ["NOUN", "PROPN", "ADJ"]
+                and not token.is_stop
+                and not token.is_punct
+                and len(token.text) > 3
+                and token.lemma_ != "-PRON-"
+            ):
                 concepts.append(token.lemma_.lower())
 
         # Advanced pattern extraction for technical terms
-        tech_patterns = re.findall(r'\b[A-Z]{2,}(?:[A-Z][a-z]+)*\b', text)
+        tech_patterns = re.findall(r"\b[A-Z]{2,}(?:[A-Z][a-z]+)*\b", text)
         concepts.extend([p.lower() for p in tech_patterns])
 
         # Filter and deduplicate with enhanced exclusions
         filtered_concepts = []
         excluded_terms = {
-            "user", "message", "response", "clever", "system", "thing", "way",
-            "time", "part", "place", "person", "word", "text", "example"
+            "user",
+            "message",
+            "response",
+            "clever",
+            "system",
+            "thing",
+            "way",
+            "time",
+            "part",
+            "place",
+            "person",
+            "word",
+            "text",
+            "example",
         }
 
         for concept in concepts:
             concept = concept.strip()
-            if (len(concept) > 2 and
-                concept not in excluded_terms and
-                not concept.isdigit() and
-                not concept.startswith(('http', 'www')) and
-                    len(concept.split()) <= 4):
+            if (
+                len(concept) > 2
+                and concept not in excluded_terms
+                and not concept.isdigit()
+                and not concept.startswith(("http", "www"))
+                and len(concept.split()) <= 4
+            ):
                 filtered_concepts.append(concept)
 
         # Prioritize by frequency and return top concepts
@@ -544,10 +574,12 @@ class CleverEvolutionEngine:
                 semantic_score = doc_a.similarity(doc_b)
             else:
                 # Calculate word-level similarity for out-of-vocab terms
-                words_a = [token.text.lower()
-                           for token in doc_a if not token.is_stop]
-                words_b = [token.text.lower()
-                           for token in doc_b if not token.is_stop]
+                words_a = [
+                    token.text.lower() for token in doc_a if not token.is_stop
+                ]
+                words_b = [
+                    token.text.lower() for token in doc_b if not token.is_stop
+                ]
                 common_words = set(words_a) & set(words_b)
                 total_words = set(words_a) | set(words_b)
                 semantic_score = len(common_words) / max(1, len(total_words))
@@ -616,6 +648,9 @@ class CleverEvolutionEngine:
                 WHERE pattern_hash = ?
             """,
                 (new_frequency, new_effectiveness, pattern_hash),
+                # Project Coding Instructions:
+                # See .github/copilot-instructions.md for architecture, documentation, and workflow rules.
+                # All code must follow these standards.
             )
         else:
             cursor.execute(
@@ -778,7 +813,7 @@ class CleverEvolutionEngine:
 
         # Form connections between PDF concepts
         for i, concept_a in enumerate(pdf_concepts):
-            for concept_b in pdf_concepts[i + 1:]:
+            for concept_b in pdf_concepts[i + 1 :]:
                 connection = self.analyze_concept_connection(
                     concept_a["name"], concept_b["name"], content[:500]
                 )
@@ -898,9 +933,11 @@ class CleverEvolutionEngine:
             )
 
             # Boost concepts with many connections
-            connection_count = len(list(  # type: ignore
-                self.concept_graph.neighbors(node_id)  # type: ignore
-            ))
+            connection_count = len(
+                list(  # type: ignore
+                    self.concept_graph.neighbors(node_id)  # type: ignore
+                )
+            )
             connection_bonus = min(0.2, connection_count * 0.02)
 
             concept.strength = min(1.0, concept.strength + connection_bonus)
@@ -971,12 +1008,12 @@ class CleverEvolutionEngine:
     def update_response_generation(self):
         """
         Update response generation capabilities based on recent interactions
-        
+
         Why: Tracks and improves Clever's response quality over time through
         learning from interaction patterns and effectiveness metrics
         Where: Called by analyze_interaction after processing user conversations
         How: Updates capability scores in database via DatabaseManager
-        
+
         Connects to:
             - database.py: Uses DatabaseManager for thread-safe updates
             - analyze_interaction: Called as part of learning pipeline
@@ -1028,18 +1065,18 @@ class CleverEvolutionEngine:
     def get_evolution_status(self) -> Dict:
         """
         Get comprehensive status of evolution engine's learning progress
-        
+
         Why: Provides real-time insights into Clever's learning state, network
         complexity, and capability growth for monitoring and debugging
         Where: Called by app.py for status endpoints and debug interfaces
         How: Analyzes concept graph, queries capability scores via DatabaseManager
-        
+
         Args:
             None
-            
+
         Returns:
             Dict containing evolution metrics, network stats, and capability scores
-            
+
         Connects to:
             - database.py: Queries capability_evolution table via DatabaseManager
             - NetworkX: Analyzes concept_graph for network metrics
@@ -1052,13 +1089,15 @@ class CleverEvolutionEngine:
         # Network analysis with full NetworkX capabilities
         concept_count = len(self.concept_graph.nodes())
         connection_count = len(self.concept_graph.edges())
-        network_density = nx.density(
-            self.concept_graph) if concept_count > 0 else 0
+        network_density = (
+            nx.density(self.concept_graph) if concept_count > 0 else 0
+        )
 
         # Advanced network metrics
         clustering_coefficient = (
             nx.average_clustering(self.concept_graph.to_undirected())
-            if concept_count > 0 else 0
+            if concept_count > 0
+            else 0
         )
 
         # Calculate centrality measures for top concepts
@@ -1068,10 +1107,12 @@ class CleverEvolutionEngine:
                 betweenness = nx.betweenness_centrality(self.concept_graph)
                 eigenvector = nx.eigenvector_centrality(self.concept_graph)
                 centrality_scores = {
-                    "top_betweenness": sorted(betweenness.items(),
-                                              key=lambda x: x[1], reverse=True)[:5],
-                    "top_eigenvector": sorted(eigenvector.items(),
-                                              key=lambda x: x[1], reverse=True)[:5]
+                    "top_betweenness": sorted(
+                        betweenness.items(), key=lambda x: x[1], reverse=True
+                    )[:5],
+                    "top_eigenvector": sorted(
+                        eigenvector.items(), key=lambda x: x[1], reverse=True
+                    )[:5],
                 }
             except Exception:
                 centrality_scores = {"error": "Unable to calculate centrality"}
@@ -1091,7 +1132,6 @@ class CleverEvolutionEngine:
             ORDER BY timestamp DESC LIMIT 5"""
         )
         recent_events = cursor.fetchall()
-
 
         return {
             "concept_count": concept_count,
@@ -1145,21 +1185,23 @@ class CleverEvolutionEngine:
         avg_capability = cursor.fetchone()[0] or 0.1
 
         # Learning velocity (recent growth trends)
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT AVG(growth_rate) FROM capability_evolution
             WHERE last_exercise > datetime('now', '-7 days')
-        """)
+        """
+        )
         recent_growth = cursor.fetchone()[0] or 0.01
 
         # Comprehensive evolution score with advanced weighting
         evolution_score = (
-            network_score * 0.25 +        # Network size
-            density_score * 0.20 +        # Connection density
-            avg_strength * 0.25 +         # Concept strength
-            avg_capability * 0.20 +       # Capability levels
-            clustering_score * 0.05 +     # Network clustering
-            centrality_score * 0.03 +     # Network centralization
-            min(recent_growth * 50, 0.02)  # Recent learning velocity
+            network_score * 0.25  # Network size
+            + density_score * 0.20  # Connection density
+            + avg_strength * 0.25  # Concept strength
+            + avg_capability * 0.20  # Capability levels
+            + clustering_score * 0.05  # Network clustering
+            + centrality_score * 0.03  # Network centralization
+            + min(recent_growth * 50, 0.02)  # Recent learning velocity
         )
 
         return min(1.0, max(0.0, evolution_score))
@@ -1217,15 +1259,15 @@ class CleverEvolutionEngine:
     def save_concept(self, concept: ConceptNode):
         """
         Persist concept node to the centralized database
-        
+
         Why: Ensures learned concepts survive across application restarts
         and enables persistent knowledge accumulation
         Where: Called by analyze_interaction after creating new concepts
         How: Serializes ConceptNode data and stores via DatabaseManager
-        
+
         Args:
             concept: ConceptNode instance with learned concept data
-            
+
         Connects to:
             - database.py: Uses DatabaseManager for thread-safe persistence
             - concept_network table: Stores concept data with JSON serialization
@@ -1302,18 +1344,18 @@ class CleverEvolutionEngine:
     ):
         """
         Log significant learning events for evolution tracking
-        
+
         Why: Records major learning milestones and capability improvements
         for debugging and understanding Clever's growth patterns
         Where: Called by analyze_interaction when significant learning occurs
         How: Persists event data to evolution_events table via DatabaseManager
-        
+
         Args:
             event_type: Category of evolution event (e.g., "learning_event")
             description: Human-readable description of the event
             trigger_data: Context data that triggered the evolution
             impact_score: Numerical significance of the event (0.0-1.0)
-            
+
         Connects to:
             - database.py: Uses DatabaseManager for event persistence
             - evolution_events table: Stores chronological learning history

@@ -33,6 +33,19 @@ Clever runs locally (Python 3.12 + Flask), using spaCy, VADER, and TextBlob for 
 
 ---
 
+## GitHub Copilot & API Usage
+
+To maximize productivity and avoid hitting GitHub API rate limits, please review the [COPILOT_USAGE_GUIDE.md](./COPILOT_USAGE_GUIDE.md).
+
+- Authenticate with a Personal Access Token for higher rate limits
+- Monitor your API usage and avoid unnecessary requests
+- Batch related actions to minimize calls
+- Wait for rate limit resets if exceeded
+
+For troubleshooting and more tips, see the guide above.
+
+---
+
 ## ✨ Key Features
 
 **Clever** combines advanced NLP processing, a magical particle UI, and autonomous learning capabilities in a completely local environment.

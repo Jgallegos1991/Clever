@@ -274,23 +274,21 @@ class ErrorRecoverySystem:
         try:
             # Try to reload spaCy model
             import spacy
-            
-            # Download model if missing
             try:
                 nlp = spacy.load("en_core_web_sm")
             except OSError:
-                # Model not found, try to download
-                os.system("python -m spacy download en_core_web_sm")
-                nlp = spacy.load("en_core_web_sm")
-            
+                # Model not found, strict offline: cannot download
+                self.debugger.error('error_recovery', 'Missing spaCy model: en_core_web_sm. Please install manually.')
+                return {
+                    'success': False,
+                    'message': 'Missing spaCy model: en_core_web_sm. Please install manually.'
+                }
             # Test model
             doc = nlp("Test sentence")
-            
             return {
                 'success': True,
                 'message': 'NLP models restored'
             }
-            
         except Exception as e:
             return {
                 'success': False,
@@ -357,30 +355,20 @@ class ErrorRecoverySystem:
     def _recover_import_issues(self, error_info: Dict[str, Any]) -> Dict[str, Any]:
         """Recover from import errors"""
         try:
-            # Try to install missing packages
+            # Strict offline: do not install missing packages
             error_message = error_info['error_message']
-            
-            # Extract package name from error
             if "No module named" in error_message:
                 package_name = error_message.split("'")[1] if "'" in error_message else None
-                
                 if package_name:
-                    # Try to install package
-                    os.system(f"pip install {package_name}")
-                    
-                    # Try to import again
-                    __import__(package_name)
-                    
+                    self.debugger.error('error_recovery', f"Missing package: {package_name}. Please install manually.")
                     return {
-                        'success': True,
-                        'message': f'Installed missing package: {package_name}'
+                        'success': False,
+                        'message': f'Missing package: {package_name}. Please install manually.'
                     }
-            
             return {
                 'success': False,
                 'message': 'Could not identify missing package'
             }
-            
         except Exception as e:
             return {
                 'success': False,

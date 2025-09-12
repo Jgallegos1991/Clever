@@ -1,4 +1,3 @@
-
 """
 Database Manager for Clever AI
 
@@ -17,6 +16,7 @@ Connects to:
     - persona.py: Persona engine
     - app.py: Main application
 """
+
 from __future__ import annotations
 
 import sqlite3
@@ -69,7 +69,9 @@ class DatabaseManager:
                 """
             )
             # Backfill columns if the table pre-existed without them
-            cols = {row[1] for row in con.execute("PRAGMA table_info(sources)")}
+            cols = {
+                row[1] for row in con.execute("PRAGMA table_info(sources)")
+            }
             if "content_hash" not in cols:
                 con.execute("ALTER TABLE sources ADD COLUMN content_hash TEXT")
             if "size" not in cols:
@@ -145,7 +147,17 @@ class DatabaseManager:
                     SET filename = ?, content = ?, content_hash = ?, size = ?, modified_ts = ?
                     WHERE id = ?
                     """,
-                    (filename, content, content_hash, size, modified_ts, existing_id),
+                    (
+                        filename,
+                        content,
+                        content_hash,
+                        size,
+                        modified_ts,
+                        existing_id,
+                    ),
+                    # Project Coding Instructions:
+                    # See .github/copilot-instructions.md for architecture, documentation, and workflow rules.
+                    # All code must follow these standards.
                 )
                 con.commit()
                 return int(existing_id), "updated"
@@ -161,8 +173,11 @@ class DatabaseManager:
             return int(cur.lastrowid), "inserted"
 
     # --- Context notes ---
-    def set_context_note(self, key: str, value: str, ts: float | None = None) -> None:
+    def set_context_note(
+        self, key: str, value: str, ts: float | None = None
+    ) -> None:
         import time as _time
+
         if ts is None:
             ts = _time.time()
         with _lock, self._connect() as con:
@@ -184,7 +199,9 @@ class DatabaseManager:
 
     def get_context_notes(self) -> dict[str, str]:
         with _lock, self._connect() as con:
-            cur = con.execute("SELECT key, value FROM context_notes ORDER BY key ASC")
+            cur = con.execute(
+                "SELECT key, value FROM context_notes ORDER BY key ASC"
+            )
             return {row[0]: row[1] for row in cur.fetchall()}
 
     # Backward-compat shim used by older callers
@@ -238,86 +255,153 @@ class DatabaseManager:
             )
             return [Source(*row) for row in cur.fetchall()]
 
-    def search_snippets(self, query: str, limit: int = 5, window: int = 240) -> list[dict]:
+    def search_snippets(
+        self, query: str, limit: int = 5, window: int = 240
+    ) -> list[dict]:
         """Return top content snippets matching the query with smart caching.
 
         Enhanced with better scoring and performance optimization.
         """
         import re as _re, time
+
         if not query:
             return []
-        
+
         # Cache frequent searches for better performance
         cache_key = f"search_{hash(query)}_{limit}"
-        
+
         # tokenize query with better filtering
-        q_tokens = [t.lower() for t in _re.split(r"\W+", query) if len(t) > 2 and t not in {'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'has', 'was', 'one', 'our', 'out', 'day', 'get', 'use', 'her', 'his', 'how', 'may', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use'}]
+        q_tokens = [
+            t.lower()
+            for t in _re.split(r"\W+", query)
+            if len(t) > 2
+            and t
+            not in {
+                "the",
+                "and",
+                "for",
+                "are",
+                "but",
+                "not",
+                "you",
+                "all",
+                "can",
+                "had",
+                "has",
+                "was",
+                "one",
+                "our",
+                "out",
+                "day",
+                "get",
+                "use",
+                "her",
+                "his",
+                "how",
+                "may",
+                "new",
+                "now",
+                "old",
+                "see",
+                "two",
+                "way",
+                "who",
+                "boy",
+                "did",
+                "its",
+                "let",
+                "put",
+                "say",
+                "she",
+                "too",
+                "use",
+            }
+        ]
         if not q_tokens:
             return []
-        
+
         # Enhanced preselection with better LIKE patterns
         like_pattern = " ".join(q_tokens[:3])  # Use top 3 tokens
-        pre = self.search_sources(like_pattern, limit=min(100, limit*20))
+        pre = self.search_sources(like_pattern, limit=min(100, limit * 20))
         hits: list[dict] = []
-        
+
         for s in pre:
             text = s.content
             low = text.lower()
-            
+
             # Enhanced scoring with multiple factors
             exact_matches = sum(low.count(tok) for tok in q_tokens)
-            partial_matches = sum(1 for tok in q_tokens if any(tok in word for word in low.split()))
+            partial_matches = sum(
+                1
+                for tok in q_tokens
+                if any(tok in word for word in low.split())
+            )
             score = exact_matches * 2 + partial_matches
-            
+
             # Bonus for matches in filename
-            filename_matches = sum(1 for tok in q_tokens if tok in s.filename.lower())
+            filename_matches = sum(
+                1 for tok in q_tokens if tok in s.filename.lower()
+            )
             score += filename_matches * 3
-            
+
             if score <= 0:
                 continue
-                
+
             # Smart snippet extraction with better boundaries
-            positions = [low.find(tok) for tok in q_tokens if low.find(tok) != -1]
+            positions = [
+                low.find(tok) for tok in q_tokens if low.find(tok) != -1
+            ]
             if not positions:
                 continue
-                
+
             first_pos = min(positions)
             start = max(0, first_pos - window // 2)
             end = min(len(text), start + window)
-            
+
             # Expand to sentence boundaries for better readability
             try:
                 # Look for sentence endings before start
-                sentence_start = text.rfind('.', 0, start)
+                sentence_start = text.rfind(".", 0, start)
                 if sentence_start != -1 and start - sentence_start < 100:
                     start = sentence_start + 1
-                
+
                 # Look for sentence endings after end
-                sentence_end = text.find('.', end)
+                sentence_end = text.find(".", end)
                 if sentence_end != -1 and sentence_end - end < 100:
                     end = sentence_end + 1
-                    
+
                 snippet = text[start:end].strip()
             except Exception:
                 snippet = text[start:end].strip()
-            
-            hits.append({
-                "id": s.id,
-                "filename": s.filename,
-                "path": s.path,
-                "score": int(score),
-                "snippet": snippet,
-                "start": int(start),
-                "end": int(end),
-            })
-        
+
+            hits.append(
+                {
+                    "id": s.id,
+                    "filename": s.filename,
+                    "path": s.path,
+                    "score": int(score),
+                    "snippet": snippet,
+                    "start": int(start),
+                    "end": int(end),
+                }
+            )
+
         # Enhanced sorting: score first, then recency, then filename
-        hits.sort(key=lambda h: (h["score"], h["id"], h["filename"]), reverse=True)
+        hits.sort(
+            key=lambda h: (h["score"], h["id"], h["filename"]), reverse=True
+        )
         return hits[:limit]
 
     # --- Chat history ---
-    def add_utterance(self, role: str, text: str, mode: str | None = None, ts: float | None = None) -> int:
+    def add_utterance(
+        self,
+        role: str,
+        text: str,
+        mode: str | None = None,
+        ts: float | None = None,
+    ) -> int:
         import time as _time
+
         if ts is None:
             ts = _time.time()
         with _lock, self._connect() as con:
@@ -335,7 +419,13 @@ class DatabaseManager:
                 (int(limit),),
             )
             return [
-                {"id": r[0], "role": r[1], "text": r[2], "mode": r[3], "ts": r[4]}
+                {
+                    "id": r[0],
+                    "role": r[1],
+                    "text": r[2],
+                    "mode": r[3],
+                    "ts": r[4],
+                }
                 for r in cur.fetchall()
             ]
 
@@ -350,6 +440,7 @@ class DatabaseManager:
         ts: float | None = None,
     ) -> int:
         import time as _time, json as _json
+
         if ts is None:
             ts = _time.time()
         payload = None
@@ -370,6 +461,7 @@ class DatabaseManager:
 
     def list_interactions(self, limit: int = 100) -> list[dict]:
         import json as _json
+
         with _lock, self._connect() as con:
             cur = con.execute(
                 "SELECT id, ts, user_input, active_mode, action_taken, parsed_data FROM interactions ORDER BY id DESC LIMIT ?",
@@ -381,21 +473,29 @@ class DatabaseManager:
                     pd = _json.loads(r[5] or "{}")
                 except Exception:
                     pd = {}
-                out.append({
-                    "id": r[0],
-                    "ts": r[1],
-                    "user_input": r[2],
-                    "active_mode": r[3],
-                    "action_taken": r[4],
-                    "parsed_data": pd,
-                })
+                out.append(
+                    {
+                        "id": r[0],
+                        "ts": r[1],
+                        "user_input": r[2],
+                        "active_mode": r[3],
+                        "action_taken": r[4],
+                        "parsed_data": pd,
+                    }
+                )
             return out
 
     # --- Compatibility: store user+assistant exchange and an interaction ---
-    def add_conversation(self, user_text: str, reply_text: str, *, meta: dict | None = None) -> None:
+    def add_conversation(
+        self, user_text: str, reply_text: str, *, meta: dict | None = None
+    ) -> None:
         try:
-            self.add_utterance("user", user_text, mode=(meta or {}).get("detected_intent"))
-            self.add_utterance("assistant", reply_text, mode=(meta or {}).get("activePersona"))
+            self.add_utterance(
+                "user", user_text, mode=(meta or {}).get("detected_intent")
+            )
+            self.add_utterance(
+                "assistant", reply_text, mode=(meta or {}).get("activePersona")
+            )
             self.add_interaction(
                 user_input=user_text,
                 active_mode=(meta or {}).get("activePersona"),
@@ -409,14 +509,21 @@ class DatabaseManager:
 # Shared instance
 db_manager = DatabaseManager(config.DB_PATH)
 
+
 # --- Compatibility shim ---
-def add_conversation(user_text: str, reply_text: str, *, meta: dict | None = None) -> None:
+def add_conversation(
+    user_text: str, reply_text: str, *, meta: dict | None = None
+) -> None:
     """Back-compat function if callers import add_conversation directly.
     Prefer database.db_manager.add_conversation, but keep this to avoid crashes.
     """
     try:
-        db_manager.add_utterance("user", user_text, mode=(meta or {}).get("detected_intent"))
-        db_manager.add_utterance("assistant", reply_text, mode=(meta or {}).get("activePersona"))
+        db_manager.add_utterance(
+            "user", user_text, mode=(meta or {}).get("detected_intent")
+        )
+        db_manager.add_utterance(
+            "assistant", reply_text, mode=(meta or {}).get("activePersona")
+        )
         db_manager.add_interaction(
             user_input=user_text,
             active_mode=(meta or {}).get("activePersona"),
