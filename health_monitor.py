@@ -116,7 +116,7 @@ class SystemHealthMonitor:
             health_data['size_mb'] = db_size
             
             # Check database connectivity
-            conn = sqlite3.connect(db_path)
+            conn = DatabaseManager(db_path)._connect()
             cursor = conn.cursor()
             
             # Check table counts

@@ -227,7 +227,7 @@ class CleverBackupSystem:
     
     def _analyze_database(self, db_path: str) -> Dict[str, Any]:
         """Analyze database and return metadata"""
-        conn = sqlite3.connect(db_path)
+        conn = DatabaseManager(db_path)._connect()
         cursor = conn.cursor()
         
         # Get all tables

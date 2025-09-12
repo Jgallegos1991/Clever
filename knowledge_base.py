@@ -121,7 +121,7 @@ def log_interaction(user_message: str, clever_response: str, intent_detected: st
     """Log a chat interaction"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             # Use the existing schema with user_input and action_taken columns
@@ -154,7 +154,7 @@ def get_recent_interactions(limit: int = 10) -> List[Dict]:
     """Get recent chat interactions"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -196,7 +196,7 @@ def add_knowledge_source(filename: str, file_path: str = None, content_type: str
     """Add a knowledge source to the database"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -227,7 +227,7 @@ def add_content_chunk(source_id: int, chunk_index: int, content: str,
     """Add a content chunk to the database"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -256,7 +256,7 @@ def search_content(query: str, limit: int = 5) -> List[Dict]:
     """Search content chunks for relevant information"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             # Simple text search - in production, would use embeddings
@@ -300,7 +300,7 @@ def get_user_preference(key: str) -> Optional[str]:
     """Get a user preference value"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             cursor.execute('SELECT preference_value FROM user_preferences WHERE preference_key = ?', (key,))
@@ -317,7 +317,7 @@ def set_user_preference(key: str, value: str) -> bool:
     """Set a user preference value"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -338,7 +338,7 @@ def update_personality_state(emotional_state: str, mood_score: float, interactio
     """Update Clever's personality state"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -360,7 +360,7 @@ def get_personality_state() -> Optional[Dict]:
     """Get Clever's current personality state"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             cursor.execute('SELECT emotional_state, mood_score, interaction_count, last_updated FROM personality_state WHERE id = 1')
@@ -385,7 +385,7 @@ def log_system_metric(metric_name: str, metric_value: float, metric_data: Dict =
     """Log a system metric"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -411,7 +411,7 @@ def get_database_stats() -> Dict[str, Any]:
     """Get database statistics"""
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
+            conn = with DatabaseManager(config.DB_PATH)._connect() as conn:
             cursor = conn.cursor()
             
             stats = {}

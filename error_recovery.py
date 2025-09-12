@@ -199,7 +199,7 @@ class ErrorRecoverySystem:
             init_db()
             
             # Test connection
-            conn = sqlite3.connect('clever.db')
+            conn = DatabaseManager(config.DB_PATH)._connect()
             cursor = conn.cursor()
             cursor.execute('SELECT 1')
             conn.close()
