@@ -1,5 +1,16 @@
 """
-Knowledge Base Module - Wrapper for database functionality with extended capabilities
+Knowledge Base Module - Extended database functionality for content management.
+
+Why: Provides high-level interface for knowledge management operations including
+     chat history, source tracking, user preferences, and system metrics
+     while building on the core DatabaseManager infrastructure.
+
+Where: Used by chat interface, content ingestion systems, analytics modules,
+       and any component requiring knowledge-oriented database operations.
+
+How: Wraps DatabaseManager with domain-specific methods for interactions,
+     knowledge sources, preferences, and system state management using
+     centralized configuration and consistent database access patterns.
 """
 
 import sqlite3
@@ -8,45 +19,55 @@ import threading
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
-# Import existing database functionality
-try:
-    from database import DatabaseManager, Source
-    HAS_DATABASE = True
-except ImportError:
-    HAS_DATABASE = False
+import config
+from database import DatabaseManager, Source
 
 # Thread-safe database operations
 _db_lock = threading.RLock()
 
-# Global database instance
+# Global database instance using centralized configuration
 _db_manager = None
 
-def init_db(db_path: str = "clever.db") -> bool:
-    """Initialize the knowledge base database"""
+
+def init_db(db_path: str | None = None) -> bool:
+    """
+    Initialize knowledge base database with extended schema.
+    
+    Why: Sets up additional database tables and functionality beyond core
+         DatabaseManager for knowledge-specific operations and analytics.
+    
+    Where: Called during application startup to ensure knowledge base
+           schema exists and is properly configured.
+    
+    How: Uses centralized config.DB_PATH by default, creates extended tables
+         for interactions, sources, preferences, and metrics with proper
+         constraints and relationships.
+    """
     global _db_manager
     
-    try:
-        with _db_lock:
-            # Use existing DatabaseManager if available
-            if HAS_DATABASE:
-                _db_manager = DatabaseManager(db_path)
-            
-            # Ensure required tables exist
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            
-            # Create interactions table for chat history
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS interactions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp TEXT NOT NULL,
-                    user_message TEXT NOT NULL,
-                    clever_response TEXT NOT NULL,
-                    intent_detected TEXT,
-                    sentiment_compound REAL,
-                    nlp_analysis TEXT
-                )
-            ''')
+    if db_path is None:
+        db_path = config.DB_PATH
+        
+    with _db_lock:
+        # Initialize core database manager
+        _db_manager = DatabaseManager(db_path)
+        
+        # Create extended knowledge base tables
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Enhanced interactions table for chat history
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS knowledge_interactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                user_message TEXT NOT NULL,
+                clever_response TEXT NOT NULL,
+                intent_detected TEXT,
+                sentiment_compound REAL,
+                nlp_analysis TEXT
+            )
+        ''')
             
             # Create knowledge sources table
             cursor.execute('''
@@ -118,33 +139,33 @@ def init_db(db_path: str = "clever.db") -> bool:
 
 def log_interaction(user_message: str, clever_response: str, intent_detected: str = None,
                    sentiment_compound: float = None, nlp_analysis: Dict = None) -> int:
-    """Log a chat interaction"""
+    """
+    Log a chat interaction with analytics metadata.
+    
+    Why: Records user conversations with sentiment analysis and intent detection
+         for learning algorithms, conversation analytics, and response improvement.
+    
+    Where: Used by chat interface and conversation handlers to track all
+           interactions for evolution engine analysis and pattern recognition.
+    
+    How: Stores interaction data in standardized database format with JSON
+         metadata for sentiment and NLP analysis results using centralized DB.
+    """
     try:
         with _db_lock:
-            conn = sqlite3.connect("clever.db")
-            cursor = conn.cursor()
+            if _db_manager is None:
+                init_db()
             
-            # Use the existing schema with user_input and action_taken columns
-            cursor.execute('''
-                INSERT INTO interactions 
-                (timestamp, user_input, action_taken, active_mode, parsed_data)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (
-                datetime.now().isoformat(),
-                user_message,
-                clever_response,  # Store response in action_taken
-                intent_detected or 'chat',  # Store intent in active_mode
-                json.dumps({
+            # Use DatabaseManager's add_interaction method
+            return _db_manager.add_interaction(
+                user_input=user_message,
+                active_mode=intent_detected or 'chat',
+                action_taken=clever_response,
+                parsed_data={
                     'sentiment_compound': sentiment_compound,
                     'nlp_analysis': nlp_analysis
-                }) if (sentiment_compound is not None or nlp_analysis) else None
-            ))
-            
-            interaction_id = cursor.lastrowid
-            conn.commit()
-            conn.close()
-            
-            return interaction_id
+                } if (sentiment_compound is not None or nlp_analysis) else None
+            )
             
     except Exception as e:
         print(f"Failed to log interaction: {e}")
