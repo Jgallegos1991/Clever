@@ -1050,9 +1050,11 @@ if __name__ == "__main__":
                 if check_result.get("status") == "healthy"
                 else "⚠️" if check_result.get("status") == "warning" else "❌"
             )
-            print(
-                f"  {status_icon} {check_name}: {check_result.get('status', 'unknown')}"
+            line = (
+                f"  {status_icon} {check_name}: "
+                f"{check_result.get('status', 'unknown')}"
             )
+            print(line)
 
     # Run quick tests
     if test_suite:
@@ -1061,9 +1063,12 @@ if __name__ == "__main__":
 
         test_results = run_quick_tests()
 
-        print(
-            f"  Tests: {test_results['passed_tests']}/{test_results['total_tests']} passed ({test_results['success_rate']:.1f}%)"
+        tests_line = (
+            f"  Tests: {test_results['passed_tests']}/"
+            f"{test_results['total_tests']} passed ("
+            f"{test_results['success_rate']:.1f}% )"
         )
+        print(tests_line)
 
         if test_results["status"] == "passed":
             print("✅ All critical tests passed")
@@ -1073,12 +1078,14 @@ if __name__ == "__main__":
     # Check evolution engine
     try:
         evolution_engine = get_evolution_engine()
-        evolution_status = evolution_engine.get_evolution_status()
+        evo_status = evolution_engine.get_evolution_status()
         print(
-            f"\n🧬 Evolution Engine: {evolution_status.get('concept_count', 0)} concepts learned"
+            "\n🧬 Evolution Engine: "
+            f"{evo_status.get('concept_count', 0)} concepts learned"
         )
         print(
-            f"   Evolution Score: {evolution_status.get('evolution_score', 0):.3f}"
+            "   Evolution Score: "
+            f"{evo_status.get('evolution_score', 0):.3f}"
         )
     except Exception as e:
         print(f"⚠️  Evolution engine status unknown: {e}")
@@ -1089,7 +1096,7 @@ if __name__ == "__main__":
     print("🌐 External Access: Disabled (local only)")
 
     print("🌟 Synaptic Hub Neural Interface Ready!")
-    print(f"🔗 Local: http://127.0.0.1:5000")
+    print("🔗 Local: http://127.0.0.1:5000")
 
     # Tailscale remote access removed for local isolation
 
@@ -1118,9 +1125,11 @@ if __name__ == "__main__":
                 e, {"context": "flask_server_startup"}
             )
             if recovery_result.get("recovery_attempted"):
-                print(
-                    f"🔧 Recovery attempted: {recovery_result.get('recovery_message', 'Unknown')}"
+                rec_line = (
+                    "🔧 Recovery attempted: "
+                    f"{recovery_result.get('recovery_message', 'Unknown')}"
                 )
+                print(rec_line)
     finally:
         if debugger:
             debugger.info("app", "Clever AI shutdown complete")
