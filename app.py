@@ -216,9 +216,36 @@ def chat():
                 }
             )
 
-        # Process with enhanced conversation engine and error recovery
+        # Process with enhanced conversation engine for maximum capability
         try:
-            # Get NLP analysis
+            from enhanced_conversation_engine import get_conversation_engine
+            
+            # Get the enhanced conversation engine
+            conv_engine = get_conversation_engine()
+            
+            # Process conversation with full system access
+            mode = data.get("mode", "Auto")
+            context_data = data.get("context", {})
+            
+            # Use enhanced conversation engine for comprehensive processing
+            response_data = conv_engine.process_conversation(
+                user_message=user_message,
+                mode=mode,
+                context_data=context_data
+            )
+            
+            # Log interaction for learning (handled by conversation engine)
+            if debugger:
+                debugger.info("app", f"Enhanced conversation processed successfully: mode={mode}")
+            
+            return jsonify(response_data)
+            
+        except Exception as enhanced_error:
+            # Fallback to standard processing if enhanced engine fails
+            if debugger:
+                debugger.warning("app", f"Enhanced engine fallback: {enhanced_error}")
+            
+            # Standard NLP analysis as fallback
             analysis = {}
             if nlp_processor:
                 analysis = nlp_processor.process(user_message)
@@ -227,7 +254,7 @@ def chat():
                     analysis = vars(analysis)
                 analysis["user_input"] = user_message
 
-            # Use enhanced conversation engine for response
+            # Standard conversation processing
             try:
                 from clever_conversation_engine import (
                     process_clever_conversation,
