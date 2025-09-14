@@ -40,8 +40,12 @@ def run_rclone_sync(src: str, dst: str, extra: str | None = None) -> Tuple[int, 
         if flag not in args:
             # already covered by EXTRA default above; keep idempotent
             pass
-    proc = subprocess.run(args, capture_output=True, text=True)
-    return proc.returncode, proc.stdout, proc.stderr
+    try:
+        proc = subprocess.run(args, capture_output=True, text=True)
+        return proc.returncode, proc.stdout, proc.stderr
+    except FileNotFoundError:
+        # Graceful handling if rclone is not installed
+        return 127, "", "rclone not found: is it installed and in PATH?"
 
 
 def sync_clever_from_remote() -> Tuple[int, str, str]:
