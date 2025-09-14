@@ -13,7 +13,19 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 def run_tooltip_tests():
-    """Run UI tooltip tests specifically"""
+    """
+    Execute UI tooltip validation tests with detailed result reporting.
+    
+    Why: Validates UI tooltip consistency and accessibility standards
+         across Clever AI's interface components for optimal user experience.
+    Where: Called as part of comprehensive test suite to verify UI
+           components meet accessibility and consistency requirements.
+    How: Imports and executes tooltip tests from test_ui_functionality,
+         formats results with status icons and detailed error reporting.
+         
+    Returns:
+        dict: Test results including status, pass/fail counts, and detailed feedback
+    """
     print("🔍 Running UI Tooltip Tests...")
     
     try:
@@ -43,10 +55,22 @@ def run_tooltip_tests():
         
     except Exception as e:
         print(f"❌ Error running tooltip tests: {e}")
-        return {'status': 'error', 'error': str(e)}
+        raise  # Re-raise instead of swallowing
 
 def run_main_test_suite():
-    """Run the main Clever test suite"""
+    """
+    Execute the comprehensive Clever AI test suite with detailed reporting.
+    
+    Why: Provides thorough validation of Clever AI's core functionality
+         including database, NLP, persona, and system integration tests.
+    Where: Primary test execution function called to validate system
+           health and functionality across all major components.
+    How: Imports test_suite module, runs all registered tests, formats
+         results with category breakdown and performance metrics.
+         
+    Returns:
+        dict: Comprehensive test results with status, timing, and category details
+    """
     print("🚀 Running Main Test Suite...")
     
     try:
@@ -68,10 +92,22 @@ def run_main_test_suite():
         
     except Exception as e:
         print(f"❌ Error running main test suite: {e}")
-        return {'status': 'error', 'error': str(e)}
+        raise  # Re-raise instead of swallowing
 
 def run_pytest_tests():
-    """Run pytest tests if available"""
+    """
+    Execute pytest-based tests with subprocess and capture results.
+    
+    Why: Runs standard pytest test cases to validate application functionality
+         using industry-standard testing framework and methodologies.
+    Where: Called as part of comprehensive test suite to supplement custom
+           test runners with pytest-based validation coverage.
+    How: Uses subprocess to run pytest with verbose output, captures
+         results and provides formatted summary of test execution.
+         
+    Returns:
+        dict: Test results with status and execution details
+    """
     print("🧪 Checking for pytest tests...")
     
     try:
@@ -103,7 +139,24 @@ def run_pytest_tests():
         return {'status': 'error', 'error': str(e)}
 
 def create_test_report(tooltip_results, main_results, pytest_results):
-    """Create a comprehensive test report"""
+    """
+    Generate comprehensive test report from all test suite results.
+    
+    Why: Provides unified reporting and documentation of test execution
+         for CI/CD integration and development team visibility.
+    Where: Called after all test suites complete to aggregate results
+           into single comprehensive report for analysis and archival.
+    How: Combines results from tooltip, main suite, and pytest tests,
+         creates timestamped JSON report, saves to file with error handling.
+         
+    Args:
+        tooltip_results: Results from UI tooltip validation tests
+        main_results: Results from main Clever AI test suite  
+        pytest_results: Results from pytest execution
+        
+    Returns:
+        dict: Comprehensive test report with summary and detailed results
+    """
     timestamp = datetime.now().isoformat()
     
     report = {
@@ -132,7 +185,16 @@ def create_test_report(tooltip_results, main_results, pytest_results):
     return report
 
 def main():
-    """Main test runner"""
+    """
+    Main entry point for Clever AI comprehensive test suite execution.
+    
+    Why: Orchestrates complete testing workflow including UI, functionality,
+         and integration tests with unified reporting and status indication.
+    Where: Primary test runner entry point called from command line or
+           CI/CD systems to validate complete Clever AI system functionality.
+    How: Executes tooltip tests, main test suite, and pytest in sequence,
+         generates comprehensive report, provides clear pass/fail indication.
+    """
     print("=" * 60)
     print("🧪 CLEVER AI COMPREHENSIVE TEST SUITE")
     print("=" * 60)

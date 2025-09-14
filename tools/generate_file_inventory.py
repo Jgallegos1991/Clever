@@ -8,7 +8,19 @@ INVENTORY_PATH = REPO_ROOT / "file-inventory.md"
 
 
 def get_file_stats():
-    """Collect file extension stats: count, lines of code, and size."""
+    """
+    Collect comprehensive file extension statistics across repository.
+    
+    Why: Provides insights into project composition and file distribution
+         for documentation and project analysis purposes.
+    Where: Called by inventory generation to build statistical overview
+           of repository contents and file type distribution.
+    How: Walks directory tree, categorizes files by extension, counts
+         files and lines, measures sizes with error handling for access issues.
+         
+    Returns:
+        defaultdict: Statistics dict with count, LOC, and size per extension
+    """
     stats = defaultdict(lambda: {'count': 0, 'loc': 0, 'size': 0})
     for root, dirs, files in os.walk(REPO_ROOT):
         for fname in files:
@@ -21,6 +33,7 @@ def get_file_stats():
             except Exception:
                 size = 0
                 lines = 0
+                raise  # Re-raise to maintain visibility of errors
             stats[ext]['count'] += 1
             stats[ext]['loc'] += lines
             stats[ext]['size'] += size
@@ -28,7 +41,19 @@ def get_file_stats():
 
 
 def get_last_modified():
-    """Get last modified date for each file."""
+    """
+    Extract last modification timestamps for all repository files.
+    
+    Why: Tracks file activity and recent changes for project maintenance
+         and development activity analysis across repository contents.
+    Where: Used by inventory generation to identify recently modified
+           files and provide development activity insights.
+    How: Walks file system, extracts modification times, converts to
+         ISO format with graceful error handling for inaccessible files.
+         
+    Returns:
+        dict: Mapping of file paths to ISO-formatted modification timestamps
+    """
     mod_dates = {}
     for root, dirs, files in os.walk(REPO_ROOT):
         for fname in files:
@@ -40,11 +65,21 @@ def get_last_modified():
                 ).isoformat()
             except Exception:
                 mod_dates[fpath] = 'N/A'
+                raise  # Re-raise to maintain error visibility
     return mod_dates
 
 
 def generate_inventory():
-    """Generate markdown file inventory."""
+    """
+    Generate comprehensive markdown file inventory report for repository.
+    
+    Why: Creates automated documentation of project structure and file
+         composition for development reference and project analysis.
+    Where: Main function called to produce file-inventory.md documentation
+           used by development team and project management processes.
+    How: Combines file statistics and modification data, formats as markdown
+         table, writes to inventory file with timestamp and structured sections.
+    """
     stats = get_file_stats()
     mod_dates = get_last_modified()
     lines = [

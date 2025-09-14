@@ -9,6 +9,16 @@ from file_ingestor import FileIngestor
 
 
 def _run_cycle():
+    """
+    Execute one complete sync and ingestion cycle for all configured directories.
+    
+    Why: Performs automated synchronization and file processing to maintain
+         up-to-date knowledge base without manual intervention.
+    Where: Called by run_scheduler at configured intervals to process
+           both sync directories and ingest new content.
+    How: Conditionally syncs from remote using rclone (if enabled), then
+         runs FileIngestor on both SYNC_DIR and SYNAPTIC_HUB_DIR.
+    """
     # sync both (best effort) then ingest both roots
     if config.ENABLE_RCLONE:
         sync_clever_from_remote()
@@ -18,6 +28,19 @@ def _run_cycle():
 
 
 def run_scheduler(stop_event: threading.Event | None = None):
+    """
+    Run the continuous scheduling system for automated sync and ingestion.
+    
+    Why: Provides automated background processing to keep Clever AI's
+         knowledge base synchronized with external file changes.
+    Where: Main scheduler entry point, typically run as background service
+           or in dedicated thread for continuous operation.
+    How: Checks configuration, calculates interval timing, runs sync cycles
+         in loop with interruptible sleep, handles errors gracefully.
+    
+    Args:
+        stop_event: Optional threading Event to enable graceful shutdown
+    """
     if not config.AUTO_RCLONE_SCHEDULE:
         print("Scheduler disabled.")
         return
@@ -26,10 +49,7 @@ def run_scheduler(stop_event: threading.Event | None = None):
     while True:
         if stop_event and stop_event.is_set():
             break
-        try:
-            _run_cycle()
-        except Exception as e:
-            print("scheduler cycle error:", e)
+        _run_cycle()
         # sleep in small chunks so we can exit promptly
         for _ in range(iv):
             if stop_event and stop_event.is_set():
