@@ -96,10 +96,10 @@ class CleverTestSuite:
         # Test 1: Database connection
         try:
             from config import DB_PATH
-            conn = with DatabaseManager(DB_PATH)._connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT 1')
-            conn.close()
+            from database import DatabaseManager
+            with DatabaseManager(DB_PATH)._connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT 1')
             tests.append({'name': 'database_connection', 'status': 'passed'})
         except Exception as e:
             tests.append({'name': 'database_connection', 'status': 'failed', 'error': str(e)})
