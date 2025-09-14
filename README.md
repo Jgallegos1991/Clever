@@ -155,6 +155,26 @@ Clever's interface is a **3D holographic chamber** where:
 - **Offline Models** - spaCy and other models run locally
 - **Data Protection** - Automated backups with encryption options
 
+### Content Security Policy (CSP)
+
+The UI is now fully CSP-hardened:
+
+- No inline `<script>` or `<style>` tags (all logic in `static/js`, styles in `static/css`)
+- Strict header applied in `app.py` (`add_security_headers`) with:
+	- `script-src 'self'` (no `unsafe-inline`, no remote code)
+	- `style-src 'self'`
+	- `img-src 'self' data:` (allow small embedded assets)
+	- `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`
+- Particles bootstrap: `static/js/particles-init.js`
+
+If you need to add a one-off inline script for debugging (avoid in normal use):
+
+1. Prefer creating a new file under `static/js/your-module.js` and reference it.
+2. As a last resort, you could temporarily append `unsafe-inline` to the appropriate directive in `add_security_headers`, but revert immediately after.
+3. For future granular exceptions, introduce a nonce or hash (not required now; repository intentionally keeps attack surface minimal).
+
+All legacy templates with inline code were removed (`index_*` variants) to keep the threat model clean and auditable.
+
 ## 📊 System Status
 
 **Current State**: 🟢 **FULLY OPERATIONAL**

@@ -908,11 +908,44 @@ def pdf_knowledge():
 
 @app.after_request
 def add_security_headers(resp):
-    # Disallow fetching external assets; self + data URIs only.
-    csp = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; media-src 'self' data:;"
-    resp.headers.setdefault("Content-Security-Policy", csp)
-    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
-    resp.headers.setdefault("Referrer-Policy", "no-referrer")
+    """Attach security/security hardening headers to every response.
+
+    Why: Enforces strict CSP + related headers to keep the offline single-user
+    threat model intact and eliminate injection classes (XSS, rogue external
+    asset inclusion). Inline scripts/styles were removed
+    (`index.html` refactor)
+    so they can now be forbidden entirely.
+    Where: Flask after_request hook — runs for every UI + API response ensuring
+    consistency (centralized control vs. scattering headers per route).
+    How: Sets a deny-by-default CSP permitting only same-origin resources. Data
+    Data URIs allowed for images only (icons/embeds). No inline/eval. Extend
+    only by editing this function (single source of truth) — e.g., for workers
+    add `worker-src 'self'`.
+
+    Returns:
+        Modified Flask response with headers applied.
+
+    Connects to:
+        - templates/index.html: Relies solely on external JS/CSS under /static
+    - static/js/particles-init.js: Loaded via <script defer> under script-src
+        - debug_config.py: Indirectly benefits from reduced noise (blocked CSP
+          violations would surface cleanly)
+    """
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self'; "  # only local JS, no inline, no eval
+        "style-src 'self'; "   # externalized CSS only
+        "img-src 'self' data:; "  # data URIs for small assets
+        "font-src 'self'; "
+        "connect-src 'self'; "
+        "media-src 'self' data:; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'"
+    )
+    resp.headers['Content-Security-Policy'] = csp
+    resp.headers.setdefault('X-Content-Type-Options', 'nosniff')
+    resp.headers.setdefault('Referrer-Policy', 'no-referrer')
     return resp
 
 
