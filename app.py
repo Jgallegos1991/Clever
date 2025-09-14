@@ -145,14 +145,60 @@ app = Flask(
 # Enforce no-internet at runtime (allow loopback only)
 try:
     offline_guard.enable()
+    print("✅ Offline guard enabled - external network access blocked")
 except Exception as e:
     print(f"[WARN] offline guard not applied: {e}")
+
+# Run comprehensive system validation at startup
+try:
+    from system_validator import validate_system_startup
+    validation_report = validate_system_startup()
+    
+    if validation_report['overall_status'] == 'PASS':
+        print(f"✅ System validation passed - {validation_report['passed_checks']}/{validation_report['total_checks']} checks")
+        if validation_report['auto_corrections_applied'] > 0:
+            print(f"🔧 Applied {validation_report['auto_corrections_applied']} auto-corrections")
+    else:
+        print(f"⚠️ System validation issues - {validation_report['critical_issues']} critical issues found")
+        for result in validation_report['results']:
+            if not result.passed and result.severity == 'critical':
+                print(f"❌ CRITICAL: {result.check_name} - {result.details}")
+    
+except Exception as e:
+    print(f"[WARN] System validation failed: {e}")
+
+# Start automated monitoring system
+try:
+    from automated_monitor import start_system_monitoring
+    start_system_monitoring()
+    print("🔄 Automated monitoring system started - "
+          "continuous oversight active")
+except Exception as e:
+    print(f"[WARN] Automated monitoring failed to start: {e}")
 
 
 @app.route("/")
 def index():
-    # Serve the Synaptic Hub UI
-    return render_template("index.html")
+    """Serve primary landing UI.
+
+    Why: Provides minimal, CSP-compliant shell with particle canvas.
+    Where: Root route; passes a cache_buster to avoid stale JS during dev.
+    How: Supplies an integer timestamp (seconds) as cache_buster query param.
+    """
+    cache_buster = int(time.time())
+    return render_template("index.html", cache_buster=cache_buster)
+
+
+@app.route("/test")
+def test_working():
+    """Serve a basic diagnostic template (no particles) to confirm rendering.
+
+    Why: Allows quick differentiation between template/render failures and
+    animation script issues.
+    Where: /test route for manual checks.
+    How: Renders static minimal HTML (test_basic.html).
+    """
+    return render_template("test_basic.html")
 
 
 @app.route("/magical")
