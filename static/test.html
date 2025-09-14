@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page</title>
+    <style>
+        body { 
+            background: black; 
+            color: lime; 
+            font-family: monospace; 
+            padding: 20px;
+        }
+        .test-dot {
+            position: absolute;
+            top: 100px;
+            left: 100px;
+            width: 10px;
+            height: 10px;
+            background: lime;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Page Working!</h1>
+    <div class="test-dot"></div>
+    <p>If you can see this, the server is working correctly.</p>
+    
+    <canvas id="testCanvas" width="300" height="200" style="border: 1px solid lime;"></canvas>
+    
+    <script>
+        document.write('<p>JavaScript is working!</p>');
+        
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = 'lime';
+        ctx.fillRect(50, 50, 100, 100);
+        ctx.fillText('Canvas Working!', 60, 80);
+        
+        console.log('Test page loaded successfully');
+    </script>
+</body>
+</html>
