@@ -1,4 +1,17 @@
-# persona.py — Clever Persona Engine (offline‑only, Jay‑specific)
+"""
+Persona Engine Module - AI personality and response generation for Clever.
+
+Why: Implements multiple response modes and personality traits that create 
+     consistent, contextual interactions tailored to Jay's preferences while
+     maintaining offline-first architecture and local processing only.
+
+Where: Used by main Flask app, chat interface, and conversation management
+       to generate AI responses across different interaction scenarios.
+
+How: Provides PersonaEngine class with mode-specific response generation,
+     sentiment analysis integration, and proactive suggestion system using
+     local NLP processing and rule-based personality modeling.
+"""
 from __future__ import annotations
 
 from types import SimpleNamespace
@@ -6,7 +19,7 @@ import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-# Import your NLP helper (lazy-loaded spaCy + sentiment)
+# Import NLP helper with lazy-loaded spaCy + sentiment analysis
 from nlp_processor import nlp_processor
 
 logger = logging.getLogger(__name__)

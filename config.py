@@ -1,40 +1,50 @@
 """
-Central configuration for Clever.
+Central configuration for Clever AI Assistant.
 
-Edit these defaults as needed or override via environment variables.
+Why: Provides centralized configuration management for all Clever components, 
+     ensuring consistent settings across the application while maintaining 
+     offline-first and single-user design principles.
+
+Where: Used by all Python modules that need configuration settings, including
+       database paths, server settings, and feature flags.
+
+How: Import this module and access configuration constants directly. 
+     Environment variables can override defaults. All paths and settings
+     are resolved once at startup for consistency.
 """
 import os
 from pathlib import Path
 
-# Import user-specific configuration
-try:
-    from user_config import *
-except ImportError:
-    # Fallback defaults if user_config doesn't exist
-    USER_NAME = "Jay"
-    USER_EMAIL = "user@example.com"
-    TAILSCALE_ENABLED = False
-    CLEVER_EXTERNAL_ACCESS = False
+# Import user-specific configuration (required - no fallbacks per architecture standards)
+from user_config import USER_NAME, USER_EMAIL, TAILSCALE_ENABLED, CLEVER_EXTERNAL_ACCESS
 
 # Base directories
 ROOT_DIR = Path(__file__).resolve().parent
 
-# Minimal .env loader (offline, no extra deps)
-def _load_dotenv(path: Path):
+def _load_dotenv(path: Path) -> None:
+	"""
+	Load environment variables from .env file for configuration overrides.
+	
+	Why: Allows environment-specific configuration without modifying code,
+	     supporting different deployment scenarios while staying offline-first.
+	
+	Where: Called once during module initialization to load .env settings.
+	
+	How: Reads key=value pairs from .env file and sets them as environment
+	     variables if not already set, with basic parsing for quotes.
+	"""
 	if not path.exists():
 		return
-	try:
-		for line in path.read_text().splitlines():
-			line = line.strip()
-			if not line or line.startswith('#'):
-				continue
-			if '=' not in line:
-				continue
-			k, v = line.split('=', 1)
-			k = k.strip(); v = v.strip().strip('"').strip("'")
-			os.environ.setdefault(k, v)
-	except Exception:
-		pass
+	
+	for line in path.read_text().splitlines():
+		line = line.strip()
+		if not line or line.startswith('#'):
+			continue
+		if '=' not in line:
+			continue
+		k, v = line.split('=', 1)
+		k = k.strip(); v = v.strip().strip('"').strip("'")
+		os.environ.setdefault(k, v)
 
 _load_dotenv(ROOT_DIR / ".env")
 
@@ -65,8 +75,18 @@ ENABLE_RCLONE = False
 AUTO_RCLONE_SCHEDULE = os.environ.get("AUTO_RCLONE_SCHEDULE", "false").lower() in {"1", "true", "yes", "on"}
 RCLONE_INTERVAL_MINUTES = int(os.environ.get("RCLONE_INTERVAL_MINUTES", "60"))
 
-# Allowed filesystem roots for local operations (comma-separated paths)
 def _split_paths(val: str) -> list[str]:
+	"""
+	Split comma-separated path string into list of cleaned paths.
+	
+	Why: Provides consistent parsing of path lists from environment variables
+	     or configuration strings, ensuring proper path handling.
+	
+	Where: Used internally for processing ALLOWED_ROOTS and similar path configs.
+	
+	How: Splits on comma, strips whitespace, and filters out empty strings
+	     to return clean list of path strings.
+	"""
 	return [p.strip() for p in val.split(',') if p.strip()]
 
 HOME_DIR = str(Path.home())
