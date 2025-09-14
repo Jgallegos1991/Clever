@@ -1,47 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Clever</title>
-  <!-- Load main stylesheet ONLY -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self';"><!--Relaxed for debugging-->
-  </head>
-  <body>
-  <!-- Quick status chip (updated by JS) -->
-  <div id="selfcheck" class="selfcheck">Ambient creativity waiting…</div>
-  <!-- Particle canvas and grid overlay -->
-  <canvas id="particles"></canvas>
-  <div class="grid-overlay" aria-hidden="true"></div>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Clever AI</title>
+    <!-- Core minimal landing styles (kept) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}?v={{ cache_buster }}">
+    <!-- Note: Additional advanced styles live in style.css (already present in repo) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
+</head>
+<body>
+    <!-- Accessibility + failsafe marker: If you can read this text in page source, template rendered. -->
+    <noscript><div class="noscript-warning">JavaScript disabled – static fallback active.</div></noscript>
 
-  <!-- HUD overlay with chat on the right like the screenshot -->
-  <div class="hud grid-full glass-manifested">
-    <section class="chat-panel glass-manifested">
-      <div id="chat-log" class="chat" role="log" aria-live="polite" aria-label="Chat messages"></div>
-    </section>
-  </div>
-
-  <!-- Compact analysis card (floats under reply) -->
-  <div class="panel analysis-panel glass-manifested" aria-label="Live Analysis" role="complementary">
-    <h3>Live Analysis</h3>
-    <div id="analysis-content">
-      <div id="intent">Intent: —</div>
-      <div id="sentiment">Sentiment: —</div>
-      <div id="entities">Entities: —</div>
-      <div id="keywords">Keywords: —</div>
+    <!-- System + particle diagnostics (legacy minimal block retained for debug visibility) -->
+    <div class="status" id="legacy-debug-status">
+        <h2>Clever AI</h2>
+        <p>Status: <span id="system-status">Starting...</span></p>
+        <p>Particles: <span id="particle-count">0</span></p>
+        <p>JS Init: <span id="js-init-status">pending</span></p>
     </div>
-  </div>
 
-  <!-- Bottom entry bar (frosted, neon accents) -->
-  <div class="entrybar">
-    <button class="icon-btn" id="mode-btn" title="Modes" aria-label="Modes">○</button>
-    <input id="chat-input" type="text" placeholder="Talk to Clever..." autocomplete="off" autofocus />
-    <button class="icon-btn" id="send-btn" title="Send" aria-label="Send">➤</button>
-  </div>
-    <!-- Emergency particle system - guaranteed to work -->
-  <script src="{{ url_for('static', filename='js/emergency-particles.js') }}"></script>
-  <!-- Ultimate diagnostic to analyze deeper issues -->
-  <script src="{{ url_for('static', filename='js/ultimate-diagnostic.js') }}"></script>
-  </body>
+    <!-- Particle canvas (shared by minimal + advanced systems) -->
+    <canvas id="particles" aria-hidden="true"></canvas>
+
+    <!-- Magical status overlay (manifests phrases & thinking pulses) -->
+    <div id="magical-status" aria-live="polite" aria-atomic="true">
+        <div class="microcopy" id="microcopy-line">Ideas crystallizing…</div>
+    </div>
+
+    <!-- Manifestation container where conversation cards will emerge from particle field -->
+    <main id="manifestation-root" class="manifestation-root" role="main">
+        <div id="conversation-stream" class="conversation-stream" aria-label="Dialogue Stream"></div>
+        <div id="input-panel" class="input-panel glass-manifesting" data-state="idle">
+            <form id="chat-form" autocomplete="off">
+                <input id="user-input" name="q" type="text" placeholder="Summon a thought…" aria-label="Type your message" />
+                <button id="send-btn" type="submit" aria-label="Send">Send</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Failure fallback (hidden unless orchestrator declares failure) -->
+    <div id="fallback-panel" class="fallback-panel hidden">
+        Particle system unavailable – presenting basic interface.
+    </div>
+
+    <!-- Scripts: advanced particle system + orchestrator. Order matters: chamber first, then orchestrator. -->
+    <script src="{{ url_for('static', filename='js/holographic-chamber.js') }}?v={{ cache_buster }}" defer></script>
+    <script src="{{ url_for('static', filename='js/magic-orchestrator.js') }}?v={{ cache_buster }}" defer></script>
+    <!-- Note: Removed minimal particles-init.js from automatic load; remains available for emergency fallback via orchestrator dynamic import if needed. -->
+</body>
 </html>

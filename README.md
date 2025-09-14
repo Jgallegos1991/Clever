@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-# projects
-start of new projects
-Clever AI and the Synaptic Hub Project: Comprehensive Overview
-=======
 # The Synaptic Hub & Clever AI Co-Pilot
->>>>>>> 333518b64d3f662a99d2e655950180f34b5cf669
 
 [![Status](https://img.shields.io/badge/status-fully%20operational-success?style=for-the-badge)](https://github.com/Jgallegos1991/projects)
 [![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white)]
