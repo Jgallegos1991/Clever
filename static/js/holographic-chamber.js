@@ -493,17 +493,15 @@ window.triggerPulse = function(intensity) {
 // The chamber is initialized by main.js using window.startHolographicChamber()
 console.log('🔧 Holographic chamber loaded, waiting for main.js initialization...');
 
-// Git configuration commands (not part of the class)
-/* 
-git config --global commit.gpgSign false
-git config --local commit.gpgSign false
-git config --global user.name
-git config --global user.email
-*/
-git commit -a --author="Jordan Gallegos <lapirfta@gmail.com>" -m "Clever AI: Codebase cleanup, performance monitoring, adaptive UI, and accessibility improvements. All main files and folders organized. See COPILOT_USAGE_GUIDE.md for standards."
-sudo apt-get update && sudo apt-get install git-lfs
-git lfs install
-git add .
-git commit -m "WIP: Staging all local changes before rebase"
-git pull --rebase
-git push
+// Debug: Check if functions are exported
+console.log('🎯 startHolographicChamber type:', typeof window.startHolographicChamber);
+console.log('🎯 HolographicChamber type:', typeof window.HolographicChamber);
+
+// Update debug display if available
+setTimeout(() => {
+  const debugDiv = document.getElementById('debug-info');
+  if (debugDiv) {
+    debugDiv.innerHTML = 'Holographic chamber JS loaded!<br/>Functions exported: ' + 
+                        (typeof window.startHolographicChamber === 'function' ? 'YES' : 'NO');
+  }
+}, 100);

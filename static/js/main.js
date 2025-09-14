@@ -9,20 +9,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const modeBtn = document.getElementById('mode-btn');
 
   // Initialize holographic chamber with debugging
+  const debugDiv = document.getElementById('debug-info');
   const canvasElem = document.getElementById('particles');
+  
+  debugDiv.innerHTML = 'Canvas found: ' + (canvasElem ? 'YES' : 'NO');
   console.log('🔧 Main.js initializing holographic chamber...');
   console.log('🎯 Canvas element found:', canvasElem);
   console.log('🎨 Canvas dimensions:', canvasElem?.offsetWidth, 'x', canvasElem?.offsetHeight);
   
+  debugDiv.innerHTML += '<br/>startFunction: ' + typeof window['startHolographicChamber'];
+  
   if (canvasElem instanceof HTMLCanvasElement && typeof window['startHolographicChamber'] === 'function') {
     console.log('🚀 Starting holographic chamber from main.js...');
-    window['holographicChamber'] = window['startHolographicChamber'](canvasElem);
-    console.log('✅ Holographic chamber initialized:', window['holographicChamber']);
+    debugDiv.innerHTML += '<br/>Initializing particles...';
+    try {
+      window['holographicChamber'] = window['startHolographicChamber'](canvasElem);
+      console.log('✅ Holographic chamber initialized:', window['holographicChamber']);
+      debugDiv.innerHTML += '<br/>✅ Particles initialized!';
+    } catch (error) {
+      console.error('❌ Particle initialization failed:', error);
+      debugDiv.innerHTML += '<br/>❌ Init failed: ' + error.message;
+    }
   } else {
     console.error('❌ Cannot initialize holographic chamber:', {
       canvas: canvasElem,
       startFunction: typeof window['startHolographicChamber']
     });
+    debugDiv.innerHTML += '<br/>❌ Missing function or canvas';
   }
 
   // Send on click or Enter
