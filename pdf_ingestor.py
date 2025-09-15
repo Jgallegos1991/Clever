@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Enhanced File Ingestor with PDF Support
+<<<<<<< HEAD
 
 Intelligently processes PDFs, text files, and other documents for
 Clever's knowledge base.
@@ -10,19 +11,42 @@ import os
 import hashlib
 from pathlib import Path
 from typing import List, Dict, Tuple
+=======
+Intelligently processes PDFs, text files, and other documents for Clever's knowledge base.
+"""
+
+import os
+import json
+import hashlib
+import time
+from pathlib import Path
+from typing import List, Dict, Optional, Tuple
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 import logging
 
 # Core dependencies
 from database import db_manager
+<<<<<<< HEAD
+=======
+from nlp_processor import nlp_processor
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 import config
 
 # PDF processing (optional dependency)
 try:
+<<<<<<< HEAD
     import pypdf as PyPDF2  # Import pypdf with PyPDF2 alias for compatibility
     PDF_SUPPORT = True
 except ImportError:
     PDF_SUPPORT = False
     print("📚 PDF support not available. Install with: pip install pypdf")
+=======
+    import PyPDF2
+    PDF_SUPPORT = True
+except ImportError:
+    PDF_SUPPORT = False
+    print("📚 PDF support not available. Install with: pip install PyPDF2")
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 logger = logging.getLogger(__name__)
 

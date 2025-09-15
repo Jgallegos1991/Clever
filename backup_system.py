@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+<<<<<<< HEAD
 Clever AI Backup System - Comprehensive backup and restoration
 
 Why: Provides complete data protection and disaster recovery for all Clever
@@ -15,6 +16,10 @@ Connects to:
     - config.py: Backs up configuration files and settings
     - knowledge sources: Protects ingested documents and processed content
     - logs: Preserves system logs and debugging information
+=======
+Clever AI Backup System
+Comprehensive backup and restoration for all Clever components
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 """
 
 import os
@@ -28,6 +33,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 
 class CleverBackupSystem:
+<<<<<<< HEAD
     """
     Complete backup system for Clever AI with comprehensive data protection
     
@@ -57,11 +63,17 @@ class CleverBackupSystem:
         Connects to:
             - File system: Creates backup storage directory structure
         """
+=======
+    """Complete backup system for Clever AI"""
+    
+    def __init__(self, backup_dir: str = "./backups"):
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         self.backup_dir = Path(backup_dir)
         self.backup_dir.mkdir(exist_ok=True, parents=True)
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
     def create_full_backup(self) -> str:
+<<<<<<< HEAD
         """
         Create comprehensive backup of entire Clever system
         
@@ -81,6 +93,9 @@ class CleverBackupSystem:
             - config.py: Preserves configuration files and settings
             - File system: Archives logs and knowledge sources
         """
+=======
+        """Create comprehensive backup of entire Clever system"""
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         print("🔄 Creating Clever AI Full System Backup...")
         print("=" * 50)
         
@@ -284,7 +299,11 @@ class CleverBackupSystem:
     
     def _analyze_database(self, db_path: str) -> Dict[str, Any]:
         """Analyze database and return metadata"""
+<<<<<<< HEAD
         conn = DatabaseManager(db_path)._connect()
+=======
+        conn = sqlite3.connect(db_path)
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         cursor = conn.cursor()
         
         # Get all tables

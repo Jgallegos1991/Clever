@@ -10,6 +10,22 @@ from pathlib import Path
 
 
 def list_operations() -> List[str]:
+<<<<<<< HEAD
+=======
+    """
+    Return list of available self-repair operations for Clever AI system.
+    
+    Why: Provides safe, whitelisted operations for automated system
+         maintenance and UI enhancements without manual intervention.
+    Where: Used by repair systems and administrative tools to discover
+           available self-repair capabilities.
+    How: Returns hardcoded list of operation names that can be passed
+         to the apply() function for execution.
+    
+    Returns:
+        List[str]: Names of available repair operations
+    """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     return [
         "ensure_service_worker",
         "ensure_citations",
@@ -20,6 +36,25 @@ def list_operations() -> List[str]:
 
 
 def apply(op: str) -> Tuple[bool, str]:
+<<<<<<< HEAD
+=======
+    """
+    Execute specified self-repair operation with safety validation.
+    
+    Why: Provides controlled execution of whitelisted repair operations
+         to maintain system functionality and enhance user experience.
+    Where: Called by automated repair systems or administrative tools
+           to perform specific maintenance tasks.
+    How: Validates operation name against whitelist, dispatches to
+         appropriate internal handler function, returns success status.
+    
+    Args:
+        op: Name of the operation to execute (from list_operations)
+        
+    Returns:
+        Tuple[bool, str]: (success_flag, status_message)
+    """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     if op == "ensure_service_worker":
         return _ensure_service_worker_present()
     if op == "ensure_citations":

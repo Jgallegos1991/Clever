@@ -31,6 +31,7 @@ body {
   overflow: hidden;
 }
 
+<<<<<<< HEAD
 /* Particle Canvas - legacy Clever UI */
 #particles {
   position: fixed;
@@ -49,6 +50,8 @@ body {
   filter: none;
 }
 
+=======
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 /* Status indicator - cosmic status */
 .selfcheck { 
   position: fixed; 
@@ -265,13 +268,20 @@ body {
     transform: scale(1.05);
 }
 
+<<<<<<< HEAD
 /* Holographic Grid Stage - Reactive Energy Field */
 .grid-overlay {
     position: fixed;
+=======
+/* Magical grid overlay effect */
+.grid-overlay {
+    position: absolute;
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+<<<<<<< HEAD
     opacity: 0.08;
     background-image: 
         linear-gradient(rgba(105, 234, 203, 0.15) 1px, transparent 1px),
@@ -318,6 +328,21 @@ body {
         transform: perspective(800px) rotateX(0deg) scale(1);
         opacity: 0.08;
     }
+=======
+    opacity: 0.1;
+    background-image: 
+        linear-gradient(rgba(105, 234, 203, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(105, 234, 203, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridPulse 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes gridPulse {
+    0%, 100% { opacity: 0.05; }
+    50% { opacity: 0.15; }
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 }
 
 /* Enhanced button with magical effects */
@@ -436,12 +461,17 @@ body {
   }
 }
 
+<<<<<<< HEAD
 /* Clean modern layout - centered conversation */
+=======
+/* HUD overlay - interface emerges from the void */
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 .hud {
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
+<<<<<<< HEAD
   justify-content: center;
   align-items: center;
   padding: 20px;
@@ -608,6 +638,117 @@ body {
 
 .analysis-panel:hover {
   opacity: 1;
+=======
+  justify-content: flex-end;
+  padding: 24px;
+  z-index: 2;
+}
+
+.chat-panel {
+  align-self: flex-end;
+  max-width: 560px;
+  width: 100%;
+  margin-bottom: 16px;
+  animation: panel-emerge 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.chat {
+  max-height: 45vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px;
+}
+
+/* Neon chat bubbles like screenshot */
+.message { 
+  max-width: 85%;
+  padding: 12px 14px; 
+  border-radius: 12px; 
+  background: var(--bubble);
+  border: 1px solid rgba(105, 234, 203, 0.18);
+  box-shadow: 0 0 18px rgba(105, 234, 203, 0.15);
+  backdrop-filter: blur(8px);
+}
+.message .chip {
+  display: inline-block;
+  font-size: 12px;
+  color: #69EACB;
+  border: 1px solid rgba(105, 234, 203, 0.35);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  background: rgba(16, 24, 33, 0.6);
+}
+.message .bubble {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--fg);
+}
+.message.user { 
+  align-self: flex-end; 
+  border-color: rgba(105, 234, 203, 0.35);
+  box-shadow: 0 0 22px rgba(105, 234, 203, 0.25);
+}
+.message.ai { 
+  align-self: flex-start; 
+  border-color: rgba(255, 107, 255, 0.35);
+  box-shadow: 0 0 22px rgba(255, 107, 255, 0.25);
+}
+
+/* Frosted bottom entry bar */
+.entrybar {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  width: min(860px, 92vw);
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(16, 24, 33, 0.6);
+  border: 1px solid rgba(105, 234, 203, 0.25);
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 28px rgba(105, 234, 203, 0.15);
+  z-index: 3;
+}
+.entrybar input {
+  width: 100%;
+  background: rgba(10, 14, 20, 0.5);
+  border: 1px solid rgba(105, 234, 203, 0.25);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--fg);
+  outline: none;
+}
+.entrybar .icon-btn {
+  height: 44px;
+  width: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(105, 234, 203, 0.16), rgba(255, 107, 255, 0.12));
+  border: 1px solid rgba(105, 234, 203, 0.35);
+  color: var(--fg);
+}
+.entrybar .icon-btn:hover {
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.25);
+}
+
+/* Analysis card floating under chat */
+.analysis-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 108px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(16, 24, 33, 0.65);
+  border: 1px solid rgba(105, 234, 203, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 2;
+  max-width: 420px;
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 }
 .analysis-panel h3 { margin: 0 0 8px 0; font-size: 14px; color: var(--muted); }
 
@@ -621,6 +762,7 @@ body {
   flex-direction: column; 
 }
 
+<<<<<<< HEAD
 /* Modern smooth animations */
 @keyframes fadeInUp {
   from {
@@ -641,6 +783,18 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+=======
+@keyframes panel-emerge {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   }
 }
 
@@ -943,14 +1097,21 @@ body.clean .grid-full::before {
 }
 
 /* Responsive design */
+<<<<<<< HEAD
 /* Responsive design */
 @media (max-width: 768px) {
   .hud {
     padding: 12px;
+=======
+@media (max-width: 768px) {
+  .hud {
+    padding: 16px;
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   }
   
   .chat-panel {
     max-width: 100%;
+<<<<<<< HEAD
     margin-bottom: 100px;
   }
   
@@ -982,10 +1143,35 @@ body.clean .grid-full::before {
     right: 8px;
     font-size: 10px;
     padding: 4px 8px;
+=======
+  }
+  
+  .entry {
+    width: 100%;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  
+  .entry input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .msg {
+    max-width: 85%;
+    padding: 14px 16px;
+  }
+  
+  .selfcheck {
+    top: 4px;
+    right: 4px;
+    font-size: 11px;
+    padding: 6px 12px;
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   }
 }
 
 @media (max-width: 480px) {
+<<<<<<< HEAD
   .message {
     max-width: 90%;
   }
@@ -1016,3 +1202,18 @@ body.clean .grid-full::before {
   }
 }
 
+=======
+  .entry .icon {
+    padding: 8px 10px;
+  }
+  
+  .entry select {
+    display: none; /* Hide voice select on small screens */
+  }
+  
+  .msg {
+    max-width: 90%;
+    padding: 12px 14px;
+  }
+}
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

@@ -2,12 +2,17 @@
 
 This directory contains all frontend assets for Clever, organized for maintainability and clarity.
 
+<<<<<<< HEAD
 
 ## 📁 Directory Structure (Cleaned)
+=======
+## 📁 Directory Structure
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 ```
 static/
 ├── css/
+<<<<<<< HEAD
 │   ├── style.css            # Main stylesheet
 │   ├── landing.css          # Magical UI and particle styles
 │   └── test_basic.css       # Diagnostic template stylesheet
@@ -20,10 +25,39 @@ static/
 ├── assets/                  # Images and other assets
 │   └── *.png                # Screenshots and images
 └── README.md                # This file
+=======
+│   └── style.css                    # Main stylesheet
+├── js/
+│   ├── core/                        # Core application files
+│   │   ├── app.js                   # Main application logic
+│   │   └── sw.js                    # Service worker
+│   ├── engines/                     # Particle/visual engines
+│   │   ├── einstein-engine.js       # Advanced particle physics
+│   │   ├── quantum-scene.js         # Complex quantum simulation
+│   │   └── quantum-scene-simple.js  # Simplified particle system (active)
+│   ├── performance/                 # Performance monitoring & optimization
+│   │   ├── clever-performance-quick.js
+│   │   ├── performance-dashboard.js
+│   │   ├── performance-enhancer.js
+│   │   └── performance-quick.js
+│   ├── unused/                      # Legacy/unused files
+│   │   ├── orb.js
+│   │   ├── scene*.js               # Various legacy scene implementations
+│   │   ├── sources.js
+│   │   └── test-particles.js
+│   └── archive/                     # Backup files
+│       ├── scene.js.backup
+│       ├── scene.js.corrupted
+│       └── scene.js.fixed
+├── assets/                          # Images and other assets
+│   └── *.png                       # Screenshots and images
+└── README.md                        # This file
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 ```
 
 ## 🚀 Active Components
 
+<<<<<<< HEAD
 
 ### Currently Used Files:
 - **CSS**: `css/style.css`, `css/landing.css`, `css/test_basic.css`
@@ -46,6 +80,26 @@ static/
 
 - File organization follows modern web development best practices
 - All legacy/unused files have been removed for clarity
+=======
+### Currently Used Files:
+- **CSS**: `css/style.css` - All styling for Clever's interface
+- **Core**: `js/core/app.js` - Main application logic and chat interface
+- **Engine**: `js/engines/quantum-scene-simple.js` - Active particle system
+- **Performance**: `js/performance/performance-dashboard.js` - Performance monitoring
+- **Service Worker**: `js/core/sw.js` - Offline functionality
+
+### Key Features:
+- **Quantum Particle System**: Beautiful, responsive particle animations
+- **Chat Interface**: Real-time communication with Clever
+- **Performance Monitoring**: Built-in performance tracking
+- **Offline Support**: Service worker for offline functionality
+- **Responsive Design**: Works on all device sizes
+
+## 🔧 Development Notes
+
+- File organization follows modern web development best practices
+- Legacy files preserved in `unused/` and `archive/` directories
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 - Version numbers in HTML template prevent caching issues during development
 - All paths are absolute from `/static/` for consistency
 

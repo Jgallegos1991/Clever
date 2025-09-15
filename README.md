@@ -26,6 +26,7 @@ Clever runs locally (Python 3.12 + Flask), using spaCy, VADER, and TextBlob for 
 
 ---
 
+<<<<<<< HEAD
 ## GitHub Copilot & API Usage
 
 To maximize productivity and avoid hitting GitHub API rate limits, please review the [COPILOT_USAGE_GUIDE.md](./COPILOT_USAGE_GUIDE.md).
@@ -142,6 +143,57 @@ If port toast says “exit code 127”, ignore it and run make run in the termin
 To reset the venv: make clean-venv && make setup.
 >>>>>>> 79ac8fc (UI polish: input shortcuts, auto-fading panels, analysis bubbles; tasks.json; README run steps; favicon route.)
 =======
+=======
+## ✨ Key Features
+
+**Clever** combines advanced NLP processing, a magical particle UI, and autonomous learning capabilities in a completely local environment.
+
+- **🎯 Completely Offline** - No external API calls, all processing local
+- **🎨 Magical UI** - Holographic chamber with particle swarm morphs (idle → summon → dialogue → dissolve)
+- **🧠 Advanced NLP** - Multi-layered text analysis with spaCy and VADER
+- **📚 Autonomous Learning** - Evolves through interaction and builds knowledge
+- **💫 Dynamic Persona** - Witty, empathetic AI with Jay-specific patterns
+- **📄 PDF Sync** - Intelligent document processing and sync capabilities
+- **🔧 Self-Healing** - Comprehensive debugging and error recovery
+- **💾 Smart Backup** - Automated system state preservation
+
+## 🚀 Quick Start
+
+```bash
+# Minimal setup (offline-only testing)
+make setup-min
+
+# Full setup with NLP models (optional)
+make setup-full
+
+# Run Clever
+make run
+
+# Run tests
+make test
+```
+
+Visit `http://127.0.0.1:5000` to experience Clever's magical interface.
+
+## 🏗️ Architecture
+
+*Last Updated: September 9, 2025*  
+*System Status: 🟢 Fully Operational with Enhanced Capabilities*
+
+- **`app.py`** - Flask orchestrator with magical state management
+- **`persona.py`** - Dynamic personality system with Jay-specific traits
+- **`nlp_processor.py`** - Advanced text analysis engine
+- **`knowledge_base.py`** - SQLite database with learning capabilities
+- **`evolution_engine.py`** - Autonomous learning and capability tracking
+
+### Advanced Systems
+
+- **Debug Infrastructure** - Health monitoring, error recovery, automated testing
+- **Magical UI** - Particle swarm interface optimized for Chromebook performance and 45+ FPS
+- **PDF Processing** - Enhanced sync with visual feedback
+- **Backup System** - Comprehensive data protection and restoration
+
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 ## 🎨 Magical UI
 
 Clever's interface is a **3D holographic chamber** where:
@@ -176,6 +228,7 @@ Clever's interface is a **3D holographic chamber** where:
 - **Offline Models** - spaCy and other models run locally
 - **Data Protection** - Automated backups with encryption options
 
+<<<<<<< HEAD
 ### Content Security Policy (CSP)
 
 The UI is now fully CSP-hardened:
@@ -196,6 +249,8 @@ If you need to add a one-off inline script for debugging (avoid in normal use):
 
 All legacy templates with inline code were removed (`index_*` variants) to keep the threat model clean and auditable.
 
+=======
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 ## 📊 System Status
 
 **Current State**: 🟢 **FULLY OPERATIONAL**
@@ -226,7 +281,11 @@ All legacy templates with inline code were removed (`index_*` variants) to keep 
 ├── debug_config.py          # Debug infrastructure
 ├── backup_system.py         # Backup and restoration
 ├── templates/               # UI templates (index.html)
+<<<<<<< HEAD
 ├── static/                  # UI assets (css/style.css, js/holographic-chamber.js, js/main.js)
+=======
+├── static/                  # UI assets (style.css, js/particles.js, js/main.js)
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 ├── docs/                    # Comprehensive documentation
 └── tests/                   # Automated test suite
 ```
@@ -271,4 +330,7 @@ Ready to see what true AI partnership looks like? Fire up Clever and let the mag
 
 *Last Updated: September 9, 2025*  
 *System Status: 🟢 Fully Operational with Enhanced Capabilities*
+<<<<<<< HEAD
 >>>>>>> 333518b64d3f662a99d2e655950180f34b5cf669
+=======
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

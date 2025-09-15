@@ -22,6 +22,10 @@ import sys
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+<<<<<<< HEAD
+=======
+import config
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 # Configure logging
 logging.basicConfig(
@@ -31,9 +35,33 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class SyncEventHandler(FileSystemEventHandler):
+<<<<<<< HEAD
     """Handles file system events in sync directories"""
     
     def __init__(self):
+=======
+    """
+    File system event handler for automatic ingestion of sync directory changes.
+    
+    Why: Enables real-time processing of files added to sync directories,
+         ensuring Clever AI's knowledge base stays current with external changes.
+    Where: Used by the sync watcher system to monitor Clever_Sync and 
+           synaptic_hub_sync directories for file system events.
+    How: Inherits from FileSystemEventHandler, debounces events to prevent
+         rapid-fire ingestion, and directly uses FileIngestor for processing.
+    """
+    
+    def __init__(self):
+        """
+        Initialize the sync event handler with debouncing and direct ingestion.
+        
+        Why: Sets up debouncing to prevent excessive ingestion calls and
+             establishes direct connection to FileIngestor for efficient processing.
+        Where: Called when SyncEventHandler is instantiated by the sync watcher.
+        How: Configures debounce timing, imports FileIngestor, and initializes
+             with the configured sync directory from config.SYNC_DIR.
+        """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         self.last_trigger = 0
         self.debounce_seconds = 2  # Prevent rapid-fire ingestion
         # Direct ingestion via FileIngestor
@@ -42,7 +70,20 @@ class SyncEventHandler(FileSystemEventHandler):
         self.ingestor = FileIngestor(base_dir=config.SYNC_DIR)
         
     def on_any_event(self, event):
+<<<<<<< HEAD
         """React to any file system event"""
+=======
+        """
+        Process any file system event with intelligent filtering and debouncing.
+        
+        Why: Automatically detects file changes in sync directories to maintain
+             up-to-date knowledge base without manual intervention.
+        Where: Called by the watchdog Observer when any file system event occurs
+               in monitored directories.
+        How: Filters out directories and temporary files, applies debouncing to
+             prevent rapid-fire triggers, then initiates ingestion for valid files.
+        """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if event.is_directory:
             return
         # Debounce rapid events
@@ -59,7 +100,23 @@ class SyncEventHandler(FileSystemEventHandler):
         self.trigger_ingestion(src)
         
     def trigger_ingestion(self, file_path):
+<<<<<<< HEAD
         """Trigger ingestion endpoint on Flask server"""
+=======
+        """
+        Execute direct file ingestion with comprehensive error handling.
+        
+        Why: Processes detected file changes immediately to keep Clever AI's
+             knowledge base synchronized with external file updates.
+        Where: Called by on_any_event after successful event filtering and
+               debouncing validation.
+        How: Uses FileIngestor to process the file, logs ingestion status,
+             and handles any processing errors gracefully with detailed logging.
+        
+        Args:
+            file_path: Path to the file that triggered the ingestion event
+        """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         try:
             status = self.ingestor.ingest_file(file_path)
             if status in ("inserted", "updated"):
@@ -68,6 +125,7 @@ class SyncEventHandler(FileSystemEventHandler):
                 logger.info(f"No ingestion needed for {file_path} (status: {status})")
         except Exception as e:
             logger.error(f"Error during ingestion of {file_path}: {e}")
+<<<<<<< HEAD
 
 def main():
     """Main function to set up watchers and start monitoring"""
@@ -76,6 +134,25 @@ def main():
     clever_sync_dir = os.getenv('CLEVER_SYNC_DIR', './Clever_Sync')
     synaptic_hub_sync_dir = os.getenv('SYNAPTIC_HUB_SYNC_DIR', './synaptic_hub_sync')
     flask_url = os.getenv('FLASK_URL', 'http://localhost:5000')
+=======
+            raise  # Re-raise instead of swallowing the exception
+
+def main():
+    """
+    Initialize and run the sync directory monitoring system.
+    
+    Why: Provides continuous monitoring of sync directories to enable
+         real-time knowledge base updates for Clever AI's offline-first architecture.
+    Where: Entry point for the sync watcher service, typically run as a
+           background process or daemon.
+    How: Configures directory paths from environment, validates existence,
+         sets up watchdog Observer with SyncEventHandler, and runs monitoring loop.
+    """
+    
+    # Get configuration from config.py
+    clever_sync_dir = config.SYNC_DIR
+    synaptic_hub_sync_dir = config.SYNAPTIC_HUB_DIR
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     
     # Convert to Path objects and check if they exist
     sync_dirs = []

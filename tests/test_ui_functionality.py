@@ -10,14 +10,43 @@ from typing import List, Dict, Any
 
 
 class UITooltipTests:
+<<<<<<< HEAD
     """Test UI tooltip consistency and accessibility without external dependencies"""
+=======
+    """
+    Comprehensive UI tooltip testing system for Clever AI interface validation.
+    
+    Why: Ensures user interface tooltips are consistent, accessible, and
+         properly structured across all template files for optimal UX.
+    Where: Used by testing infrastructure to validate UI components meet
+           accessibility standards and tooltip consistency requirements.
+    How: Parses HTML templates using regex, extracts button elements,
+         validates tooltip attributes, and checks accessibility compliance.
+    """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     
     def __init__(self):
         self.templates_dir = Path(__file__).resolve().parents[1] / 'templates'
         self.test_results = []
     
     def run_all_tooltip_tests(self) -> Dict[str, Any]:
+<<<<<<< HEAD
         """Run all tooltip-related tests"""
+=======
+        """
+        Execute comprehensive tooltip test suite and aggregate results.
+        
+        Why: Provides unified entry point for all tooltip-related validation
+             with structured reporting and error handling for CI/CD integration.
+        Where: Main testing method called by test runners and validation
+               systems to verify UI tooltip compliance across templates.
+        How: Runs battery of tooltip tests, captures results and errors,
+             calculates pass/fail statistics, returns structured report.
+             
+        Returns:
+            Dict[str, Any]: Comprehensive test results with status and details
+        """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         tests = [
             ('button_tooltips_exist', self.test_button_tooltips_exist),
             ('tooltip_consistency', self.test_tooltip_consistency),
@@ -265,7 +294,23 @@ class UITooltipTests:
 
 
 def run_ui_tooltip_tests() -> Dict[str, Any]:
+<<<<<<< HEAD
     """Run UI tooltip tests and return results"""
+=======
+    """
+    Execute UI tooltip validation tests and return structured results.
+    
+    Why: Provides programmatic interface for tooltip testing that can be
+         integrated into automated testing pipelines and validation systems.
+    Where: Called by test automation, CI/CD processes, and manual validation
+           tools to verify UI tooltip compliance and consistency.
+    How: Creates UITooltipTests instance, executes full test suite,
+         returns structured results for further processing or reporting.
+         
+    Returns:
+        Dict[str, Any]: Complete test results including pass/fail status
+    """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     test_runner = UITooltipTests()
     return test_runner.run_all_tooltip_tests()
 

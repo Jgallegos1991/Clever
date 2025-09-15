@@ -8,6 +8,7 @@ export function hidePanel(name) {
 	// Optional: Hide side panels
 	console.log(`[Clever] Hiding panel: ${name}`);
 }
+<<<<<<< HEAD
 // Holographic Chamber - Advanced Particle System for Clever AI
 // Quantum swarm with morphing behaviors: idle → summon → dialogue → dissolve
 class HolographicChamber {
@@ -400,3 +401,5 @@ window.triggerPulse = function (intensity) {
 // Note: Auto-initialization removed to prevent conflicts with main.js
 // The chamber is initialized by main.js using window.startHolographicChamber()
 console.log('🔧 Holographic chamber loaded, waiting for main.js initialization...');
+=======
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

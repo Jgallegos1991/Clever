@@ -1,4 +1,5 @@
 """
+<<<<<<< HEAD
 Knowledge Base Module - Centralized data management for Clever AI
 
 Why: Provides advanced database operations beyond basic DatabaseManager including
@@ -22,11 +23,29 @@ Connects to:
     - nlp_processor.py: Stores processed keywords, entities, and analysis results
 """
 
+=======
+Knowledge Base Module - Extended database functionality for content management.
+
+Why: Provides high-level interface for knowledge management operations including
+     chat history, source tracking, user preferences, and system metrics
+     while building on the core DatabaseManager infrastructure.
+
+Where: Used by chat interface, content ingestion systems, analytics modules,
+       and any component requiring knowledge-oriented database operations.
+
+How: Wraps DatabaseManager with domain-specific methods for interactions,
+     knowledge sources, preferences, and system state management using
+     centralized configuration and consistent database access patterns.
+"""
+
+import sqlite3
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 import json
 import threading
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
+<<<<<<< HEAD
 from database import DatabaseManager
 import config
 
@@ -78,6 +97,57 @@ def init_db() -> bool:
                     nlp_analysis TEXT
                 )
             ''')
+=======
+import config
+from database import DatabaseManager, Source
+
+# Thread-safe database operations
+_db_lock = threading.RLock()
+
+# Global database instance using centralized configuration
+_db_manager = None
+
+
+def init_db(db_path: str | None = None) -> bool:
+    """
+    Initialize knowledge base database with extended schema.
+    
+    Why: Sets up additional database tables and functionality beyond core
+         DatabaseManager for knowledge-specific operations and analytics.
+    
+    Where: Called during application startup to ensure knowledge base
+           schema exists and is properly configured.
+    
+    How: Uses centralized config.DB_PATH by default, creates extended tables
+         for interactions, sources, preferences, and metrics with proper
+         constraints and relationships.
+    """
+    global _db_manager
+    
+    if db_path is None:
+        db_path = config.DB_PATH
+        
+    with _db_lock:
+        # Initialize core database manager
+        _db_manager = DatabaseManager(db_path)
+        
+        # Create extended knowledge base tables
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Enhanced interactions table for chat history
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS knowledge_interactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                user_message TEXT NOT NULL,
+                clever_response TEXT NOT NULL,
+                intent_detected TEXT,
+                sentiment_compound REAL,
+                nlp_analysis TEXT
+            )
+        ''')
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             # Create knowledge sources table
             cursor.execute('''
@@ -139,6 +209,10 @@ def init_db() -> bool:
             ''')
             
             conn.commit()
+<<<<<<< HEAD
+=======
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             return True
             
@@ -149,6 +223,7 @@ def init_db() -> bool:
 def log_interaction(user_message: str, clever_response: str, intent_detected: str = None,
                    sentiment_compound: float = None, nlp_analysis: Dict = None) -> int:
     """
+<<<<<<< HEAD
     Log a chat interaction to the knowledge base
     
     Why: Stores chat interactions for learning, memory, and conversation history
@@ -198,12 +273,41 @@ def log_interaction(user_message: str, clever_response: str, intent_detected: st
             conn.commit()
             
             return interaction_id
+=======
+    Log a chat interaction with analytics metadata.
+    
+    Why: Records user conversations with sentiment analysis and intent detection
+         for learning algorithms, conversation analytics, and response improvement.
+    
+    Where: Used by chat interface and conversation handlers to track all
+           interactions for evolution engine analysis and pattern recognition.
+    
+    How: Stores interaction data in standardized database format with JSON
+         metadata for sentiment and NLP analysis results using centralized DB.
+    """
+    try:
+        with _db_lock:
+            if _db_manager is None:
+                init_db()
+            
+            # Use DatabaseManager's add_interaction method
+            return _db_manager.add_interaction(
+                user_input=user_message,
+                active_mode=intent_detected or 'chat',
+                action_taken=clever_response,
+                parsed_data={
+                    'sentiment_compound': sentiment_compound,
+                    'nlp_analysis': nlp_analysis
+                } if (sentiment_compound is not None or nlp_analysis) else None
+            )
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
     except Exception as e:
         print(f"Failed to log interaction: {e}")
         return -1
 
 def get_recent_interactions(limit: int = 10) -> List[Dict]:
+<<<<<<< HEAD
     """
     Retrieve recent chat interactions from the knowledge base
     
@@ -260,12 +364,51 @@ def get_recent_interactions(limit: int = 10) -> List[Dict]:
                 
                 return interactions
                 
+=======
+    """Get recent chat interactions"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT timestamp, user_input, action_taken, active_mode, parsed_data
+                FROM interactions 
+                ORDER BY timestamp DESC 
+                LIMIT ?
+            ''', (limit,))
+            
+            interactions = []
+            for row in cursor.fetchall():
+                timestamp, user_input, action_taken, active_mode, parsed_data_json = row
+                
+                parsed_data = {}
+                if parsed_data_json:
+                    try:
+                        parsed_data = json.loads(parsed_data_json)
+                    except:
+                        pass
+                
+                interactions.append({
+                    'timestamp': timestamp,
+                    'user_message': user_input,  # Map to expected field name
+                    'clever_response': action_taken,  # Map to expected field name
+                    'intent_detected': active_mode,
+                    'sentiment_compound': parsed_data.get('sentiment_compound'),
+                    'nlp_analysis': parsed_data.get('nlp_analysis')
+                })
+            
+            conn.close()
+            return interactions
+            
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     except Exception as e:
         print(f"Failed to get recent interactions: {e}")
         return []
 
 def add_knowledge_source(filename: str, file_path: str = None, content_type: str = None,
                         file_size: int = None, content_hash: str = None) -> int:
+<<<<<<< HEAD
     """
     Add a knowledge source to the database
     
@@ -296,6 +439,13 @@ def add_knowledge_source(filename: str, file_path: str = None, content_type: str
         with _db_lock:
             with _db_manager._connect() as conn:
                 cursor = conn.cursor()
+=======
+    """Add a knowledge source to the database"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             cursor.execute('''
                 INSERT INTO knowledge_sources 
@@ -312,6 +462,10 @@ def add_knowledge_source(filename: str, file_path: str = None, content_type: str
             
             source_id = cursor.lastrowid
             conn.commit()
+<<<<<<< HEAD
+=======
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             return source_id
             
@@ -321,6 +475,7 @@ def add_knowledge_source(filename: str, file_path: str = None, content_type: str
 
 def add_content_chunk(source_id: int, chunk_index: int, content: str,
                      keywords: List[str] = None, entities: List[str] = None) -> int:
+<<<<<<< HEAD
     """
     Add a content chunk to the database for a knowledge source
     
@@ -351,6 +506,13 @@ def add_content_chunk(source_id: int, chunk_index: int, content: str,
         with _db_lock:
             with _db_manager._connect() as conn:
                 cursor = conn.cursor()
+=======
+    """Add a content chunk to the database"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             cursor.execute('''
                 INSERT INTO content_chunks 
@@ -366,6 +528,10 @@ def add_content_chunk(source_id: int, chunk_index: int, content: str,
             
             chunk_id = cursor.lastrowid
             conn.commit()
+<<<<<<< HEAD
+=======
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             return chunk_id
             
@@ -374,6 +540,7 @@ def add_content_chunk(source_id: int, chunk_index: int, content: str,
         return -1
 
 def search_content(query: str, limit: int = 5) -> List[Dict]:
+<<<<<<< HEAD
     """
     Search content chunks for relevant information
     
@@ -401,6 +568,13 @@ def search_content(query: str, limit: int = 5) -> List[Dict]:
         with _db_lock:
             with _db_manager._connect() as conn:
                 cursor = conn.cursor()
+=======
+    """Search content chunks for relevant information"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             # Simple text search - in production, would use embeddings
             cursor.execute('''
@@ -432,6 +606,10 @@ def search_content(query: str, limit: int = 5) -> List[Dict]:
                     'source_filename': filename
                 })
             
+<<<<<<< HEAD
+=======
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             return results
             
     except Exception as e:
@@ -439,6 +617,7 @@ def search_content(query: str, limit: int = 5) -> List[Dict]:
         return []
 
 def get_user_preference(key: str) -> Optional[str]:
+<<<<<<< HEAD
     """
     Retrieve a user preference value
     
@@ -468,6 +647,17 @@ def get_user_preference(key: str) -> Optional[str]:
             
             cursor.execute('SELECT preference_value FROM user_preferences WHERE preference_key = ?', (key,))
             result = cursor.fetchone()
+=======
+    """Get a user preference value"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+            
+            cursor.execute('SELECT preference_value FROM user_preferences WHERE preference_key = ?', (key,))
+            result = cursor.fetchone()
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             return result[0] if result else None
             
@@ -476,6 +666,7 @@ def get_user_preference(key: str) -> Optional[str]:
         return None
 
 def set_user_preference(key: str, value: str) -> bool:
+<<<<<<< HEAD
     """
     Set a user preference value
     
@@ -503,6 +694,13 @@ def set_user_preference(key: str, value: str) -> bool:
         with _db_lock:
             with _db_manager._connect() as conn:
                 cursor = conn.cursor()
+=======
+    """Set a user preference value"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             cursor.execute('''
                 INSERT OR REPLACE INTO user_preferences (preference_key, preference_value, last_updated)
@@ -510,6 +708,10 @@ def set_user_preference(key: str, value: str) -> bool:
             ''', (key, value, datetime.now().isoformat()))
             
             conn.commit()
+<<<<<<< HEAD
+=======
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             return True
             
@@ -518,6 +720,7 @@ def set_user_preference(key: str, value: str) -> bool:
         return False
 
 def update_personality_state(emotional_state: str, mood_score: float, interaction_count: int) -> bool:
+<<<<<<< HEAD
     """
     Update Clever's personality state
     
@@ -546,6 +749,13 @@ def update_personality_state(emotional_state: str, mood_score: float, interactio
         with _db_lock:
             with _db_manager._connect() as conn:
                 cursor = conn.cursor()
+=======
+    """Update Clever's personality state"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             cursor.execute('''
                 INSERT OR REPLACE INTO personality_state 
@@ -554,6 +764,10 @@ def update_personality_state(emotional_state: str, mood_score: float, interactio
             ''', (emotional_state, mood_score, interaction_count, datetime.now().isoformat()))
             
             conn.commit()
+<<<<<<< HEAD
+=======
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             return True
             
@@ -562,6 +776,7 @@ def update_personality_state(emotional_state: str, mood_score: float, interactio
         return False
 
 def get_personality_state() -> Optional[Dict]:
+<<<<<<< HEAD
     """
     Retrieve Clever's current personality state
     
@@ -588,6 +803,17 @@ def get_personality_state() -> Optional[Dict]:
             
             cursor.execute('SELECT emotional_state, mood_score, interaction_count, last_updated FROM personality_state WHERE id = 1')
             result = cursor.fetchone()
+=======
+    """Get Clever's current personality state"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+            
+            cursor.execute('SELECT emotional_state, mood_score, interaction_count, last_updated FROM personality_state WHERE id = 1')
+            result = cursor.fetchone()
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             if result:
                 return {
@@ -604,6 +830,7 @@ def get_personality_state() -> Optional[Dict]:
         return None
 
 def log_system_metric(metric_name: str, metric_value: float, metric_data: Dict = None) -> bool:
+<<<<<<< HEAD
     """
     Log a system performance or behavior metric
     
@@ -632,6 +859,13 @@ def log_system_metric(metric_name: str, metric_value: float, metric_data: Dict =
         with _db_lock:
             with _db_manager._connect() as conn:
                 cursor = conn.cursor()
+=======
+    """Log a system metric"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             cursor.execute('''
                 INSERT INTO system_metrics (metric_name, metric_value, metric_data, timestamp)
@@ -644,6 +878,10 @@ def log_system_metric(metric_name: str, metric_value: float, metric_data: Dict =
             ))
             
             conn.commit()
+<<<<<<< HEAD
+=======
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             return True
             
@@ -652,6 +890,7 @@ def log_system_metric(metric_name: str, metric_value: float, metric_data: Dict =
         return False
 
 def get_database_stats() -> Dict[str, Any]:
+<<<<<<< HEAD
     """
     Retrieve comprehensive database statistics
     
@@ -675,6 +914,13 @@ def get_database_stats() -> Dict[str, Any]:
         with _db_lock:
             with _db_manager._connect() as conn:
                 cursor = conn.cursor()
+=======
+    """Get database statistics"""
+    try:
+        with _db_lock:
+            conn = sqlite3.connect("clever.db")
+            cursor = conn.cursor()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             
             stats = {}
             
@@ -688,16 +934,29 @@ def get_database_stats() -> Dict[str, Any]:
                 except:
                     stats[f'{table}_count'] = 0
             
+<<<<<<< HEAD
             # Database file size using centralized config
             import os
             if os.path.exists(config.DB_PATH):
                 stats['database_size_mb'] = os.path.getsize(config.DB_PATH) / (1024 * 1024)
             
+=======
+            # Database file size
+            import os
+            if os.path.exists("clever.db"):
+                stats['database_size_mb'] = os.path.getsize("clever.db") / (1024 * 1024)
+            
+            conn.close()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             return stats
             
     except Exception as e:
         print(f"Failed to get database stats: {e}")
         return {}
 
+<<<<<<< HEAD
 # Initialize database on import - no parameters needed, uses config.DB_PATH
+=======
+# Initialize database on import
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 init_db()

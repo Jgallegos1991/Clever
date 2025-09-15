@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # nlp_processor.py — Clever (offline-first, Jay-only)
 # Lazy singleton loader for spaCy; robust fallbacks;
 # tiny LRU cache for quick hits.
@@ -7,21 +8,50 @@
 # documentation, and workflow rules.
 # All code must follow these standards.
 
+=======
+"""
+NLP Processor Module - Local natural language processing for Clever AI.
+
+Why: Provides offline-first NLP capabilities including sentiment analysis,
+     keyword extraction, and entity recognition using local spaCy models
+     without any external API calls or fallback dependencies.
+
+Where: Used by persona engine, knowledge base search, evolution engine,
+       and any component requiring text analysis and language processing.
+
+How: Implements singleton spaCy model loading with thread safety, LRU caching
+     for performance, and structured NLP result objects for consistent data flow.
+"""
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 from __future__ import annotations
 
 import threading
 from functools import lru_cache
 from types import SimpleNamespace
+<<<<<<< HEAD
 from typing import List, Iterable
 import spacy  # Required dependency - no fallbacks
 from textblob import TextBlob  # Required dependency - no fallbacks
 from spacy.language import Language
 
 # Thread-safe spaCy singleton - Full potential operation
+=======
+from typing import List, Iterable, Optional, TYPE_CHECKING
+
+# Required dependencies - no fallbacks per architecture standards
+import spacy
+from textblob import TextBlob
+
+if TYPE_CHECKING:
+    from spacy.language import Language
+
+# Lazy, thread-safe singleton for spaCy
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 _NLP = None
 _NLP_LOCK = threading.Lock()
 _SPACY_MODEL_NAME = "en_core_web_sm"
 
+<<<<<<< HEAD
 # Stopwords for keyword filtering
 _STOPWORDS = set(
     """
@@ -85,10 +115,26 @@ def _load_spacy() -> Language:
     Connects to:
         - spacy: Core NLP library for language processing
         - Threading: Ensures thread-safe singleton pattern
+=======
+
+def _load_spacy() -> "Language":
+    """
+    Load spaCy model once with thread-safe lazy initialization.
+    
+    Why: Provides efficient spaCy model loading with singleton pattern to avoid
+         repeated model loading overhead while maintaining thread safety.
+    
+    Where: Called internally by NLP processing functions when spaCy analysis
+           is required for sentiment, entities, or language processing.
+    
+    How: Uses double-checked locking pattern for thread-safe initialization,
+         loads English model with optimized pipeline configuration.
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     """
     global _NLP
     if _NLP is not None:
         return _NLP
+<<<<<<< HEAD
 
     with _NLP_LOCK:
         if _NLP is not None:
@@ -147,6 +193,109 @@ def _keywords_spacy(doc) -> List[str]:
             seen.add(keyword)
             deduped.append(keyword)
 
+=======
+    
+    with _NLP_LOCK:
+        if _NLP is not None:
+            return _NLP
+        
+        # Load English model with optimized pipeline 
+        _NLP = spacy.load(_SPACY_MODEL_NAME, disable=["tagger", "lemmatizer"])
+        
+        # Ensure sentencizer for sentence boundaries
+        if "senter" not in _NLP.pipe_names and "sentencizer" not in _NLP.pipe_names:
+            _NLP.add_pipe("sentencizer")
+            
+        return _NLP
+
+
+# ---- Keyword extraction --------------------------------------------------------------------------
+
+_STOPWORDS = set(
+    """
+    a an and are as at be but by for if in into is it of on or such that the their then there these they this to was were will with you your i we our us from about over under again very
+    """.split()
+)
+
+
+def _normalize_token(t: str) -> str:
+    """
+    Normalize token by converting to lowercase and filtering special characters.
+    
+    Why: Provides consistent token normalization for keyword extraction and
+         text analysis, ensuring reliable comparison and deduplication.
+    
+    Where: Used internally by keyword extraction and token processing functions
+           to standardize text tokens before analysis and counting.
+    
+    How: Strips whitespace, converts to lowercase, and retains only alphanumeric
+         characters plus hyphens and underscores for clean token representation.
+    """
+    t = t.strip().lower()
+    return "".join(ch for ch in t if ch.isalnum() or ch in ("-", "_"))
+
+
+def _top_tokens(tokens: Iterable[str], k: int = 8) -> List[str]:
+    from collections import Counter
+
+    toks = [
+        _normalize_token(t)
+        for t in tokens
+        if t and len(t) > 2 and _normalize_token(t) not in _STOPWORDS
+    ]
+    counts = Counter(toks)
+    out = [w for w, _ in counts.most_common(k)]
+    # keep order stable but deduplicated
+    seen, ordered = set(), []
+    for w in toks:
+        if w in counts and w not in seen:
+            seen.add(w)
+            ordered.append(w)
+        if len(ordered) >= k:
+            break
+    # prefer frequency top but maintain first-appearance flavor
+    merged = []
+    for w in out + ordered:
+        if w and w not in merged:
+            merged.append(w)
+        if len(merged) >= k:
+            break
+    return merged
+
+
+def _keywords_spacy(doc) -> List[str]:
+    # Prefer entities and noun chunks (ideas ≈ “things”) with minimal work.
+    kws = []
+
+    # Entities
+    try:
+        for ent in getattr(doc, "ents", []):
+            text = _normalize_token(ent.text)
+            if text and text not in _STOPWORDS and len(text) > 2:
+                kws.append(text)
+    except Exception:
+        pass
+
+    # Noun chunks
+    try:
+        for nc in getattr(doc, "noun_chunks", []):
+            text = _normalize_token(nc.text)
+            if text and text not in _STOPWORDS and len(text) > 2:
+                kws.append(text)
+    except Exception:
+        # Some pipelines won’t have noun_chunks when tagger is disabled
+        pass
+
+    # Fallback to high-signal tokens
+    toks = [t.text for t in doc if not t.is_space]
+    kws.extend(_top_tokens(toks, k=8))
+    # Deduplicate, keep order
+    seen, deduped = set(), []
+    for k in kws:
+        if k not in seen:
+            seen.add(k)
+            deduped.append(k)
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     return deduped[:10]
 
 
@@ -159,6 +308,7 @@ def _keywords_fallback(text: str) -> List[str]:
     return _top_tokens(toks, k=8)
 
 
+<<<<<<< HEAD
 # ---- Sentiment ------------------------------------------------------------
 
 
@@ -177,24 +327,37 @@ def _sentiment(text: str) -> float:
         - persona.py: Persona response mood inference
         - evolution_engine.py: Learning from interaction sentiment
     """
+=======
+# ---- Sentiment -----------------------------------------------------------------------------------
+
+def _sentiment(text: str) -> float:
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     if not text:
         return 0.0
     if TextBlob is None:
         return 0.0
     try:
         # Range is [-1.0, 1.0]
+<<<<<<< HEAD
         blob = TextBlob(text)
         sentiment = getattr(blob, 'sentiment', None)
         polarity = getattr(sentiment, 'polarity', None)
         if polarity is not None:
             return float(polarity)
         return 0.0
+=======
+        return float(TextBlob(text).sentiment.polarity)
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     except Exception:
         return 0.0
 
 
+<<<<<<< HEAD
 # ---- Public Processor ------------------------------------------------------
 
+=======
+# ---- Public Processor ----------------------------------------------------------------------------
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 class _NLPProcessor:
     """Small façade with a stable, testable API."""
@@ -209,6 +372,7 @@ class _NLPProcessor:
 
     @lru_cache(maxsize=256)
     def _quick_cache(self, text: str) -> SimpleNamespace:
+<<<<<<< HEAD
         """Cache processing results for short, frequently used inputs."""
         return self._process_uncached(text)
 
@@ -224,16 +388,30 @@ class _NLPProcessor:
         Returns:
             SimpleNamespace with keywords (List[str]) and sentiment (float)
         """
+=======
+        return self._process_uncached(text)
+
+    def process(self, text: str) -> SimpleNamespace:
+        """Return SimpleNamespace(keywords: List[str], sentiment: float)."""
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         text = (text or "").strip()
         if not text:
             return SimpleNamespace(keywords=[], sentiment=0.0)
 
+<<<<<<< HEAD
         # Cache short inputs for performance
+=======
+        # Cache very short inputs (common greetings/quick hits).
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if len(text) <= 120:
             return self._quick_cache(text)
 
         return self._process_uncached(text)
 
+<<<<<<< HEAD
+=======
+    # ---- internals ----
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def _process_uncached(self, text: str) -> SimpleNamespace:
         nlp = self._ensure()
         if nlp is not None:
@@ -252,6 +430,7 @@ class _NLPProcessor:
 # Singleton export used by the app
 nlp_processor = _NLPProcessor()
 
+<<<<<<< HEAD
 
 # Public class alias for external imports
 class UnifiedNLPProcessor(_NLPProcessor):
@@ -276,3 +455,16 @@ class UnifiedNLPProcessor(_NLPProcessor):
 
 # Singleton export for application use - full potential operation
 nlp_processor = UnifiedNLPProcessor()
+=======
+# Public class alias for external imports
+class UnifiedNLPProcessor(_NLPProcessor):
+    """Public interface to the NLP processor. Alias for _NLPProcessor."""
+    
+    def __init__(self) -> None:
+        super().__init__()
+    
+    @property
+    def nlp(self):
+        """Provide access to the underlying spaCy model for compatibility checks."""
+        return self._ensure()
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
