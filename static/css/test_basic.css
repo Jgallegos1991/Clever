@@ -1,0 +1,4 @@
+/* test_basic.css - CSP-compliant styles for diagnostic page */
+body { background:#111; color:#00ff88; font-family: monospace; padding:20px; }
+h1 { margin-top:0; }
+.ok { color:#00ff88; }

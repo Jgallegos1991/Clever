@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clever AI</title>
+    <style>
+        body { 
+            background: #0a0a0a; 
+            color: #00ff88; 
+            font-family: 'Courier New', monospace; 
+            margin: 0;
+            overflow: hidden;
+        }
+        .status { 
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.7; } 
+        }
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="status">
+        <h2>Clever AI</h2>
+        <p>Status: <span id="system-status">Starting...</span></p>
+        <p>Particles: <span id="particle-count">0</span></p>
+    </div>
+    
+    <canvas id="particles"></canvas>
+    
+    <script>
+        // Update status immediately
+        document.getElementById('system-status').textContent = 'Online ✓';
+        
+        // Setup canvas
+        var canvas = document.getElementById('particles');
+        var ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Create particles
+        var particles = [];
+        for (var i = 0; i < 25; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                dx: (Math.random() - 0.5) * 3,
+                dy: (Math.random() - 0.5) * 3,
+                size: Math.random() * 2 + 1
+            });
+        }
+        
+        // Update particle count
+        document.getElementById('particle-count').textContent = particles.length;
+        
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff88';
+            
+            particles.forEach(function(p) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                p.x += p.dx;
+                p.y += p.dy;
+                
+                // Bounce off edges
+                if (p.x > canvas.width || p.x < 0) p.dx *= -1;
+                if (p.y > canvas.height || p.y < 0) p.dy *= -1;
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Start animation
+        animate();
+        console.log('Clever AI particles system started successfully!');
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+2025-09-09 06:38:23,685 |     INFO | clever_ai | setup_logging:91 | 🐛 Clever AI Debug System Initialized
+2025-09-09 06:38:23,685 |     INFO | clever_ai | setup_logging:92 | Session ID: 20250909_063823
+2025-09-09 06:38:23,685 |     INFO | clever_ai | setup_logging:93 | Debug Level: INFO
+2025-09-09 06:38:23,685 |     INFO | clever_ai | info:108 | [HEALTH_MONITOR] System Health Monitor initialized
+2025-09-09 06:38:23,685 |     INFO | clever_ai | info:108 | [ERROR_RECOVERY] Error Recovery System initialized
+2025-09-09 06:38:23,686 |     INFO | clever_ai | info:108 | [TEST_SUITE] Clever Test Suite initialized
+2025-09-09 06:38:23,686 |     INFO | clever_ai | info:108 | [APP] Debug and monitoring systems initialized
+2025-09-09 06:38:23,687 |     INFO | clever_ai | info:108 | [APP] Clever AI configured for: Jay (lapirfta@gmail.com)
+2025-09-09 06:38:23,872 |     INFO | clever_ai | info:108 | [APP] NLP processor initialized successfully
