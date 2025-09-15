@@ -3,18 +3,23 @@ Knowledge Base Module - Centralized data management for Clever AI
 
 Why: Provides advanced database operations beyond basic DatabaseManager including
 chat history, knowledge sources, content chunks, user preferences, and personality
-state management. Enables Clever to build comprehensive memory and learning.
-Where: Used by app.py for chat interactions, evolution_engine for learning,
-and sync modules for knowledge ingestion. Acts as high-level database API.
+state management. Enables Clever to build comprehensive memory and learning
+capabilities while maintaining thread-safe operations and single database architecture.
+Where: Used by app.py for chat interactions, evolution_engine for learning analysis,
+sync modules for knowledge ingestion, and persona.py for context retrieval. Acts as
+high-level database API layer above DatabaseManager for specialized Clever operations.
 How: Extends DatabaseManager functionality with specialized tables and operations
-for Clever's specific data needs while maintaining single database architecture.
+for Clever's specific data needs including interaction logging, content search,
+preference management, and personality tracking using centralized DB_PATH configuration.
 
 Connects to:
     - database.py: Uses centralized DatabaseManager for all database operations
-    - config.py: Uses DB_PATH for single database configuration
-    - app.py: Chat history logging and user preference management
-    - evolution_engine.py: Knowledge storage and personality state tracking
-    - sync modules: Knowledge source and content chunk management
+    - config.py: Uses DB_PATH for single database configuration  
+    - app.py: Chat history logging, context retrieval, and user preference management
+    - evolution_engine.py: Knowledge storage, interaction analysis, and personality state tracking
+    - persona.py: Context building and knowledge-aware response generation
+    - sync modules: Knowledge source registration and content chunk management
+    - nlp_processor.py: Stores processed keywords, entities, and analysis results
 """
 
 import json
@@ -60,8 +65,8 @@ def init_db() -> bool:
             # Use DatabaseManager's connection for table creation
             with _db_manager._connect() as conn:
                 cursor = conn.cursor()
-            
-            # Create interactions table for chat history
+                
+                # Create interactions table for chat history
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS interactions (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
