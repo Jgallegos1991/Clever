@@ -8,6 +8,9 @@ INVENTORY_PATH = REPO_ROOT / "file-inventory.md"
 
 
 def get_file_stats():
+<<<<<<< HEAD
+    """Collect file extension stats: count, lines of code, and size."""
+=======
     """
     Collect comprehensive file extension statistics across repository.
     
@@ -21,6 +24,7 @@ def get_file_stats():
     Returns:
         defaultdict: Statistics dict with count, LOC, and size per extension
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     stats = defaultdict(lambda: {'count': 0, 'loc': 0, 'size': 0})
     for root, dirs, files in os.walk(REPO_ROOT):
         for fname in files:
@@ -33,7 +37,10 @@ def get_file_stats():
             except Exception:
                 size = 0
                 lines = 0
+<<<<<<< HEAD
+=======
                 raise  # Re-raise to maintain visibility of errors
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             stats[ext]['count'] += 1
             stats[ext]['loc'] += lines
             stats[ext]['size'] += size
@@ -41,6 +48,9 @@ def get_file_stats():
 
 
 def get_last_modified():
+<<<<<<< HEAD
+    """Get last modified date for each file."""
+=======
     """
     Extract last modification timestamps for all repository files.
     
@@ -54,6 +64,7 @@ def get_last_modified():
     Returns:
         dict: Mapping of file paths to ISO-formatted modification timestamps
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     mod_dates = {}
     for root, dirs, files in os.walk(REPO_ROOT):
         for fname in files:
@@ -65,11 +76,17 @@ def get_last_modified():
                 ).isoformat()
             except Exception:
                 mod_dates[fpath] = 'N/A'
+<<<<<<< HEAD
+=======
                 raise  # Re-raise to maintain error visibility
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     return mod_dates
 
 
 def generate_inventory():
+<<<<<<< HEAD
+    """Generate markdown file inventory."""
+=======
     """
     Generate comprehensive markdown file inventory report for repository.
     
@@ -80,6 +97,7 @@ def generate_inventory():
     How: Combines file statistics and modification data, formats as markdown
          table, writes to inventory file with timestamp and structured sections.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     stats = get_file_stats()
     mod_dates = get_last_modified()
     lines = [

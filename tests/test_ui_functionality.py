@@ -10,6 +10,9 @@ from typing import List, Dict, Any
 
 
 class UITooltipTests:
+<<<<<<< HEAD
+    """Test UI tooltip consistency and accessibility without external dependencies"""
+=======
     """
     Comprehensive UI tooltip testing system for Clever AI interface validation.
     
@@ -20,12 +23,16 @@ class UITooltipTests:
     How: Parses HTML templates using regex, extracts button elements,
          validates tooltip attributes, and checks accessibility compliance.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     
     def __init__(self):
         self.templates_dir = Path(__file__).resolve().parents[1] / 'templates'
         self.test_results = []
     
     def run_all_tooltip_tests(self) -> Dict[str, Any]:
+<<<<<<< HEAD
+        """Run all tooltip-related tests"""
+=======
         """
         Execute comprehensive tooltip test suite and aggregate results.
         
@@ -39,6 +46,7 @@ class UITooltipTests:
         Returns:
             Dict[str, Any]: Comprehensive test results with status and details
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         tests = [
             ('button_tooltips_exist', self.test_button_tooltips_exist),
             ('tooltip_consistency', self.test_tooltip_consistency),
@@ -286,6 +294,9 @@ class UITooltipTests:
 
 
 def run_ui_tooltip_tests() -> Dict[str, Any]:
+<<<<<<< HEAD
+    """Run UI tooltip tests and return results"""
+=======
     """
     Execute UI tooltip validation tests and return structured results.
     
@@ -299,6 +310,7 @@ def run_ui_tooltip_tests() -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: Complete test results including pass/fail status
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     test_runner = UITooltipTests()
     return test_runner.run_all_tooltip_tests()
 

@@ -22,7 +22,10 @@ import sys
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+<<<<<<< HEAD
+=======
 import config
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 # Configure logging
 logging.basicConfig(
@@ -32,6 +35,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class SyncEventHandler(FileSystemEventHandler):
+<<<<<<< HEAD
+    """Handles file system events in sync directories"""
+    
+    def __init__(self):
+=======
     """
     File system event handler for automatic ingestion of sync directory changes.
     
@@ -53,6 +61,7 @@ class SyncEventHandler(FileSystemEventHandler):
         How: Configures debounce timing, imports FileIngestor, and initializes
              with the configured sync directory from config.SYNC_DIR.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         self.last_trigger = 0
         self.debounce_seconds = 2  # Prevent rapid-fire ingestion
         # Direct ingestion via FileIngestor
@@ -61,6 +70,9 @@ class SyncEventHandler(FileSystemEventHandler):
         self.ingestor = FileIngestor(base_dir=config.SYNC_DIR)
         
     def on_any_event(self, event):
+<<<<<<< HEAD
+        """React to any file system event"""
+=======
         """
         Process any file system event with intelligent filtering and debouncing.
         
@@ -71,6 +83,7 @@ class SyncEventHandler(FileSystemEventHandler):
         How: Filters out directories and temporary files, applies debouncing to
              prevent rapid-fire triggers, then initiates ingestion for valid files.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if event.is_directory:
             return
         # Debounce rapid events
@@ -87,6 +100,9 @@ class SyncEventHandler(FileSystemEventHandler):
         self.trigger_ingestion(src)
         
     def trigger_ingestion(self, file_path):
+<<<<<<< HEAD
+        """Trigger ingestion endpoint on Flask server"""
+=======
         """
         Execute direct file ingestion with comprehensive error handling.
         
@@ -100,6 +116,7 @@ class SyncEventHandler(FileSystemEventHandler):
         Args:
             file_path: Path to the file that triggered the ingestion event
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         try:
             status = self.ingestor.ingest_file(file_path)
             if status in ("inserted", "updated"):
@@ -108,6 +125,16 @@ class SyncEventHandler(FileSystemEventHandler):
                 logger.info(f"No ingestion needed for {file_path} (status: {status})")
         except Exception as e:
             logger.error(f"Error during ingestion of {file_path}: {e}")
+<<<<<<< HEAD
+
+def main():
+    """Main function to set up watchers and start monitoring"""
+    
+    # Get configuration from environment
+    clever_sync_dir = os.getenv('CLEVER_SYNC_DIR', './Clever_Sync')
+    synaptic_hub_sync_dir = os.getenv('SYNAPTIC_HUB_SYNC_DIR', './synaptic_hub_sync')
+    flask_url = os.getenv('FLASK_URL', 'http://localhost:5000')
+=======
             raise  # Re-raise instead of swallowing the exception
 
 def main():
@@ -125,6 +152,7 @@ def main():
     # Get configuration from config.py
     clever_sync_dir = config.SYNC_DIR
     synaptic_hub_sync_dir = config.SYNAPTIC_HUB_DIR
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     
     # Convert to Path objects and check if they exist
     sync_dirs = []

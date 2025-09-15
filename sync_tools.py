@@ -1,3 +1,21 @@
+<<<<<<< HEAD
+"""
+Clever sync tools for local file monitoring and ingestion
+
+Why: Provides real-time file monitoring and ingestion capabilities for
+Clever's knowledge base, ensuring continuous learning from new content
+Where: Used by sync_watcher and file ingestion pipeline
+How: Implements file system monitoring with watchdog, content ingestion
+via DatabaseManager, and PDF/text processing integration
+
+Connects to:
+    - sync_watcher.py: File system monitoring daemon
+    - file_ingestor.py: Text file processing and ingestion
+    - pdf_ingestor.py: PDF content extraction and ingestion  
+    - database.py: Centralized content storage via DatabaseManager
+"""
+=======
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 from __future__ import annotations
 
 import subprocess
@@ -8,6 +26,26 @@ import config
 
 def run_rclone_sync(src: str, dst: str, extra: str | None = None) -> Tuple[int, str, str]:
     """
+<<<<<<< HEAD
+    Run rclone sync operation for cloud file synchronization
+    
+    Why: Enables synchronized file operations between local and remote storage
+    while maintaining offline-first operation principles
+    Where: Called by sync workflows when cloud sync is enabled
+    How: Executes rclone subprocess with configured parameters and safety flags
+    
+    Args:
+        src: Source path for synchronization
+        dst: Destination path for synchronization  
+        extra: Additional rclone flags and parameters
+        
+    Returns:
+        Tuple of (return_code, stdout, stderr) from rclone execution
+        
+    Connects to:
+        - config.py: Uses RCLONE_EXTRA configuration settings
+        - sync_watcher.py: File change detection triggers
+=======
     Execute rclone sync operation with comprehensive error handling.
     
     Why: Provides robust cloud storage synchronization with standardized
@@ -25,6 +63,7 @@ def run_rclone_sync(src: str, dst: str, extra: str | None = None) -> Tuple[int, 
         
     Returns:
         Tuple[int, str, str]: (returncode, stdout, stderr) from rclone execution
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     """
     args = [
         "rclone",
@@ -44,6 +83,13 @@ def run_rclone_sync(src: str, dst: str, extra: str | None = None) -> Tuple[int, 
         proc = subprocess.run(args, capture_output=True, text=True)
         return proc.returncode, proc.stdout, proc.stderr
     except FileNotFoundError:
+<<<<<<< HEAD
+        # rclone not installed; remain offline-friendly
+        return 127, "", "rclone not installed"
+
+
+def sync_clever_from_remote() -> Tuple[int, str, str]:
+=======
         # Graceful handling if rclone is not installed
         return 127, "", "rclone not found: is it installed and in PATH?"
 
@@ -60,6 +106,7 @@ def sync_clever_from_remote() -> Tuple[int, str, str]:
     Returns:
         Tuple[int, str, str]: (returncode, stdout, stderr) from rclone operation
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     if not (config.RCLONE_REMOTE and config.RCLONE_SRC):
         return 2, "", "RCLONE_REMOTE/RCLONE_SRC not configured"
     src = f"{config.RCLONE_REMOTE}:{config.RCLONE_SRC}"
@@ -68,6 +115,8 @@ def sync_clever_from_remote() -> Tuple[int, str, str]:
 
 
 def sync_synaptic_from_remote() -> Tuple[int, str, str]:
+<<<<<<< HEAD
+=======
     """
     Sync Synaptic Hub data from remote cloud storage to local directory.
     
@@ -80,6 +129,7 @@ def sync_synaptic_from_remote() -> Tuple[int, str, str]:
     Returns:
         Tuple[int, str, str]: (returncode, stdout, stderr) from rclone sync
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     if not (config.RCLONE_REMOTE and config.RCLONE_DST):
         return 2, "", "RCLONE_REMOTE/RCLONE_DST not configured"
     src = f"{config.RCLONE_REMOTE}:{config.RCLONE_DST}"

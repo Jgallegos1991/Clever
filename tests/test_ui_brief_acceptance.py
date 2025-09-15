@@ -6,6 +6,8 @@ INDEX = ROOT / 'templates' / 'index.html'
 
 
 def test_index_has_core_elements():
+<<<<<<< HEAD
+=======
     """
     Validate presence of essential UI elements in the index template.
     
@@ -16,6 +18,7 @@ def test_index_has_core_elements():
     How: Parses index.html with BeautifulSoup, searches for specific
          elements by ID and class, asserts their existence.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     html = INDEX.read_text(encoding='utf-8')
     soup = BeautifulSoup(html, 'html.parser')
     # Particle canvas present
@@ -31,6 +34,15 @@ def test_index_has_core_elements():
 
 
 def test_assets_wired_locally():
+<<<<<<< HEAD
+    html = INDEX.read_text(encoding='utf-8')
+    assert "url_for('static', filename='style.css')" in html
+    assert "url_for('static', filename='js/holographic-chamber.js')" in html
+    assert "url_for('static', filename='js/core/app.js')" in html
+
+
+def test_microcopy_placeholders():
+=======
     """
     Verify all static assets are properly wired for local serving.
     
@@ -58,6 +70,7 @@ def test_microcopy_placeholders():
     How: Searches HTML content for specific placeholder text that
          matches the creative, ambient UI tone requirements.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     html = INDEX.read_text(encoding='utf-8')
     # Presence of placeholder copy that matches the brief tone
     assert 'Ambient creativity' in html or 'Your thought enters the flow' in html

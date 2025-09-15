@@ -1,4 +1,10 @@
 """
+<<<<<<< HEAD
+offline_guard.py — Enforce no-internet runtime for Clever.
+
+Blocks all outbound socket connections except loopback (127.0.0.1, ::1).
+Opt-in by importing and calling enable(). Safe to call multiple times.
+=======
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
 Offline Guard - Enforce strict no-internet runtime for Clever AI.
 
@@ -22,6 +28,7 @@ How: Monkey-patches Python socket module to intercept and block non-loopback
      connections, providing fine-grained network access control with opt-in
      activation and detection of network-related code references.
  main
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 """
 from __future__ import annotations
 
@@ -33,6 +40,8 @@ _orig_socket = socket.socket
 
 
 def _is_loopback(addr: Tuple[str, int]) -> bool:
+<<<<<<< HEAD
+=======
     """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
     Determine if an address is a local loopback connection.
@@ -62,6 +71,7 @@ def _is_loopback(addr: Tuple[str, int]) -> bool:
          localhost hostname, and IPv6 loopback (::1).
  main
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     host = addr[0]
     if host.startswith('127.'):
         return True
@@ -71,6 +81,9 @@ def _is_loopback(addr: Tuple[str, int]) -> bool:
 
 
 class _GuardedSocket(socket.socket):
+<<<<<<< HEAD
+    def connect(self, address):  # type: ignore[override]
+=======
     """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
     Socket wrapper that enforces offline-only operation by blocking external connections.
@@ -112,11 +125,14 @@ class _GuardedSocket(socket.socket):
              for external addresses, otherwise delegates to parent connect.
         """
  main
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if not _is_loopback(address):
             raise PermissionError(f"Outbound network blocked to {address}")
         return super().connect(address)
 
     def connect_ex(self, address):  # type: ignore[override]
+<<<<<<< HEAD
+=======
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
         """Attempt connection to address, returning error code for non-loopback addresses."""
 
@@ -133,12 +149,15 @@ class _GuardedSocket(socket.socket):
              otherwise delegates to parent connect_ex method.
         """
  main
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if not _is_loopback(address):
             return 111  # ECONNREFUSED-like
         return super().connect_ex(address)
 
 
 def enable() -> None:
+<<<<<<< HEAD
+=======
     """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
     Enable offline guard by patching global socket to block external connections.
@@ -162,6 +181,7 @@ def enable() -> None:
          to prevent duplicate activation, safe to call multiple times.
  main
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     global _ENABLED
     if _ENABLED:
         return
@@ -170,6 +190,8 @@ def enable() -> None:
 
 
 def disable() -> None:
+<<<<<<< HEAD
+=======
     """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
     Disable offline guard by restoring original socket functionality.
@@ -193,6 +215,7 @@ def disable() -> None:
          safe to call multiple times and when already disabled.
  main
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     global _ENABLED
     if not _ENABLED:
         return
@@ -201,6 +224,8 @@ def disable() -> None:
 
 
 def is_enabled() -> bool:
+<<<<<<< HEAD
+=======
     """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
     Check if offline guard is currently active and blocking external connections.
@@ -227,10 +252,14 @@ def is_enabled() -> bool:
          and network connections are being filtered.
  main
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     return _ENABLED
 
 
 def contains_network_reference(text: str) -> bool:
+<<<<<<< HEAD
+    """Check if text contains network/internet references that should be blocked"""
+=======
     """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
     Analyze text content for network/internet references that violate offline-first principles.
@@ -260,6 +289,7 @@ def contains_network_reference(text: str) -> bool:
          in text content using case-insensitive pattern matching.
  main
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     network_terms = [
         'http://', 'https://', 'www.', '.com', '.org', '.net',
         'fetch(', 'axios', 'request', 'download', 'upload',

@@ -15,6 +15,8 @@ spec.loader.exec_module(clever_app)
 
 @pytest.fixture(autouse=True)
 def app_client(monkeypatch):
+<<<<<<< HEAD
+=======
     """
     Set up Flask test client with isolated database for testing.
     
@@ -31,6 +33,7 @@ def app_client(monkeypatch):
     Yields:
         Flask test client configured for isolated testing
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     # Force DEBUG off for tests
     monkeypatch.setenv('FLASK_ENV', 'testing')
 
@@ -45,6 +48,8 @@ def app_client(monkeypatch):
 
 
 def test_health(app_client):
+<<<<<<< HEAD
+=======
     """
     Test health endpoint functionality and response structure validation.
     
@@ -55,6 +60,7 @@ def test_health(app_client):
     How: Makes GET request to /health, validates HTTP 200 response,
          checks for valid status fields in both minimal and structured formats.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     r = app_client.get('/health')
     assert r.status_code == 200
     data = r.get_json()
@@ -65,6 +71,8 @@ def test_health(app_client):
 
 
 def test_index(app_client):
+<<<<<<< HEAD
+=======
     """
     Test main index page loads correctly with expected content.
     
@@ -75,12 +83,15 @@ def test_index(app_client):
     How: Makes GET request to root path, validates HTTP 200 status
          and confirms "Clever" text appears in response content.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     r = app_client.get('/')
     assert r.status_code == 200
     assert b'Clever' in r.data
 
 
 def test_chat_happy(app_client):
+<<<<<<< HEAD
+=======
     """
     Test successful chat interaction with valid message input.
     
@@ -91,6 +102,7 @@ def test_chat_happy(app_client):
     How: Posts valid chat message, validates HTTP 200 response,
          checks for required response and analysis fields in JSON output.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     r = app_client.post('/chat', json={'message': 'hey clever?'})
     assert r.status_code == 200
     data = r.get_json()
@@ -103,6 +115,8 @@ def test_chat_happy(app_client):
 
 
 def test_chat_bad_request(app_client):
+<<<<<<< HEAD
+=======
     """
     Test chat endpoint error handling with invalid empty message input.
     
@@ -113,11 +127,14 @@ def test_chat_bad_request(app_client):
     How: Posts empty message to chat endpoint, validates HTTP 400
          status indicating proper client error response handling.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     r = app_client.post('/chat', json={'message': ''})
     assert r.status_code == 400
 
 
 def test_ingest_form(app_client):
+<<<<<<< HEAD
+=======
     """
     Test form submission functionality for ingestion endpoint.
     
@@ -128,6 +145,7 @@ def test_ingest_form(app_client):
     How: Posts form data to /ingest endpoint, validates HTTP 200
          response and success message format in JSON response.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     r = app_client.post('/ingest', data={'name': 'jay'})
     assert r.status_code == 200
     data = r.get_json()

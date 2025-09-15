@@ -2,7 +2,11 @@ import os
 import json
 import hashlib
 import time
+<<<<<<< HEAD
+import pypdf as PyPDF2  # Import pypdf with PyPDF2 alias for compatibility
+=======
 import PyPDF2
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 import re
 
 # --- CHANGE 1: Import the shared instances and config ---
@@ -13,6 +17,53 @@ import config
 
 class FileIngestor:
     """
+<<<<<<< HEAD
+    FileIngestor class for ingesting files and extracting knowledge
+
+    Why: Ensures Clever is resilient, adaptive, and nearly invisible—always
+    operating in the background, never cutting short on capability, and ready
+    to evolve with the user. Centralizes file ingestion logic for robust,
+    automated knowledge extraction and database updates.
+    Where: Connects to shared DatabaseManager (db_manager), NLP processor
+    (nlp_processor), and evolution engine (get_evolution_engine).
+    How: Walks through files in a directory, processes each file (PDF/text),
+    extracts content and metadata, performs NLP analysis, and updates the
+    database. Triggers evolution learning for meaningful content, all while
+    maintaining seamless, resilient operation.
+
+    Connects to:
+        - database.py: Uses db_manager for database operations
+        - nlp_processor.py: Uses nlp_processor for NLP analysis
+        - evolution_engine.py: Triggers evolution learning
+        - config.py: Uses config for directory paths
+    """
+    def __init__(self, base_dir):
+        """
+        Initialize FileIngestor with a base directory
+        
+        Why: Sets up the ingestion root for scanning files
+        Where: Used by ingest_all_files and main script entry
+        How: Expands user path, checks directory existence, stores path
+        
+        Args:
+            base_dir: Path to the directory to ingest
+        """
+        self.base_dir = os.path.expanduser(base_dir)
+        if not os.path.isdir(self.base_dir):
+            print(
+                f"Warning: Ingestion directory not found at '{self.base_dir}'"
+            )
+            
+    def ingest_all_files(self):
+        """
+        Walk through the base directory and ingest each file
+        
+    Why: Automates bulk ingestion for knowledge extraction and
+    database updates
+        Where: Entry point for file ingestion, called by main script
+    How: Recursively scans directory, processes each file, tracks status,
+    handles errors
+=======
     File processing and knowledge base ingestion system for Clever AI.
     
     Why: Converts various file formats into structured knowledge base entries
@@ -51,15 +102,22 @@ class FileIngestor:
                to populate knowledge base with existing file content.
         How: Walks directory tree, filters hidden files, processes each file
              through ingest_file, aggregates and reports processing statistics.
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """
         print(f"Starting ingestion process for directory: {self.base_dir}")
         inserted = updated = unchanged = failed = 0
         for root, _, files in os.walk(self.base_dir):
             for file in files:
+<<<<<<< HEAD
+                # Ignore hidden files like .DS_Store
+                if file.startswith('.'):
+                    continue
+=======
                 # We want to ignore hidden files like .DS_Store
                 if file.startswith('.'):
                     continue
                 
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                 file_path = os.path.join(root, file)
                 try:
                     status = self.ingest_file(file_path)
@@ -74,13 +132,36 @@ class FileIngestor:
                 except Exception as e:
                     print(f"Error ingesting {file_path}: {e}")
                     failed += 1
+<<<<<<< HEAD
+        print(
+            f"Ingestion complete. inserted={inserted} updated={updated} "
+            f"unchanged={unchanged} failed={failed}"
+=======
                     raise  # Re-raise to maintain error visibility
         print(
             f"Ingestion complete. inserted={inserted} updated={updated} unchanged={unchanged} failed={failed}"
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         )
     
     def ingest_file(self, file_path):
         """
+<<<<<<< HEAD
+        Ingest a single file and add its content to the database
+        
+        Why: Enables granular ingestion and knowledge extraction for each file
+        Where: Called by ingest_all_files for every file found
+    How: Checks file existence, extracts content (PDF/text), performs NLP,
+    computes hash, upserts to DB, triggers evolution learning
+        
+        Args:
+            file_path: Path to the file to ingest
+        Returns:
+            Status string: 'inserted', 'updated', 'unchanged', or 'failed'
+        Connects to:
+            - db_manager.add_or_update_source: Database upsert
+            - nlp_processor.process: NLP analysis
+            - get_evolution_engine().process_pdf_knowledge: Evolution learning
+=======
         Process single file for knowledge base ingestion with NLP analysis and metadata tracking.
         
         Why: Converts individual files into searchable knowledge base entries
@@ -95,19 +176,34 @@ class FileIngestor:
             
         Returns:
             str: Status of ingestion - "inserted", "updated", "unchanged", or "failed"
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """
         if not os.path.exists(file_path):
             print(f"File not found: {file_path}")
             return "failed"
+<<<<<<< HEAD
+=======
         
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         # Compute metadata early for quick-skip check
         filename = os.path.basename(file_path)
         size = os.path.getsize(file_path)
         modified_ts = os.path.getmtime(file_path)
 
+<<<<<<< HEAD
+    # Quick-skip: if DB has same size and mtime, assume unchanged
+    # (avoids read/hash)
+        existing = db_manager.get_source_by_path(file_path)
+        if (
+            existing
+            and existing.size == size
+            and existing.modified_ts == modified_ts
+        ):
+=======
         # Quick-skip: if DB has same size and mtime, assume unchanged (avoids read/hash)
         existing = db_manager.get_source_by_path(file_path)
         if existing and existing.size == size and existing.modified_ts == modified_ts:
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             print(f"unchanged: {filename} (fast-skip)")
             return "unchanged"
 
@@ -116,6 +212,29 @@ class FileIngestor:
         entities = []
         keywords = []
         
+<<<<<<< HEAD
+        try:
+            if filename.lower().endswith('.pdf'):
+                content, entities, keywords = self.process_pdf(file_path)
+            else:
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+                
+                # Basic NLP analysis for text files
+                if nlp_processor and content.strip():
+                    try:
+                        analysis = nlp_processor.process(content)
+                        if hasattr(analysis, '__dict__'):
+                            analysis_dict = vars(analysis)
+                            entities = analysis_dict.get('entities', [])
+                            keywords = analysis_dict.get('keywords', [])
+                    except Exception as e:
+                        print(f"NLP analysis failed for {filename}: {e}")
+                        
+        except Exception as e:
+            print(f"Error processing {file_path}: {e}")
+            return "failed"
+=======
         if filename.lower().endswith('.pdf'):
             content, entities, keywords = self.process_pdf(file_path)
         else:
@@ -129,6 +248,7 @@ class FileIngestor:
                     analysis_dict = vars(analysis)
                     entities = analysis_dict.get('entities', [])
                     keywords = analysis_dict.get('keywords', [])
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
         if not content.strip():
             print(f"No content extracted from {filename}")
@@ -172,6 +292,20 @@ class FileIngestor:
     
     def process_pdf(self, pdf_path):
         """
+<<<<<<< HEAD
+        Extract content, entities, and keywords from a PDF file
+        
+        Why: Enables knowledge extraction from PDF documents for ingestion
+        Where: Called by ingest_file for PDF files
+        How: Reads PDF pages, cleans text, performs NLP analysis for entities/keywords
+        
+        Args:
+            pdf_path: Path to the PDF file
+        Returns:
+            Tuple: (content, entities, keywords)
+        Connects to:
+            - nlp_processor.process: NLP analysis
+=======
         Extract and analyze content from PDF files with NLP processing.
         
         Why: Enables knowledge base ingestion from PDF documents with
@@ -186,19 +320,42 @@ class FileIngestor:
             
         Returns:
             Tuple[str, List, List]: (cleaned_content, entities, keywords)
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """
         content = ""
         entities = []
         keywords = []
+<<<<<<< HEAD
+        try:
+            with open(pdf_path, 'rb') as file:
+                reader = PyPDF2.PdfReader(file)
+=======
         
         try:
             with open(pdf_path, 'rb') as file:
                 reader = PyPDF2.PdfReader(file)
                 
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                 for page_num, page in enumerate(reader.pages):
                     page_text = page.extract_text()
                     if page_text.strip():
                         content += f"\n--- Page {page_num + 1} ---\n{page_text}"
+<<<<<<< HEAD
+                # Enhanced text cleaning
+                content = self.clean_pdf_text(content)
+                # Extract entities and keywords using NLP
+                if nlp_processor and content.strip():
+                    try:
+                        analysis = nlp_processor.process(content)
+                        if hasattr(analysis, '__dict__'):
+                            analysis_dict = vars(analysis)
+                            entities = analysis_dict.get('entities', [])
+                            keywords = analysis_dict.get('keywords', [])
+                    except Exception as e:
+                        print(f"NLP analysis failed for PDF: {e}")
+        except Exception as e:
+            print(f"PDF processing error: {e}")
+=======
                 
                 # Enhanced text cleaning
                 content = self.clean_pdf_text(content)
@@ -215,10 +372,34 @@ class FileIngestor:
             print(f"PDF processing error: {e}")
             raise  # Re-raise instead of swallowing
             
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         return content, entities, keywords
     
     def clean_pdf_text(self, text):
         """
+<<<<<<< HEAD
+        Clean and normalize PDF text for ingestion
+        
+        Why: Improves quality of extracted text for NLP and database storage
+        Where: Used by process_pdf after extracting raw text
+        How: Removes excessive whitespace, page markers, artifacts, normalizes line breaks
+        
+        Args:
+            text: Raw text extracted from PDF
+        Returns:
+            Cleaned and normalized text string
+        """
+        if not text:
+            return ""
+        # Remove excessive whitespace
+        text = re.sub(r'\s+', ' ', text)
+        # Remove page headers/footers patterns
+        text = re.sub(r'--- Page \d+ ---\s*', '\n\n', text)
+        # Remove common PDF artifacts
+        text = re.sub(r'[^\w\s.,!?;:()\[\]{}"\'-]', '', text)
+        # Normalize line breaks
+        text = re.sub(r'\n\s*\n', '\n\n', text)
+=======
         Normalize and clean extracted PDF text for consistent processing.
         
         Why: PDF text extraction often contains formatting artifacts and
@@ -249,6 +430,7 @@ class FileIngestor:
         # Normalize line breaks
         text = re.sub(r'\n\s*\n', '\n\n', text)
         
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         return text.strip()
 
 # --------------------------

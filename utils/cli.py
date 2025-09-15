@@ -9,6 +9,8 @@ from database import db_manager
 
 
 def cmd_ingest(path: Optional[str]):
+<<<<<<< HEAD
+=======
     """
     Execute file ingestion for specified path or default sync directory.
     
@@ -22,11 +24,14 @@ def cmd_ingest(path: Optional[str]):
     Args:
         path: Optional directory path to ingest, defaults to config.SYNC_DIR
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     p = path or config.SYNC_DIR
     FileIngestor(p).ingest_all_files()
 
 
 def cmd_list():
+<<<<<<< HEAD
+=======
     """
     Display list of all sources in the Clever AI knowledge base.
     
@@ -37,11 +42,14 @@ def cmd_list():
     How: Queries database manager for all sources, formats and prints
          tabular output with ID, filename, size, and path information.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     for s in db_manager.list_sources():
         print(f"{s.id}\t{s.filename}\t{s.size or len(s.content)}\t{s.path}")
 
 
 def cmd_search(query: str):
+<<<<<<< HEAD
+=======
     """
     Search knowledge base content for sources matching query string.
     
@@ -55,11 +63,14 @@ def cmd_search(query: str):
     Args:
         query: Search string to match against source content and metadata
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     for s in db_manager.search_sources(query):
         print(f"{s.id}\t{s.filename}\t{s.size or len(s.content)}\t{s.path}")
 
 
 def cmd_show(source_id: int, content: bool):
+<<<<<<< HEAD
+=======
     """
     Display detailed information for a specific source by ID.
     
@@ -74,6 +85,7 @@ def cmd_show(source_id: int, content: bool):
         source_id: Unique identifier for the source to display
         content: Whether to include full source content in output
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     s = db_manager.get_source(source_id)
     if not s:
         print("not found")
@@ -85,6 +97,8 @@ def cmd_show(source_id: int, content: bool):
 
 
 def main():
+<<<<<<< HEAD
+=======
     """
     Main CLI entry point with argument parsing and command dispatch.
     
@@ -95,6 +109,7 @@ def main():
     How: Sets up argparse with subcommands for ingest, list, search, show
          operations, parses arguments and dispatches to appropriate handlers.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     ap = argparse.ArgumentParser(prog="clever")
     sp = ap.add_subparsers(dest="cmd", required=True)
 

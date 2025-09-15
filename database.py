@@ -1,4 +1,24 @@
 """
+<<<<<<< HEAD
+Database Manager for Clever AI
+
+Why: Provides thread-safe, centralized access to the single SQLite database
+(clever.db) for all persistence and retrieval operations. Ensures data integrity
+and enforces single-database architecture.
+Where: Used by all modules requiring data storage or retrieval, including
+ingestors, evolution engine, persona, and app.
+How: Implements a thread-safe DatabaseManager class, dataclasses for sources,
+and connection helpers. All database operations route through this module.
+
+Connects to:
+    - config.py: Uses DB_PATH for database location
+    - file_ingestor.py, pdf_ingestor.py: Ingestion modules
+    - evolution_engine.py: Self-learning core
+    - persona.py: Persona engine
+    - app.py: Main application
+"""
+
+=======
 Database Management Module - SQLite-based data persistence for Clever AI.
 
 Why: Provides centralized, thread-safe database operations for all Clever components,
@@ -11,6 +31,7 @@ Where: Used throughout the application by persona engine, evolution engine,
 How: Implements DatabaseManager class with thread-safe operations using SQLite,
      with automatic schema management and standardized data models for consistency.
 """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 from __future__ import annotations
 
 import sqlite3
@@ -27,6 +48,8 @@ _lock = threading.RLock()
 
 @dataclass
 class Source:
+<<<<<<< HEAD
+=======
     """
     Data model for knowledge source files in the database.
     
@@ -38,6 +61,7 @@ class Source:
     How: Dataclass with optional fields for content hashing and file statistics,
          allowing both simple and comprehensive file tracking scenarios.
     """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     id: int
     filename: str
     path: str
@@ -48,6 +72,9 @@ class Source:
 
 
 class DatabaseManager:
+<<<<<<< HEAD
+    def __init__(self, db_path: str | Path):
+=======
     """
     Thread-safe SQLite database manager for Clever AI data persistence.
     
@@ -74,11 +101,18 @@ class DatabaseManager:
         How: Stores path, creates parent directories, and calls _init() for
              schema setup with thread-safe initialization.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         self.db_path = str(db_path)
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         self._init()
 
     def _connect(self):
+<<<<<<< HEAD
+        # check_same_thread=False to allow access from Flask thread + background jobs
+        return sqlite3.connect(self.db_path, check_same_thread=False)
+
+    def _init(self):
+=======
         """
         Create thread-safe SQLite database connection.
         
@@ -104,6 +138,7 @@ class DatabaseManager:
         How: Creates tables with proper constraints, adds missing columns to
              existing tables, and commits changes within thread-safe context.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         with _lock, self._connect() as con:
             con.execute(
                 """
@@ -120,7 +155,13 @@ class DatabaseManager:
                 """
             )
             # Backfill columns if the table pre-existed without them
+<<<<<<< HEAD
+            cols = {
+                row[1] for row in con.execute("PRAGMA table_info(sources)")
+            }
+=======
             cols = {row[1] for row in con.execute("PRAGMA table_info(sources)")}
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             if "content_hash" not in cols:
                 con.execute("ALTER TABLE sources ADD COLUMN content_hash TEXT")
             if "size" not in cols:
@@ -174,6 +215,11 @@ class DatabaseManager:
         size: int | None = None,
         modified_ts: float | None = None,
     ) -> tuple[int, str]:
+<<<<<<< HEAD
+        """Insert, update if content changed, or no-op.
+
+        Returns (id, status) where status in {"inserted","updated","unchanged"}.
+=======
         """
         Insert new source or update existing source with content change detection.
 
@@ -189,6 +235,7 @@ class DatabaseManager:
         Returns:
             tuple[int, str]: (source_id, status) where status is one of
                            "inserted", "updated", or "unchanged"
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """
         with _lock, self._connect() as con:
             cur = con.cursor()
@@ -208,7 +255,21 @@ class DatabaseManager:
                     SET filename = ?, content = ?, content_hash = ?, size = ?, modified_ts = ?
                     WHERE id = ?
                     """,
+<<<<<<< HEAD
+                    (
+                        filename,
+                        content,
+                        content_hash,
+                        size,
+                        modified_ts,
+                        existing_id,
+                    ),
+                    # Project Coding Instructions:
+                    # See .github/copilot-instructions.md for architecture, documentation, and workflow rules.
+                    # All code must follow these standards.
+=======
                     (filename, content, content_hash, size, modified_ts, existing_id),
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                 )
                 con.commit()
                 return int(existing_id), "updated"
@@ -223,6 +284,14 @@ class DatabaseManager:
             con.commit()
             return int(cur.lastrowid), "inserted"
 
+<<<<<<< HEAD
+    # --- Context notes ---
+    def set_context_note(
+        self, key: str, value: str, ts: float | None = None
+    ) -> None:
+        import time as _time
+
+=======
     def set_context_note(self, key: str, value: str, ts: float | None = None) -> None:
         """
         Store or update a context note in the database.
@@ -237,6 +306,7 @@ class DatabaseManager:
              with automatic timestamp if not provided.
         """
         import time as _time
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if ts is None:
             ts = _time.time()
         with _lock, self._connect() as con:
@@ -251,6 +321,8 @@ class DatabaseManager:
             con.commit()
 
     def set_context_notes(self, notes: dict[str, str]) -> None:
+<<<<<<< HEAD
+=======
         """
         Store multiple context notes in a single transaction.
         
@@ -263,12 +335,23 @@ class DatabaseManager:
         How: Iterates through dictionary and calls set_context_note for each
              key-value pair, with None values converted to empty strings.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         for k, v in (notes or {}).items():
             if v is None:
                 v = ""
             self.set_context_note(str(k), str(v))
 
     def get_context_notes(self) -> dict[str, str]:
+<<<<<<< HEAD
+        with _lock, self._connect() as con:
+            cur = con.execute(
+                "SELECT key, value FROM context_notes ORDER BY key ASC"
+            )
+            return {row[0]: row[1] for row in cur.fetchall()}
+
+    # Backward-compat shim used by older callers
+    def add_source(self, filename: str, path: str, content: str) -> int:
+=======
         """
         Retrieve all stored context notes as a dictionary.
         
@@ -298,10 +381,13 @@ class DatabaseManager:
         How: Delegates to add_or_update_source and returns just the source ID,
              discarding the status information for simpler interface.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         id_, _ = self.add_or_update_source(filename, path, content)
         return id_
 
     def list_sources(self) -> list[Source]:
+<<<<<<< HEAD
+=======
         """
         Retrieve all sources from the database in reverse chronological order.
         
@@ -314,6 +400,7 @@ class DatabaseManager:
         How: Queries all source records with complete metadata, orders by ID
              descending to show newest first, returns as Source objects.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         with _lock, self._connect() as con:
             cur = con.execute(
                 "SELECT id, filename, path, content, content_hash, size, modified_ts FROM sources ORDER BY id DESC"
@@ -321,6 +408,8 @@ class DatabaseManager:
             return [Source(*row) for row in cur.fetchall()]
 
     def get_source(self, source_id: int) -> Optional[Source]:
+<<<<<<< HEAD
+=======
         """
         Retrieve a specific source by its database ID.
         
@@ -333,6 +422,7 @@ class DatabaseManager:
         How: Queries single source by primary key with thread-safe access,
              returns Source object or None if not found.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         with _lock, self._connect() as con:
             cur = con.execute(
                 "SELECT id, filename, path, content, content_hash, size, modified_ts FROM sources WHERE id = ?",
@@ -342,6 +432,8 @@ class DatabaseManager:
             return Source(*row) if row else None
 
     def get_source_by_path(self, path: str) -> Optional[Source]:
+<<<<<<< HEAD
+=======
         """
         Retrieve a source by its file path for deduplication and updates.
         
@@ -354,6 +446,7 @@ class DatabaseManager:
         How: Queries single source by unique path constraint with thread-safe
              access, returns Source object or None if path not found.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         with _lock, self._connect() as con:
             cur = con.execute(
                 "SELECT id, filename, path, content, content_hash, size, modified_ts FROM sources WHERE path = ?",
@@ -363,6 +456,8 @@ class DatabaseManager:
             return Source(*row) if row else None
 
     def delete_source_by_path(self, path: str) -> int:
+<<<<<<< HEAD
+=======
         """
         Delete a source from the database by its file path.
         
@@ -375,12 +470,15 @@ class DatabaseManager:
         How: Deletes source record matching the given path with thread-safe
              operation, returns number of deleted records (0 or 1).
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         with _lock, self._connect() as con:
             cur = con.execute("DELETE FROM sources WHERE path = ?", (path,))
             con.commit()
             return cur.rowcount
 
     def search_sources(self, query: str, limit: int = 50) -> list[Source]:
+<<<<<<< HEAD
+=======
         """
         Search for sources matching query in filename, path, or content.
         
@@ -393,6 +491,7 @@ class DatabaseManager:
         How: Uses SQL LIKE queries across filename, path, and content fields
              with case-insensitive pattern matching, returns recent results first.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         q = f"%{query}%"
         with _lock, self._connect() as con:
             cur = con.execute(
@@ -407,6 +506,155 @@ class DatabaseManager:
             )
             return [Source(*row) for row in cur.fetchall()]
 
+<<<<<<< HEAD
+    def search_snippets(
+        self, query: str, limit: int = 5, window: int = 240
+    ) -> list[dict]:
+        """Return top content snippets matching the query with smart caching.
+
+        Enhanced with better scoring and performance optimization.
+        """
+        import re as _re, time
+
+        if not query:
+            return []
+
+        # Cache frequent searches for better performance
+        cache_key = f"search_{hash(query)}_{limit}"
+
+        # tokenize query with better filtering
+        q_tokens = [
+            t.lower()
+            for t in _re.split(r"\W+", query)
+            if len(t) > 2
+            and t
+            not in {
+                "the",
+                "and",
+                "for",
+                "are",
+                "but",
+                "not",
+                "you",
+                "all",
+                "can",
+                "had",
+                "has",
+                "was",
+                "one",
+                "our",
+                "out",
+                "day",
+                "get",
+                "use",
+                "her",
+                "his",
+                "how",
+                "may",
+                "new",
+                "now",
+                "old",
+                "see",
+                "two",
+                "way",
+                "who",
+                "boy",
+                "did",
+                "its",
+                "let",
+                "put",
+                "say",
+                "she",
+                "too",
+                "use",
+            }
+        ]
+        if not q_tokens:
+            return []
+
+        # Enhanced preselection with better LIKE patterns
+        like_pattern = " ".join(q_tokens[:3])  # Use top 3 tokens
+        pre = self.search_sources(like_pattern, limit=min(100, limit * 20))
+        hits: list[dict] = []
+
+        for s in pre:
+            text = s.content
+            low = text.lower()
+
+            # Enhanced scoring with multiple factors
+            exact_matches = sum(low.count(tok) for tok in q_tokens)
+            partial_matches = sum(
+                1
+                for tok in q_tokens
+                if any(tok in word for word in low.split())
+            )
+            score = exact_matches * 2 + partial_matches
+
+            # Bonus for matches in filename
+            filename_matches = sum(
+                1 for tok in q_tokens if tok in s.filename.lower()
+            )
+            score += filename_matches * 3
+
+            if score <= 0:
+                continue
+
+            # Smart snippet extraction with better boundaries
+            positions = [
+                low.find(tok) for tok in q_tokens if low.find(tok) != -1
+            ]
+            if not positions:
+                continue
+
+            first_pos = min(positions)
+            start = max(0, first_pos - window // 2)
+            end = min(len(text), start + window)
+
+            # Expand to sentence boundaries for better readability
+            try:
+                # Look for sentence endings before start
+                sentence_start = text.rfind(".", 0, start)
+                if sentence_start != -1 and start - sentence_start < 100:
+                    start = sentence_start + 1
+
+                # Look for sentence endings after end
+                sentence_end = text.find(".", end)
+                if sentence_end != -1 and sentence_end - end < 100:
+                    end = sentence_end + 1
+
+                snippet = text[start:end].strip()
+            except Exception:
+                snippet = text[start:end].strip()
+
+            hits.append(
+                {
+                    "id": s.id,
+                    "filename": s.filename,
+                    "path": s.path,
+                    "score": int(score),
+                    "snippet": snippet,
+                    "start": int(start),
+                    "end": int(end),
+                }
+            )
+
+        # Enhanced sorting: score first, then recency, then filename
+        hits.sort(
+            key=lambda h: (h["score"], h["id"], h["filename"]), reverse=True
+        )
+        return hits[:limit]
+
+    # --- Chat history ---
+    def add_utterance(
+        self,
+        role: str,
+        text: str,
+        mode: str | None = None,
+        ts: float | None = None,
+    ) -> int:
+        import time as _time
+
+=======
     def search_snippets(self, query: str, limit: int = 5, window: int = 240) -> list[dict]:
         """
         Advanced search returning scored content snippets with context.
@@ -507,6 +755,7 @@ class DatabaseManager:
              mode, and timestamp, returns the new utterance ID.
         """
         import time as _time
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if ts is None:
             ts = _time.time()
         with _lock, self._connect() as con:
@@ -518,6 +767,8 @@ class DatabaseManager:
             return int(cur.lastrowid)
 
     def list_utterances(self, limit: int = 50) -> list[dict]:
+<<<<<<< HEAD
+=======
         """
         Retrieve recent conversation utterances in reverse chronological order.
         
@@ -530,16 +781,31 @@ class DatabaseManager:
         How: Queries utterances table ordered by ID descending to get most recent
              first, returns as dictionaries with all fields included.
         """
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         with _lock, self._connect() as con:
             cur = con.execute(
                 "SELECT id, role, text, mode, ts FROM utterances ORDER BY id DESC LIMIT ?",
                 (int(limit),),
             )
             return [
+<<<<<<< HEAD
+                {
+                    "id": r[0],
+                    "role": r[1],
+                    "text": r[2],
+                    "mode": r[3],
+                    "ts": r[4],
+                }
+                for r in cur.fetchall()
+            ]
+
+    # --- Interactions (thought_process logging) ---
+=======
                 {"id": r[0], "role": r[1], "text": r[2], "mode": r[3], "ts": r[4]}
                 for r in cur.fetchall()
             ]
 
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def add_interaction(
         self,
         *,
@@ -549,6 +815,10 @@ class DatabaseManager:
         parsed_data: Optional[dict] = None,
         ts: float | None = None,
     ) -> int:
+<<<<<<< HEAD
+        import time as _time, json as _json
+
+=======
         """
         Log detailed interaction metadata for evolution engine analytics.
         
@@ -562,6 +832,7 @@ class DatabaseManager:
              user input, active mode, action taken, and parsed analytics data.
         """
         import time as _time, json as _json
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if ts is None:
             ts = _time.time()
         payload = None
@@ -581,6 +852,10 @@ class DatabaseManager:
             return int(cur.lastrowid)
 
     def list_interactions(self, limit: int = 100) -> list[dict]:
+<<<<<<< HEAD
+        import json as _json
+
+=======
         """
         Retrieve recent interaction records for analytics and learning.
         
@@ -594,6 +869,7 @@ class DatabaseManager:
              JSON metadata safely, returns structured dictionaries.
         """
         import json as _json
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         with _lock, self._connect() as con:
             cur = con.execute(
                 "SELECT id, ts, user_input, active_mode, action_taken, parsed_data FROM interactions ORDER BY id DESC LIMIT ?",
@@ -605,6 +881,31 @@ class DatabaseManager:
                     pd = _json.loads(r[5] or "{}")
                 except Exception:
                     pd = {}
+<<<<<<< HEAD
+                out.append(
+                    {
+                        "id": r[0],
+                        "ts": r[1],
+                        "user_input": r[2],
+                        "active_mode": r[3],
+                        "action_taken": r[4],
+                        "parsed_data": pd,
+                    }
+                )
+            return out
+
+    # --- Compatibility: store user+assistant exchange and an interaction ---
+    def add_conversation(
+        self, user_text: str, reply_text: str, *, meta: dict | None = None
+    ) -> None:
+        try:
+            self.add_utterance(
+                "user", user_text, mode=(meta or {}).get("detected_intent")
+            )
+            self.add_utterance(
+                "assistant", reply_text, mode=(meta or {}).get("activePersona")
+            )
+=======
                 out.append({
                     "id": r[0],
                     "ts": r[1],
@@ -631,6 +932,7 @@ class DatabaseManager:
         try:
             self.add_utterance("user", user_text, mode=(meta or {}).get("detected_intent"))
             self.add_utterance("assistant", reply_text, mode=(meta or {}).get("activePersona"))
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             self.add_interaction(
                 user_input=user_text,
                 active_mode=(meta or {}).get("activePersona"),
@@ -641,6 +943,26 @@ class DatabaseManager:
             pass
 
 
+<<<<<<< HEAD
+# Shared instance
+db_manager = DatabaseManager(config.DB_PATH)
+
+
+# --- Compatibility shim ---
+def add_conversation(
+    user_text: str, reply_text: str, *, meta: dict | None = None
+) -> None:
+    """Back-compat function if callers import add_conversation directly.
+    Prefer database.db_manager.add_conversation, but keep this to avoid crashes.
+    """
+    try:
+        db_manager.add_utterance(
+            "user", user_text, mode=(meta or {}).get("detected_intent")
+        )
+        db_manager.add_utterance(
+            "assistant", reply_text, mode=(meta or {}).get("activePersona")
+        )
+=======
 # Shared instance using centralized configuration
 db_manager = DatabaseManager(config.DB_PATH)
 
@@ -661,6 +983,7 @@ def add_conversation(user_text: str, reply_text: str, *, meta: dict | None = Non
     try:
         db_manager.add_utterance("user", user_text, mode=(meta or {}).get("detected_intent"))
         db_manager.add_utterance("assistant", reply_text, mode=(meta or {}).get("activePersona"))
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         db_manager.add_interaction(
             user_input=user_text,
             active_mode=(meta or {}).get("activePersona"),

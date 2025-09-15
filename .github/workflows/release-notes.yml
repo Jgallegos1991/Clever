@@ -1,0 +1,17 @@
+name: Automated Release Notes
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  release-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate release notes
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: false
+          body: 'Automated release notes generated from PRs and commits.'

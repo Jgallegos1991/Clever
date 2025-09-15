@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clever AI</title>
+    <style>
+        body { 
+            background: #0a0a0a; 
+            color: #00ff88; 
+            font-family: 'Courier New', monospace; 
+            padding: 20px;
+            margin: 0;
+            overflow: hidden;
+        }
+        .status { 
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        .test { 
+            animation: pulse 1s infinite; 
+        }
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.5; } 
+        }
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="status">
+        <h2 class="test">Clever AI</h2>
+        <p>System: <span id="status">Starting...</span></p>
+    </div>
+    
+    <canvas id="particles"></canvas>
+  </div>
+  <!-- Particle canvas and grid overlay -->
+  <canvas id="particles"></canvas>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <!-- HUD overlay with chat on the right like the screenshot -->
+  <div class="hud grid-full glass-manifested">
+    <section class="chat-panel glass-manifested">
+      <div id="chat-log" class="chat" role="log" aria-live="polite" aria-label="Chat messages"></div>
+    </section>
+  </div>
+
+  <!-- Compact analysis card (floats under reply) -->
+  <div class="panel analysis-panel glass-manifested" aria-label="Live Analysis" role="complementary">
+    <h3>Live Analysis</h3>
+    <div id="analysis-content">
+      <div id="intent">Intent: —</div>
+      <div id="sentiment">Sentiment: —</div>
+      <div id="entities">Entities: —</div>
+      <div id="keywords">Keywords: —</div>
+    </div>
+  </div>
+
+  <!-- Bottom entry bar (frosted, neon accents) -->
+  <div class="entrybar">
+    <button class="icon-btn" id="mode-btn" title="Modes" aria-label="Modes">○</button>
+    <input id="chat-input" type="text" placeholder="Talk to Clever..." autocomplete="off" autofocus />
+    <button class="icon-btn" id="send-btn" title="Send" aria-label="Send">➤</button>
+  </div>
+    <!-- Scripts -->
+    <script>
+        setTimeout(function() {
+            var debugDiv = document.getElementById('debug-info');
+            if (debugDiv) {
+                debugDiv.innerHTML = 'JavaScript working!';
+            }
+        }, 500);
+    </script>
+</body>
+</html>

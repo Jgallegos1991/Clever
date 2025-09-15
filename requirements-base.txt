@@ -1,3 +1,7 @@
 Flask==3.1.1
 watchdog==6.0.0
+<<<<<<< HEAD
+pypdf>=3.9.0
+=======
 PyPDF2==3.0.1
+>>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

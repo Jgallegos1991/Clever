@@ -1,0 +1,21 @@
+/* Snapshot of style.css - current UI state */
+/* Captured: 2025-09-15 */
+/* --- BEGIN ORIGINAL CONTENT --- */
+:root {
+	/* UI Brief core colors */
+	--bg-cosmic: #0B0F14;
+	--bg-cosmic-2: #121821;
+	--fg: #e9f1fb;
+	--muted: #95a3b3;
+	--neon-teal: #69EACB;
+	--neon-magenta: #FF6BFF;
+	--soft-cyan: #33ccff;
+	--chip: #0f1b24;
+	--bubble: #101821;
+	--glow-teal: rgba(105, 234, 203, 0.35);
+	--glow-magenta: rgba(255, 107, 255, 0.35);
+	--glass-bg: rgba(11, 15, 20, 0.7);
+}
+...TRUNCATED_ORIGINAL_CONTENT_PLACEHOLDER...
+/* --- END ORIGINAL CONTENT --- */
+
