@@ -1,0 +1,18 @@
+/* Snapshot of landing.css - current UI state */
+/* Captured: 2025-09-15 */
+/* --- BEGIN ORIGINAL CONTENT --- */
+/* landing.css - extracted from inline <style> in index.html
+ * Why: Enforce CSP by removing inline styles; prevents XSS via style injection.
+ * Where: Linked by templates/index.html for landing particle/status UI.
+ * How: Provides minimal layout + animation used by initial minimal shell.
+ */
+body {
+	background: #0a0a0a;
+	color: #00ff88;
+	font-family: 'Courier New', monospace;
+	margin: 0;
+	overflow: hidden;
+}
+...TRUNCATED_ORIGINAL_CONTENT_PLACEHOLDER...
+/* --- END ORIGINAL CONTENT --- */
+
