@@ -173,12 +173,47 @@
     });
   }
 
+  // ---------------------------- Global click-to-focus + inactivity fade ----
+  function setupGlobalFocusAndFade(){
+    const userInput = /** @type {HTMLInputElement|null} */ (document.getElementById('user-input'));
+    let lastInteraction = Date.now();
+    const FADE_AFTER_MS = 6000;
+
+    function markInteraction(){
+      lastInteraction = Date.now();
+      if(document.body.classList.contains('ui-faded')){
+        document.body.classList.remove('ui-faded');
+      }
+    }
+
+    // Focus input when clicking anywhere that is not inherently interactive
+    document.addEventListener('click', (e)=>{
+      markInteraction();
+      const target = e.target;
+      if(!(target instanceof Element)) return;
+      if(target.matches('input, textarea, button, a, select, [contenteditable], .manifest-card')) return;
+      if(userInput) userInput.focus();
+    });
+
+    // Key press also counts as interaction
+    document.addEventListener('keydown', markInteraction, { passive: true });
+    document.addEventListener('mousemove', markInteraction, { passive: true });
+
+    // Periodic fade checker
+    setInterval(()=>{
+      if(Date.now() - lastInteraction > FADE_AFTER_MS){
+        document.body.classList.add('ui-faded');
+      }
+    }, 1500);
+  }
+
   // ---------------------------- Boot sequence ---------------------------------
   function boot(){
     markPhase('booting');
     startMicroLoop();
     initParticles();
     wireInput();
+    setupGlobalFocusAndFade();
     setState(STATE.IDLE);
     // Safety timeout: if nothing happened within 5s and no particles detected, fallback.
     setTimeout(()=>{

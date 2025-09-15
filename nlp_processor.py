@@ -1,8 +1,10 @@
 # nlp_processor.py — Clever (offline-first, Jay-only)
-# Lazy singleton loader for spaCy; robust fallbacks; tiny LRU cache for quick hits.
+# Lazy singleton loader for spaCy; robust fallbacks;
+# tiny LRU cache for quick hits.
 
 # Project Coding Instructions:
-# See .github/copilot-instructions.md for architecture, documentation, and workflow rules.
+# See .github/copilot-instructions.md for architecture,
+# documentation, and workflow rules.
 # All code must follow these standards.
 
 from __future__ import annotations
@@ -23,8 +25,8 @@ _SPACY_MODEL_NAME = "en_core_web_sm"
 # Stopwords for keyword filtering
 _STOPWORDS = set(
     """
-    a an and are as at be but by for if in into is it of on or such that the 
-    their then there these they this to was were will with you your i we our 
+    a an and are as at be but by for if in into is it of on or such that the
+    their then there these they this to was were will with you your i we our
     us from about over under again very
 """.split()
 )
@@ -37,7 +39,8 @@ def _normalize_token(token: str) -> str:
     Why: Ensures consistent token formatting for reliable keyword matching
     and deduplication across all NLP operations.
     Where: Used by keyword extraction functions for token standardization.
-    How: Strips, lowercases, and filters to alphanumeric plus hyphens/underscores.
+    How: Strips, lowercases, and filters to alphanumeric plus
+    hyphens/underscores.
     """
     token = token.strip().lower()
     return "".join(ch for ch in token if ch.isalnum() or ch in ("-", "_"))
@@ -156,7 +159,7 @@ def _keywords_fallback(text: str) -> List[str]:
     return _top_tokens(toks, k=8)
 
 
-# ---- Sentiment -----------------------------------------------------------------------------------
+# ---- Sentiment ------------------------------------------------------------
 
 
 def _sentiment(text: str) -> float:
@@ -180,12 +183,17 @@ def _sentiment(text: str) -> float:
         return 0.0
     try:
         # Range is [-1.0, 1.0]
-        return float(TextBlob(text).sentiment.polarity)
+        blob = TextBlob(text)
+        sentiment = getattr(blob, 'sentiment', None)
+        polarity = getattr(sentiment, 'polarity', None)
+        if polarity is not None:
+            return float(polarity)
+        return 0.0
     except Exception:
         return 0.0
 
 
-# ---- Public Processor ----------------------------------------------------------------------------
+# ---- Public Processor ------------------------------------------------------
 
 
 class _NLPProcessor:
@@ -263,7 +271,7 @@ class UnifiedNLPProcessor(_NLPProcessor):
         spaCy model access for specialized NLP operations.
         How: Returns the loaded spaCy Language model instance.
         """
-        return self._ensure_nlp()
+        return self._ensure()
 
 
 # Singleton export for application use - full potential operation

@@ -75,7 +75,11 @@ class PersonaEngine:
         history: Optional[List[Dict[str, Any]]] = None,
         context: Optional[Dict[str, Any]] = None,
     ) -> PersonaResponse:
-        """Generate a reply given input text, mode, optional chat history, and context."""
+        """
+        Generate a reply given input text, mode, optional chat history, and context.
+        Enhanced to avoid literal interpretation, respond with curiosity/creativity,
+        and log ambiguous/creative inputs for self-learning.
+        """
         if not text:
             return PersonaResponse(
                 text="", mode=mode, sentiment=0.0, proactive_suggestions=[]
@@ -89,11 +93,16 @@ class PersonaEngine:
         sentiment = nlp_res.sentiment
         keywords = nlp_res.keywords
 
+        # Log ambiguous or creative phrasing for self-learning
+        if self._is_ambiguous_or_creative(text):
+            logger.info(f"Ambiguous/creative input logged for self-learning: {text}")
+
         # Select style function; default to Auto if unknown
         style_fn = self.modes.get(mode, self._auto_style)
 
         # Build reply text and suggestions
         reply = style_fn(text, keywords, context, history)
+        reply = self._respond_with_curiosity_and_nuance(text, reply)
         suggestions: List[str] = []
 
         # Proactive suggestion example
@@ -113,6 +122,26 @@ class PersonaEngine:
             proactive_suggestions=suggestions,
             quality_score=None,
         )
+
+    def _is_ambiguous_or_creative(self, text: str) -> bool:
+        """Detect if input is ambiguous, metaphorical, or creative."""
+        creative_markers = [
+            "metaphor", "like a", "as if", "imagine", "what if", "suppose",
+            "let's say", "picture this", "just a thought"
+        ]
+        return any(marker in text.lower() for marker in creative_markers)
+
+    def _respond_with_curiosity_and_nuance(self, text: str, reply: str) -> str:
+        """
+        Enhance Clever's persona response to avoid literalism and show curiosity/creativity.
+        """
+        if self._is_ambiguous_or_creative(text):
+            return (
+                "I love your creative phrasing! Instead of taking it literally, "
+                "I'll interpret your intent and respond with curiosity. "
+                f"Here's my take: {reply}"
+            )
+        return reply
 
     # --------- Mode Styles ---------
 

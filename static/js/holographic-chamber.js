@@ -1,4 +1,5 @@
 // Holographic Chamber - Advanced Particle System for Clever AI
+// CONFIG NOTE: For best performance, render particles as simple pixels (fillRect) instead of blurred/glowing circles. This eliminates lag and ensures smooth animation even with high particle counts.
 // Quantum swarm with morphing behaviors: idle → summon → dialogue → dissolve
 
 class HolographicChamber {
@@ -11,8 +12,10 @@ class HolographicChamber {
     
     // Performance settings optimized for Chromebook
     // Adaptive performance: auto-tune particle count based on device
-    this.maxParticles = this.getAdaptiveParticleCount();
-    this.dpr = Math.min(2, window.devicePixelRatio || 1);
+  // Lower particle count for performance
+  this.maxParticles = 60;
+  // Force dpr to 1 for crisp pixel rendering and avoid scaling issues
+  this.dpr = 1;
     
     this.init();
   }
@@ -30,8 +33,8 @@ class HolographicChamber {
     this.addAccessibilityControls();
     this.addDebugToggle();
     
-    // Start with a formation cycle
-    this.startFormationCycle();
+  // Always start with whirlpool formation for idle
+  this.morphToFormation('whirlpool');
     
     this.animate();
     console.log('🎬 Animation started with whirlpool formation');
@@ -47,10 +50,7 @@ class HolographicChamber {
       this.mouse.x = e.clientX - rect.left;
       this.mouse.y = e.clientY - rect.top;
     });
-    
-    this.canvas.addEventListener('click', () => {
-      this.triggerRandomFormation();
-    });
+    // Removed random formation trigger on canvas click to keep whirlpool idle state
   }
 
   startFormationCycle() {
@@ -74,16 +74,14 @@ class HolographicChamber {
   }
 
   resize() {
-    const rect = this.canvas.getBoundingClientRect();
-    this.width = rect.width;
-    this.height = rect.height;
-    
-    this.canvas.width = this.width * this.dpr;
-    this.canvas.height = this.height * this.dpr;
-    this.ctx.scale(this.dpr, this.dpr);
-    
-    this.canvas.style.width = this.width + 'px';
-    this.canvas.style.height = this.height + 'px';
+  // Use window innerWidth/innerHeight for full viewport coverage
+  this.width = window.innerWidth;
+  this.height = window.innerHeight;
+  this.canvas.width = this.width;
+  this.canvas.height = this.height;
+  this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any scaling
+  this.canvas.style.width = this.width + 'px';
+  this.canvas.style.height = this.height + 'px';
   }
 
   createParticles() {
@@ -92,16 +90,16 @@ class HolographicChamber {
       this.particles.push({
         x: Math.random() * this.width,
         y: Math.random() * this.height,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: (Math.random() - 0.5) * 1.2,
-        targetX: Math.random() * this.width,
-        targetY: Math.random() * this.height,
-        size: Math.random() * 4 + 2, // Larger particles
-        alpha: Math.random() * 0.4 + 0.6, // Brighter alpha
-        hue: Math.random() * 60 + 160, // Teal to cyan range
-        phase: Math.random() * Math.PI * 2,
-        speed: 0.05 + Math.random() * 0.03, // Faster movement
-        energy: Math.random() * 0.5 + 0.5 // Energy level for pulsing
+    vx: (Math.random() - 0.5) * 0.2,
+    vy: (Math.random() - 0.5) * 0.2,
+    targetX: Math.random() * this.width,
+    targetY: Math.random() * this.height,
+    size: Math.random() * 2 + 1,
+    alpha: Math.random() * 0.4 + 0.6,
+    hue: Math.random() * 60 + 160,
+    phase: Math.random() * Math.PI * 2,
+    speed: 0.005 + Math.random() * 0.004, // Minimum movement
+    energy: Math.random() * 0.08 + 0.08 // Minimum pulsing
       });
     }
   }
@@ -204,15 +202,27 @@ class HolographicChamber {
     
     this.state = newState;
     
+    // Map Clever's thought process/intent to formation
     switch (newState) {
       case 'idle':
-        this.morphToFormation('scatter');
+        // Clever's idol: angled whirlpool as default idle state
+        this.morphToFormation('whirlpool');
         break;
       case 'summon':
         this.morphToFormation('sphere');
         break;
       case 'dialogue':
-        this.morphToFormation('helix');
+        if (window.cleverIntent === 'shape_request' || window.cleverIntent === 'cube') {
+          this.morphToFormation('cube');
+        } else if (window.cleverIntent === 'creative') {
+          this.morphToFormation('torus');
+        } else if (window.cleverIntent === 'deep') {
+          this.morphToFormation('cube');
+        } else if (window.cleverIntent === 'galaxy') {
+          this.morphToFormation('spiral');
+        } else {
+          this.morphToFormation('helix');
+        }
         break;
       case 'dissolve':
         this.morphToFormation('scatter');
@@ -228,8 +238,8 @@ class HolographicChamber {
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance > 1) {
-        particle.vx += dx * particle.speed;
-        particle.vy += dy * particle.speed;
+        particle.vx += dx * (particle.speed * 0.08); // Minimum formation movement
+        particle.vy += dy * (particle.speed * 0.08);
       }
       
       // Mouse interaction - subtle attraction
@@ -239,31 +249,31 @@ class HolographicChamber {
         const mouseDistance = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
         
         if (mouseDistance < 150) {
-          const attraction = (150 - mouseDistance) / 150 * 0.003;
+          const attraction = (150 - mouseDistance) / 150 * 0.0002; // Minimum mouse attraction
           particle.vx += mouseDx * attraction;
           particle.vy += mouseDy * attraction;
           
           // Increase energy when near mouse
-          particle.energy = Math.min(1, particle.energy + 0.02);
+          particle.energy = Math.min(1, particle.energy + 0.001); // Minimum energy change
         } else {
           // Decrease energy when away from mouse
-          particle.energy = Math.max(0.3, particle.energy - 0.01);
+          particle.energy = Math.max(0.08, particle.energy - 0.0005);
         }
       }
       
       // Apply velocity with damping
-      particle.vx *= 0.92;
-      particle.vy *= 0.92;
+  particle.vx *= 0.995; // Maximum damping
+  particle.vy *= 0.995;
       
-      particle.x += particle.vx;
-      particle.y += particle.vy;
+  particle.x += particle.vx;
+  particle.y += particle.vy;
       
-      // Update phase for pulsing (speed up when energized)
-      particle.phase += 0.03 + particle.energy * 0.05;
+  // Update phase for pulsing (minimum)
+  particle.phase += 0.0015 + particle.energy * 0.002;
       
-      // Update hue slightly for color shifting
-      particle.hue += 0.1;
-      if (particle.hue > 220) particle.hue = 160;
+  // Update hue slightly for color shifting (slower)
+  particle.hue += 0.04;
+  if (particle.hue > 220) particle.hue = 160;
       
       // Wrap around screen edges
       if (particle.x < 0) particle.x = this.width;
@@ -274,16 +284,10 @@ class HolographicChamber {
   }
 
   draw() {
-  // Add debug info to confirm canvas is drawing
-  this.ctx.fillStyle = 'rgba(105, 234, 203, 0.8)';
-  this.ctx.font = '16px Arial';
-  this.ctx.fillText(`✨ Particles: ${this.particles.length} | Formation: ${this.targetFormation || 'whirlpool'}`, 10, 25);
-
-  // Add visible debug info
-  this.ctx.font = 'bold 16px Arial';
-  this.ctx.fillStyle = 'rgba(105, 234, 203, 1.0)'; // FULLY OPAQUE debug text
-  this.ctx.fillText(`🌊 PARTICLES: ${this.particles.length} | STATE: ${this.state}`, 20, 50);
-  this.ctx.fillText(`🎯 CANVAS: ${this.width}x${this.height}`, 20, 70);
+  // Clear canvas each frame to prevent pixel trails
+  this.ctx.clearRect(0, 0, this.width, this.height);
+  // Minimal debug info for performance
+  // ...existing code...
     
   // Accessibility overlay
   if (this.accessibilityEnabled) {
@@ -311,42 +315,14 @@ class HolographicChamber {
     this.ctx.restore();
   }
     
-    this.particles.forEach(particle => {
-      const pulse = Math.sin(particle.phase) * 0.3 + 0.7; // Strong pulse
-      const energyPulse = Math.sin(particle.phase * 2) * particle.energy;
-      const finalAlpha = 1.0; // MAXIMUM ALPHA - no transparency!
-      const finalSize = Math.max(8, particle.size * (1.5 + energyPulse * 0.8)); // Guaranteed large size
-      
-      // MEGA OUTER GLOW (impossible to miss)
-      this.ctx.save();
-      this.ctx.globalAlpha = 0.8; // Very visible
-      this.ctx.fillStyle = `hsl(${particle.hue}, 100%, 60%)`; // Brighter
-      this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, finalSize * 8, 0, Math.PI * 2);
-      this.ctx.fill();
-      
-      // LARGE MIDDLE GLOW
-      this.ctx.globalAlpha = 0.9;
-      this.ctx.fillStyle = `hsl(${particle.hue}, 100%, 75%)`;
-      this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, finalSize * 4, 0, Math.PI * 2);
-      this.ctx.fill();
-      
-      // PARTICLE CORE (BRILLIANT WHITE CENTER)
-      this.ctx.globalAlpha = 1.0; // Full opacity
-      this.ctx.fillStyle = 'white'; // Pure white, no HSL
-      this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, finalSize * 2, 0, Math.PI * 2);
-      this.ctx.fill();
-      
-      // Extra bright center dot
-      this.ctx.fillStyle = 'cyan';
-      this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, finalSize * 0.8, 0, Math.PI * 2);
-      this.ctx.fill();
-      
-      this.ctx.restore();
-    });
+  this.particles.forEach(particle => {
+  // Render as simple pixel for performance
+  this.ctx.save();
+  this.ctx.globalAlpha = 1.0;
+  this.ctx.fillStyle = '#69EACB'; // Neon teal pixel
+  this.ctx.fillRect(Math.round(particle.x), Math.round(particle.y), 2, 2);
+  this.ctx.restore();
+  });
     
     // Draw much brighter connections
     this.drawConnections();
@@ -384,9 +360,54 @@ class HolographicChamber {
   }
 
   animate() {
+    // Standard animation loop: update simulation, render frame, schedule next frame
     this.update();
     this.draw();
     requestAnimationFrame(() => this.animate());
+  }
+
+  // Move manifestCard and public methods outside animate()
+  manifestCard(opts) {
+    const { x, y, w, h, color = '#69EACB', onComplete } = opts;
+    // Pick 40 particles closest to card center
+    const centerX = x + w / 2;
+    const centerY = y + h / 2;
+    const manifestParticles = this.particles
+      .map(p => ({ p, dist: Math.hypot(p.x - centerX, p.y - centerY) }))
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, 40)
+      .map(obj => obj.p);
+
+    // Animate them to card bounds
+    manifestParticles.forEach((p, i) => {
+      p.targetX = x + (i % 8) * (w / 8) + Math.random() * 8;
+      p.targetY = y + Math.floor(i / 8) * (h / 5) + Math.random() * 8;
+      p.size = 8 + Math.random() * 4;
+      p.alpha = 1;
+      p.hue = 170 + Math.random() * 40;
+      p.manifesting = true;
+    });
+
+    // Fade out and trigger callback after animation
+    let frame = 0;
+    const animateManifest = () => {
+      frame++;
+      manifestParticles.forEach(p => {
+        // Move toward target
+        p.x += (p.targetX - p.x) * 0.18;
+        p.y += (p.targetY - p.y) * 0.18;
+        // Fade out
+        if (frame > 18) p.alpha -= 0.07;
+      });
+      this.draw();
+      if (frame < 28) {
+        requestAnimationFrame(animateManifest);
+      } else {
+        manifestParticles.forEach(p => { p.manifesting = false; p.alpha = 0.7; p.size = 4; });
+        if (typeof onComplete === 'function') onComplete();
+      }
+    };
+    animateManifest();
   }
 
   // Public methods for external control
@@ -403,17 +424,18 @@ class HolographicChamber {
 
   // Adaptive particle count based on device performance
   getAdaptiveParticleCount() {
-    // Use hardware concurrency and memory as hints
+    // Use hardware concurrency and memory as hints (feature-detected)
     const cores = navigator.hardwareConcurrency || 2;
-    const mem = navigator.deviceMemory || 4;
-    // Mobile: fewer particles
-    if (/Mobi|Android/i.test(navigator.userAgent)) return 60;
-    // Low-end: fewer particles
-    if (cores <= 2 || mem < 3) return 80;
-    // Mid-range: moderate
-    if (cores <= 4 || mem < 6) return 120;
-    // High-end: max
-    return 180;
+    const navAny = /** @type {any} */ (navigator);
+    const mem = typeof navAny.deviceMemory === 'number' ? navAny.deviceMemory : 4;
+  // Mobile: fewer particles
+  if (/Mobi|Android/i.test(navigator.userAgent)) return 60;
+  // Low-end: fewer particles
+  if (cores <= 2 || mem < 3) return 80;
+  // Mid-range: moderate
+  if (cores <= 4 || mem < 6) return 120;
+  // High-end: max
+  return 180;
   }
 
   // Accessibility controls
@@ -424,7 +446,7 @@ class HolographicChamber {
     btn.style.position = 'absolute';
     btn.style.top = '10px';
     btn.style.right = '10px';
-    btn.style.zIndex = 1000;
+  btn.style.zIndex = "1000";
     btn.style.background = '#222';
     btn.style.color = '#fff';
     btn.style.border = '2px solid #39ff14';
@@ -446,7 +468,7 @@ class HolographicChamber {
     btn.style.position = 'absolute';
     btn.style.top = '50px';
     btn.style.right = '10px';
-    btn.style.zIndex = 1000;
+  btn.style.zIndex = "1000";
     btn.style.background = '#222';
     btn.style.color = '#39ff14';
     btn.style.border = '2px solid #fff';

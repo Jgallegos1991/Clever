@@ -4,6 +4,8 @@ System Validator and Auto-Corrector for Clever AI
 Why: Ensures continuous adherence to all Unbreakable Rules and instructions
 by monitoring system state, detecting deviations, and automatically correcting
 issues to maintain peak performance and perfect instruction compliance.
+  
+  
 Where: Used by app.py, persona.py, and all core modules for continuous
 validation and self-correction of system integrity and rule compliance.
 How: Implements comprehensive validation checks, automated corrections,
@@ -17,23 +19,20 @@ Connects to:
 """
 from __future__ import annotations
 
-import os
-import sys
+from typing import Dict, List, Any
 import socket
-import logging
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 
-# Import core system components
 import config
 import user_config
 from utils import offline_guard
 from debug_config import get_debugger
 
 logger = get_debugger()
-
+  
+  
 @dataclass
 class ValidationResult:
     """Container for validation check results"""
@@ -44,18 +43,24 @@ class ValidationResult:
     auto_corrected: bool = False
     correction_details: str = ""
 
+
 class SystemValidator:
     """
-    Comprehensive system validator ensuring perfect adherence to all rules
+    Comprehensive system validator ensuring perfect adherence to all rules.
     
+  
+  
     Why: Maintains system integrity by continuously validating against
     Unbreakable Rules and automatically correcting any deviations to ensure
     Clever operates at full potential without compromise.
     Where: Integrated into all core system operations for real-time validation
-    and correction, ensuring consistent peak performance across all interactions.
+    and correction,
+    ensuring consistent peak performance across all interactions.
     How: Implements validation matrix covering offline operation, single-user
     mode, database integrity, and documentation standards with auto-correction.
     
+  
+  
     Connects to:
         - offline_guard: Validates and enforces offline-only operation
         - config system: Ensures proper configuration compliance
@@ -64,7 +69,7 @@ class SystemValidator:
     """
     
     def __init__(self):
-        """Initialize validator with all rule checks"""
+        """Initialize validator with all rule checks."""
         self.validation_checks = [
             self._validate_offline_enforcement,
             self._validate_single_user_config,
@@ -77,50 +82,59 @@ class SystemValidator:
             self._validate_documentation_standards,
             self._validate_performance_optimization
         ]
-        
+
     def run_full_validation(self) -> Dict[str, Any]:
         """
-        Run comprehensive system validation
+        Run comprehensive system validation.
         
-        Why: Provides complete system health check against all Unbreakable Rules
-        to ensure perfect compliance and identify any areas requiring correction.
-        Where: Called during system startup and periodically for maintenance
-        How: Executes all validation checks, attempts auto-correction, reports results
+    Why: Provides complete system health check against all Unbreakable Rules.
+    To ensure perfect compliance and identify any areas requiring correction.
+    Where: Called during system startup and periodically for maintenance.
+    How: Executes all validation checks, attempts auto-correction,
+    reports results.
         
         Returns:
-            Complete validation report with results and corrections
+            Complete validation report with results and corrections.
         """
-        logger.info('system_validator', 'Starting comprehensive system validation...')
-        
+        logger.info(
+            'system_validator',
+            'Starting comprehensive system validation...'
+        )
         results = []
         auto_corrections_applied = 0
         critical_issues = 0
-        
         for check in self.validation_checks:
             try:
                 result = check()
                 results.append(result)
-                
                 if result.auto_corrected:
                     auto_corrections_applied += 1
-                    logger.info('system_validator', f'Auto-corrected: {result.check_name}')
-                
+                    logger.info(
+                        'system_validator',
+                        f'Auto-corrected: {result.check_name}'
+                    )
                 if result.severity == 'critical' and not result.passed:
                     critical_issues += 1
-                    
             except Exception as e:
-                logger.error('system_validator', f'Validation check failed: {check.__name__}: {e}')
-                results.append(ValidationResult(
-                    check_name=check.__name__,
-                    passed=False,
-                    details=f"Validation failed with error: {e}",
-                    severity='critical'
-                ))
+                logger.error(
+                    'system_validator',
+                    f'Validation check failed: {check.__name__}: {e}'
+                )
+                results.append(
+                    ValidationResult(
+                        check_name=check.__name__,
+                        passed=False,
+                        details=f"Validation failed with error: {e}",
+                        severity='critical'
+                    )
+                )
                 critical_issues += 1
         
         report = {
             'timestamp': datetime.now().isoformat(),
-            'overall_status': 'PASS' if critical_issues == 0 else 'CRITICAL_ISSUES',
+            'overall_status': (
+                'PASS' if critical_issues == 0 else 'CRITICAL_ISSUES'
+            ),
             'total_checks': len(results),
             'passed_checks': sum(1 for r in results if r.passed),
             'critical_issues': critical_issues,
@@ -129,7 +143,11 @@ class SystemValidator:
             'recommendations': self._generate_recommendations(results)
         }
         
-        logger.info('system_validator', f'Validation complete: {report["overall_status"]} - {report["passed_checks"]}/{report["total_checks"]} passed')
+        logger.info(
+            'system_validator',
+            f'Validation complete: {report["overall_status"]} - '
+            f'{report["passed_checks"]}/{report["total_checks"]} passed'
+        )
         return report
     
     def _validate_offline_enforcement(self) -> ValidationResult:
@@ -141,10 +159,15 @@ class SystemValidator:
                 return ValidationResult(
                     check_name="Offline Enforcement",
                     passed=True,
-                    details="Offline guard was disabled, automatically enabled",
+                    details=(
+                        "Offline guard was disabled, automatically enabled"
+                    ),
                     severity='warning',
                     auto_corrected=True,
-                    correction_details="Called offline_guard.enable() to enforce offline operation"
+                    correction_details=(
+                        "Called offline_guard.enable() to enforce offline "
+                        "operation"
+                    )
                 )
             
             # Test that external connections are blocked
@@ -157,7 +180,9 @@ class SystemValidator:
                 return ValidationResult(
                     check_name="Offline Enforcement",
                     passed=False,
-                    details="External network connections not properly blocked",
+                    details=(
+                        "External network connections not properly blocked"
+                    ),
                     severity='critical'
                 )
             except (PermissionError, OSError):
@@ -167,7 +192,10 @@ class SystemValidator:
             return ValidationResult(
                 check_name="Offline Enforcement",
                 passed=True,
-                details="Offline operation properly enforced - external connections blocked",
+                details=(
+                    "Offline operation properly enforced - external "
+                    "connections blocked"
+                ),
                 severity='info'
             )
             
@@ -183,11 +211,17 @@ class SystemValidator:
         """Validate Rule #2: Single-User Only (Jay)"""
         try:
             # Check user configuration
-            if not hasattr(user_config, 'USER_NAME') or user_config.USER_NAME != "Jay":
+            if (
+                not hasattr(user_config, 'USER_NAME') or
+                user_config.USER_NAME != "Jay"
+            ):
                 return ValidationResult(
                     check_name="Single User Config",
                     passed=False,
-                    details=f"User name not configured as 'Jay': {getattr(user_config, 'USER_NAME', 'MISSING')}",
+                    details=(
+                        f"User name not configured as 'Jay': "
+                        f"{getattr(user_config, 'USER_NAME', 'MISSING')}"
+                    ),
                     severity='critical'
                 )
             
@@ -203,7 +237,10 @@ class SystemValidator:
             return ValidationResult(
                 check_name="Single User Config",
                 passed=True,
-                details=f"System properly configured for single user: {user_config.USER_NAME}",
+                details=(
+                    f"System properly configured for single user: "
+                    f"{user_config.USER_NAME}"
+                ),
                 severity='info'
             )
             
@@ -224,7 +261,10 @@ class SystemValidator:
                 return ValidationResult(
                     check_name="Single Database",
                     passed=False,
-                    details=f"Found {len(db_files)} database files, should be exactly 1: {[f.name for f in db_files]}",
+                    details=(
+                        f"Found {len(db_files)} database files, "
+                        f"should be exactly 1: {[f.name for f in db_files]}"
+                    ),
                     severity='critical'
                 )
             
@@ -241,14 +281,19 @@ class SystemValidator:
                 return ValidationResult(
                     check_name="Single Database",
                     passed=False,
-                    details=f"Database file mismatch: found {db_files[0].name}, expected {expected_db.name}",
+                    details=(
+                        f"Database file mismatch: found {db_files[0].name}, "
+                        f"expected {expected_db.name}"
+                    ),
                     severity='critical'
                 )
             
             return ValidationResult(
                 check_name="Single Database",
                 passed=True,
-                details=f"Single database properly configured: {expected_db.name}",
+                details=(
+                    f"Single database properly configured: {expected_db.name}"
+                ),
                 severity='info'
             )
             
@@ -276,14 +321,20 @@ class SystemValidator:
                     return ValidationResult(
                         check_name="Jay Personalization",
                         passed=False,
-                        details=f"{attr} mismatch: expected '{expected}', got '{actual}'",
+                        details=(
+                            f"{attr} mismatch: expected '{expected}', "
+                            f"got '{actual}'"
+                        ),
                         severity='warning'
                     )
             
             return ValidationResult(
                 check_name="Jay Personalization",
                 passed=True,
-                details="System properly personalized for Jay with correct user details",
+                details=(
+                    "System properly personalized for Jay with correct "
+                    "user details"
+                ),
                 severity='info'
             )
             
@@ -310,7 +361,9 @@ class SystemValidator:
                 )
             
             # Test response generation
-            test_response = persona_engine.generate("Test message", mode="Auto")
+            test_response = persona_engine.generate(
+                "Test message", mode="Auto"
+            )
             
             if not test_response or not test_response.text:
                 return ValidationResult(
@@ -321,7 +374,9 @@ class SystemValidator:
                 )
             
             # Check all modes are available
-            required_modes = ["Auto", "Creative", "Deep Dive", "Support", "Quick Hit"]
+            required_modes = [
+                "Auto", "Creative", "Deep Dive", "Support", "Quick Hit"
+            ]
             for mode in required_modes:
                 if mode not in persona_engine.modes:
                     return ValidationResult(
@@ -334,7 +389,10 @@ class SystemValidator:
             return ValidationResult(
                 check_name="Clever Persona",
                 passed=True,
-                details=f"Clever persona fully functional with {len(persona_engine.modes)} modes available",
+                details=(
+                    f"Clever persona fully functional with "
+                    f"{len(persona_engine.modes)} modes available"
+                ),
                 severity='info'
             )
             
@@ -352,7 +410,7 @@ class SystemValidator:
             # Check critical files exist
             required_files = [
                 'templates/index.html',
-                'static/css/style.css', 
+                'static/css/style.css',
                 'static/js/holographic-chamber.js',
                 'static/js/main.js',
                 'app.py',
@@ -378,11 +436,16 @@ class SystemValidator:
             template_path = Path('templates/index.html')
             if template_path.exists():
                 content = template_path.read_text()
-                if 'holographic-chamber.js' not in content or 'main.js' not in content:
+                if (
+                    'holographic-chamber.js' not in content or
+                    'main.js' not in content
+                ):
                     return ValidationResult(
                         check_name="File Structure Compliance",
                         passed=False,
-                        details="Template not loading correct JavaScript files",
+                        details=(
+                            "Template not loading correct JavaScript files"
+                        ),
                         severity='warning'
                     )
             
@@ -404,13 +467,20 @@ class SystemValidator:
     def _validate_nlp_capabilities(self) -> ValidationResult:
         """Validate NLP processor has full capabilities"""
         try:
-            from nlp_processor import nlp_processor, UnifiedNLPProcessor
+            from nlp_processor import nlp_processor
             
             # Test NLP processing
-            test_text = "This is a complex sentence with multiple entities and emotions for testing NLP capabilities."
+            test_text = (
+                "This is a complex sentence with multiple entities and "
+                "emotions for testing NLP capabilities."
+            )
             result = nlp_processor.process(test_text)
             
-            if not result or not hasattr(result, 'keywords') or not hasattr(result, 'sentiment'):
+            if (
+                not result or
+                not hasattr(result, 'keywords') or
+                not hasattr(result, 'sentiment')
+            ):
                 return ValidationResult(
                     check_name="NLP Capabilities",
                     passed=False,
@@ -428,7 +498,10 @@ class SystemValidator:
                 )
             
             # Check sentiment analysis
-            if result.sentiment is None or not isinstance(result.sentiment, (int, float)):
+            if (
+                result.sentiment is None or
+                not isinstance(result.sentiment, (int, float))
+            ):
                 return ValidationResult(
                     check_name="NLP Capabilities",
                     passed=False,
@@ -439,7 +512,11 @@ class SystemValidator:
             return ValidationResult(
                 check_name="NLP Capabilities",
                 passed=True,
-                details=f"NLP processor fully functional - extracted {len(result.keywords)} keywords, sentiment: {result.sentiment}",
+                details=(
+                    f"NLP processor fully functional - extracted "
+                    f"{len(result.keywords)} keywords, "
+                    f"sentiment: {result.sentiment}"
+                ),
                 severity='info'
             )
             
@@ -478,14 +555,19 @@ class SystemValidator:
                 return ValidationResult(
                     check_name="Evolution Engine Access",
                     passed=False,
-                    details=f"Evolution engine interaction logging failed: {e}",
+                    details=(
+                        f"Evolution engine interaction logging failed: {e}"
+                    ),
                     severity='warning'
                 )
             
             return ValidationResult(
                 check_name="Evolution Engine Access",
                 passed=True,
-                details="Evolution engine fully accessible with logging capabilities",
+                details=(
+                    "Evolution engine fully accessible with logging "
+                    "capabilities"
+                ),
                 severity='info'
             )
             
@@ -501,7 +583,9 @@ class SystemValidator:
         """Validate Rule #4: Mandatory Code Documentation"""
         try:
             # Check key files have proper documentation headers
-            files_to_check = ['app.py', 'persona.py', 'database.py', 'evolution_engine.py']
+            files_to_check = [
+                'app.py', 'persona.py', 'database.py', 'evolution_engine.py'
+            ]
             undocumented_files = []
             
             for file_path in files_to_check:
@@ -509,21 +593,30 @@ class SystemValidator:
                 if path.exists():
                     content = path.read_text()
                     # Check for documentation patterns
-                    if 'Why:' not in content or 'Where:' not in content or 'How:' not in content:
+                    if (
+                        'Why:' not in content or
+                        'Where:' not in content or
+                        'How:' not in content
+                    ):
                         undocumented_files.append(file_path)
             
             if undocumented_files:
                 return ValidationResult(
                     check_name="Documentation Standards",
                     passed=False,
-                    details=f"Files missing proper documentation: {undocumented_files}",
+                    details=(
+                        f"Files missing proper documentation: "
+                        f"{undocumented_files}"
+                    ),
                     severity='warning'
                 )
             
             return ValidationResult(
                 check_name="Documentation Standards",
                 passed=True,
-                details="All key files have proper documentation standards",
+                details=(
+                    "All key files have proper documentation standards"
+                ),
                 severity='info'
             )
             
@@ -548,28 +641,38 @@ class SystemValidator:
             # Check response time
             start_time = time.time()
             from persona import persona_engine
-            test_response = persona_engine.generate("Quick test", mode="Quick Hit")
+            persona_engine.generate(
+                "Quick test", mode="Quick Hit"
+            )
             response_time = time.time() - start_time
             
             issues = []
             if memory_mb > 500:  # Flag if using more than 500MB
                 issues.append(f"High memory usage: {memory_mb:.1f}MB")
             
-            if response_time > 2.0:  # Flag if responses take more than 2 seconds
+            if (
+                response_time > 2.0
+                # Flag if responses take more than 2 seconds
+            ):
                 issues.append(f"Slow response time: {response_time:.2f}s")
             
             if issues:
                 return ValidationResult(
                     check_name="Performance Optimization",
                     passed=False,
-                    details=f"Performance issues detected: {'; '.join(issues)}",
+                    details=(
+                        f"Performance issues detected: {'; '.join(issues)}"
+                    ),
                     severity='warning'
                 )
             
             return ValidationResult(
                 check_name="Performance Optimization",
                 passed=True,
-                details=f"Performance optimal - Memory: {memory_mb:.1f}MB, Response: {response_time:.3f}s",
+                details=(
+                    f"Performance optimal - Memory: {memory_mb:.1f}MB, "
+                    f"Response: {response_time:.3f}s"
+                ),
                 severity='info'
             )
             
@@ -577,7 +680,9 @@ class SystemValidator:
             return ValidationResult(
                 check_name="Performance Optimization",
                 passed=True,
-                details="Performance monitoring unavailable (psutil not installed)",
+                details=(
+                    "Performance monitoring unavailable (psutil not installed)"
+                ),
                 severity='info'
             )
         except Exception as e:
@@ -588,30 +693,51 @@ class SystemValidator:
                 severity='warning'
             )
     
-    def _generate_recommendations(self, results: List[ValidationResult]) -> List[str]:
+    def _generate_recommendations(
+        self, results: List[ValidationResult]
+    ) -> List[str]:
         """Generate actionable recommendations based on validation results"""
         recommendations = []
         
-        failed_critical = [r for r in results if not r.passed and r.severity == 'critical']
+        failed_critical = [
+            r for r in results if not r.passed and r.severity == 'critical'
+        ]
         if failed_critical:
-            recommendations.append("CRITICAL: Address failed critical checks immediately for system stability")
+            recommendations.append(
+                "CRITICAL: Address failed critical checks "
+                "immediately for system stability"
+            )
         
         auto_corrected = [r for r in results if r.auto_corrected]
         if auto_corrected:
-            recommendations.append("Review auto-corrections applied to ensure they meet requirements")
+            recommendations.append(
+                "Review auto-corrections applied to ensure "
+                "they meet requirements"
+            )
         
-        warnings = [r for r in results if not r.passed and r.severity == 'warning']
+        warnings = [
+            r for r in results if not r.passed and r.severity == 'warning'
+        ]
         if warnings:
-            recommendations.append("Address warning-level issues to optimize system performance")
+            recommendations.append(
+                "Address warning-level issues to optimize "
+                "system performance"
+            )
         
         if len([r for r in results if r.passed]) == len(results):
-            recommendations.append("System operating at peak performance - all validations passed!")
+            recommendations.append(
+                "System operating at peak performance - "
+                "all validations passed!"
+            )
         
         return recommendations
 
 # Global validator instance
+  
+  
 _system_validator = None
 
+  
 def get_system_validator() -> SystemValidator:
     """
     Get global system validator instance
@@ -633,6 +759,7 @@ def get_system_validator() -> SystemValidator:
         _system_validator = SystemValidator()
     return _system_validator
 
+  
 def validate_system_startup() -> Dict[str, Any]:
     """
     Run system validation during startup
@@ -647,6 +774,7 @@ def validate_system_startup() -> Dict[str, Any]:
     validator = get_system_validator()
     return validator.run_full_validation()
 
+  
 if __name__ == "__main__":
     # Run standalone validation
     validator = SystemValidator()
