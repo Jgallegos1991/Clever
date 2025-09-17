@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 """
 File Watcher Module - Automated file ingestion through filesystem monitoring.
 
@@ -13,7 +11,6 @@ Where: Used by sync systems and background processes to watch for file changes
 How: Implements watchdog-based filesystem monitoring with event handlers that
      trigger appropriate ingestion based on file operations and directory roots.
 """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 from __future__ import annotations
 
 import os
@@ -26,9 +23,7 @@ from database import db_manager
 
 
 class IngestEventHandler(FileSystemEventHandler):
-<<<<<<< HEAD
     def __init__(self):
-=======
     """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
     File system event handler for automatic ingestion of changes in monitored directories.
@@ -75,7 +70,6 @@ class IngestEventHandler(FileSystemEventHandler):
              using centralized configuration settings.
  main
         """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         super().__init__()
         self.ingestors = {
             config.SYNC_DIR: FileIngestor(config.SYNC_DIR),
@@ -83,8 +77,6 @@ class IngestEventHandler(FileSystemEventHandler):
         }
 
     def on_modified(self, event):
-<<<<<<< HEAD
-=======
         """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
         Handle file modification events by triggering ingestion for updated content.
@@ -108,14 +100,11 @@ class IngestEventHandler(FileSystemEventHandler):
              appropriate ingestor based on path matching.
  main
         """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if event.is_directory:
             return
         self._ingest_file(event.src_path)
 
     def on_created(self, event):
-<<<<<<< HEAD
-=======
         """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
         Handle file creation events by ingesting newly created files.
@@ -139,17 +128,14 @@ class IngestEventHandler(FileSystemEventHandler):
              appropriate ingestor based on path matching.
  main
         """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if event.is_directory:
             return
         self._ingest_file(event.src_path)
 
     def on_moved(self, event):
-<<<<<<< HEAD
         if event.is_directory:
             return
         # delete old, ingest new
-=======
         """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
         Handle file move/rename events by updating database paths and content.
@@ -176,13 +162,10 @@ class IngestEventHandler(FileSystemEventHandler):
         if event.is_directory:
             return
         # Remove old entry, ingest at new location
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         db_manager.delete_source_by_path(event.src_path)
         self._ingest_file(event.dest_path)
 
     def on_deleted(self, event):
-<<<<<<< HEAD
-=======
         """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
         Handle file deletion events by removing entries from knowledge base.
@@ -206,13 +189,11 @@ class IngestEventHandler(FileSystemEventHandler):
              synchronized with actual filesystem state.
  main
         """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if event.is_directory:
             return
         db_manager.delete_source_by_path(event.src_path)
 
     def _ingest_file(self, path: str):
-<<<<<<< HEAD
         # pick ingestor based on root
         for root, ingestor in self.ingestors.items():
             if path.startswith(root):
@@ -239,7 +220,6 @@ def run_watch():
     observer.stop()
     observer.join()
 
-=======
         """
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
         Process file ingestion using appropriate FileIngestor based on path location.
@@ -330,7 +310,6 @@ def run_watch(directories=None):
         print("File watcher stopped.")
  main
 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 if __name__ == "__main__":
     run_watch()

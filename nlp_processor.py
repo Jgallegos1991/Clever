@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # nlp_processor.py — Clever (offline-first, Jay-only)
 # Lazy singleton loader for spaCy; robust fallbacks;
 # tiny LRU cache for quick hits.
@@ -8,7 +7,6 @@
 # documentation, and workflow rules.
 # All code must follow these standards.
 
-=======
 """
 NLP Processor Module - Local natural language processing for Clever AI.
 
@@ -22,20 +20,17 @@ Where: Used by persona engine, knowledge base search, evolution engine,
 How: Implements singleton spaCy model loading with thread safety, LRU caching
      for performance, and structured NLP result objects for consistent data flow.
 """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 from __future__ import annotations
 
 import threading
 from functools import lru_cache
 from types import SimpleNamespace
-<<<<<<< HEAD
 from typing import List, Iterable
 import spacy  # Required dependency - no fallbacks
 from textblob import TextBlob  # Required dependency - no fallbacks
 from spacy.language import Language
 
 # Thread-safe spaCy singleton - Full potential operation
-=======
 from typing import List, Iterable, Optional, TYPE_CHECKING
 
 # Required dependencies - no fallbacks per architecture standards
@@ -46,12 +41,10 @@ if TYPE_CHECKING:
     from spacy.language import Language
 
 # Lazy, thread-safe singleton for spaCy
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 _NLP = None
 _NLP_LOCK = threading.Lock()
 _SPACY_MODEL_NAME = "en_core_web_sm"
 
-<<<<<<< HEAD
 # Stopwords for keyword filtering
 _STOPWORDS = set(
     """
@@ -115,7 +108,6 @@ def _load_spacy() -> Language:
     Connects to:
         - spacy: Core NLP library for language processing
         - Threading: Ensures thread-safe singleton pattern
-=======
 
 def _load_spacy() -> "Language":
     """
@@ -129,12 +121,10 @@ def _load_spacy() -> "Language":
     
     How: Uses double-checked locking pattern for thread-safe initialization,
          loads English model with optimized pipeline configuration.
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     """
     global _NLP
     if _NLP is not None:
         return _NLP
-<<<<<<< HEAD
 
     with _NLP_LOCK:
         if _NLP is not None:
@@ -193,7 +183,6 @@ def _keywords_spacy(doc) -> List[str]:
             seen.add(keyword)
             deduped.append(keyword)
 
-=======
     
     with _NLP_LOCK:
         if _NLP is not None:
@@ -295,7 +284,6 @@ def _keywords_spacy(doc) -> List[str]:
         if k not in seen:
             seen.add(k)
             deduped.append(k)
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     return deduped[:10]
 
 
@@ -308,7 +296,6 @@ def _keywords_fallback(text: str) -> List[str]:
     return _top_tokens(toks, k=8)
 
 
-<<<<<<< HEAD
 # ---- Sentiment ------------------------------------------------------------
 
 
@@ -327,37 +314,29 @@ def _sentiment(text: str) -> float:
         - persona.py: Persona response mood inference
         - evolution_engine.py: Learning from interaction sentiment
     """
-=======
 # ---- Sentiment -----------------------------------------------------------------------------------
 
 def _sentiment(text: str) -> float:
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     if not text:
         return 0.0
     if TextBlob is None:
         return 0.0
     try:
         # Range is [-1.0, 1.0]
-<<<<<<< HEAD
         blob = TextBlob(text)
         sentiment = getattr(blob, 'sentiment', None)
         polarity = getattr(sentiment, 'polarity', None)
         if polarity is not None:
             return float(polarity)
         return 0.0
-=======
         return float(TextBlob(text).sentiment.polarity)
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     except Exception:
         return 0.0
 
 
-<<<<<<< HEAD
 # ---- Public Processor ------------------------------------------------------
 
-=======
 # ---- Public Processor ----------------------------------------------------------------------------
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 class _NLPProcessor:
     """Small façade with a stable, testable API."""
@@ -372,7 +351,6 @@ class _NLPProcessor:
 
     @lru_cache(maxsize=256)
     def _quick_cache(self, text: str) -> SimpleNamespace:
-<<<<<<< HEAD
         """Cache processing results for short, frequently used inputs."""
         return self._process_uncached(text)
 
@@ -388,30 +366,22 @@ class _NLPProcessor:
         Returns:
             SimpleNamespace with keywords (List[str]) and sentiment (float)
         """
-=======
         return self._process_uncached(text)
 
     def process(self, text: str) -> SimpleNamespace:
         """Return SimpleNamespace(keywords: List[str], sentiment: float)."""
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         text = (text or "").strip()
         if not text:
             return SimpleNamespace(keywords=[], sentiment=0.0)
 
-<<<<<<< HEAD
         # Cache short inputs for performance
-=======
         # Cache very short inputs (common greetings/quick hits).
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if len(text) <= 120:
             return self._quick_cache(text)
 
         return self._process_uncached(text)
 
-<<<<<<< HEAD
-=======
     # ---- internals ----
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def _process_uncached(self, text: str) -> SimpleNamespace:
         nlp = self._ensure()
         if nlp is not None:
@@ -430,7 +400,6 @@ class _NLPProcessor:
 # Singleton export used by the app
 nlp_processor = _NLPProcessor()
 
-<<<<<<< HEAD
 
 # Public class alias for external imports
 class UnifiedNLPProcessor(_NLPProcessor):
@@ -455,7 +424,6 @@ class UnifiedNLPProcessor(_NLPProcessor):
 
 # Singleton export for application use - full potential operation
 nlp_processor = UnifiedNLPProcessor()
-=======
 # Public class alias for external imports
 class UnifiedNLPProcessor(_NLPProcessor):
     """Public interface to the NLP processor. Alias for _NLPProcessor."""
@@ -467,4 +435,3 @@ class UnifiedNLPProcessor(_NLPProcessor):
     def nlp(self):
         """Provide access to the underlying spaCy model for compatibility checks."""
         return self._ensure()
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

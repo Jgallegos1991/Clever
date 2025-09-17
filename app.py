@@ -1,5 +1,4 @@
 """
-<<<<<<< HEAD
 Clever AI Main Application
 
 # Project Coding Instructions:
@@ -24,28 +23,6 @@ Connects to:
     - user_config.py: User-specific settings
 """
 
-import os, sys, time
-from datetime import datetime
-from flask import Flask, request, jsonify, render_template
-from flask import redirect, url_for
-from io import BytesIO
-import json as _json
-
-# Ensure repo root on path so utils.* resolves in tests and runtime
-=======
-Flask Application Module - Main web server for Clever AI assistant.
-
-Why: Provides HTTP interface for Clever AI with chat endpoints, file uploads,
-     and system management while enforcing offline-first architecture and
-     integrating all core components including persona, NLP, and database.
-
-Where: Main application entry point that coordinates all system components,
-       serves web interface, and handles user interactions through REST API.
-
-How: Implements Flask web server with offline guard enforcement, centralized
-     configuration, comprehensive error handling, and integration with persona
-     engine, evolution engine, and knowledge management systems.
-"""
 import os
 import sys
 import time
@@ -55,119 +32,10 @@ from io import BytesIO
 import json as _json
 
 # Ensure repo root on path for module resolution
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 if APP_ROOT not in sys.path:
     sys.path.insert(0, APP_ROOT)
 
-<<<<<<< HEAD
-from utils import offline_guard
-from evolution_engine import get_evolution_engine
-
-# Import debugging and monitoring systems
-try:
-    from debug_config import get_debugger, debug_method, performance_monitor
-    from health_monitor import get_health_monitor
-    from error_recovery import get_error_recovery, handle_error_with_recovery
-    # Skip test_suite for now due to syntax errors
-    # from test_suite import get_test_suite
-
-    # Initialize systems
-    debugger = get_debugger()
-    health_monitor = get_health_monitor()
-    error_recovery = get_error_recovery()
-    test_suite = None  # Temporarily disabled
-
-    debugger.info("app", "Debug and monitoring systems initialized")
-except Exception as e:
-    print(f"[WARN] Debug systems not available: {e}")
-    debugger = None
-    health_monitor = None
-    error_recovery = None
-    test_suite = None
-
-# -------- User & Config Integration ----------
-try:
-    import config as user_config
-    from user_config import (
-        USER_NAME,
-        USER_EMAIL,
-        TAILSCALE_ENABLED,
-        CLEVER_EXTERNAL_ACCESS,
-    )
-
-    DEBUG = getattr(user_config, "DEBUG", True)
-    if debugger:
-        debugger.info(
-            "app", f"Clever AI configured for: {USER_NAME} ({USER_EMAIL})"
-        )
-    else:
-        print(f"🔧 Clever AI configured for: {USER_NAME} ({USER_EMAIL})")
-    if TAILSCALE_ENABLED:
-        print(f"🌐 Tailscale integration enabled")
-    if CLEVER_EXTERNAL_ACCESS:
-        print(f"🌍 External access enabled via Tailscale")
-except Exception as e:
-    DEBUG = True
-    USER_NAME = "Jay"
-    USER_EMAIL = "user@example.com"
-    TAILSCALE_ENABLED = False
-    CLEVER_EXTERNAL_ACCESS = False
-    if error_recovery:
-        error_recovery.handle_error(e, {"context": "user_config_loading"})
-
-
-# -------- database (tolerate missing) --------
-class _NullDB:
-    def add_conversation(self, *_args, **_kwargs):
-        pass
-
-
-db_manager = _NullDB()
-try:
-    # if your database.py exposes DatabaseManager or a global db_manager, use it
-    from database import db_manager as real_db
-
-    db_manager = real_db or db_manager
-except Exception as e:
-    if debugger:
-        debugger.warning("app", "DB not wired, running without persistence", e)
-    else:
-        print(f"[WARN] DB not wired, running without persistence: {e}")
-    if error_recovery:
-        error_recovery.handle_error(e, {"context": "database_initialization"})
-
-# -------- NLP (tolerate missing) -------------
-nlp_processor = None
-try:
-    from nlp_processor import UnifiedNLPProcessor
-
-    nlp_processor = UnifiedNLPProcessor()
-    if debugger:
-        debugger.info("app", "NLP processor initialized successfully")
-except Exception as e:
-    if debugger:
-        debugger.warning("app", "NLP offline/unavailable", e)
-    else:
-        print(f"[WARN] NLP offline/unavailable: {e}")
-    if error_recovery:
-        error_recovery.handle_error(e, {"context": "nlp_initialization"})
-
-# -------- Persona (required, but degrade) ----
-try:
-    from persona import CleverPersona
-
-    # Initialize persona engine - full potential operation
-    clever_persona = CleverPersona(nlp_processor, db_manager)
-except Exception as e:
-    print(f"[ERROR] Persona engine failed to initialize: {e}")
-    raise RuntimeError("Persona engine required for full operation") from e
-
-app = Flask(
-    __name__,
-    static_folder=os.path.join(APP_ROOT, "static"),
-    template_folder=os.path.join(APP_ROOT, "templates"),
-=======
 # Core imports - no fallbacks per architecture standards
 import config
 from utils import offline_guard
@@ -204,113 +72,15 @@ clever_persona = PersonaEngine("Clever", USER_NAME)
 debugger.info('app', 'Persona engine initialized')
 
 # Initialize Flask application
-
 app = Flask(
     __name__,
     static_folder=os.path.join(APP_ROOT, 'static'),
     template_folder=os.path.join(APP_ROOT, 'templates')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 )
 
 # Enforce no-internet at runtime (allow loopback only)
 try:
     offline_guard.enable()
-<<<<<<< HEAD
-    print("✅ Offline guard enabled - external network access blocked")
-except Exception as e:
-    print(f"[WARN] offline guard not applied: {e}")
-
-# Run comprehensive system validation at startup
-try:
-    from system_validator import validate_system_startup
-    validation_report = validate_system_startup()
-    
-    if validation_report['overall_status'] == 'PASS':
-        print(f"✅ System validation passed - {validation_report['passed_checks']}/{validation_report['total_checks']} checks")
-        if validation_report['auto_corrections_applied'] > 0:
-            print(f"🔧 Applied {validation_report['auto_corrections_applied']} auto-corrections")
-    else:
-        print(f"⚠️ System validation issues - {validation_report['critical_issues']} critical issues found")
-        for result in validation_report['results']:
-            if not result.passed and result.severity == 'critical':
-                print(f"❌ CRITICAL: {result.check_name} - {result.details}")
-    
-except Exception as e:
-    print(f"[WARN] System validation failed: {e}")
-
-# Start automated monitoring system
-try:
-    from automated_monitor import start_system_monitoring
-    start_system_monitoring()
-    print("🔄 Automated monitoring system started - "
-          "continuous oversight active")
-except Exception as e:
-    print(f"[WARN] Automated monitoring failed to start: {e}")
-
-
-@app.route("/")
-def index():
-    """Serve primary landing UI.
-
-    Why: Provides minimal, CSP-compliant shell with particle canvas.
-    Where: Root route; passes a cache_buster to avoid stale JS during dev.
-    How: Supplies an integer timestamp (seconds) as cache_buster query param.
-    """
-    cache_buster = int(time.time())
-    return render_template("index.html", cache_buster=cache_buster)
-
-
-@app.route("/test")
-def test_working():
-    """Serve a basic diagnostic template (no particles) to confirm rendering.
-
-    Why: Allows quick differentiation between template/render failures and
-    animation script issues.
-    Where: /test route for manual checks.
-    How: Renders static minimal HTML (test_basic.html).
-    """
-    return render_template("test_basic.html")
-
-
-@app.route("/magical")
-def magical_ui():
-    # Deprecated route; redirect to main UI
-    return redirect(url_for("index"))
-
-
-@app.route("/projects_page")
-def projects_page():
-    # Deprecated route; redirect to main UI
-    return redirect(url_for("index"))
-
-
-@app.route("/generator_page")
-def generator_page():
-    # Deprecated route; redirect to main UI
-    return redirect(url_for("index"))
-
-
-@app.route("/favicon.ico")
-def favicon():
-    try:
-        return app.send_static_file("img/favicon.svg")
-    except Exception:
-        return ("", 204)
-
-
-@app.route("/sw.js")
-def service_worker_stub():
-    # Keep console clean; no offline SW in this build
-    return (
-        "// no-op service worker\n",
-        200,
-        {"Content-Type": "application/javascript"},
-    )
-
-
-@app.route("/chat", methods=["POST"])
-@performance_monitor("app")
-=======
 except Exception as e:
     print(f"[WARN] offline guard not applied: {e}")
 
@@ -320,18 +90,10 @@ def index():
     return render_template('index.html')
 
 @app.route('/magical')
-def magical_ui():
-    # Deprecated route; redirect to main UI
-    return redirect(url_for('index'))
-
 @app.route('/projects_page')
-def projects_page():
-    # Deprecated route; redirect to main UI
-    return redirect(url_for('index'))
-
 @app.route('/generator_page')
-def generator_page():
-    # Deprecated route; redirect to main UI
+def deprecated_ui():
+    # Deprecated routes; redirect to main UI
     return redirect(url_for('index'))
 
 @app.route('/favicon.ico')
@@ -347,62 +109,10 @@ def service_worker_stub():
     return ("// no-op service worker\n", 200, {"Content-Type": "application/javascript"})
 
 @app.route('/chat', methods=['POST'])
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def chat():
     """Main chat endpoint with debug integration"""
     try:
         if debugger:
-<<<<<<< HEAD
-            debugger.debug("app", "Chat request received")
-
-        data = request.get_json()
-        if not data or "message" not in data:
-            return jsonify({"error": "No message provided"}), 400
-
-        user_message = data["message"].strip()
-        if not user_message:
-            return jsonify({"error": "Empty message"}), 400
-
-        # Apply offline guard
-        if offline_guard.contains_network_reference(user_message):
-            return jsonify(
-                {
-                    "response": "I'm designed to work completely offline! I can't access external networks or services.",
-                    "blocked_request": True,
-                }
-            )
-
-        # Process with enhanced conversation engine for maximum capability
-        try:
-            from enhanced_conversation_engine import get_conversation_engine
-            
-            # Get the enhanced conversation engine
-            conv_engine = get_conversation_engine()
-            
-            # Process conversation with full system access
-            mode = data.get("mode", "Auto")
-            context_data = data.get("context", {})
-            
-            # Use enhanced conversation engine for comprehensive processing
-            response_data = conv_engine.process_conversation(
-                user_message=user_message,
-                mode=mode,
-                context_data=context_data
-            )
-            
-            # Log interaction for learning (handled by conversation engine)
-            if debugger:
-                debugger.info("app", f"Enhanced conversation processed successfully: mode={mode}")
-            
-            return jsonify(response_data)
-            
-        except Exception as enhanced_error:
-            # Fallback to standard processing if enhanced engine fails
-            if debugger:
-                debugger.warning("app", f"Enhanced engine fallback: {enhanced_error}")
-            
-            # Standard NLP analysis as fallback
-=======
             debugger.debug('app', 'Chat request received')
         
         data = request.get_json()
@@ -423,191 +133,54 @@ def chat():
         # Process with enhanced conversation engine and error recovery
         try:
             # Get NLP analysis
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             analysis = {}
             if nlp_processor:
                 analysis = nlp_processor.process(user_message)
                 # Convert SimpleNamespace to dict and add user_input
-<<<<<<< HEAD
-                if hasattr(analysis, "__dict__"):
-                    analysis = vars(analysis)
-                analysis["user_input"] = user_message
-
-            # Standard conversation processing
-            try:
-                from clever_conversation_engine import (
-                    process_clever_conversation,
-                )
-
-=======
                 if hasattr(analysis, '__dict__'):
                     analysis = vars(analysis)
                 analysis['user_input'] = user_message
-            
+
             # Use enhanced conversation engine for response
             try:
                 from clever_conversation_engine import process_clever_conversation
                 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                 # Prepare context
                 context = {
                     "user": USER_NAME,
                     "timestamp": datetime.now().isoformat(),
-<<<<<<< HEAD
-                    "session_id": request.environ.get(
-                        "HTTP_X_SESSION_ID", "default"
-                    ),
-                }
-
-=======
                     "session_id": request.environ.get('HTTP_X_SESSION_ID', 'default')
                 }
                 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                 # Get knowledge base if available
                 knowledge_base = None
                 try:
                     from knowledge_base import get_knowledge_base
-<<<<<<< HEAD
-
-                    knowledge_base = get_knowledge_base()
-                except Exception:
-                    pass  # Knowledge base not available
-
-                # Process through enhanced conversation engine
-                conversation_result = process_clever_conversation(
-                    user_message, analysis, context, knowledge_base
-                )
-
-                response = conversation_result["response"]
-
-                if debugger:
-                    debugger.info(
-                        "conversation",
-                        f'Enhanced conversation processing - approach: {conversation_result.get("approach")}, mood: {conversation_result.get("mood")}',
-                    )
-
-            except Exception as conv_error:
-                if debugger:
-                    debugger.warning(
-                        "conversation",
-                        f"Enhanced conversation engine failed, falling back: {conv_error}",
-                    )
-
-=======
                     knowledge_base = get_knowledge_base()
                 except Exception:
                     pass  # Knowledge base not available
                 
                 # Process through enhanced conversation engine
                 conversation_result = process_clever_conversation(user_message, analysis, context, knowledge_base)
-                
                 response = conversation_result["response"]
-                
+
                 if debugger:
                     debugger.info('conversation', f'Enhanced conversation processing - approach: {conversation_result.get("approach")}, mood: {conversation_result.get("mood")}')
-                
+            
             except Exception as conv_error:
                 if debugger:
                     debugger.warning('conversation', f'Enhanced conversation engine failed, falling back: {conv_error}')
                 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                 # Fallback to basic persona
                 response = "I understand your message, but I'm running in minimal mode."
                 if clever_persona and analysis:
-                    # CleverPersona.generate_response only takes analysis parameter
                     persona_result = clever_persona.generate_response(analysis)
                     response = persona_result.get("text", response)
-<<<<<<< HEAD
-
-=======
                 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                 conversation_result = {
                     "response": response,
                     "mood": "curious",
                     "energy": 0.7,
-<<<<<<< HEAD
-                    "approach": "full_potential",
-                }
-
-            # Evolution learning with enhanced data
-            try:
-                evolution_engine = get_evolution_engine()
-                intent = analysis.get("intent", "general")
-                sentiment = analysis.get("sentiment", {})
-                if isinstance(sentiment, dict):
-                    sentiment_value = sentiment.get("compound", 0)
-                else:
-                    sentiment_value = float(sentiment) if sentiment else 0
-                evolution_engine.analyze_interaction(
-                    user_message, response, intent, sentiment_value
-                )
-                if debugger:
-                    debugger.debug("app", "Evolution learning completed")
-            except Exception as e:
-                if debugger:
-                    debugger.warning("app", "Evolution learning failed", e)
-
-            # Log conversation
-            db_manager.add_conversation(user_message, response)
-
-            if debugger:
-                debugger.info(
-                    "app", "Enhanced chat interaction completed successfully"
-                )
-
-            # Return enhanced response data
-            return jsonify(
-                {
-                    "response": response,
-                    "analysis": analysis,
-                    "mood": conversation_result.get("mood", "curious"),
-                    "energy": conversation_result.get("energy", 0.7),
-                    "excitement": conversation_result.get("excitement", 0.5),
-                    "creativity": conversation_result.get("creativity", 0.7),
-                    "approach": conversation_result.get(
-                        "approach", "curious_collaborator"
-                    ),
-                    "particle_intensity": conversation_result.get(
-                        "particle_intensity", 0.6
-                    ),
-                    "ui_reactions": conversation_result.get(
-                        "ui_reactions", {}
-                    ),
-                    "insights": conversation_result.get("insights", []),
-                    "proactive_suggestions": conversation_result.get(
-                        "proactive_suggestions", []
-                    ),
-                    "clever_state": conversation_result.get(
-                        "clever_state", {}
-                    ),
-                    "conversation_context": conversation_result.get(
-                        "conversation_context", {}
-                    ),
-                    "timestamp": datetime.now().isoformat(),
-                }
-            )
-
-        except Exception as e:
-            if error_recovery:
-                recovery_result = error_recovery.handle_error(
-                    e,
-                    {
-                        "endpoint": "/chat",
-                        "user_message": user_message[
-                            :100
-                        ],  # Truncated for privacy
-                    },
-                )
-
-                # If recovery was attempted, try again
-                if recovery_result.get("recovery_successful"):
-                    if debugger:
-                        debugger.info(
-                            "app", "Retrying chat after successful recovery"
-                        )
-=======
                     "approach": "fallback"
                 }
             
@@ -662,40 +235,9 @@ def chat():
                 if recovery_result.get('recovery_successful'):
                     if debugger:
                         debugger.info('app', 'Retrying chat after successful recovery')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
-                    # Simple retry logic here - in production, you might want more sophisticated retry
                     response = "I had a brief moment of confusion, but I'm back now! How can I help you?"
                 else:
                     response = "I'm experiencing some technical difficulties, but I'm still here to help as best I can."
-<<<<<<< HEAD
-
-                return jsonify(
-                    {
-                        "response": response,
-                        "recovery_info": recovery_result,
-                        "timestamp": datetime.now().isoformat(),
-                    }
-                )
-            else:
-                raise e
-
-    except Exception as e:
-        if debugger:
-            debugger.error("app", "Chat endpoint failed", e)
-        return (
-            jsonify(
-                {
-                    "error": "I'm having trouble processing your message right now. Please try again.",
-                    "technical_error": str(e) if DEBUG else None,
-                }
-            ),
-            500,
-        )
-
-
-@app.post("/api/stt")
-@performance_monitor("app")
-=======
                 
                 return jsonify({
                     "response": response,
@@ -714,17 +256,10 @@ def chat():
         }), 500
 
 @app.post('/api/stt')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def stt():
-    """Offline speech-to-text via Vosk if available and model present.
-    Accepts multipart/form-data with file field 'audio' (mono 16k WAV preferred).
-    """
+    """Offline speech-to-text via Vosk if available and model present."""
     try:
-<<<<<<< HEAD
         f = request.files.get("audio")
-=======
-        f = request.files.get('audio')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if not f or not f.filename:
             return jsonify({"error": "no audio provided"}), 400
         data = f.read()
@@ -737,40 +272,21 @@ def stt():
             return jsonify({"error": "stt model not installed (vosk)"}), 400
 
         # Read WAV header
-<<<<<<< HEAD
         wf = wave.open(BytesIO(data), "rb")
-=======
-        wf = wave.open(BytesIO(data), 'rb')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         n_channels = wf.getnchannels()
         sample_rate = wf.getframerate()
         sampwidth = wf.getsampwidth()
 
         # Resolve and cache Vosk model
-<<<<<<< HEAD
         model_dir = os.environ.get(
             "VOSK_MODEL", os.path.join(APP_ROOT, "models", "vosk", "en-us")
         )
         if not os.path.isdir(model_dir):
-            return (
-                jsonify(
-                    {
-                        "error": "vosk model not found",
-                        "hint": f"Place model at {model_dir} or set VOSK_MODEL env var",
-                        "info": "Download from https://alphacephei.com/vosk/models (offline use only)",
-                    }
-                ),
-                400,
-            )
-=======
-        model_dir = os.environ.get('VOSK_MODEL', os.path.join(APP_ROOT, 'models', 'vosk', 'en-us'))
-        if not os.path.isdir(model_dir):
             return jsonify({
-                "error": "vosk model not found", 
+                "error": "vosk model not found",
                 "hint": f"Place model at {model_dir} or set VOSK_MODEL env var",
                 "info": "Download from https://alphacephei.com/vosk/models (offline use only)"
             }), 400
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         global _VOSK_MODEL
         try:
             _VOSK_MODEL
@@ -794,42 +310,13 @@ def stt():
                 try:
                     raw = audioop.lin2lin(raw, sampwidth, 2)
                 except Exception:
-<<<<<<< HEAD
-                    return (
-                        jsonify(
-                            {
-                                "error": f"cannot convert sample width {sampwidth} -> 16-bit"
-                            }
-                        ),
-                        400,
-                    )
-=======
                     return jsonify({"error": f"cannot convert sample width {sampwidth} -> 16-bit"}), 400
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             if n_channels == 2:
                 try:
                     raw = audioop.tomono(raw, 2, 0.5, 0.5)
                 except Exception:
                     return jsonify({"error": "failed to downmix stereo"}), 400
             elif n_channels != 1:
-<<<<<<< HEAD
-                return (
-                    jsonify(
-                        {"error": f"unsupported channel count {n_channels}"}
-                    ),
-                    400,
-                )
-            if sample_rate != target_rate:
-                raw, state = audioop.ratecv(
-                    raw, 2, 1, sample_rate, target_rate, state
-                )
-            if rec.AcceptWaveform(raw):
-                part = _json.loads(rec.Result())
-                if part.get("text"):
-                    results.append(part["text"])
-        final = _json.loads(rec.FinalResult()).get("text", "")
-        text = " ".join([*results, final]).strip()
-=======
                 return jsonify({"error": f"unsupported channel count {n_channels}"}), 400
             if sample_rate != target_rate:
                 raw, state = audioop.ratecv(raw, 2, 1, sample_rate, target_rate, state)
@@ -839,18 +326,12 @@ def stt():
                     results.append(part['text'])
         final = _json.loads(rec.FinalResult()).get('text', '')
         text = ' '.join([*results, final]).strip()
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         return jsonify({"text": text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-<<<<<<< HEAD
-
 @app.get("/api/selfcheck")
 @performance_monitor("app")
-=======
-@app.get('/api/selfcheck')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def selfcheck():
     """Expose a quick local-only status for UI and diagnostics."""
     try:
@@ -858,27 +339,14 @@ def selfcheck():
         og_enabled = False
         try:
             from utils import offline_guard as _og
-<<<<<<< HEAD
-
-            og_enabled = bool(getattr(_og, "is_enabled", lambda: False)())
-=======
             og_enabled = bool(getattr(_og, 'is_enabled', lambda: False)())
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         except Exception:
             og_enabled = False
 
         # DB status
-<<<<<<< HEAD
-        db_ok, db_path = False, getattr(
-            getattr(db_manager, "db_path", None), "strip", lambda: ""
-        )() or getattr(db_manager, "db_path", "")
-        try:
-            p = db_path or os.path.join(APP_ROOT, "clever.db")
-=======
-        db_ok, db_path = False, getattr(getattr(db_manager, 'db_path', None), 'strip', lambda: '')() or getattr(db_manager, 'db_path', '')
+        db_ok, db_path = False, getattr(getattr(db_manager, 'db_path', None), 'strip', lambda: '')() or getattr(db_manager, 'db_path', "")
         try:
             p = db_path or os.path.join(APP_ROOT, 'clever.db')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             db_ok = os.path.exists(p)
         except Exception:
             db_ok = False
@@ -886,47 +354,11 @@ def selfcheck():
         # NLP status
         spacy_loaded = False
         try:
-<<<<<<< HEAD
-            spacy_loaded = bool(
-                getattr(
-                    getattr(nlp_processor, "nlp", None), "pipe_names", None
-                )
-            )
-=======
             spacy_loaded = bool(getattr(getattr(nlp_processor, 'nlp', None), 'pipe_names', None))
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         except Exception:
             spacy_loaded = False
 
         # Vosk status (model path exists)
-<<<<<<< HEAD
-        model_dir = os.environ.get(
-            "VOSK_MODEL", os.path.join(APP_ROOT, "models", "vosk", "en-us")
-        )
-        vosk_available = os.path.isdir(model_dir)
-
-        return jsonify(
-            {
-                "offline_guard": og_enabled,
-                "database": {"ok": db_ok, "path": db_path},
-                "nlp": {"spacy_loaded": spacy_loaded},
-                "stt": {
-                    "vosk_model_found": vosk_available,
-                    "model_dir": model_dir,
-                },
-            }
-        )
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.post("/api/summarize")
-@performance_monitor("app")
-def summarize():
-    """Local quick summary using nlp_processor (offline)."""
-    data = request.get_json(silent=True) or {}
-    text = (data.get("text") or "").strip()
-=======
         model_dir = os.environ.get('VOSK_MODEL', os.path.join(APP_ROOT, 'models', 'vosk', 'en-us'))
         vosk_available = os.path.isdir(model_dir)
 
@@ -940,27 +372,18 @@ def summarize():
         return jsonify({'error': str(e)}), 500
 
 @app.post('/api/summarize')
+@performance_monitor("app")
 def summarize():
     """Local quick summary using nlp_processor (offline)."""
     data = request.get_json(silent=True) or {}
     text = (data.get('text') or '').strip()
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     if not text:
         return jsonify({"error": "no text"}), 400
     # naive: select keywords and first 2-3 sentences
     try:
         from textwrap import shorten
         import re
-<<<<<<< HEAD
 
-        res = {}
-        if nlp_processor and hasattr(nlp_processor, "process"):
-            ns = nlp_processor.process(text)
-            res["keywords"] = getattr(ns, "keywords", [])
-        sents = re.split(r"(?:\.|\!|\?)\s+", text)
-        summary = " ".join(sents[:3]).strip()
-        res["summary"] = summary[:1000]
-=======
         res = {}
         if nlp_processor and hasattr(nlp_processor, 'process'):
             ns = nlp_processor.process(text)
@@ -968,24 +391,12 @@ def summarize():
         sents = re.split(r'(?:\.|\!|\?)\s+', text)
         summary = ' '.join(sents[:3]).strip()
         res['summary'] = summary[:1000]
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         return jsonify(res)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-<<<<<<< HEAD
-
-@app.get("/api/search")
-@performance_monitor("app")
-def search():
-    """Search local ingested sources (SQLite) and return snippets."""
-    q = (request.args.get("q") or "").strip()
-    if not q:
-        return jsonify([])
-    try:
-        if hasattr(db_manager, "search_snippets"):
-=======
 @app.get('/api/search')
+@performance_monitor("app")
 def search():
     """Search local ingested sources (SQLite) and return snippets."""
     q = (request.args.get('q') or '').strip()
@@ -993,36 +404,18 @@ def search():
         return jsonify([])
     try:
         if hasattr(db_manager, 'search_snippets'):
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             hits = db_manager.search_snippets(q, limit=10)
             return jsonify(hits)
         return jsonify([])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-<<<<<<< HEAD
-
-@app.route("/api/analyze", methods=["POST"])
-@performance_monitor("app")
-=======
 @app.route('/api/analyze', methods=['POST'])
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
+@performance_monitor("app")
 def analyze():
     """NLP analysis endpoint for personality enhancer"""
     try:
         if debugger:
-<<<<<<< HEAD
-            debugger.debug("app", "Analysis request received")
-
-        data = request.get_json()
-        if not data or "text" not in data:
-            return jsonify({"error": "No text provided"}), 400
-
-        text = data["text"].strip()
-        if not text:
-            return jsonify({"error": "Empty text"}), 400
-
-=======
             debugger.debug('app', 'Analysis request received')
         
         data = request.get_json()
@@ -1033,7 +426,6 @@ def analyze():
         if not text:
             return jsonify({"error": "Empty text"}), 400
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         # Get NLP analysis
         analysis = {}
         if nlp_processor:
@@ -1044,52 +436,6 @@ def analyze():
                 "sentiment": {"compound": 0.0},
                 "intent": "casual_chat",
                 "entities": [],
-<<<<<<< HEAD
-                "keywords": text.split()[:5],
-            }
-
-        if debugger:
-            # Convert SimpleNamespace to dict for debugging
-            analysis_dict = (
-                analysis if isinstance(analysis, dict) else vars(analysis)
-            )
-            debugger.debug(
-                "app",
-                f'Analysis completed: {analysis_dict.get("intent", "unknown")}',
-            )
-
-        # Convert SimpleNamespace to dict for JSON serialization
-        if hasattr(analysis, "__dict__"):
-            analysis = vars(analysis)
-
-        return jsonify(analysis)
-
-    except Exception as e:
-        if debugger:
-            debugger.error("app", "Analysis failed", e)
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/ingest", methods=["POST"])
-@performance_monitor("app")
-def ingest():
-    """Form ingest endpoint"""
-    try:
-        form_data = request.form.to_dict()
-        processed = {k: (v or "").upper() for k, v in form_data.items()}
-        return jsonify(
-            {
-                "message": "Form submitted successfully!",
-                "processed_data": processed,
-            }
-        )
-    except Exception as e:
-        return jsonify({"error": f"ingest failed: {e}"}), 400
-
-
-@app.get("/health")
-@performance_monitor("app")
-=======
                 "keywords": text.split()[:5]
             }
         
@@ -1110,7 +456,9 @@ def ingest():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/ingest', methods=['POST'])
+@performance_monitor("app")
 def ingest():
+    """Form ingest endpoint"""
     try:
         form_data = request.form.to_dict()
         processed = {k: (v or "").upper() for k, v in form_data.items()}
@@ -1119,7 +467,7 @@ def ingest():
         return jsonify({"error": f"ingest failed: {e}"}), 400
 
 @app.get('/health')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
+@performance_monitor("app")
 def health():
     """Basic health check endpoint"""
     try:
@@ -1130,29 +478,6 @@ def health():
             return jsonify({"status": "ok", "monitoring": "disabled"})
     except Exception as e:
         if error_recovery:
-<<<<<<< HEAD
-            recovery_result = error_recovery.handle_error(
-                e, {"endpoint": "/health"}
-            )
-            return (
-                jsonify(
-                    {
-                        "status": "error",
-                        "error": str(e),
-                        "recovery_attempted": recovery_result.get(
-                            "recovery_attempted", False
-                        ),
-                    }
-                ),
-                500,
-            )
-        else:
-            return jsonify({"status": "error", "error": str(e)}), 500
-
-
-@app.get("/debug/status")
-@performance_monitor("app")
-=======
             recovery_result = error_recovery.handle_error(e, {'endpoint': '/health'})
             return jsonify({
                 "status": "error", 
@@ -1163,33 +488,17 @@ def health():
             return jsonify({"status": "error", "error": str(e)}), 500
 
 @app.get('/debug/status')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def debug_status():
     """Debug system status endpoint"""
     try:
         if not debugger:
             return jsonify({"error": "Debug system not available"}), 503
-<<<<<<< HEAD
-
-=======
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         status = {
             "debug_enabled": True,
             "health_monitor": health_monitor is not None,
             "error_recovery": error_recovery is not None,
             "test_suite": test_suite is not None,
-<<<<<<< HEAD
-            "timestamp": datetime.now().isoformat(),
-        }
-
-        if health_monitor:
-            status["health_summary"] = health_monitor.get_health_summary()
-
-        if error_recovery:
-            status["error_statistics"] = error_recovery.get_error_statistics()
-
-=======
             "timestamp": datetime.now().isoformat()
         }
         
@@ -1199,57 +508,22 @@ def debug_status():
         if error_recovery:
             status["error_statistics"] = error_recovery.get_error_statistics()
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         return jsonify(status)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-<<<<<<< HEAD
-
-@app.get("/debug/test")
-@performance_monitor("app")
-=======
 @app.get('/debug/test')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def debug_test():
     """Run quick system tests"""
     try:
         if not test_suite:
             return jsonify({"error": "Test suite not available"}), 503
-<<<<<<< HEAD
-
-        from test_suite import run_quick_tests
-
-=======
         
         from test_suite import run_quick_tests
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         results = run_quick_tests()
         return jsonify(results)
     except Exception as e:
         if error_recovery:
-<<<<<<< HEAD
-            recovery_result = error_recovery.handle_error(
-                e, {"endpoint": "/debug/test"}
-            )
-            return (
-                jsonify(
-                    {
-                        "error": str(e),
-                        "recovery_attempted": recovery_result.get(
-                            "recovery_attempted", False
-                        ),
-                    }
-                ),
-                500,
-            )
-        else:
-            return jsonify({"error": str(e)}), 500
-
-
-@app.route("/evolution-status")
-@performance_monitor("app")
-=======
             recovery_result = error_recovery.handle_error(e, {'endpoint': '/debug/test'})
             return jsonify({
                 "error": str(e),
@@ -1259,7 +533,6 @@ def debug_test():
             return jsonify({"error": str(e)}), 500
 
 @app.route('/evolution-status')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def evolution_status():
     """Get Clever's current evolution status"""
     try:
@@ -1268,55 +541,14 @@ def evolution_status():
         return jsonify(status)
     except Exception as e:
         if debugger:
-<<<<<<< HEAD
-            debugger.error("app", f"Evolution status error: {e}")
-        return jsonify({"error": str(e)}), 500
-
-
-# -------- Enhanced Conversation Engine Endpoints --------
-
-
-@app.route("/api/clever-greeting")
-@performance_monitor("app")
-=======
             debugger.error('app', f'Evolution status error: {e}')
         return jsonify({"error": str(e)}), 500
 
-# -------- Enhanced Conversation Engine Endpoints --------
-
 @app.route('/api/clever-greeting')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def clever_greeting():
     """Get Clever's dynamic contextual greeting"""
     try:
         from clever_conversation_engine import get_clever_greeting
-<<<<<<< HEAD
-
-        greeting_data = get_clever_greeting()
-
-        if debugger:
-            debugger.info(
-                "conversation",
-                f'Generated greeting: {greeting_data["greeting"][:50]}...',
-            )
-
-        return jsonify(greeting_data)
-    except Exception as e:
-        if debugger:
-            debugger.error("conversation", f"Greeting generation error: {e}")
-        return jsonify(
-            {
-                "greeting": "Hey Jay! 🌟 Ready for some magical thinking together?",
-                "mood": "curious",
-                "energy": 0.7,
-                "particle_intensity": 0.6,
-            }
-        )
-
-
-@app.route("/api/clever-state")
-@performance_monitor("app")
-=======
         greeting_data = get_clever_greeting()
         
         if debugger:
@@ -1334,51 +566,17 @@ def clever_greeting():
         })
 
 @app.route('/api/clever-state')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def clever_state():
     """Get Clever's current personality and system state"""
     try:
         from clever_conversation_engine import CleverConversationEngine
-<<<<<<< HEAD
-
-        engine = CleverConversationEngine()
-
-=======
         engine = CleverConversationEngine()
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         # Get comprehensive state
         state_data = {
             "clever_state": engine.clever_state,
             "conversation_patterns": engine._analyze_conversation_patterns(),
             "session_insights": engine._generate_clever_insights({}, {}),
-<<<<<<< HEAD
-            "greeting": engine.get_dynamic_greeting()["greeting"],
-        }
-
-        if debugger:
-            debugger.info(
-                "conversation",
-                f'State request - mood: {engine.clever_state["mood"]}, energy: {engine.clever_state["energy"]:.2f}',
-            )
-
-        return jsonify(state_data)
-    except Exception as e:
-        if debugger:
-            debugger.error("conversation", f"State retrieval error: {e}")
-        return jsonify(
-            {
-                "clever_state": {
-                    "mood": "curious",
-                    "energy": 0.7,
-                    "creativity": 0.7,
-                    "focus": 0.6,
-                },
-                "conversation_patterns": {"status": "State not available"},
-                "session_insights": ["Starting fresh conversation"],
-            }
-        )
-=======
             "greeting": engine.get_dynamic_greeting()["greeting"]
         }
         
@@ -1399,64 +597,7 @@ def clever_state():
             "conversation_patterns": {"status": "State not available"},
             "session_insights": ["Starting fresh conversation"]
         })
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
-        status = evolution_engine.get_evolution_status()
-        return jsonify(status)
-    except Exception as e:
-        return jsonify({"error": f"Evolution status unavailable: {e}"}), 500
 
-<<<<<<< HEAD
-
-@app.route("/sync-status")
-@performance_monitor("app")
-def sync_status():
-    """API endpoint for sync status"""
-    try:
-        with open("./static/js/sync_status.json", "r") as f:
-            status = _json.load(f)
-        return jsonify(status)
-    except FileNotFoundError:
-        return jsonify(
-            {"status": "no_sync_data", "timestamp": datetime.now().isoformat()}
-        )
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/pdf-knowledge")
-@performance_monitor("app")
-def pdf_knowledge():
-    """API endpoint to get processed PDF knowledge from centralized database
-    Why: Provides access to PDF processing results for debugging and monitoring Clever's knowledge ingestion and learning progress
-    Where: Called by frontend or external monitoring tools
-    How: Queries pdf_knowledge table via centralized DatabaseManager
-    Returns: JSON response with PDF knowledge data or error information
-    Connects to: database.py (DatabaseManager), pdf_ingestor.py (PDF processing pipeline)
-    """
-    try:
-        with db_manager._connect() as conn:
-            cursor = conn.cursor()
-
-            cursor.execute(
-                """
-                SELECT filename, processed_date, chunk_count, entities, keywords
-                FROM pdf_knowledge 
-                ORDER BY processed_date DESC
-                LIMIT 20
-            """
-            )
-
-        pdfs = []
-        for row in cursor.fetchall():
-            (
-                filename,
-                processed_date,
-                chunk_count,
-                entities_json,
-                keywords_json,
-            ) = row
-
-=======
 @app.route('/sync-status')
 def sync_status():
     """API endpoint for sync status"""
@@ -1488,27 +629,11 @@ def pdf_knowledge():
         for row in cursor.fetchall():
             filename, processed_date, chunk_count, entities_json, keywords_json = row
             
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             try:
                 entities = _json.loads(entities_json) if entities_json else []
                 keywords = _json.loads(keywords_json) if keywords_json else []
             except:
                 entities, keywords = [], []
-<<<<<<< HEAD
-
-            pdfs.append(
-                {
-                    "filename": filename,
-                    "processed_date": processed_date,
-                    "chunk_count": chunk_count,
-                    "entity_count": len(entities),
-                    "keyword_count": len(keywords),
-                    "entities": entities[:10],  # First 10 entities
-                    "keywords": keywords[:20],  # First 20 keywords
-                }
-            )
-
-=======
             
             pdfs.append({
                 'filename': filename,
@@ -1521,74 +646,19 @@ def pdf_knowledge():
             })
         
         conn.close()
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         return jsonify(pdfs)
     except Exception as e:
         return jsonify({"error": f"PDF knowledge unavailable: {e}"}), 500
 
-<<<<<<< HEAD
-
-@app.after_request
-def add_security_headers(resp):
-    """Attach security/security hardening headers to every response.
-
-    Why: Enforces strict CSP + related headers to keep the offline single-user
-    threat model intact and eliminate injection classes (XSS, rogue external
-    asset inclusion). Inline scripts/styles were removed
-    (`index.html` refactor)
-    so they can now be forbidden entirely.
-    Where: Flask after_request hook — runs for every UI + API response ensuring
-    consistency (centralized control vs. scattering headers per route).
-    How: Sets a deny-by-default CSP permitting only same-origin resources. Data
-    Data URIs allowed for images only (icons/embeds). No inline/eval. Extend
-    only by editing this function (single source of truth) — e.g., for workers
-    add `worker-src 'self'`.
-
-    Returns:
-        Modified Flask response with headers applied.
-
-    Connects to:
-        - templates/index.html: Relies solely on external JS/CSS under /static
-    - static/js/particles-init.js: Loaded via <script defer> under script-src
-        - debug_config.py: Indirectly benefits from reduced noise (blocked CSP
-          violations would surface cleanly)
-    """
-    csp = (
-        "default-src 'self'; "
-        "script-src 'self'; "  # only local JS, no inline, no eval
-        "style-src 'self'; "   # externalized CSS only
-        "img-src 'self' data:; "  # data URIs for small assets
-        "font-src 'self'; "
-        "connect-src 'self'; "
-        "media-src 'self' data:; "
-        "object-src 'none'; "
-        "base-uri 'self'; "
-        "form-action 'self'"
-    )
-    resp.headers['Content-Security-Policy'] = csp
-=======
 @app.after_request
 def add_security_headers(resp):
     # Disallow fetching external assets; self + data URIs only.
     csp = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; media-src 'self' data:;"
     resp.headers.setdefault('Content-Security-Policy', csp)
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     resp.headers.setdefault('X-Content-Type-Options', 'nosniff')
     resp.headers.setdefault('Referrer-Policy', 'no-referrer')
     return resp
 
-<<<<<<< HEAD
-
-if __name__ == "__main__":
-    """Main application startup with comprehensive system initialization"""
-    print("\n🧠 Clever AI - Advanced Personal Assistant")
-    print("=" * 50)
-
-    # Run system initialization and health checks
-    if debugger:
-        debugger.info("app", "Starting Clever AI system initialization")
-
-=======
 if __name__ == '__main__':
     """Main application startup with comprehensive system initialization"""
     print("\n🧠 Clever AI - Advanced Personal Assistant")
@@ -1598,34 +668,10 @@ if __name__ == '__main__':
     if debugger:
         debugger.info('app', 'Starting Clever AI system initialization')
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     # Run startup health check
     if health_monitor:
         print("🔍 Running startup health check...")
         health_status = health_monitor.run_full_health_check()
-<<<<<<< HEAD
-
-        if health_status["overall_status"] == "healthy":
-            print("✅ All systems healthy")
-        elif health_status["overall_status"] == "warning":
-            print("⚠️  Some systems have warnings")
-        else:
-            print("❌ System health issues detected")
-
-        # Print health summary
-        for check_name, check_result in health_status["checks"].items():
-            status_icon = (
-                "✅"
-                if check_result.get("status") == "healthy"
-                else "⚠️" if check_result.get("status") == "warning" else "❌"
-            )
-            line = (
-                f"  {status_icon} {check_name}: "
-                f"{check_result.get('status', 'unknown')}"
-            )
-            print(line)
-
-=======
         
         if health_status['overall_status'] == 'healthy':
             print("✅ All systems healthy")
@@ -1639,43 +685,10 @@ if __name__ == '__main__':
             status_icon = "✅" if check_result.get('status') == 'healthy' else "⚠️" if check_result.get('status') == 'warning' else "❌"
             print(f"  {status_icon} {check_name}: {check_result.get('status', 'unknown')}")
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     # Run quick tests
     if test_suite:
         print("\n🧪 Running quick system tests...")
         from test_suite import run_quick_tests
-<<<<<<< HEAD
-
-        test_results = run_quick_tests()
-
-        tests_line = (
-            f"  Tests: {test_results['passed_tests']}/"
-            f"{test_results['total_tests']} passed ("
-            f"{test_results['success_rate']:.1f}% )"
-        )
-        print(tests_line)
-
-        if test_results["status"] == "passed":
-            print("✅ All critical tests passed")
-        else:
-            print("⚠️  Some tests failed")
-
-    # Check evolution engine
-    try:
-        evolution_engine = get_evolution_engine()
-        evo_status = evolution_engine.get_evolution_status()
-        print(
-            "\n🧬 Evolution Engine: "
-            f"{evo_status.get('concept_count', 0)} concepts learned"
-        )
-        print(
-            "   Evolution Score: "
-            f"{evo_status.get('evolution_score', 0):.3f}"
-        )
-    except Exception as e:
-        print(f"⚠️  Evolution engine status unknown: {e}")
-
-=======
         test_results = run_quick_tests()
         
         print(f"  Tests: {test_results['passed_tests']}/{test_results['total_tests']} passed ({test_results['success_rate']:.1f}%)")
@@ -1694,52 +707,10 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"⚠️  Evolution engine status unknown: {e}")
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     print(f"\n🎯 Configured for: {USER_NAME}")
     print(f"🐍 Debug Mode: {'Enabled' if DEBUG else 'Disabled'}")
     # External access disabled: local only
     print("🌐 External Access: Disabled (local only)")
-<<<<<<< HEAD
-
-    print("🌟 Synaptic Hub Neural Interface Ready!")
-    print("🔗 Local: http://127.0.0.1:5000")
-
-    # Tailscale remote access removed for local isolation
-
-    print("=" * 50)
-
-    # Force binding to localhost only
-    host = "127.0.0.1"
-    port = user_config.APP_PORT if hasattr(user_config, "APP_PORT") else 5000
-
-    try:
-        if debugger:
-            debugger.info("app", "Flask server starting")
-
-        app.run(host=host, port=port, debug=DEBUG)
-
-    except KeyboardInterrupt:
-        print("\n👋 Clever AI shutting down gracefully...")
-        if debugger:
-            debugger.info("app", "Clever AI shutdown initiated by user")
-    except Exception as e:
-        print(f"\n❌ Server error: {e}")
-        if debugger:
-            debugger.error("app", "Flask server error", e)
-        if error_recovery:
-            recovery_result = error_recovery.handle_error(
-                e, {"context": "flask_server_startup"}
-            )
-            if recovery_result.get("recovery_attempted"):
-                rec_line = (
-                    "🔧 Recovery attempted: "
-                    f"{recovery_result.get('recovery_message', 'Unknown')}"
-                )
-                print(rec_line)
-    finally:
-        if debugger:
-            debugger.info("app", "Clever AI shutdown complete")
-=======
     
     print("🌟 Synaptic Hub Neural Interface Ready!")
     print(f"🔗 Local: http://127.0.0.1:5000")
@@ -1766,6 +737,24 @@ if __name__ == '__main__':
         print(f"\n❌ Server error: {e}")
         if debugger:
             debugger.error('app', 'Flask server error', e)
+        # Self-healing: run all fixer.py healing operations
+        try:
+            import subprocess
+            healing_ops = [
+                "fix_indentation",
+                "remove_stray_sql",
+                "clean_merge_markers",
+                "repair_dependencies",
+                "validate_config",
+                "check_database_integrity",
+                "cleanup_logs",
+            ]
+            for op in healing_ops:
+                print(f"🩺 Attempting self-healing: {op}...")
+                subprocess.run(["python3", "fixer.py", op], check=False)
+            print("🩺 All self-healing routines completed. Please restart Clever if errors persist.")
+        except Exception as heal_err:
+            print(f"⚠️  Self-healing failed: {heal_err}")
         if error_recovery:
             recovery_result = error_recovery.handle_error(e, {'context': 'flask_server_startup'})
             if recovery_result.get('recovery_attempted'):
@@ -1773,5 +762,3 @@ if __name__ == '__main__':
     finally:
         if debugger:
             debugger.info('app', 'Clever AI shutdown complete')
-
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

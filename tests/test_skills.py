@@ -10,8 +10,6 @@ spec.loader.exec_module(clever_app)
 
 
 def test_summarize_ok():
-<<<<<<< HEAD
-=======
     """
     Test successful text summarization API endpoint functionality.
     
@@ -21,7 +19,6 @@ def test_summarize_ok():
     How: Uses Flask test client to POST text data, validates HTTP 200 response
          and confirms 'summary' field exists in JSON response.
     """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     c = clever_app.app.test_client()
     r = c.post('/api/summarize', json={'text': 'Hello world. This is Clever. Local only.'})
     assert r.status_code == 200
@@ -30,8 +27,6 @@ def test_summarize_ok():
 
 
 def test_search_empty():
-<<<<<<< HEAD
-=======
     """
     Test search API endpoint behavior with empty query parameters.
     
@@ -42,7 +37,6 @@ def test_search_empty():
     How: Sends GET request with empty query parameter, validates
          HTTP 200 status and empty list response format.
     """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     c = clever_app.app.test_client()
     r = c.get('/api/search?q=')
     assert r.status_code == 200

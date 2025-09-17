@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # persona.py — Clever Persona Engine (offline‑only, Jay‑specific)
 """
 Persona Engine for Clever AI
@@ -21,7 +20,6 @@ Connects to:
     - app.py: Main application for user interaction
 """
 # persona.py — Clever Persona Engine (offline‑only, Jay‑specific)
-=======
 """
 Persona Engine Module - AI personality and response generation for Clever.
 
@@ -36,7 +34,6 @@ How: Provides PersonaEngine class with mode-specific response generation,
      sentiment analysis integration, and proactive suggestion system using
      local NLP processing and rule-based personality modeling.
 """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 from __future__ import annotations
 
 from types import SimpleNamespace
@@ -44,19 +41,13 @@ import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-<<<<<<< HEAD
 # Import your NLP helper (lazy-loaded spaCy + sentiment)
-=======
 # Import NLP helper with lazy-loaded spaCy + sentiment analysis
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 from nlp_processor import nlp_processor
 
 logger = logging.getLogger(__name__)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 class PersonaResponse(SimpleNamespace):
     """
     Simple container for persona responses.  Fields:
@@ -66,30 +57,21 @@ class PersonaResponse(SimpleNamespace):
       proactive_suggestions: List[str] -> Suggestions appended to reply (if any)
       quality_score: Optional[float]    -> Reserved for future scoring
     """
-<<<<<<< HEAD
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     text: str
     mode: str
     sentiment: float
     proactive_suggestions: List[str]
     quality_score: Optional[float] = None
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 class PersonaEngine:
     """
     Persona engine for Clever.  Each mode has a style function and an optional
     suggestion generator.  This engine never calls external services—everything
     runs locally via the nlp_processor and simple heuristics.
     """
-<<<<<<< HEAD
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def __init__(self, name: str = "Clever", owner: str = "Jay") -> None:
         self.name = name
         self.owner = owner
@@ -101,7 +83,6 @@ class PersonaEngine:
             "Quick Hit": self._quick_hit_style,
         }
 
-<<<<<<< HEAD
     def generate(
         self,
         text: str,
@@ -118,7 +99,6 @@ class PersonaEngine:
             return PersonaResponse(
                 text="", mode=mode, sentiment=0.0, proactive_suggestions=[]
             )
-=======
     def generate(self,
                  text: str,
                  mode: str = "Auto",
@@ -127,7 +107,6 @@ class PersonaEngine:
         """Generate a reply given input text, mode, optional chat history, and context."""
         if not text:
             return PersonaResponse(text="", mode=mode, sentiment=0.0, proactive_suggestions=[])
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
         history = history or []
         context = context or {}
@@ -137,19 +116,15 @@ class PersonaEngine:
         sentiment = nlp_res.sentiment
         keywords = nlp_res.keywords
 
-<<<<<<< HEAD
         # Log ambiguous or creative phrasing for self-learning
         if self._is_ambiguous_or_creative(text):
             logger.info(f"Ambiguous/creative input logged for self-learning: {text}")
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         # Select style function; default to Auto if unknown
         style_fn = self.modes.get(mode, self._auto_style)
 
         # Build reply text and suggestions
         reply = style_fn(text, keywords, context, history)
-<<<<<<< HEAD
         reply = self._respond_with_curiosity_and_nuance(text, reply)
         suggestions: List[str] = []
 
@@ -162,13 +137,11 @@ class PersonaEngine:
             suggestions.append(
                 "I can search your files for more details. Try describing your problem or code."
             )
-=======
         suggestions: List[str] = []
 
         # Proactive suggestion example
         if mode == "Auto" and any(w in text.lower() for w in ["file", "code", "project"]) and not suggestions:
             suggestions.append("I can search your files for more details. Try describing your problem or code.")
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
         return PersonaResponse(
             text=reply,
@@ -178,7 +151,6 @@ class PersonaEngine:
             quality_score=None,
         )
 
-<<<<<<< HEAD
     def _is_ambiguous_or_creative(self, text: str) -> bool:
         """Detect if input is ambiguous, metaphorical, or creative."""
         creative_markers = [
@@ -208,7 +180,6 @@ class PersonaEngine:
         context: Dict[str, Any],
         history: List[Dict[str, Any]],
     ) -> str:
-=======
     # --------- Mode Styles ---------
 
     def _auto_style(self,
@@ -216,7 +187,6 @@ class PersonaEngine:
                     keywords: List[str],
                     context: Dict[str, Any],
                     history: List[Dict[str, Any]]) -> str:
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """Balanced and useful: reflect + next steps + ask follow-up."""
         t = text.strip()
         parts = [f"Got it — {t}."]
@@ -230,7 +200,6 @@ class PersonaEngine:
         parts.append("Want me to go quick or dive deeper?")
         return " ".join(parts)
 
-<<<<<<< HEAD
     def _creative_style(
         self,
         text: str,
@@ -238,18 +207,15 @@ class PersonaEngine:
         context: Dict[str, Any],
         history: List[Dict[str, Any]],
     ) -> str:
-=======
     def _creative_style(self,
                         text: str,
                         keywords: List[str],
                         context: Dict[str, Any],
                         history: List[Dict[str, Any]]) -> str:
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """Creative tone. Encourage brainstorming and imaginative twists."""
         intro = "✨ Let’s get creative. "
         idea = f"Imagine “{text.strip()}” as part of a story or design. "
         if keywords:
-<<<<<<< HEAD
             idea += (
                 f"We could weave in themes like {', '.join(keywords[:3])}. "
             )
@@ -266,7 +232,6 @@ class PersonaEngine:
         context: Dict[str, Any],
         history: List[Dict[str, Any]],
     ) -> str:
-=======
             idea += f"We could weave in themes like {', '.join(keywords[:3])}. "
         if context.get("goal"):
             idea += f"All while staying true to your goal of {context['goal']}."
@@ -277,7 +242,6 @@ class PersonaEngine:
                          keywords: List[str],
                          context: Dict[str, Any],
                          history: List[Dict[str, Any]]) -> str:
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """Deep Dive tone. Break down problems systematically."""
         parts = ["Let’s dive deeper. Quick analysis:"]
 
@@ -290,7 +254,6 @@ class PersonaEngine:
                     ctx_parts.append(f"{k}: {context[k]}")
             if ctx_parts:
                 parts.append("Context – " + "; ".join(ctx_parts) + ".")
-<<<<<<< HEAD
         parts.append(
             "Feel free to ask follow‑up questions or provide more details."
         )
@@ -335,7 +298,6 @@ class PersonaEngine:
 persona_engine = PersonaEngine()
 
 
-=======
         parts.append("Feel free to ask follow‑up questions or provide more details.")
         return " ".join(parts)
 
@@ -365,28 +327,21 @@ persona_engine = PersonaEngine()
 # Instantiate a global persona engine for use in app.py
 persona_engine = PersonaEngine()
 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 class CleverPersona:
     """
     Main persona class that integrates with NLP processor and database manager.
     This is the interface expected by app.py.
     """
-<<<<<<< HEAD
 
-=======
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def __init__(self, nlp_processor, db_manager):
         """Initialize CleverPersona with NLP processor and database manager."""
         self.nlp_processor = nlp_processor
         self.db_manager = db_manager
         self.persona_engine = PersonaEngine(name="Clever", owner="Jay")
         self.last_used_trait = "core"  # Default trait
-<<<<<<< HEAD
 
-=======
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def generate_response(self, analysis):
         """Generate a response based on provided analysis (dict or namespace).
 
@@ -396,39 +351,30 @@ class CleverPersona:
         """
         # Normalize analysis into a dict
         a = analysis
-<<<<<<< HEAD
         if hasattr(a, "__dict__"):
-=======
         if hasattr(a, '__dict__'):
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             a = vars(a)
         if not isinstance(a, dict):
             a = {}
 
-<<<<<<< HEAD
         user_text = (a.get("user_input") or "").strip()
         # Pull keywords/sentiment from analysis or compute locally
         kws = list(a.get("keywords") or [])
         sent = a.get("sentiment")
-=======
         user_text = (a.get('user_input') or '').strip()
         # Pull keywords/sentiment from analysis or compute locally
         kws = list(a.get('keywords') or [])
         sent = a.get('sentiment')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if user_text and (not kws or sent is None):
             try:
                 n = nlp_processor.process(user_text)
                 if not kws:
-<<<<<<< HEAD
                     kws = list(getattr(n, "keywords", []) or [])
                 if sent is None:
                     sent = float(getattr(n, "sentiment", 0.0) or 0.0)
-=======
                     kws = list(getattr(n, 'keywords', []) or [])
                 if sent is None:
                     sent = float(getattr(n, 'sentiment', 0.0) or 0.0)
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             except Exception:
                 sent = float(sent or 0.0)
         if sent is None:
@@ -453,11 +399,8 @@ class CleverPersona:
         self.last_used_trait = trait
 
         # Use original text, not a placeholder
-<<<<<<< HEAD
         source_text = user_text or (", ".join(kws) if kws else "your request")
-=======
         source_text = user_text or (', '.join(kws) if kws else 'your request')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
         # Generate the reply
         response = self.persona_engine.generate(
@@ -469,16 +412,13 @@ class CleverPersona:
 
         # Tighten overly generic outputs by adding a small actionable nudge
         out_text = response.text.strip()
-<<<<<<< HEAD
         if (
             user_text
             and user_text.endswith("?")
             and "Let’s" not in out_text
             and "Let's" not in out_text
         ):
-=======
         if user_text and user_text.endswith('?') and 'Let’s' not in out_text and "Let's" not in out_text:
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             out_text += " If you can share one detail, I’ll get specific."
 
         return {
@@ -488,25 +428,19 @@ class CleverPersona:
             "keywords": kws,
             "proactive_suggestions": response.proactive_suggestions,
         }
-<<<<<<< HEAD
 
-=======
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def _determine_mode(self, sentiment, keywords):
         """Determine the appropriate mode based on sentiment and keywords."""
         if sentiment < -0.3:
             return "Support"
         if sentiment > 0.5:
             return "Creative"
-<<<<<<< HEAD
         if any(
             word in keywords
             for word in ["analyze", "deep", "detail", "explain"]
         ):
-=======
         if any(word in keywords for word in ["analyze", "deep", "detail", "explain"]):
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             return "Deep Dive"
         if any(word in keywords for word in ["quick", "fast", "brief"]):
             return "Quick Hit"

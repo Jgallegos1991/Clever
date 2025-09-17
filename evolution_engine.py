@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 Clever's Evolution Engine - Self-Learning Intelligence Core
 
@@ -35,7 +34,6 @@ from config import DB_PATH
 from database import DatabaseManager
 
 # Load spaCy model - required for full operation
-=======
 #!/usr/bin/env python3
 """
 Evolution Engine Module - Self-learning intelligence core for Clever AI.
@@ -72,16 +70,13 @@ import spacy
 import config
 
 # Load spaCy model for text processing
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 nlp = spacy.load("en_core_web_sm")
 
 
 @dataclass
 class ConceptNode:
-<<<<<<< HEAD
     """Represents a learned concept in Clever's mind"""
 
-=======
     """
     Represents a learned concept in Clever's evolving knowledge network.
     
@@ -95,7 +90,6 @@ class ConceptNode:
     How: Stores concept metadata including creation time, strength metrics,
          related concepts as a network, and source interactions for traceability.
     """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     concept_id: str
     name: str
     strength: float
@@ -105,7 +99,6 @@ class ConceptNode:
     source_interactions: List[str]
     confidence: float
 
-<<<<<<< HEAD
 
 class CleverEvolutionEngine:
     """
@@ -495,7 +488,6 @@ class CleverEvolutionEngine:
         concept_id = self.generate_concept_id(name)
         now = datetime.now()
 
-=======
 class CleverEvolutionEngine:
     """Autonomous intelligence growth system"""
     
@@ -519,7 +511,6 @@ class CleverEvolutionEngine:
         
         # Concept network table
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS concept_network (
                 concept_id TEXT PRIMARY KEY,
                 name TEXT,
                 strength REAL DEFAULT 0.1,
@@ -534,7 +525,6 @@ class CleverEvolutionEngine:
         
         # Interaction patterns table
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS interaction_patterns (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 pattern_hash TEXT UNIQUE,
                 pattern_type TEXT,
@@ -548,7 +538,6 @@ class CleverEvolutionEngine:
         
         # Knowledge connections table
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS knowledge_connections (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 concept_a TEXT,
                 concept_b TEXT,
@@ -561,7 +550,6 @@ class CleverEvolutionEngine:
         
         # Evolution events table
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS evolution_events (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_type TEXT,
                 description TEXT,
@@ -573,7 +561,6 @@ class CleverEvolutionEngine:
         
         # Capability tracking table
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS capability_evolution (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 capability_name TEXT,
                 current_level REAL DEFAULT 0.1,
@@ -721,7 +708,6 @@ class CleverEvolutionEngine:
         concept_id = self.generate_concept_id(name)
         now = datetime.now()
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         concept = ConceptNode(
             concept_id=concept_id,
             name=name,
@@ -730,7 +716,6 @@ class CleverEvolutionEngine:
             last_reinforced=now,
             related_concepts=set(),
             source_interactions=[user_message[:100]],
-<<<<<<< HEAD
             confidence=0.1,
         )
 
@@ -748,7 +733,6 @@ class CleverEvolutionEngine:
             # type: ignore
             concept = self.concept_graph.nodes[concept_id]["concept"]
 
-=======
             confidence=0.1
         )
         
@@ -762,12 +746,10 @@ class CleverEvolutionEngine:
         if concept_id in self.concept_graph:
             concept = self.concept_graph.nodes[concept_id]['concept']
             
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             # Calculate reinforcement
             base_reinforcement = 0.05
             sentiment_multiplier = 1.0 + (sentiment_bonus * 0.5)
             time_decay = self.calculate_time_decay(concept.last_reinforced)
-<<<<<<< HEAD
 
             reinforcement = (
                 base_reinforcement * sentiment_multiplier * time_decay
@@ -854,7 +836,6 @@ class CleverEvolutionEngine:
     def calculate_connection_strength(
         self, concept_a: str, concept_b: str, context: str
     ) -> float:
-=======
             
             reinforcement = base_reinforcement * sentiment_multiplier * time_decay
             
@@ -902,13 +883,11 @@ class CleverEvolutionEngine:
         return None
     
     def calculate_connection_strength(self, concept_a: str, concept_b: str, context: str) -> float:
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """Calculate strength of connection between concepts"""
         # Distance in text
         context_lower = context.lower()
         pos_a = context_lower.find(concept_a.lower())
         pos_b = context_lower.find(concept_b.lower())
-<<<<<<< HEAD
 
         if pos_a == -1 or pos_b == -1:
             return 0.0
@@ -1127,7 +1106,6 @@ class CleverEvolutionEngine:
         for concept in pdf_concepts:
             concept_id = self.generate_concept_id(concept["name"])
 
-=======
         
         if pos_a == -1 or pos_b == -1:
             return 0.0
@@ -1274,23 +1252,18 @@ class CleverEvolutionEngine:
         for concept in pdf_concepts:
             concept_id = self.generate_concept_id(concept['name'])
             
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             if concept_id not in self.concept_graph:
                 # Create new concept from PDF
                 new_concept = ConceptNode(
                     concept_id=concept_id,
-<<<<<<< HEAD
                     name=concept["name"],
                     strength=concept["strength"],
-=======
                     name=concept['name'],
                     strength=concept['strength'],
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                     creation_time=datetime.now(),
                     last_reinforced=datetime.now(),
                     related_concepts=set(),
                     source_interactions=[f"PDF: {filename}"],
-<<<<<<< HEAD
                     confidence=concept["confidence"],
                 )
 
@@ -1389,7 +1362,6 @@ class CleverEvolutionEngine:
 
         return concepts
 
-=======
                     confidence=concept['confidence']
                 )
                 
@@ -1461,29 +1433,24 @@ class CleverEvolutionEngine:
         
         return concepts
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def extract_domain_terms(self, content: str) -> List[str]:
         """Extract domain-specific terminology"""
         # Technical terms, proper nouns, specialized vocabulary
         domain_patterns = [
-<<<<<<< HEAD
             r"\b[A-Z][a-z]+(?:[A-Z][a-z]+)+\b",  # CamelCase
             r"\b[A-Z]{2,}\b",  # Acronyms
             r"\b\w+(?:[-_]\w+)+\b",  # Hyphenated/underscored terms
         ]
 
-=======
             r'\b[A-Z][a-z]+(?:[A-Z][a-z]+)+\b',  # CamelCase
             r'\b[A-Z]{2,}\b',  # Acronyms
             r'\b\w+(?:[-_]\w+)+\b',  # Hyphenated/underscored terms
         ]
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         terms = []
         for pattern in domain_patterns:
             matches = re.findall(pattern, content)
             terms.extend([match.lower() for match in matches])
-<<<<<<< HEAD
 
         return list(set(terms))[:15]  # Limit to prevent noise
 
@@ -1533,7 +1500,6 @@ class CleverEvolutionEngine:
 
             self.save_concept(concept)
 
-=======
         
         return list(set(terms))[:15]  # Limit to prevent noise
     
@@ -1572,12 +1538,10 @@ class CleverEvolutionEngine:
             
             self.save_concept(concept)
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def optimize_connection_weights(self):
         """Optimize connection weights using network analysis"""
         # Use PageRank to identify important concepts
         try:
-<<<<<<< HEAD
             pagerank_scores = nx.pagerank(self.concept_graph)  # type: ignore
 
             for node_id, score in pagerank_scores.items():
@@ -1593,7 +1557,6 @@ class CleverEvolutionEngine:
         except Exception as e:
             print(f"PageRank optimization failed: {e}")
 
-=======
             pagerank_scores = nx.pagerank(self.concept_graph)
             
             for node_id, score in pagerank_scores.items():
@@ -1605,27 +1568,22 @@ class CleverEvolutionEngine:
         except Exception as e:
             print(f"PageRank optimization failed: {e}")
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def identify_knowledge_clusters(self) -> List[Dict]:
         """Identify clusters of related knowledge"""
         try:
             # Use community detection
-<<<<<<< HEAD
             undirected_graph = self.concept_graph.to_undirected()  # type: ignore
             communities = nx.community.greedy_modularity_communities(  # type: ignore
                 undirected_graph
             )
 
-=======
             undirected_graph = self.concept_graph.to_undirected()
             communities = nx.community.greedy_modularity_communities(undirected_graph)
             
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             clusters = []
             for i, community in enumerate(communities):
                 cluster_concepts = []
                 for node_id in community:
-<<<<<<< HEAD
                     # type: ignore
                     # type: ignore
                     concept = self.concept_graph.nodes[node_id]["concept"]
@@ -1681,7 +1639,6 @@ class CleverEvolutionEngine:
 
         effective_patterns = cursor.fetchall()
 
-=======
                     concept = self.concept_graph.nodes[node_id]['concept']
                     cluster_concepts.append({
                         'name': concept.name,
@@ -1718,28 +1675,22 @@ class CleverEvolutionEngine:
         
         effective_patterns = cursor.fetchall()
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         # Update pattern weights for future responses
         pattern_weights = {}
         for pattern_type, avg_effectiveness, usage_count in effective_patterns:
             weight = avg_effectiveness * (1 + usage_count * 0.1)
             pattern_weights[pattern_type] = min(2.0, weight)
-<<<<<<< HEAD
 
         # Save pattern weights
         cursor.execute(
             """
-=======
         
         # Save pattern weights
         cursor.execute('''
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
-            CREATE TABLE IF NOT EXISTS response_patterns (
                 pattern_type TEXT PRIMARY KEY,
                 weight REAL,
                 last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-<<<<<<< HEAD
         """
         )
 
@@ -1898,7 +1849,6 @@ class CleverEvolutionEngine:
 
         return min(1.0, max(0.0, evolution_score))
 
-=======
         ''')
         
         for pattern_type, weight in pattern_weights.items():
@@ -1988,7 +1938,6 @@ class CleverEvolutionEngine:
         
         return min(1.0, evolution_score)
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     # Utility methods
     def categorize_sentiment(self, sentiment: float) -> str:
         """Categorize sentiment into ranges"""
@@ -1998,7 +1947,6 @@ class CleverEvolutionEngine:
             return "negative"
         else:
             return "neutral"
-<<<<<<< HEAD
 
     def detect_question_type(self, message: str) -> str:
         """Detect type of question"""
@@ -2018,7 +1966,6 @@ class CleverEvolutionEngine:
         else:
             return "statement"
 
-=======
     
     def detect_question_type(self, message: str) -> str:
         """Detect type of question"""
@@ -2032,12 +1979,10 @@ class CleverEvolutionEngine:
         else:
             return "statement"
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def analyze_response_style(self, response: str) -> str:
         """Analyze Clever's response style"""
         if len(response) > 200:
             return "detailed"
-<<<<<<< HEAD
         elif any(
             word in response.lower()
             for word in ["!", "awesome", "great", "excited"]
@@ -2051,7 +1996,6 @@ class CleverEvolutionEngine:
         else:
             return "conversational"
 
-=======
         elif any(word in response.lower() for word in ['!', 'awesome', 'great', 'excited']):
             return "enthusiastic"
         elif any(word in response.lower() for word in ['however', 'although', 'consider']):
@@ -2059,12 +2003,10 @@ class CleverEvolutionEngine:
         else:
             return "conversational"
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def calculate_time_decay(self, last_time: datetime) -> float:
         """Calculate time decay factor"""
         hours_passed = (datetime.now() - last_time).total_seconds() / 3600
         return max(0.1, 1.0 - (hours_passed / 168))  # Decay over week
-<<<<<<< HEAD
 
     def save_concept(self, concept: ConceptNode):
         """
@@ -2194,7 +2136,6 @@ class CleverEvolutionEngine:
             }
         )
 
-=======
     
     def save_concept(self, concept: ConceptNode):
         """Save concept to database"""
@@ -2266,15 +2207,11 @@ class CleverEvolutionEngine:
             'timestamp': datetime.now(),
             'impact_score': impact_score
         })
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 # Global evolution engine instance
 evolution_engine = None
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def get_evolution_engine():
     """Get global evolution engine instance"""
     global evolution_engine

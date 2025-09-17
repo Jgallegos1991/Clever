@@ -1,6 +1,5 @@
 """
 Debug Configuration - Comprehensive debugging and logging system for Clever AI
-<<<<<<< HEAD
 
 # Project Coding Instructions:
 # See .github/copilot-instructions.md for architecture, documentation, and workflow rules.
@@ -20,8 +19,6 @@ Connects to:
     - nlp_processor.py: NLP processing performance and error tracking
     - database.py: Database operation monitoring and error reporting
     - All modules: Centralized logging and debugging infrastructure
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 """
 
 import os
@@ -33,7 +30,6 @@ from typing import Dict, Any, Optional
 import json
 from functools import wraps
 
-<<<<<<< HEAD
 
 class CleverDebugger:
     """
@@ -88,7 +84,6 @@ class CleverDebugger:
             "performance_metrics": True,
         }
 
-=======
 class CleverDebugger:
     """Enhanced debugging system for Clever AI"""
     
@@ -114,12 +109,10 @@ class CleverDebugger:
             'performance_metrics': True
         }
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         # Performance tracking
         self.performance_metrics = {}
         self.error_count = 0
         self.warning_count = 0
-<<<<<<< HEAD
 
     def setup_logging(self):
         """
@@ -169,7 +162,6 @@ class CleverDebugger:
             os.path.join(
                 self.debug_dir, f"clever_errors_{self.session_id}.log"
             )
-=======
         
     def setup_logging(self):
         """Setup comprehensive logging system"""
@@ -203,12 +195,10 @@ class CleverDebugger:
         # Error-only handler
         error_handler = logging.FileHandler(
             os.path.join(self.debug_dir, f'clever_errors_{self.session_id}.log')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         )
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(file_formatter)
         self.logger.addHandler(error_handler)
-<<<<<<< HEAD
 
         # Performance metrics handler
         self.perf_logger = logging.getLogger("clever_performance")
@@ -226,7 +216,6 @@ class CleverDebugger:
         self.logger.info(f"Session ID: {self.session_id}")
         self.logger.info(f"Debug Level: {self.debug_level}")
 
-=======
         
         # Performance metrics handler
         self.perf_logger = logging.getLogger('clever_performance')
@@ -242,7 +231,6 @@ class CleverDebugger:
         self.logger.info(f"Session ID: {self.session_id}")
         self.logger.info(f"Debug Level: {self.debug_level}")
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def debug(self, component: str, message: str, data: Optional[Dict] = None):
         """Log debug message for specific component"""
         if self.debug_flags.get(component, False):
@@ -250,33 +238,26 @@ class CleverDebugger:
             if data:
                 log_msg += f" | Data: {json.dumps(data, default=str)[:200]}"
             self.logger.debug(log_msg)
-<<<<<<< HEAD
 
-=======
     
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def info(self, component: str, message: str, data: Optional[Dict] = None):
         """Log info message"""
         log_msg = f"[{component.upper()}] {message}"
         if data:
             log_msg += f" | {json.dumps(data, default=str)[:200]}"
         self.logger.info(log_msg)
-<<<<<<< HEAD
 
     def warning(
         self, component: str, message: str, data: Optional[Dict] = None
     ):
-=======
     
     def warning(self, component: str, message: str, data: Optional[Dict] = None):
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         """Log warning message"""
         self.warning_count += 1
         log_msg = f"[{component.upper()}] {message}"
         if data:
             log_msg += f" | {json.dumps(data, default=str)[:200]}"
         self.logger.warning(log_msg)
-<<<<<<< HEAD
 
     def error(
         self,
@@ -292,7 +273,6 @@ class CleverDebugger:
         if data:
             log_msg += f" | Data: {json.dumps(data, default=str)[:200]}"
 
-=======
     
     def error(self, component: str, message: str, error: Optional[Exception] = None, data: Optional[Dict] = None):
         """Log error with full traceback"""
@@ -302,14 +282,12 @@ class CleverDebugger:
         if data:
             log_msg += f" | Data: {json.dumps(data, default=str)[:200]}"
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         if error:
             log_msg += f" | Error: {str(error)}"
             self.logger.error(log_msg)
             self.logger.error(f"Traceback: {traceback.format_exc()}")
         else:
             self.logger.error(log_msg)
-<<<<<<< HEAD
 
     def track_performance(
         self,
@@ -337,7 +315,6 @@ class CleverDebugger:
         metrics["min_time"] = min(metrics["min_time"], duration)
         metrics["max_time"] = max(metrics["max_time"], duration)
 
-=======
     
     def track_performance(self, component: str, operation: str, duration: float, metadata: Optional[Dict] = None):
         """Track performance metrics"""
@@ -359,12 +336,10 @@ class CleverDebugger:
         metrics['min_time'] = min(metrics['min_time'], duration)
         metrics['max_time'] = max(metrics['max_time'], duration)
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         # Log performance
         perf_msg = f"{component}.{operation} | {duration:.4f}s | avg: {metrics['avg_time']:.4f}s"
         if metadata:
             perf_msg += f" | {json.dumps(metadata, default=str)[:100]}"
-<<<<<<< HEAD
 
         self.perf_logger.info(perf_msg)
 
@@ -411,7 +386,6 @@ class CleverDebugger:
 _debugger = None
 
 
-=======
         
         self.perf_logger.info(perf_msg)
     
@@ -454,12 +428,10 @@ _debugger = None
 # Global debugger instance
 _debugger = None
 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def get_debugger() -> CleverDebugger:
     """Get global debugger instance"""
     global _debugger
     if _debugger is None:
-<<<<<<< HEAD
         debug_level = os.environ.get("CLEVER_DEBUG_LEVEL", "INFO")
         _debugger = CleverDebugger(debug_level)
     return _debugger
@@ -468,20 +440,17 @@ def get_debugger() -> CleverDebugger:
 def debug_method(component: str):
     """Decorator for debugging method calls"""
 
-=======
         debug_level = os.environ.get('CLEVER_DEBUG_LEVEL', 'INFO')
         _debugger = CleverDebugger(debug_level)
     return _debugger
 
 def debug_method(component: str):
     """Decorator for debugging method calls"""
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             debugger = get_debugger()
             start_time = datetime.now()
-<<<<<<< HEAD
 
             try:
                 # Log method entry
@@ -537,7 +506,6 @@ def debug_method(component: str):
 def performance_monitor(component: str):
     """Decorator for monitoring function performance"""
 
-=======
             
             try:
                 # Log method entry
@@ -580,13 +548,11 @@ def performance_monitor(component: str):
 
 def performance_monitor(component: str):
     """Decorator for monitoring function performance"""
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             debugger = get_debugger()
             start_time = datetime.now()
-<<<<<<< HEAD
 
             try:
                 result = func(*args, **kwargs)
@@ -623,7 +589,6 @@ def performance_monitor(component: str):
 def debug_context(component: str, operation: str):
     """Context manager for debugging operations"""
 
-=======
             
             try:
                 result = func(*args, **kwargs)
@@ -653,21 +618,16 @@ def debug_context(component: str, operation: str):
 
 def debug_context(component: str, operation: str):
     """Context manager for debugging operations"""
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     class DebugContext:
         def __init__(self):
             self.debugger = get_debugger()
             self.start_time = None
-<<<<<<< HEAD
 
-=======
         
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         def __enter__(self):
             self.start_time = datetime.now()
             self.debugger.debug(component, f"Starting {operation}")
             return self
-<<<<<<< HEAD
 
         def __exit__(self, exc_type, exc_val, exc_tb):
             duration = (datetime.now() - self.start_time).total_seconds()
@@ -690,7 +650,6 @@ def debug_context(component: str, operation: str):
     return DebugContext()
 
 
-=======
         
         def __exit__(self, exc_type, exc_val, exc_tb):
             duration = (datetime.now() - self.start_time).total_seconds()
@@ -707,21 +666,16 @@ def debug_context(component: str, operation: str):
     
     return DebugContext()
 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 # Convenience functions
 def debug_log(component: str, message: str, data: Optional[Dict] = None):
     """Quick debug logging"""
     get_debugger().debug(component, message, data)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def info_log(component: str, message: str, data: Optional[Dict] = None):
     """Quick info logging"""
     get_debugger().info(component, message, data)
 
-<<<<<<< HEAD
 
 def error_log(
     component: str,
@@ -733,12 +687,10 @@ def error_log(
     get_debugger().error(component, message, error, data)
 
 
-=======
 def error_log(component: str, message: str, error: Optional[Exception] = None, data: Optional[Dict] = None):
     """Quick error logging"""
     get_debugger().error(component, message, error, data)
 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 def warning_log(component: str, message: str, data: Optional[Dict] = None):
     """Quick warning logging"""
     get_debugger().warning(component, message, data)

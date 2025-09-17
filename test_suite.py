@@ -1,8 +1,5 @@
 """
-<<<<<<< HEAD
 from database import DatabaseManager
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 Automated Testing System - Comprehensive test runner and validation for Clever AI
 """
 
@@ -98,18 +95,15 @@ class CleverTestSuite:
         
         # Test 1: Database connection
         try:
-<<<<<<< HEAD
             from config import DB_PATH
             from database import DatabaseManager
             with DatabaseManager(DB_PATH)._connect() as conn:
                 cursor = conn.cursor()
                 cursor.execute('SELECT 1')
-=======
             conn = sqlite3.connect('clever.db')
             cursor = conn.cursor()
             cursor.execute('SELECT 1')
             conn.close()
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             tests.append({'name': 'database_connection', 'status': 'passed'})
         except Exception as e:
             tests.append({'name': 'database_connection', 'status': 'failed', 'error': str(e)})
@@ -119,12 +113,9 @@ class CleverTestSuite:
             from knowledge_base import init_db
             init_db()
             
-<<<<<<< HEAD
             from config import DB_PATH
             conn = with DatabaseManager(DB_PATH)._connect() as conn:
-=======
             conn = sqlite3.connect('clever.db')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             cursor = conn.cursor()
             
             required_tables = [

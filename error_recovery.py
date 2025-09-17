@@ -1,6 +1,5 @@
 """
 Error Recovery System - Intelligent error handling and self-healing for Clever AI
-<<<<<<< HEAD
 
 Why: Provides intelligent error recovery and self-healing capabilities to maintain
 system stability and availability by automatically recovering from common failures
@@ -15,8 +14,6 @@ Connects to:
     - database.py: Handles database connection recovery strategies  
     - nlp_processor.py: Recovers from NLP model loading failures
     - app.py: Provides application-level error recovery and stability
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 """
 
 import traceback
@@ -29,7 +26,6 @@ from typing import Dict, List, Any, Optional, Callable
 from debug_config import get_debugger, debug_method
 
 class ErrorRecoverySystem:
-<<<<<<< HEAD
     """
     Handles errors intelligently and attempts self-healing operations
     
@@ -58,11 +54,9 @@ class ErrorRecoverySystem:
             - debug_config.py: Integrates with centralized debugging system
             - All modules: Provides error recovery for system components
         """
-=======
     """Handles errors intelligently and attempts self-healing"""
     
     def __init__(self):
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         self.debugger = get_debugger()
         self.error_history = []
         self.recovery_strategies = {}
@@ -76,7 +70,6 @@ class ErrorRecoverySystem:
         self._register_default_strategies()
     
     def _register_default_strategies(self):
-<<<<<<< HEAD
         """
         Register default recovery strategies for common error types
         
@@ -93,9 +86,7 @@ class ErrorRecoverySystem:
             - nlp_processor.py: NLP model loading recovery strategies  
             - System resources: Memory and resource recovery strategies
         """
-=======
         """Register default recovery strategies"""
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         
         # Database connection errors
         self.register_strategy(
@@ -266,11 +257,8 @@ class ErrorRecoverySystem:
             init_db()
             
             # Test connection
-<<<<<<< HEAD
             conn = DatabaseManager(config.DB_PATH)._connect()
-=======
             conn = sqlite3.connect('clever.db')
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             cursor = conn.cursor()
             cursor.execute('SELECT 1')
             conn.close()
@@ -291,7 +279,6 @@ class ErrorRecoverySystem:
         try:
             # Try to reload spaCy model
             import spacy
-<<<<<<< HEAD
             try:
                 nlp = spacy.load("en_core_web_sm")
             except OSError:
@@ -303,7 +290,6 @@ class ErrorRecoverySystem:
                 }
             # Test model
             doc = nlp("Test sentence")
-=======
             
             # Download model if missing
             try:
@@ -316,15 +302,11 @@ class ErrorRecoverySystem:
             # Test model
             doc = nlp("Test sentence")
             
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             return {
                 'success': True,
                 'message': 'NLP models restored'
             }
-<<<<<<< HEAD
-=======
             
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         except Exception as e:
             return {
                 'success': False,
@@ -391,7 +373,6 @@ class ErrorRecoverySystem:
     def _recover_import_issues(self, error_info: Dict[str, Any]) -> Dict[str, Any]:
         """Recover from import errors"""
         try:
-<<<<<<< HEAD
             # Strict offline: do not install missing packages
             error_message = error_info['error_message']
             if "No module named" in error_message:
@@ -402,7 +383,6 @@ class ErrorRecoverySystem:
                         'success': False,
                         'message': f'Missing package: {package_name}. Please install manually.'
                     }
-=======
             # Try to install missing packages
             error_message = error_info['error_message']
             
@@ -422,15 +402,11 @@ class ErrorRecoverySystem:
                         'message': f'Installed missing package: {package_name}'
                     }
             
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             return {
                 'success': False,
                 'message': 'Could not identify missing package'
             }
-<<<<<<< HEAD
-=======
             
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         except Exception as e:
             return {
                 'success': False,

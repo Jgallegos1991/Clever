@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 """
 Backup Manager Module - Automated backup system for Clever AI project files.
 
@@ -13,17 +11,14 @@ Where: Used by scheduled backup processes, deployment systems, and manual
 How: Implements ZIP-based backup creation with timestamp naming, automatic
      cleanup of old backups, and configurable retention policies.
 """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 import os
 from pathlib import Path
 import shutil
 import time
 import zipfile
-<<<<<<< HEAD
 
 class BackupManager:
     def __init__(self, project_path, keep_latest=1):
-=======
 import config
 
 import config
@@ -87,15 +82,12 @@ class BackupManager:
         if project_path is None:
             project_path = config.ROOT_DIR
  main
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         self.project_path = Path(project_path).expanduser()
         self.backup_dir = self.project_path / "backups"
         self.backup_dir.mkdir(parents=True, exist_ok=True)
         self.keep_latest = keep_latest
 
-<<<<<<< HEAD
     def create_backup(self):
-=======
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
     def create_backup(self):
         """
@@ -125,22 +117,18 @@ class BackupManager:
             Path: Location of created backup file
  main
         """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
         backup_name = f"backup_{timestamp}.zip"
         backup_path = self.backup_dir / backup_name
 
-<<<<<<< HEAD
         # Zip project folder
         with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, dirs, files in os.walk(self.project_path):
                 # Skip backups folder itself
-=======
         # Create ZIP archive of project folder
         with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, dirs, files in os.walk(self.project_path):
                 # Skip backups folder to prevent recursive inclusion
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
                 if str(self.backup_dir) in root:
                     continue
                 for file in files:
@@ -148,13 +136,11 @@ class BackupManager:
                     zipf.write(file_path, arcname=file_path.relative_to(self.project_path))
 
         print(f"Backup created: {backup_path}")
-<<<<<<< HEAD
 
         # Clean old backups
         self.cleanup_old_backups()
 
     def cleanup_old_backups(self):
-=======
         
         # Maintain retention policy
         self.cleanup_old_backups()
@@ -186,17 +172,14 @@ class BackupManager:
              backups beyond keep_latest limit, and removes older files safely.
  main
         """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         backups = sorted(self.backup_dir.glob("backup_*.zip"), key=os.path.getmtime, reverse=True)
         if len(backups) > self.keep_latest:
             for old_backup in backups[self.keep_latest:]:
                 old_backup.unlink()
                 print(f"Deleted old backup: {old_backup}")
 
-<<<<<<< HEAD
 if __name__ == "__main__":
     bm = BackupManager(project_path="~/Projects/Jordans_AI_Base", keep_latest=1)
-=======
 
 if __name__ == "__main__":
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
@@ -205,5 +188,4 @@ if __name__ == "__main__":
     # Default backup configuration using centralized settings
     bm = BackupManager(keep_latest=3)
  main
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     bm.create_backup()

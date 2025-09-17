@@ -56,15 +56,6 @@ fmt:
 
 lint:
 	$(ACTIVATE) && flake8 .
-
-<<<<<<< HEAD
-# Validate documentation standards and architecture compliance
-validate:
-	@echo "🔍 Validating Clever's documentation and architecture standards..."
-	@./validate-documentation.sh
-
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 test:
 	$(ACTIVATE) && pytest
 
@@ -182,10 +173,7 @@ help:
 	@echo "  test             Run pytest test suite"
 	@echo "  fmt              Format code with black"
 	@echo "  lint             Lint code with flake8"
-<<<<<<< HEAD
 	@echo "  validate         Validate documentation and architecture standards"
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 	@echo ""
 	@echo "📚 Content Processing:"
 	@echo "  ingest           Trigger manual ingestion via API"

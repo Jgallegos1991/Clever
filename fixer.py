@@ -10,8 +10,6 @@ from pathlib import Path
 
 
 def list_operations() -> List[str]:
-<<<<<<< HEAD
-=======
     """
     Return list of available self-repair operations for Clever AI system.
     
@@ -25,19 +23,23 @@ def list_operations() -> List[str]:
     Returns:
         List[str]: Names of available repair operations
     """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     return [
         "ensure_service_worker",
         "ensure_citations",
         "enable_autoswitch",
         "brighten_scene",
         "boost_particles",
+        "fix_indentation",
+        "remove_stray_sql",
+        "clean_merge_markers",
+        "repair_dependencies",
+        "validate_config",
+        "check_database_integrity",
+        "cleanup_logs",
     ]
 
 
 def apply(op: str) -> Tuple[bool, str]:
-<<<<<<< HEAD
-=======
     """
     Execute specified self-repair operation with safety validation.
     
@@ -54,7 +56,6 @@ def apply(op: str) -> Tuple[bool, str]:
     Returns:
         Tuple[bool, str]: (success_flag, status_message)
     """
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     if op == "ensure_service_worker":
         return _ensure_service_worker_present()
     if op == "ensure_citations":
@@ -65,7 +66,125 @@ def apply(op: str) -> Tuple[bool, str]:
         return _brighten_scene_constants()
     if op == "boost_particles":
         return _boost_particle_count()
+    if op == "fix_indentation":
+        return _run_code_cleaner("fix_indentation")
+    if op == "remove_stray_sql":
+        return _run_code_cleaner("remove_stray_sql")
+    if op == "clean_merge_markers":
+        return _run_code_cleaner("clean_merge_markers")
+    if op == "repair_dependencies":
+        return _repair_dependencies()
+    if op == "validate_config":
+        return _validate_config_files()
+    if op == "check_database_integrity":
+        return _check_database_integrity()
+    if op == "cleanup_logs":
+        return _cleanup_logs()
     return False, "unknown operation"
+def _repair_dependencies() -> Tuple[bool, str]:
+    """
+    Check and reinstall missing Python packages using requirements.txt.
+    """
+    import subprocess
+    try:
+        result = subprocess.run(["pip", "install", "-r", "requirements.txt"], capture_output=True, text=True)
+        if result.returncode == 0:
+            return True, "Dependencies repaired."
+        else:
+            return False, f"Dependency repair failed: {result.stderr.strip()}"
+    except Exception as e:
+        return False, f"Dependency repair error: {e}"
+
+def _validate_config_files() -> Tuple[bool, str]:
+    """
+    Validate and auto-correct config.py and user_config.py for required keys and values.
+    """
+    import importlib.util
+    import sys
+    required_keys = ["DB_PATH", "DEBUG"]
+    config_files = ["config.py", "user_config.py"]
+    fixed = []
+    for fname in config_files:
+        try:
+            spec = importlib.util.spec_from_file_location("cfg", fname)
+            cfg = importlib.util.module_from_spec(spec)
+            sys.modules["cfg"] = cfg
+            spec.loader.exec_module(cfg)
+            missing = [k for k in required_keys if not hasattr(cfg, k)]
+            if missing:
+                with open(fname, "a") as f:
+                    for k in missing:
+                        f.write(f"\n{k} = None  # Auto-added by fixer\n")
+                fixed.append(f"{fname}: added {missing}")
+        except Exception as e:
+            fixed.append(f"{fname}: error {e}")
+    if fixed:
+        return True, ", ".join(fixed)
+    return True, "Config files validated."
+
+def _check_database_integrity() -> Tuple[bool, str]:
+    """
+    Check clever.db for corruption and attempt auto-repair or backup restore.
+    """
+    import sqlite3
+    db_path = "clever.db"
+    try:
+        con = sqlite3.connect(db_path)
+        con.execute("PRAGMA integrity_check;")
+        result = con.execute("PRAGMA integrity_check;").fetchone()
+        con.close()
+        if result and result[0] == "ok":
+            return True, "Database integrity OK."
+        else:
+            # Attempt restore from backup if available
+            backup = Path("clever.db.bak")
+            if backup.exists():
+                Path(db_path).write_bytes(backup.read_bytes())
+                return True, "Database restored from backup."
+            return False, f"Database integrity failed: {result[0] if result else 'Unknown error'}"
+    except Exception as e:
+        return False, f"Database integrity error: {e}"
+
+def _cleanup_logs() -> Tuple[bool, str]:
+    """
+    Archive or clean up old log files in logs/.
+    """
+    import shutil
+    from datetime import datetime
+    log_dir = Path("logs")
+    archive_dir = log_dir / f"archive_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    if not log_dir.exists():
+        return True, "No logs directory."
+    log_files = [f for f in log_dir.iterdir() if f.is_file() and f.suffix == ".log"]
+    if not log_files:
+        return True, "No log files to clean."
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    for f in log_files:
+        shutil.move(str(f), str(archive_dir / f.name))
+    return True, f"Archived {len(log_files)} log files."
+def _run_code_cleaner(mode: str) -> Tuple[bool, str]:
+    """
+    Run context-aware code cleaner for self-healing.
+    Args:
+        mode: Which fix to apply (fix_indentation, remove_stray_sql, clean_merge_markers)
+    Returns:
+        Tuple[bool, str]: Success flag and status message
+    """
+    import subprocess
+    script = "auto_code_cleaner_v2.py"
+    arg_map = {
+        "fix_indentation": "--fix",
+        "remove_stray_sql": "--fix",
+        "clean_merge_markers": "--fix",
+    }
+    try:
+        result = subprocess.run(["python3", script, arg_map.get(mode, "--fix")], capture_output=True, text=True)
+        if result.returncode == 0:
+            return True, f"{mode} completed: {result.stdout.strip()}"
+        else:
+            return False, f"{mode} failed: {result.stderr.strip()}"
+    except Exception as e:
+        return False, f"{mode} error: {e}"
 
 
 def _ensure_service_worker_present() -> Tuple[bool, str]:

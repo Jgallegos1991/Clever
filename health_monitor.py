@@ -1,6 +1,5 @@
 """
 System Health Monitor - Real-time monitoring for Clever AI components
-<<<<<<< HEAD
 
 Why: Provides comprehensive system health monitoring and alerting to ensure
 optimal performance, resource management, and early detection of issues
@@ -15,8 +14,6 @@ Connects to:
     - app.py: Provides system status for health endpoints
     - database.py: Monitors database performance and connectivity  
     - System resources: Tracks CPU, memory, disk, and process metrics
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 """
 
 import psutil
@@ -28,7 +25,6 @@ from typing import Dict, List, Any
 from debug_config import get_debugger, debug_method
 
 class SystemHealthMonitor:
-<<<<<<< HEAD
     """
     Monitors system health and component status with intelligent alerting
     
@@ -58,11 +54,9 @@ class SystemHealthMonitor:
             - psutil: System resource monitoring and process tracking
             - Alerting systems: Health status reporting and notifications
         """
-=======
     """Monitors system health and component status"""
     
     def __init__(self):
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         self.debugger = get_debugger()
         self.start_time = datetime.now()
         self.health_checks = {}
@@ -81,7 +75,6 @@ class SystemHealthMonitor:
     
     @debug_method('health_monitor')
     def check_system_resources(self) -> Dict[str, Any]:
-<<<<<<< HEAD
         """
         Check system resource usage and performance metrics
         
@@ -101,9 +94,7 @@ class SystemHealthMonitor:
             - debug_config.py: Performance metrics logging
             - Alerting systems: Resource threshold monitoring
         """
-=======
         """Check system resource usage"""
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
         try:
             # Memory usage
             memory = psutil.virtual_memory()
@@ -187,11 +178,8 @@ class SystemHealthMonitor:
             health_data['size_mb'] = db_size
             
             # Check database connectivity
-<<<<<<< HEAD
             conn = DatabaseManager(db_path)._connect()
-=======
             conn = sqlite3.connect(db_path)
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
             cursor = conn.cursor()
             
             # Check table counts
