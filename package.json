@@ -1,0 +1,16 @@
+{
+  "name": "clever-ai-frontend",
+  "version": "1.0.0",
+  "description": "Frontend assets for Clever AI application",
+  "main": "static/js/main.js",
+  "scripts": {
+    "test": "echo \"No frontend tests configured yet\"",
+    "lint": "echo \"No linting configured yet\"",
+    "build": "echo \"No build step needed - static files\""
+  },
+  "keywords": ["ai", "frontend", "javascript"],
+  "author": "Jordan Gallegos",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}
