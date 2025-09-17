@@ -11,7 +11,7 @@ from file_ingestor import FileIngestor
 def _run_cycle():
     """
     Execute one complete sync and ingestion cycle for all configured directories.
-    
+
     Why: Performs automated synchronization and file processing to maintain
          up-to-date knowledge base without manual intervention.
     Where: Called by run_scheduler at configured intervals to process
@@ -30,14 +30,14 @@ def _run_cycle():
 def run_scheduler(stop_event: threading.Event | None = None):
     """
     Run the continuous scheduling system for automated sync and ingestion.
-    
+
     Why: Provides automated background processing to keep Clever AI's
          knowledge base synchronized with external file changes.
     Where: Main scheduler entry point, typically run as background service
            or in dedicated thread for continuous operation.
     How: Checks configuration, calculates interval timing, runs sync cycles
          in loop with interruptible sleep, handles errors gracefully.
-    
+
     Args:
         stop_event: Optional threading Event to enable graceful shutdown
     """

@@ -1,6 +1,9 @@
 """
-from database import DatabaseManager
 Automated Testing System - Comprehensive test runner and validation for Clever AI
+
+Why: Provides automated, comprehensive validation of all Clever AI components to ensure reliability, standards compliance, and system health.
+Where: Used in CI, local development, and system startup to run all critical and integration tests for the project.
+How: Defines CleverTestSuite class with methods for each test category, aggregates results, and reports status for all subsystems.
 """
 
 import unittest
@@ -14,7 +17,13 @@ from typing import Dict, List, Any, Optional
 from debug_config import get_debugger, debug_method
 
 class CleverTestSuite:
-    """Comprehensive test suite for Clever AI components"""
+    """
+    Comprehensive test suite for Clever AI components
+    
+    Why: Centralizes all automated tests for database, NLP, persona, file processing, API, UI, and integration to ensure system integrity and standards compliance.
+    Where: Used by run_all_tests(), CI pipelines, and manual test runs to validate Clever AI before deployment or release.
+    How: Initializes debugger, runs each test category, aggregates results, and provides detailed reporting.
+    """
     
     def __init__(self):
         self.debugger = get_debugger()

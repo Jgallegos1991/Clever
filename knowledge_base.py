@@ -75,7 +75,7 @@ def init_db() -> bool:
     try:
         with _db_lock:
             # Use centralized DatabaseManager - no direct sqlite3 connections
-            _db_manager = DatabaseManager(config.DB_PATH)
+                _db_manager = DatabaseManager(config.DB_PATH)
             
             # Use DatabaseManager's connection for table creation
             with _db_manager._connect() as conn:
@@ -102,7 +102,7 @@ _db_lock = threading.RLock()
 _db_manager = None
 
 
-def init_db(db_path: str | None = None) -> bool:
+def init_db() -> bool:
     """
     Initialize knowledge base database with extended schema.
     

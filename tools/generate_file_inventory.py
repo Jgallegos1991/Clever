@@ -22,22 +22,22 @@ def get_file_stats():
     Returns:
         defaultdict: Statistics dict with count, LOC, and size per extension
     """
-    stats = defaultdict(lambda: {'count': 0, 'loc': 0, 'size': 0})
+    stats = defaultdict(lambda: {"count": 0, "loc": 0, "size": 0})
     for root, dirs, files in os.walk(REPO_ROOT):
         for fname in files:
             fpath = os.path.join(root, fname)
-            ext = pathlib.Path(fname).suffix.lstrip('.') or 'other'
+            ext = pathlib.Path(fname).suffix.lstrip(".") or "other"
             try:
                 size = os.path.getsize(fpath)
-                with open(fpath, 'rb') as f:
+                with open(fpath, "rb") as f:
                     lines = sum(1 for _ in f)
             except Exception:
                 size = 0
                 lines = 0
                 raise  # Re-raise to maintain visibility of errors
-            stats[ext]['count'] += 1
-            stats[ext]['loc'] += lines
-            stats[ext]['size'] += size
+            stats[ext]["count"] += 1
+            stats[ext]["loc"] += lines
+            stats[ext]["size"] += size
     return stats
 
 
@@ -62,11 +62,9 @@ def get_last_modified():
             fpath = os.path.join(root, fname)
             try:
                 mtime = os.path.getmtime(fpath)
-                mod_dates[fpath] = datetime.datetime.fromtimestamp(
-                    mtime
-                ).isoformat()
+                mod_dates[fpath] = datetime.datetime.fromtimestamp(mtime).isoformat()
             except Exception:
-                mod_dates[fpath] = 'N/A'
+                mod_dates[fpath] = "N/A"
                 raise  # Re-raise to maintain error visibility
     return mod_dates
 
@@ -89,14 +87,12 @@ def generate_inventory():
         "# File Inventory (Auto-Generated)",
         "",
         f"_Generated: {datetime.datetime.now().isoformat()}_",
-        ""
+        "",
     ]
     lines.append("| Extension | Count | Total LOC | Total Size (bytes) |")
     lines.append("|-----------|-------|-----------|--------------------|")
-    for ext, data in sorted(stats.items(), key=lambda x: -x[1]['count']):
-        lines.append(
-            f"| {ext} | {data['count']} | {data['loc']} | {data['size']} |"
-        )
+    for ext, data in sorted(stats.items(), key=lambda x: -x[1]["count"]):
+        lines.append(f"| {ext} | {data['count']} | {data['loc']} | {data['size']} |")
     lines.append("")
     lines.append("## Last Modified Dates (Top 20 files)")
     top_mod = sorted(mod_dates.items(), key=lambda x: x[1], reverse=True)[:20]
@@ -104,7 +100,7 @@ def generate_inventory():
         rel_path = os.path.relpath(fpath, REPO_ROOT)
         lines.append(f"- `{rel_path}`: {mdate}")
     with open(INVENTORY_PATH, "w") as f:
-        f.write('\n'.join(lines))
+        f.write("\n".join(lines))
     print(f"Inventory written to {INVENTORY_PATH}")
 
 

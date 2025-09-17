@@ -2,16 +2,16 @@
 """
 Enhanced File Ingestor with PDF Support
 
-Intelligently processes PDFs, text files, and other documents for
-Clever's knowledge base.
+Why: Automates ingestion and processing of PDFs, text files, and other documents for Clever's knowledge base, enabling intelligent search and learning.
+Where: Used by sync watchers, manual ingestion scripts, and background automation to populate and update the knowledge base from local and synced sources.
+How: Detects supported files, extracts content and metadata, chunks large documents, performs NLP analysis, and stores results in the database via DatabaseManager.
 """
 
 import os
 import hashlib
+
 from pathlib import Path
 from typing import List, Dict, Tuple
-Intelligently processes PDFs, text files, and other documents for Clever's knowledge base.
-"""
 
 import os
 import json
@@ -42,10 +42,22 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 class EnhancedFileIngestor:
-    """Enhanced file ingestor with PDF support and intelligent chunking."""
+    """
+    Enhanced file ingestor with PDF support and intelligent chunking.
+    
+    Why: Centralizes and streamlines document ingestion for knowledge base updates and search.
+    Where: Used by watch_and_ingest(), manual runs, and background sync processes.
+    How: Handles directory setup, file type detection, and delegates extraction and chunking logic.
+    """
     
     def __init__(self, base_dirs: List[str] = None):
-        """Initialize with multiple directories to monitor."""
+        """
+        Initialize with multiple directories to monitor.
+        
+        Why: Sets up ingestion scope and supported file types for processing.
+        Where: Called by main script and EnhancedSyncHandler.
+        How: Expands user paths, sets up extensions, ensures directories exist.
+        """
         if base_dirs is None:
             base_dirs = [config.SYNC_DIR, "./Clever_Learn"]
             

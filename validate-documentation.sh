@@ -34,7 +34,13 @@ report_warning() {
 echo
 echo "📝 Checking mandatory documentation patterns..."
 
-python_files=$(find . -name "*.py" -not -path "./.venv/*" -not -path "./.git/*" -not -path "./__pycache__/*")
+python_files=$(find . -name "*.py" \
+    -not -path "./.venv/*" \
+    -not -path "./venv/*" \
+    -not -path "./env/*" \
+    -not -path "*/site-packages/*" \
+    -not -path "./.git/*" \
+    -not -path "./__pycache__/*")
 
 for file in $python_files; do
     if grep -q "def \|class " "$file"; then
@@ -56,7 +62,16 @@ echo
 echo "🗄️  Checking single database enforcement..."
 
 # Look for multiple database references
-if db_violations=$(grep -r "\.db" --include="*.py" . | grep -v "clever\.db" | grep -v "DB_PATH" | grep -v "#" | grep -v "test"); then
+if db_violations=$(grep -r "\.db" --include="*.py" . \
+    | grep -v "clever\.db" \
+    | grep -v "DB_PATH" \
+    | grep -v "#" \
+    | grep -v "test" \
+    | grep -v '/venv/' \
+    | grep -v '/site-packages/' \
+    | grep -v '/dist-packages/' \
+    | grep -v '/.venv/' \
+    | grep -v '/__pycache__/'); then
     if [ ! -z "$db_violations" ]; then
         report_error "Found references to databases other than clever.db:"
         echo "$db_violations"

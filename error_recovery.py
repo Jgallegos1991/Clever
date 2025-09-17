@@ -11,7 +11,7 @@ periods, and intelligent failure analysis to enable automatic self-healing.
 
 Connects to:
     - debug_config.py: Integrates with debugging system for error tracking
-    - database.py: Handles database connection recovery strategies  
+    - database.py: Handles database connection recovery strategies
     - nlp_processor.py: Recovers from NLP model loading failures
     - app.py: Provides application-level error recovery and stability
 """
@@ -25,10 +25,11 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional, Callable
 from debug_config import get_debugger, debug_method
 
+
 class ErrorRecoverySystem:
     """
     Handles errors intelligently and attempts self-healing operations
-    
+
     Why: Ensures system stability and availability by automatically detecting
     and recovering from common error conditions without manual intervention,
     reducing downtime and improving user experience.
@@ -37,11 +38,11 @@ class ErrorRecoverySystem:
     How: Implements configurable recovery strategies with attempt tracking,
     cooldown management, and intelligent error pattern recognition.
     """
-    
+
     def __init__(self):
         """
         Initialize the error recovery system
-        
+
         Why: Sets up intelligent error recovery infrastructure with strategy
         registration, attempt tracking, and debugging integration to enable
         automatic self-healing capabilities throughout the application.
@@ -49,30 +50,31 @@ class ErrorRecoverySystem:
         infrastructure used by all components for failure handling.
         How: Initializes recovery strategies, attempt tracking, cooldown
         management, and debugging integration for comprehensive error handling.
-        
+
         Connects to:
             - debug_config.py: Integrates with centralized debugging system
             - All modules: Provides error recovery for system components
         """
+
     """Handles errors intelligently and attempts self-healing"""
-    
+
     def __init__(self):
         self.debugger = get_debugger()
         self.error_history = []
         self.recovery_strategies = {}
         self.max_recovery_attempts = 3
         self.recovery_cooldown = 60  # seconds
-        
+
         # Track recovery attempts
         self.recovery_attempts = {}
-        
-        self.debugger.info('error_recovery', 'Error Recovery System initialized')
+
+        self.debugger.info("error_recovery", "Error Recovery System initialized")
         self._register_default_strategies()
-    
+
     def _register_default_strategies(self):
         """
         Register default recovery strategies for common error types
-        
+
         Why: Establishes automatic recovery capabilities for known failure
         patterns including database connections, NLP models, and memory issues
         to enable self-healing without manual intervention.
@@ -80,217 +82,242 @@ class ErrorRecoverySystem:
         throughout the application lifecycle for automatic error handling.
         How: Registers strategy functions with error pattern matching for
         intelligent recovery selection based on error characteristics.
-        
+
         Connects to:
             - database.py: Database connection recovery strategies
-            - nlp_processor.py: NLP model loading recovery strategies  
+            - nlp_processor.py: NLP model loading recovery strategies
             - System resources: Memory and resource recovery strategies
         """
         """Register default recovery strategies"""
-        
+
         # Database connection errors
         self.register_strategy(
-            'database_connection_error',
+            "database_connection_error",
             self._recover_database_connection,
-            ['connection', 'database', 'sqlite']
+            ["connection", "database", "sqlite"],
         )
-        
+
         # NLP model loading errors
         self.register_strategy(
-            'nlp_model_error',
+            "nlp_model_error",
             self._recover_nlp_models,
-            ['spacy', 'model', 'load', 'nlp']
+            ["spacy", "model", "load", "nlp"],
         )
-        
+
         # Memory errors
         self.register_strategy(
-            'memory_error',
-            self._recover_memory_issues,
-            ['memory', 'ram', 'allocation']
+            "memory_error", self._recover_memory_issues, ["memory", "ram", "allocation"]
         )
-        
+
         # File system errors
         self.register_strategy(
-            'file_system_error',
+            "file_system_error",
             self._recover_file_system,
-            ['file', 'directory', 'permission', 'path']
+            ["file", "directory", "permission", "path"],
         )
-        
+
         # Import errors
         self.register_strategy(
-            'import_error',
-            self._recover_import_issues,
-            ['import', 'module', 'package']
+            "import_error", self._recover_import_issues, ["import", "module", "package"]
         )
-    
-    @debug_method('error_recovery')
-    def register_strategy(self, name: str, recovery_func: Callable, keywords: List[str]):
+
+    @debug_method("error_recovery")
+    def register_strategy(
+        self, name: str, recovery_func: Callable, keywords: List[str]
+    ):
         """Register a recovery strategy"""
         self.recovery_strategies[name] = {
-            'function': recovery_func,
-            'keywords': keywords,
-            'success_count': 0,
-            'failure_count': 0
+            "function": recovery_func,
+            "keywords": keywords,
+            "success_count": 0,
+            "failure_count": 0,
         }
-        self.debugger.debug('error_recovery', f'Registered recovery strategy: {name}')
-    
-    @debug_method('error_recovery')
-    def handle_error(self, error: Exception, context: Dict[str, Any] = None) -> Dict[str, Any]:
+        self.debugger.debug("error_recovery", f"Registered recovery strategy: {name}")
+
+    @debug_method("error_recovery")
+    def handle_error(
+        self, error: Exception, context: Dict[str, Any] = None
+    ) -> Dict[str, Any]:
         """Handle an error with intelligent recovery"""
         error_info = {
-            'timestamp': datetime.now().isoformat(),
-            'error_type': type(error).__name__,
-            'error_message': str(error),
-            'traceback': traceback.format_exc(),
-            'context': context or {}
+            "timestamp": datetime.now().isoformat(),
+            "error_type": type(error).__name__,
+            "error_message": str(error),
+            "traceback": traceback.format_exc(),
+            "context": context or {},
         }
-        
-        self.debugger.error('error_recovery', 'Error occurred', error, {'context': context})
-        
+
+        self.debugger.error(
+            "error_recovery", "Error occurred", error, {"context": context}
+        )
+
         # Add to error history
         self.error_history.append(error_info)
-        
+
         # Identify recovery strategy
         strategy = self._identify_strategy(error_info)
-        
+
         recovery_result = {
-            'error_info': error_info,
-            'strategy_used': strategy,
-            'recovery_attempted': False,
-            'recovery_successful': False,
-            'recovery_message': None
+            "error_info": error_info,
+            "strategy_used": strategy,
+            "recovery_attempted": False,
+            "recovery_successful": False,
+            "recovery_message": None,
         }
-        
+
         if strategy:
             recovery_result.update(self._attempt_recovery(strategy, error_info))
         else:
-            self.debugger.warning('error_recovery', 'No recovery strategy found for error', {
-                'error_type': error_info['error_type']
-            })
-        
+            self.debugger.warning(
+                "error_recovery",
+                "No recovery strategy found for error",
+                {"error_type": error_info["error_type"]},
+            )
+
         return recovery_result
-    
+
     def _identify_strategy(self, error_info: Dict[str, Any]) -> Optional[str]:
         """Identify appropriate recovery strategy"""
         error_text = f"{error_info['error_type']} {error_info['error_message']} {error_info['traceback']}".lower()
-        
+
         # Score strategies based on keyword matches
         strategy_scores = {}
         for strategy_name, strategy_info in self.recovery_strategies.items():
             score = 0
-            for keyword in strategy_info['keywords']:
+            for keyword in strategy_info["keywords"]:
                 if keyword.lower() in error_text:
                     score += 1
-            
+
             if score > 0:
                 # Boost score based on historical success
-                success_rate = strategy_info['success_count'] / max(1, strategy_info['success_count'] + strategy_info['failure_count'])
+                success_rate = strategy_info["success_count"] / max(
+                    1, strategy_info["success_count"] + strategy_info["failure_count"]
+                )
                 strategy_scores[strategy_name] = score * (1 + success_rate)
-        
+
         # Return strategy with highest score
         if strategy_scores:
             best_strategy = max(strategy_scores.items(), key=lambda x: x[1])[0]
-            self.debugger.debug('error_recovery', f'Selected strategy: {best_strategy}', {
-                'scores': strategy_scores
-            })
+            self.debugger.debug(
+                "error_recovery",
+                f"Selected strategy: {best_strategy}",
+                {"scores": strategy_scores},
+            )
             return best_strategy
-        
+
         return None
-    
-    def _attempt_recovery(self, strategy_name: str, error_info: Dict[str, Any]) -> Dict[str, Any]:
+
+    def _attempt_recovery(
+        self, strategy_name: str, error_info: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Attempt recovery using specified strategy"""
         # Check cooldown
         last_attempt = self.recovery_attempts.get(strategy_name)
-        if last_attempt and (datetime.now() - last_attempt).seconds < self.recovery_cooldown:
+        if (
+            last_attempt
+            and (datetime.now() - last_attempt).seconds < self.recovery_cooldown
+        ):
             return {
-                'recovery_attempted': False,
-                'recovery_successful': False,
-                'recovery_message': f'Recovery strategy {strategy_name} in cooldown'
+                "recovery_attempted": False,
+                "recovery_successful": False,
+                "recovery_message": f"Recovery strategy {strategy_name} in cooldown",
             }
-        
+
         strategy_info = self.recovery_strategies[strategy_name]
-        recovery_func = strategy_info['function']
-        
+        recovery_func = strategy_info["function"]
+
         try:
-            self.debugger.info('error_recovery', f'Attempting recovery with strategy: {strategy_name}')
-            
+            self.debugger.info(
+                "error_recovery", f"Attempting recovery with strategy: {strategy_name}"
+            )
+
             # Attempt recovery
             recovery_result = recovery_func(error_info)
-            
+
             # Update tracking
             self.recovery_attempts[strategy_name] = datetime.now()
-            
-            if recovery_result.get('success', False):
-                strategy_info['success_count'] += 1
-                self.debugger.info('error_recovery', f'Recovery successful: {strategy_name}')
+
+            if recovery_result.get("success", False):
+                strategy_info["success_count"] += 1
+                self.debugger.info(
+                    "error_recovery", f"Recovery successful: {strategy_name}"
+                )
             else:
-                strategy_info['failure_count'] += 1
-                self.debugger.warning('error_recovery', f'Recovery failed: {strategy_name}')
-            
+                strategy_info["failure_count"] += 1
+                self.debugger.warning(
+                    "error_recovery", f"Recovery failed: {strategy_name}"
+                )
+
             return {
-                'recovery_attempted': True,
-                'recovery_successful': recovery_result.get('success', False),
-                'recovery_message': recovery_result.get('message', 'Recovery attempted')
+                "recovery_attempted": True,
+                "recovery_successful": recovery_result.get("success", False),
+                "recovery_message": recovery_result.get(
+                    "message", "Recovery attempted"
+                ),
             }
-            
+
         except Exception as recovery_error:
-            strategy_info['failure_count'] += 1
-            self.debugger.error('error_recovery', f'Recovery strategy {strategy_name} failed', recovery_error)
-            
+            strategy_info["failure_count"] += 1
+            self.debugger.error(
+                "error_recovery",
+                f"Recovery strategy {strategy_name} failed",
+                recovery_error,
+            )
+
             return {
-                'recovery_attempted': True,
-                'recovery_successful': False,
-                'recovery_message': f'Recovery failed: {str(recovery_error)}'
+                "recovery_attempted": True,
+                "recovery_successful": False,
+                "recovery_message": f"Recovery failed: {str(recovery_error)}",
             }
-    
-    def _recover_database_connection(self, error_info: Dict[str, Any]) -> Dict[str, Any]:
+
+    def _recover_database_connection(
+        self, error_info: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Recover from database connection errors"""
         try:
             # Try to recreate database connection
             import sqlite3
             from knowledge_base import init_db
-            
+
             # Wait a moment
             time.sleep(1)
-            
+
             # Try to initialize database
             init_db()
-            
+
             # Test connection
             conn = DatabaseManager(config.DB_PATH)._connect()
-            conn = sqlite3.connect('clever.db')
+            conn = sqlite3.connect("clever.db")
             cursor = conn.cursor()
-            cursor.execute('SELECT 1')
+            cursor.execute("SELECT 1")
             conn.close()
-            
-            return {
-                'success': True,
-                'message': 'Database connection restored'
-            }
-            
+
+            return {"success": True, "message": "Database connection restored"}
+
         except Exception as e:
-            return {
-                'success': False,
-                'message': f'Database recovery failed: {str(e)}'
-            }
-    
+            return {"success": False, "message": f"Database recovery failed: {str(e)}"}
+
     def _recover_nlp_models(self, error_info: Dict[str, Any]) -> Dict[str, Any]:
         """Recover from NLP model loading errors"""
         try:
             # Try to reload spaCy model
             import spacy
+
             try:
                 nlp = spacy.load("en_core_web_sm")
             except OSError:
                 # Model not found, strict offline: cannot download
-                self.debugger.error('error_recovery', 'Missing spaCy model: en_core_web_sm. Please install manually.')
+                self.debugger.error(
+                    "error_recovery",
+                    "Missing spaCy model: en_core_web_sm. Please install manually.",
+                )
                 return {
-                    'success': False,
-                    'message': 'Missing spaCy model: en_core_web_sm. Please install manually.'
+                    "success": False,
+                    "message": "Missing spaCy model: en_core_web_sm. Please install manually.",
                 }
             # Test model
             doc = nlp("Test sentence")
-            
+
             # Download model if missing
             try:
                 nlp = spacy.load("en_core_web_sm")
@@ -298,159 +325,157 @@ class ErrorRecoverySystem:
                 # Model not found, try to download
                 os.system("python -m spacy download en_core_web_sm")
                 nlp = spacy.load("en_core_web_sm")
-            
+
             # Test model
             doc = nlp("Test sentence")
-            
-            return {
-                'success': True,
-                'message': 'NLP models restored'
-            }
-            
+
+            return {"success": True, "message": "NLP models restored"}
+
         except Exception as e:
-            return {
-                'success': False,
-                'message': f'NLP model recovery failed: {str(e)}'
-            }
-    
+            return {"success": False, "message": f"NLP model recovery failed: {str(e)}"}
+
     def _recover_memory_issues(self, error_info: Dict[str, Any]) -> Dict[str, Any]:
         """Recover from memory issues"""
         try:
             import gc
-            
+
             # Force garbage collection
             gc.collect()
-            
+
             # Clear caches if possible
             try:
                 from functools import lru_cache
+
                 # Clear any LRU caches
                 for obj in gc.get_objects():
-                    if hasattr(obj, 'cache_clear'):
+                    if hasattr(obj, "cache_clear"):
                         obj.cache_clear()
             except:
                 pass
-            
-            return {
-                'success': True,
-                'message': 'Memory cleanup performed'
-            }
-            
+
+            return {"success": True, "message": "Memory cleanup performed"}
+
         except Exception as e:
-            return {
-                'success': False,
-                'message': f'Memory recovery failed: {str(e)}'
-            }
-    
+            return {"success": False, "message": f"Memory recovery failed: {str(e)}"}
+
     def _recover_file_system(self, error_info: Dict[str, Any]) -> Dict[str, Any]:
         """Recover from file system errors"""
         try:
             # Create missing directories
             required_dirs = [
-                'templates', 'static', 'uploads', 'logs',
-                'Clever_Sync', 'synaptic_hub_sync'
+                "templates",
+                "static",
+                "uploads",
+                "logs",
+                "Clever_Sync",
+                "synaptic_hub_sync",
             ]
-            
+
             created_dirs = []
             for dir_name in required_dirs:
                 if not os.path.exists(dir_name):
                     os.makedirs(dir_name, exist_ok=True)
                     created_dirs.append(dir_name)
-            
-            message = f"Created missing directories: {created_dirs}" if created_dirs else "File system verified"
-            
-            return {
-                'success': True,
-                'message': message
-            }
-            
+
+            message = (
+                f"Created missing directories: {created_dirs}"
+                if created_dirs
+                else "File system verified"
+            )
+
+            return {"success": True, "message": message}
+
         except Exception as e:
             return {
-                'success': False,
-                'message': f'File system recovery failed: {str(e)}'
+                "success": False,
+                "message": f"File system recovery failed: {str(e)}",
             }
-    
+
     def _recover_import_issues(self, error_info: Dict[str, Any]) -> Dict[str, Any]:
         """Recover from import errors"""
         try:
             # Strict offline: do not install missing packages
-            error_message = error_info['error_message']
+            error_message = error_info["error_message"]
             if "No module named" in error_message:
-                package_name = error_message.split("'")[1] if "'" in error_message else None
+                package_name = (
+                    error_message.split("'")[1] if "'" in error_message else None
+                )
                 if package_name:
-                    self.debugger.error('error_recovery', f"Missing package: {package_name}. Please install manually.")
+                    self.debugger.error(
+                        "error_recovery",
+                        f"Missing package: {package_name}. Please install manually.",
+                    )
                     return {
-                        'success': False,
-                        'message': f'Missing package: {package_name}. Please install manually.'
+                        "success": False,
+                        "message": f"Missing package: {package_name}. Please install manually.",
                     }
             # Try to install missing packages
-            error_message = error_info['error_message']
-            
+            error_message = error_info["error_message"]
+
             # Extract package name from error
             if "No module named" in error_message:
-                package_name = error_message.split("'")[1] if "'" in error_message else None
-                
+                package_name = (
+                    error_message.split("'")[1] if "'" in error_message else None
+                )
+
                 if package_name:
                     # Try to install package
                     os.system(f"pip install {package_name}")
-                    
+
                     # Try to import again
                     __import__(package_name)
-                    
+
                     return {
-                        'success': True,
-                        'message': f'Installed missing package: {package_name}'
+                        "success": True,
+                        "message": f"Installed missing package: {package_name}",
                     }
-            
-            return {
-                'success': False,
-                'message': 'Could not identify missing package'
-            }
-            
+
+            return {"success": False, "message": "Could not identify missing package"}
+
         except Exception as e:
-            return {
-                'success': False,
-                'message': f'Import recovery failed: {str(e)}'
-            }
-    
-    @debug_method('error_recovery')
+            return {"success": False, "message": f"Import recovery failed: {str(e)}"}
+
+    @debug_method("error_recovery")
     def get_error_statistics(self) -> Dict[str, Any]:
         """Get error and recovery statistics"""
         # Recent errors (last 24 hours)
         recent_cutoff = datetime.now() - timedelta(hours=24)
         recent_errors = [
-            error for error in self.error_history
-            if datetime.fromisoformat(error['timestamp']) > recent_cutoff
+            error
+            for error in self.error_history
+            if datetime.fromisoformat(error["timestamp"]) > recent_cutoff
         ]
-        
+
         # Error types
         error_types = {}
         for error in recent_errors:
-            error_type = error['error_type']
+            error_type = error["error_type"]
             error_types[error_type] = error_types.get(error_type, 0) + 1
-        
+
         # Strategy statistics
         strategy_stats = {}
         for name, info in self.recovery_strategies.items():
-            total_attempts = info['success_count'] + info['failure_count']
-            success_rate = info['success_count'] / max(1, total_attempts)
+            total_attempts = info["success_count"] + info["failure_count"]
+            success_rate = info["success_count"] / max(1, total_attempts)
             strategy_stats[name] = {
-                'total_attempts': total_attempts,
-                'success_count': info['success_count'],
-                'failure_count': info['failure_count'],
-                'success_rate': success_rate
+                "total_attempts": total_attempts,
+                "success_count": info["success_count"],
+                "failure_count": info["failure_count"],
+                "success_rate": success_rate,
             }
-        
+
         return {
-            'total_errors': len(self.error_history),
-            'recent_errors_24h': len(recent_errors),
-            'error_types': error_types,
-            'strategy_statistics': strategy_stats,
-            'active_strategies': len(self.recovery_strategies)
+            "total_errors": len(self.error_history),
+            "recent_errors_24h": len(recent_errors),
+            "error_types": error_types,
+            "strategy_statistics": strategy_stats,
+            "active_strategies": len(self.recovery_strategies),
         }
+
 
 # Global error recovery system
 _error_recovery = None
+
 
 def get_error_recovery() -> ErrorRecoverySystem:
     """Get global error recovery system"""
@@ -459,7 +484,10 @@ def get_error_recovery() -> ErrorRecoverySystem:
         _error_recovery = ErrorRecoverySystem()
     return _error_recovery
 
-def handle_error_with_recovery(error: Exception, context: Dict[str, Any] = None) -> Dict[str, Any]:
+
+def handle_error_with_recovery(
+    error: Exception, context: Dict[str, Any] = None
+) -> Dict[str, Any]:
     """Convenience function to handle error with recovery"""
     recovery_system = get_error_recovery()
     return recovery_system.handle_error(error, context)

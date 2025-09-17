@@ -9,13 +9,16 @@ Usage:
     python auto_code_cleaner.py [--fix]
     # --fix: actually applies fixes, otherwise just reports
 """
+
 import os
 import re
 import sys
 from pathlib import Path
 
 PYTHON_FILE_PATTERN = re.compile(r".*\.py$")
-SQL_PATTERN = re.compile(r"^(\s*)(CREATE|ALTER|INSERT|SELECT|UPDATE|DELETE)\s+TABLE", re.IGNORECASE)
+SQL_PATTERN = re.compile(
+    r"^(\s*)(CREATE|ALTER|INSERT|SELECT|UPDATE|DELETE)\s+TABLE", re.IGNORECASE
+)
 MERGE_MARKER_PATTERN = re.compile(r"^(<<<<<<<|=======|>>>>>>>)")
 
 INDENT_ERROR_PATTERN = re.compile(r"^\s+[^\s].*")
@@ -37,8 +40,8 @@ def scan_file(path: Path, fix: bool = False):
         # Remove stray SQL outside triple quotes
         if SQL_PATTERN.match(line):
             # Only keep if inside triple quotes
-            prev = lines[i-1] if i > 0 else ""
-            next = lines[i+1] if i+1 < len(lines) else ""
+            prev = lines[i - 1] if i > 0 else ""
+            next = lines[i + 1] if i + 1 < len(lines) else ""
             if not (prev.strip().startswith('"""') or next.strip().endswith('"""')):
                 REPORT.append(f"{path}: Stray SQL at line {i+1}")
                 changed = True
@@ -48,7 +51,7 @@ def scan_file(path: Path, fix: bool = False):
     for i, line in enumerate(new_lines):
         if line.startswith("    ") and line.lstrip().startswith("def "):
             # Function should not be indented unless inside a class
-            prev = new_lines[i-1] if i > 0 else ""
+            prev = new_lines[i - 1] if i > 0 else ""
             if not prev.strip().startswith("class "):
                 REPORT.append(f"{path}: Possible indentation error at line {i+1}")
                 changed = True
@@ -71,6 +74,7 @@ def main():
         print("\nFixes applied where possible.")
     else:
         print("\nRun with --fix to apply fixes.")
+
 
 if __name__ == "__main__":
     main()

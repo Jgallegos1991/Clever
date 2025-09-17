@@ -8,6 +8,7 @@ How: Uses ast and regex to detect/fix errors, outputs a detailed report, and can
 Usage:
     python3 auto_code_cleaner_v2.py [--fix]
 """
+
 import os
 import re
 import sys
@@ -15,7 +16,9 @@ from pathlib import Path
 import ast
 
 PYTHON_FILE_PATTERN = re.compile(r".*\.py$")
-SQL_PATTERN = re.compile(r"^(\s*)(CREATE|ALTER|INSERT|SELECT|UPDATE|DELETE)\s+TABLE", re.IGNORECASE)
+SQL_PATTERN = re.compile(
+    r"^(\s*)(CREATE|ALTER|INSERT|SELECT|UPDATE|DELETE)\s+TABLE", re.IGNORECASE
+)
 MERGE_MARKER_PATTERN = re.compile(r"^(<<<<<<<|=======|>>>>>>>)")
 EXCLUDE_DIRS = {"venv", ".venv", "site-packages", "__pycache__"}
 
@@ -26,7 +29,7 @@ def is_in_function_or_class(node):
     while node:
         if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
             return True
-        node = getattr(node, 'parent', None)
+        node = getattr(node, "parent", None)
     return False
 
 
@@ -48,8 +51,8 @@ def scan_file(path: Path, fix: bool = False):
             changed = True
             continue
         if SQL_PATTERN.match(line):
-            prev = lines[i-1] if i > 0 else ""
-            next = lines[i+1] if i+1 < len(lines) else ""
+            prev = lines[i - 1] if i > 0 else ""
+            next = lines[i + 1] if i + 1 < len(lines) else ""
             if not (prev.strip().startswith('"""') or next.strip().endswith('"""')):
                 REPORT.append(f"{path}: Stray SQL at line {i+1}")
                 changed = True
@@ -64,13 +67,17 @@ def scan_file(path: Path, fix: bool = False):
                 # Check for stray SQL in string expressions not assigned or used
                 if SQL_PATTERN.match(node.value.s):
                     if not is_in_function_or_class(node):
-                        REPORT.append(f"{path}: Stray SQL string outside function/class at line {node.lineno}")
+                        REPORT.append(
+                            f"{path}: Stray SQL string outside function/class at line {node.lineno}"
+                        )
                         changed = True
             if isinstance(node, ast.FunctionDef):
                 # Check for indentation errors in function body
                 for stmt in node.body:
-                    if hasattr(stmt, 'col_offset') and stmt.col_offset % 4 != 0:
-                        REPORT.append(f"{path}: Indentation error in function '{node.name}' at line {stmt.lineno}")
+                    if hasattr(stmt, "col_offset") and stmt.col_offset % 4 != 0:
+                        REPORT.append(
+                            f"{path}: Indentation error in function '{node.name}' at line {stmt.lineno}"
+                        )
                         changed = True
     except Exception as e:
         REPORT.append(f"{path}: AST parse error: {e}")
@@ -95,6 +102,7 @@ def main():
         print("\nFixes applied where possible.")
     else:
         print("\nRun with --fix to apply fixes.")
+
 
 if __name__ == "__main__":
     main()

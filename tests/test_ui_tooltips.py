@@ -1,6 +1,9 @@
 """
 Unit tests for UI tooltip functionality
-Tests that all buttons have consistent tooltip implementations
+
+Why: Ensures all UI buttons have consistent, accessible tooltip implementations for better user experience and compliance.
+Where: Used in automated test suite to validate HTML templates in Clever's frontend.
+How: Parses HTML files, checks for title attributes on buttons, and enforces tooltip consistency across templates.
 """
 
 import pytest
@@ -10,22 +13,46 @@ from bs4 import BeautifulSoup
 
 
 class TestUITooltips:
-    """Test suite for UI tooltip consistency and accessibility"""
+    """
+    Test suite for UI tooltip consistency and accessibility
+    
+    Why: Validates that all UI buttons have tooltips and that tooltip patterns are consistent for accessibility and usability.
+    Where: Used in CI and local test runs to enforce frontend standards.
+    How: Uses BeautifulSoup to parse HTML templates and pytest for assertions.
+    """
     
     @pytest.fixture
     def template_files(self):
-        """Get all HTML template files"""
+        """
+        Get all HTML template files
+        
+        Why: Provides a list of HTML templates to be checked for tooltips
+        Where: Used by all test methods in this suite
+        How: Uses pathlib to glob for .html files in the templates directory
+        """
         templates_dir = Path(__file__).resolve().parents[1] / 'templates'
         return list(templates_dir.glob('*.html'))
     
     def parse_html_file(self, file_path):
-        """Parse HTML file and return BeautifulSoup object"""
+        """
+        Parse HTML file and return BeautifulSoup object
+        
+        Why: Enables HTML parsing for tooltip validation
+        Where: Used by all test methods to inspect button elements
+        How: Reads file and parses with BeautifulSoup
+        """
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         return BeautifulSoup(content, 'html.parser')
     
     def test_button_tooltips_exist(self, template_files):
-        """Test that all buttons have tooltips (title attribute)"""
+        """
+        Test that all buttons have tooltips (title attribute)
+        
+        Why: Ensures every button is accessible and provides context to users
+        Where: Used in CI and local test runs for frontend compliance
+        How: Checks for missing title attributes and reports failures
+        """
         missing_tooltips = []
         
         for template_file in template_files:
@@ -49,7 +76,13 @@ class TestUITooltips:
         assert len(missing_tooltips) == 0, f"Buttons missing tooltips: {missing_tooltips}"
     
     def test_tooltip_consistency(self, template_files):
-        """Test that similar buttons have consistent tooltip patterns"""
+        """
+        Test that similar buttons have consistent tooltip patterns
+        
+        Why: Enforces UI consistency for better usability and maintainability
+        Where: Used in automated test suite for frontend standards
+        How: Compares tooltip text across similar buttons and reports inconsistencies
+        """
         button_patterns = {}
         
         for template_file in template_files:
