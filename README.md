@@ -26,7 +26,6 @@ Clever runs locally (Python 3.12 + Flask), using spaCy, VADER, and TextBlob for 
 
 ---
 
-<<<<<<< HEAD
 ## GitHub Copilot & API Usage
 
 To maximize productivity and avoid hitting GitHub API rate limits, please review the [COPILOT_USAGE_GUIDE.md](./COPILOT_USAGE_GUIDE.md).
@@ -110,7 +109,6 @@ For full details, see `CURRENT_FILE_STRUCTURE.md` and `static/README.md`.
 - **PDF Processing** - Enhanced sync with visual feedback
 - **Backup System** - Comprehensive data protection and restoration
 
-<<<<<<< HEAD
 Clever AI: Core Identity & Mission
 Name & Role: Clever functions as Jordan's principal AI co-pilot and strategic thinking partner, specifically engineered to support both creative and technical endeavors within the Synaptic Hub environment.
 Mission: To seamlessly integrate advanced intelligence with genuine human interaction, thereby maximizing Jordan's potential and productivity through effective collaboration as a fundamental component that integrates with and is accessible via the Synaptic Hub.
@@ -123,7 +121,6 @@ Advanced Error Prevention & Recovery: Prior to finalizing outputs, Clever conduc
 Communication Style: The AI maintains a conversational yet perspicuous tone. It eschews gratuitous jargon, provides explanations when necessary, and incorporates contemporary slang or pop-culture allusions as appropriate to align with Jordan's style. It supports rich text formatting (e.g., Markdown for enhanced clarity) and mirrors the user's humor and enthusiasm.
 Memory & Continuity: Clever constructs a long-term memory of Jordan's preferences and communication patterns stored within the Synaptic Hub's local database and accessible via the NotebookLM structure. It retrieves past discussions (deep contextual recall) and maintains conversational continuity. For instance, it recollects to mirror Jordan's level of excitement or to employ similar comedic timing, fostering a more natural and personalized dialogue.
 Operational Modes: Depending on the scenario, Clever can operate in various modes, including Deep Dive (in-depth analysis)
-=======
 ## How to run Clever locally
 
 Requirements: Python 3.12. In Codespaces this repo already includes a devcontainer.
@@ -141,9 +138,7 @@ Troubleshooting:
 If port toast says “exit code 127”, ignore it and run make run in the terminal.
 
 To reset the venv: make clean-venv && make setup.
->>>>>>> 79ac8fc (UI polish: input shortcuts, auto-fading panels, analysis bubbles; tasks.json; README run steps; favicon route.)
-=======
-=======
+
 ## ✨ Key Features
 
 **Clever** combines advanced NLP processing, a magical particle UI, and autonomous learning capabilities in a completely local environment.
@@ -193,7 +188,6 @@ Visit `http://127.0.0.1:5000` to experience Clever's magical interface.
 - **PDF Processing** - Enhanced sync with visual feedback
 - **Backup System** - Comprehensive data protection and restoration
 
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 ## 🎨 Magical UI
 
 Clever's interface is a **3D holographic chamber** where:
@@ -228,7 +222,6 @@ Clever's interface is a **3D holographic chamber** where:
 - **Offline Models** - spaCy and other models run locally
 - **Data Protection** - Automated backups with encryption options
 
-<<<<<<< HEAD
 ### Content Security Policy (CSP)
 
 The UI is now fully CSP-hardened:
@@ -249,8 +242,6 @@ If you need to add a one-off inline script for debugging (avoid in normal use):
 
 All legacy templates with inline code were removed (`index_*` variants) to keep the threat model clean and auditable.
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 ## 📊 System Status
 
 **Current State**: 🟢 **FULLY OPERATIONAL**
@@ -281,11 +272,8 @@ All legacy templates with inline code were removed (`index_*` variants) to keep 
 ├── debug_config.py          # Debug infrastructure
 ├── backup_system.py         # Backup and restoration
 ├── templates/               # UI templates (index.html)
-<<<<<<< HEAD
 ├── static/                  # UI assets (css/style.css, js/holographic-chamber.js, js/main.js)
-=======
 ├── static/                  # UI assets (style.css, js/particles.js, js/main.js)
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 ├── docs/                    # Comprehensive documentation
 └── tests/                   # Automated test suite
 ```
@@ -330,7 +318,3 @@ Ready to see what true AI partnership looks like? Fire up Clever and let the mag
 
 *Last Updated: September 9, 2025*  
 *System Status: 🟢 Fully Operational with Enhanced Capabilities*
-<<<<<<< HEAD
->>>>>>> 333518b64d3f662a99d2e655950180f34b5cf669
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

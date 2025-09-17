@@ -31,7 +31,6 @@ body {
   overflow: hidden;
 }
 
-<<<<<<< HEAD
 /* Particle Canvas - legacy Clever UI */
 #particles {
   position: fixed;
@@ -50,8 +49,6 @@ body {
   filter: none;
 }
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 /* Status indicator - cosmic status */
 .selfcheck { 
   position: fixed; 
@@ -268,20 +265,16 @@ body {
     transform: scale(1.05);
 }
 
-<<<<<<< HEAD
 /* Holographic Grid Stage - Reactive Energy Field */
 .grid-overlay {
     position: fixed;
-=======
 /* Magical grid overlay effect */
 .grid-overlay {
     position: absolute;
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-<<<<<<< HEAD
     opacity: 0.08;
     background-image: 
         linear-gradient(rgba(105, 234, 203, 0.15) 1px, transparent 1px),
@@ -328,7 +321,6 @@ body {
         transform: perspective(800px) rotateX(0deg) scale(1);
         opacity: 0.08;
     }
-=======
     opacity: 0.1;
     background-image: 
         linear-gradient(rgba(105, 234, 203, 0.1) 1px, transparent 1px),
@@ -342,7 +334,6 @@ body {
 @keyframes gridPulse {
     0%, 100% { opacity: 0.05; }
     50% { opacity: 0.15; }
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 }
 
 /* Enhanced button with magical effects */
@@ -461,17 +452,13 @@ body {
   }
 }
 
-<<<<<<< HEAD
 /* Clean modern layout - centered conversation */
-=======
 /* HUD overlay - interface emerges from the void */
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 .hud {
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
-<<<<<<< HEAD
   justify-content: center;
   align-items: center;
   padding: 20px;
@@ -638,7 +625,6 @@ body {
 
 .analysis-panel:hover {
   opacity: 1;
-=======
   justify-content: flex-end;
   padding: 24px;
   z-index: 2;
@@ -748,7 +734,6 @@ body {
   backdrop-filter: blur(10px);
   z-index: 2;
   max-width: 420px;
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 }
 .analysis-panel h3 { margin: 0 0 8px 0; font-size: 14px; color: var(--muted); }
 
@@ -762,7 +747,6 @@ body {
   flex-direction: column; 
 }
 
-<<<<<<< HEAD
 /* Modern smooth animations */
 @keyframes fadeInUp {
   from {
@@ -783,7 +767,6 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-=======
 @keyframes panel-emerge {
   0% {
     opacity: 0;
@@ -794,7 +777,6 @@ body {
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   }
 }
 
@@ -1097,21 +1079,17 @@ body.clean .grid-full::before {
 }
 
 /* Responsive design */
-<<<<<<< HEAD
 /* Responsive design */
 @media (max-width: 768px) {
   .hud {
     padding: 12px;
-=======
 @media (max-width: 768px) {
   .hud {
     padding: 16px;
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   }
   
   .chat-panel {
     max-width: 100%;
-<<<<<<< HEAD
     margin-bottom: 100px;
   }
   
@@ -1143,7 +1121,6 @@ body.clean .grid-full::before {
     right: 8px;
     font-size: 10px;
     padding: 4px 8px;
-=======
   }
   
   .entry {
@@ -1166,12 +1143,10 @@ body.clean .grid-full::before {
     right: 4px;
     font-size: 11px;
     padding: 6px 12px;
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   }
 }
 
 @media (max-width: 480px) {
-<<<<<<< HEAD
   .message {
     max-width: 90%;
   }
@@ -1202,7 +1177,6 @@ body.clean .grid-full::before {
   }
 }
 
-=======
   .entry .icon {
     padding: 8px 10px;
   }
@@ -1216,4 +1190,3 @@ body.clean .grid-full::before {
     padding: 12px 14px;
   }
 }
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

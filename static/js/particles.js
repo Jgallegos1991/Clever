@@ -103,11 +103,8 @@
     const {ctx,w,h,pts} = state;
     if (!ctx) return;
     ctx.clearRect(0,0,w,h);
-<<<<<<< HEAD
     
-=======
     const base = 'rgba(105,234,203,'; // soft teal
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     const pulse = state.pulse;
     for (const p of pts){
       // integrate motion
@@ -117,24 +114,20 @@
         p.vx += dx*0.0025*state.speed; p.vy += dy*0.0025*state.speed;
       } else {
         // gentle drift
-<<<<<<< HEAD
         p.vx += (Math.random()-0.5)*0.015*state.speed;
         p.vy += (Math.random()-0.5)*0.015*state.speed;
       }
       // damping
       p.vx *= 0.98; p.vy *= 0.98;
-=======
         p.vx += (Math.random()-0.5)*0.02*state.speed;
         p.vy += (Math.random()-0.5)*0.02*state.speed;
       }
       // damping
       p.vx *= 0.965; p.vy *= 0.965;
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
       p.x += p.vx; p.y += p.vy;
       if (p.x<0) p.x=w; else if (p.x>w) p.x=0;
       if (p.y<0) p.y=h; else if (p.y>h) p.y=0;
 
-<<<<<<< HEAD
       // More subtle, elegant particles
       const baseAlpha = Math.min(0.4, Math.max(0.02, p.a + pulse*0.2));
       const size = Math.max(0.5, p.s * 0.8 + pulse*0.5);
@@ -152,7 +145,6 @@
     }
     // decay pulse
     state.pulse *= 0.94;
-=======
       const a = Math.min(1, Math.max(0.06, p.a + pulse*0.35));
       const s = (p.s + pulse*1.1);
       ctx.fillStyle = base + a + ')';
@@ -160,7 +152,6 @@
     }
     // decay pulse
     state.pulse *= 0.92;
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   }
 
   function loop(){

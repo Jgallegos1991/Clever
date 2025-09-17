@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const analysisPanel = document.querySelector('.analysis-panel');
   const modeBtn = document.getElementById('mode-btn');
 
-<<<<<<< HEAD
   // Initialize holographic chamber with debugging
   const debugDiv = document.getElementById('debug-info');
   const canvasElem = document.getElementById('particles');
@@ -37,12 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
       startFunction: typeof window['startHolographicChamber']
     });
     debugDiv.innerHTML += '<br/>❌ Missing function or canvas';
-=======
   // Initialize particle canvas if present
   const canvasElem = document.getElementById('particles');
   if (canvasElem instanceof HTMLCanvasElement && typeof window.startParticles === 'function') {
     window.startParticles(canvasElem, { count: 4000 });
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   }
 
   // Send on click or Enter
@@ -70,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.triggerPulse === 'function') window.triggerPulse(0.5);
   });
 
-<<<<<<< HEAD
   // Click anywhere to focus input (immersive mode)
   document.addEventListener('click', (e) => {
     const target = e.target;
@@ -110,8 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   // Mode button is a status chip, not a toggle (auto-inferred mode)
   if (modeBtn) {
     modeBtn.addEventListener('click', () => {
@@ -137,14 +131,11 @@ async function sendMessage() {
   // Update status indicator (thinking) and mode chip based on initial guess
   setSelfcheckState('thinking', 'Thinking…');
   updateModeChip(inferModeFromAnalysis({ intent: guessIntentFromText(text) }, text));
-<<<<<<< HEAD
   
   // Trigger particle summon state
   if (window.holographicChamber) {
     window.holographicChamber.summon();
   }
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   // Try to morph shape immediately from user request (e.g., "form a cube")
   const preShape = inferShapeFromTextAndAnalysis(text, null);
   if (preShape && typeof window.morphForIntent === 'function') {
@@ -167,30 +158,24 @@ async function sendMessage() {
     const data = await res.json();
     const reply = data.response || '...';
   const aiEl = appendMessage('ai', reply);
-<<<<<<< HEAD
   
     // Switch to dialogue state when receiving response
     if (window.holographicChamber) {
       window.holographicChamber.dialogue();
     }
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
     if (data && typeof data === 'object') {
       updateAnalysis(data.analysis || {});
       // Update adaptive mode chip from analysis + reply semantics
       const mode = inferModeFromAnalysis(data.analysis || {}, reply);
       updateModeChip(mode);
-<<<<<<< HEAD
       // Morph holographic chamber based on shape intent
       
       // Show/hide glass panels based on conversation state
-=======
       // Morph field based on detected shape intent
       const shape = inferShapeFromTextAndAnalysis(null, data.analysis || {});
       if (shape && typeof window.morphForIntent === 'function') {
         window.morphForIntent(shape);
       }
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
       // Snap analysis panel under the latest AI message and animate highlight
       if (aiEl) {
         lastAiEl = aiEl;
@@ -221,7 +206,6 @@ async function sendMessage() {
     }
   // Mark done and show copy
   setSelfcheckState('ok', 'Done');
-<<<<<<< HEAD
   
     // Return to idle state after a delay
     setTimeout(() => {
@@ -229,8 +213,6 @@ async function sendMessage() {
         window.holographicChamber.idle();
       }
     }, 3000);
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
   showStatus('Energy takes shape.');
     // After a delay, return to idle microcopy
     setTimeout(() => {

@@ -1,5 +1,4 @@
 #!/bin/bash
-<<<<<<< HEAD
 
 # Documentation Enforcement Script
 # This script validates that all code follows Clever's documentation standards
@@ -119,7 +118,6 @@ else
     echo "Fix these issues before committing. Run this script again to verify."
     exit 1
 fi
-=======
  copilot/fix-cc2a9f5a-a710-4e20-9fec-adba0964457f
 # Documentation and Architecture Standards Validation Script
 # Validates that all Python files meet the Clever AI documentation standards
@@ -435,4 +433,3 @@ fi
 
 exit $EXIT_CODE
  main
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

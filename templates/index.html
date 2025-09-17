@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<<<<<<< HEAD
 <head>
-    <meta charset="utf-8" />
+    <met    <script src="{{ url_for('static', filename='js/holographic-chamber.js') }}?v={{ cache_buster }}" defer></script>
+    <script src="{{ url_for('static', filename='js/magic-orchestrator.js') }}?v={{ cache_buster }}" defer></script>
+    <!-- Note: Removed minimal particles-init.js from automatic load; remains available for emergency fallback via orchestrator dynamic import if needed. -->
+</body>harset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Clever AI</title>
     <!-- Core minimal landing styles (kept) -->
@@ -51,7 +53,6 @@
     <script src="{{ url_for('static', filename='js/magic-orchestrator.js') }}?v={{ cache_buster }}" defer></script>
     <!-- Note: Removed minimal particles-init.js from automatic load; remains available for emergency fallback via orchestrator dynamic import if needed. -->
 </body>
-=======
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -97,5 +98,4 @@
   <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   </body>
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 </html>

@@ -232,7 +232,6 @@ drawOrder: [
   - Catalogued state management and event handling systems
   - Documented Flask asset serving configuration
   - Designed nanobot pixels component specification for precision detail work
-=======
 # Frontend Interface
 
 ## 3D Holographic Chamber UI

@@ -3,14 +3,11 @@
 ## Unbreakable Rules
 1. **Strictly Offline:** Never add code that makes external network calls at runtime. All libraries and models must be local. Enforce with `utils.offline_guard.enable()`.
 2. **Single-User Only:** The system is for "Jordan" (Jay). No user accounts, logins, or multi-tenancy. Personalize via `user_config.py`. The persona is a witty, empathetic female AI named "Clever".
-<<<<<<< HEAD
 3. **Single Database:** Use only ONE database file (`clever.db` via `config.DB_PATH`). NO fallbacks, placeholders, or multiple database files.
 4. **Mandatory Code Documentation:** ALL code must include comments explaining:
    - **Why:** Purpose and reasoning for the code
    - **Where:** How it connects to other parts of the system  
    - **How:** Technical implementation details
-=======
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 ## Architecture Overview
 - **Framework:** Python 3.12 + Flask (`app.py`)
@@ -21,7 +18,6 @@
   - `evolution_engine.py`: Self-learning, memory, growth metrics
   - `nlp_processor.py`: Local NLP (spaCy, VADER, TextBlob)
   - `debug_config.py`: Debugging, monitoring
-<<<<<<< HEAD
 - **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), `static/js/holographic-chamber.js` (particle engine)
 
 ## Code Documentation Standards
@@ -66,7 +62,6 @@ def example_function(param1: str, param2: int) -> str:
 - **Testing:**
   - `make test` (pytest, see `pytest.ini`)
   - `test-offline.sh` (validates offline operation and single DB)
-=======
 - **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), engines under `static/js/`, performance modules
 
 ## Developer Workflows
@@ -78,21 +73,17 @@ def example_function(param1: str, param2: int) -> str:
 - **Testing:**
   - `make test` (pytest, see `pytest.ini`)
   - `test-offline.sh` (validates offline operation)
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 - **Debugging:**
   - Use `debug_config.py` for logging, performance, error recovery
 
 ## Project Conventions
-<<<<<<< HEAD
 - **Config:** Always import from centralized `config.py` - uses `DB_PATH` for single database
 - **Database:** Use `DatabaseManager` with thread safety (`_lock`) - ONLY `clever.db` file
 - **Error Handling:** Use debug system (`get_debugger`, `performance_monitor`)
 - **Documentation:** Every function must explain Why/Where/How connections
-=======
 - **Config:** Always import user info from `user_config.py`
 - **Database:** Use `DatabaseManager` with thread safety (`_lock`)
 - **Error Handling:** Use debug system (`get_debugger`, `performance_monitor`)
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 - **File Sync:**
   - Sync dirs: `Clever_Sync/`, `synaptic_hub_sync/`
   - Ingestion: `pdf_ingestor.py` (PDFs), `file_ingestor.py` (text)
@@ -227,8 +218,5 @@ def test_persona_auto_mode_smoke():
 ```
 
 ### Frontend pattern (particles + core app)
-<<<<<<< HEAD
 - Main UI at `templates/index.html`; JS entry `static/js/main.js` loads `static/js/holographic-chamber.js` particle engine. Performance modules under `static/js/performance/` loaded only in debug mode.
-=======
 - Main UI at `templates/index.html`; JS entry `static/js/core/app.js` controls particle engines under `static/js/engines/` and performance modules under `static/js/performance/`.
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

@@ -260,7 +260,6 @@ PRAGMA table_info(user_utterances);
 
 **Last Updated:** September 4, 2025  
 **Changelog:** Initial database documentation - comprehensive schema and operations guide
-=======
 # Clever Database Documentation
 
 ## Changelog

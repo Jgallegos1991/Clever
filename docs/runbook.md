@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Clever AI - Operations Runbook
 
 **Version:** 1.0  
@@ -426,7 +425,6 @@ When running with `debug=True` (default):
 ---
 
 *End of Runbook - Last updated: 2025-09-04*
-=======
 # Operations Runbook
 
 ## System Startup & Shutdown
@@ -623,4 +621,4 @@ ps aux | grep python
 
 **Last Updated:** September 4, 2025  
 **Changelog:** Initial runbook - comprehensive operational procedures established
->>>>>>> origin/jay-import
+

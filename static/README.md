@@ -2,17 +2,13 @@
 
 This directory contains all frontend assets for Clever, organized for maintainability and clarity.
 
-<<<<<<< HEAD
 
 ## 📁 Directory Structure (Cleaned)
-=======
 ## 📁 Directory Structure
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 
 ```
 static/
 ├── css/
-<<<<<<< HEAD
 │   ├── style.css            # Main stylesheet
 │   ├── landing.css          # Magical UI and particle styles
 │   └── test_basic.css       # Diagnostic template stylesheet
@@ -25,7 +21,6 @@ static/
 ├── assets/                  # Images and other assets
 │   └── *.png                # Screenshots and images
 └── README.md                # This file
-=======
 │   └── style.css                    # Main stylesheet
 ├── js/
 │   ├── core/                        # Core application files
@@ -52,12 +47,10 @@ static/
 ├── assets/                          # Images and other assets
 │   └── *.png                       # Screenshots and images
 └── README.md                        # This file
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 ```
 
 ## 🚀 Active Components
 
-<<<<<<< HEAD
 
 ### Currently Used Files:
 - **CSS**: `css/style.css`, `css/landing.css`, `css/test_basic.css`
@@ -80,7 +73,6 @@ static/
 
 - File organization follows modern web development best practices
 - All legacy/unused files have been removed for clarity
-=======
 ### Currently Used Files:
 - **CSS**: `css/style.css` - All styling for Clever's interface
 - **Core**: `js/core/app.js` - Main application logic and chat interface
@@ -99,7 +91,6 @@ static/
 
 - File organization follows modern web development best practices
 - Legacy files preserved in `unused/` and `archive/` directories
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
 - Version numbers in HTML template prevent caching issues during development
 - All paths are absolute from `/static/` for consistency
 
