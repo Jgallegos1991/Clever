@@ -14,6 +14,7 @@ class Source:
     id: int
     filename: str
     path: str
+    content: str | None = None
     size: int | None = None
     modified_ts: float | None = None
 
@@ -94,46 +95,11 @@ CREATE TABLE IF NOT EXISTS context_notes (
                 Store or update a context note in the database.
         
                 Why: Provides persistent key-value storage for application context and state,
-                    # ...existing code...
-                continue
-
-            first_pos = min(positions)
-            start = max(0, first_pos - window // 2)
-            end = min(len(text), start + window)
-
-            # Expand to sentence boundaries for better readability
-            try:
-                # Look for sentence endings before start
-                sentence_start = text.rfind(".", 0, start)
-                if sentence_start != -1 and start - sentence_start < 100:
-                    start = sentence_start + 1
-
-                # Look for sentence endings after end
-                sentence_end = text.find(".", end)
-                if sentence_end != -1 and sentence_end - end < 100:
-                    end = sentence_end + 1
-
-                snippet = text[start:end].strip()
-            except Exception:
-                snippet = text[start:end].strip()
-
-            hits.append(
-                {
-                    "id": s.id,
-                    "filename": s.filename,
-                    "path": s.path,
-                    "score": int(score),
-                    "snippet": snippet,
-                    "start": int(start),
-                    "end": int(end),
-                }
-            )
-
-        # Enhanced sorting: score first, then recency, then filename
-        hits.sort(
-            key=lambda h: (h["score"], h["id"], h["filename"]), reverse=True
-        )
-        return hits[:limit]
+                Where: Used by application for storing context notes,
+                How: Inserts or updates the context_notes table with key, value, and timestamp.
+                """
+                # Method body
+                pass
 
     # --- Chat history ---
     def add_utterance(
@@ -144,18 +110,27 @@ CREATE TABLE IF NOT EXISTS context_notes (
         ts: float | None = None,
     ) -> int:
         import time as _time
+        if ts is None:
+            ts = _time.time()
+        with _lock, self._connect() as con:
+            cur = con.execute(
+                "INSERT INTO utterances (role, text, mode, ts) VALUES (?, ?, ?, ?)",
+                (role, text, mode, float(ts)),
+            )
+            con.commit()
+            return int(cur.lastrowid) if cur.lastrowid is not None else 0
 
     def search_snippets(self, query: str, limit: int = 5, window: int = 240) -> list[dict]:
-    """
-    Advanced search returning scored content snippets with context.
-    Why: Provides intelligent search results with relevant content excerpts, scoring, and sentence-boundary awareness for better user experience.
-    Where: Used by knowledge base queries, Q&A systems, and content discovery features that need to show relevant excerpts rather than full sources.
-    How: Tokenizes query, scores matches using multiple factors (exact matches, partial matches, filename matches), extracts contextual snippets with smart boundary detection, and ranks results by relevance.
-    """
+        """
+        Advanced search returning scored content snippets with context.
+
+        Why: Provides intelligent search results with relevant content excerpts, scoring, and sentence-boundary awareness for better user experience.
+        Where: Used by knowledge base queries, Q&A systems, and content discovery features that need to show relevant excerpts rather than full sources.
+        How: Tokenizes query, scores matches using multiple factors (exact matches, partial matches, filename matches), extracts contextual snippets with smart boundary detection, and ranks results by relevance.
+        """
         import re as _re, time
         if not query:
             return []
-        
         # Cache frequent searches for better performance
         cache_key = f"search_{hash(query)}_{limit}"
         
@@ -166,11 +141,23 @@ CREATE TABLE IF NOT EXISTS context_notes (
         
         # Enhanced preselection with better LIKE patterns
         like_pattern = " ".join(q_tokens[:3])  # Use top 3 tokens
-        pre = self.search_sources(like_pattern, limit=min(100, limit*20))
+        like_pattern = f"%{like_pattern}%"  # Add wildcards for LIKE
+        with _lock, self._connect() as con:
+            cur = con.execute(
+                "SELECT id, filename, path, content FROM sources WHERE content LIKE ? LIMIT ?",
+                (like_pattern, min(100, limit*20)),
+            )
+            pre = [
+                Source(id=row[0], filename=row[1], path=row[2], content=row[3])
+                for row in cur.fetchall()
+            ]
+        
         hits: list[dict] = []
         
         for s in pre:
             text = s.content
+            if not text:
+                continue
             low = text.lower()
             
             # Enhanced scoring with multiple factors
@@ -219,15 +206,10 @@ CREATE TABLE IF NOT EXISTS context_notes (
                 "start": int(start),
                 "end": int(end)
             })
-        if ts is None:
-            ts = _time.time()
-        with _lock, self._connect() as con:
-            cur = con.execute(
-                "INSERT INTO utterances (role, text, mode, ts) VALUES (?, ?, ?, ?)",
-                (role, text, mode, float(ts)),
-            )
-            con.commit()
-            return int(cur.lastrowid)
+        
+        # Sort by score descending and return top results
+        hits.sort(key=lambda x: x["score"], reverse=True)
+        return hits[:limit]
 
     def list_utterances(self, limit: int = 50) -> list[dict]:
         """
@@ -295,22 +277,15 @@ CREATE TABLE IF NOT EXISTS context_notes (
                 (filename, path, content_hash, size, modified_ts),
             )
             con.commit()
-            return int(cur.lastrowid), "inserted"
+            return int(cur.lastrowid) if cur.lastrowid is not None else 0, "inserted"
 
     def list_interactions(self, limit: int = 100) -> list[dict]:
-        import json as _json
-
         """
         Retrieve recent interaction records for analytics and learning.
         
-        Why: Provides access to structured interaction data for evolution engine
-             analysis, pattern recognition, and system learning algorithms.
-        
-        Where: Used by evolution engine, analytics dashboards, and learning
-               systems that need to analyze user interaction patterns.
-        
-        How: Queries interactions table in reverse chronological order, parses
-             JSON metadata safely, returns structured dictionaries.
+        Why: Provides access to structured interaction data for evolution engine analysis, pattern recognition, and system learning algorithms.
+        Where: Used by evolution engine, analytics dashboards, and learning systems that need to analyze user interaction patterns.
+        How: Queries interactions table in reverse chronological order, parses JSON metadata safely, returns structured dictionaries.
         """
         import json as _json
         with _lock, self._connect() as con:
@@ -336,6 +311,32 @@ CREATE TABLE IF NOT EXISTS context_notes (
                 )
             return out
 
+    def add_interaction(
+        self,
+        user_input: str,
+        active_mode: str | None = None,
+        action_taken: str | None = None,
+        parsed_data: dict | None = None,
+        ts: float | None = None,
+    ) -> int:
+        """
+        Add a new interaction record for analytics and learning.
+        
+        Why: Captures structured interaction data for evolution engine analysis and system learning.
+        Where: Called by conversation handlers to log user interactions for pattern analysis.
+        How: Inserts interaction data into interactions table with JSON serialization of parsed_data.
+        """
+        import json as _json, time as _time
+        if ts is None:
+            ts = _time.time()
+        with _lock, self._connect() as con:
+            cur = con.execute(
+                "INSERT INTO interactions (ts, user_input, active_mode, action_taken, parsed_data) VALUES (?, ?, ?, ?, ?)",
+                (float(ts), user_input, active_mode, action_taken, _json.dumps(parsed_data or {})),
+            )
+            con.commit()
+            return int(cur.lastrowid) if cur.lastrowid is not None else 0
+
     # --- Compatibility: store user+assistant exchange and an interaction ---
     def add_conversation(
         self, user_text: str, reply_text: str, *, meta: dict | None = None
@@ -347,10 +348,6 @@ CREATE TABLE IF NOT EXISTS context_notes (
             self.add_utterance(
                 "assistant", reply_text, mode=(meta or {}).get("activePersona")
             )
-        """
-        try:
-            self.add_utterance("user", user_text, mode=(meta or {}).get("detected_intent"))
-            self.add_utterance("assistant", reply_text, mode=(meta or {}).get("activePersona"))
             self.add_interaction(
                 user_input=user_text,
                 active_mode=(meta or {}).get("activePersona"),

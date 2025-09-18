@@ -729,21 +729,6 @@ class CleverEvolutionEngine:
     def reinforce_concept(self, concept_id: str, sentiment_bonus: float = 0.0):
         """Strengthen existing concept"""
         if concept_id in self.concept_graph:
-            # type: ignore
-            # type: ignore
-            concept = self.concept_graph.nodes[concept_id]["concept"]
-
-            confidence=0.1
-        )
-        
-        self.concept_graph.add_node(concept_id, concept=concept)
-        self.save_concept(concept)
-        
-        return concept
-    
-    def reinforce_concept(self, concept_id: str, sentiment_bonus: float = 0.0):
-        """Strengthen existing concept"""
-        if concept_id in self.concept_graph:
             concept = self.concept_graph.nodes[concept_id]['concept']
             
             # Calculate reinforcement
@@ -1361,38 +1346,6 @@ class CleverEvolutionEngine:
             )
 
         return concepts
-
-                    confidence=concept['confidence']
-                )
-                
-                if hasattr(self.concept_graph, "add_node"):
-                    self.concept_graph.add_node(concept_id, concept=new_concept)
-                else:
-                    self.concept_graph[concept_id] = new_concept
-                self.save_concept(new_concept)
-                learning_results['concepts_learned'] += 1
-                
-                self.log_evolution_event("pdf_concept_discovery", 
-                                       f"Learned from PDF: {concept['name']}",
-                                       {"source": filename, "concept": concept['name']},
-                                       concept['strength'])
-            else:
-                # Reinforce with PDF knowledge
-                self.reinforce_concept(concept_id, concept['strength'])
-        
-        # Form connections between PDF concepts
-        for i, concept_a in enumerate(pdf_concepts):
-            for concept_b in pdf_concepts[i+1:]:
-                connection = self.analyze_concept_connection(concept_a['name'], concept_b['name'], content[:500])
-                if connection:
-                    learning_results['connections_formed'] += 1
-        
-        # Check for evolution threshold
-        if learning_results['concepts_learned'] > 5 or learning_results['connections_formed'] > 3:
-            self.trigger_evolution_cascade()
-            learning_results['evolution_triggered'] = True
-        
-        return learning_results
     
     def extract_pdf_concepts(self, content: str, entities: List[Dict], keywords: List[str]) -> List[Dict]:
         """Extract high-value concepts from PDF content"""
@@ -1440,11 +1393,6 @@ class CleverEvolutionEngine:
             r"\b[A-Z][a-z]+(?:[A-Z][a-z]+)+\b",  # CamelCase
             r"\b[A-Z]{2,}\b",  # Acronyms
             r"\b\w+(?:[-_]\w+)+\b",  # Hyphenated/underscored terms
-        ]
-
-            r'\b[A-Z][a-z]+(?:[A-Z][a-z]+)+\b',  # CamelCase
-            r'\b[A-Z]{2,}\b',  # Acronyms
-            r'\b\w+(?:[-_]\w+)+\b',  # Hyphenated/underscored terms
         ]
         
         terms = []

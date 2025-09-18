@@ -173,21 +173,18 @@ class PersonaEngine:
 
     # --------- Mode Styles ---------
 
-    def _auto_style(
-        self,
-        text: str,
-        keywords: List[str],
-        context: Dict[str, Any],
-        history: List[Dict[str, Any]],
-    ) -> str:
-    # --------- Mode Styles ---------
-
     def _auto_style(self,
                     text: str,
                     keywords: List[str],
                     context: Dict[str, Any],
                     history: List[Dict[str, Any]]) -> str:
-        """Balanced and useful: reflect + next steps + ask follow-up."""
+        """
+        Balanced and useful: reflect + next steps + ask follow-up.
+        
+        Why: Provides Clever's standard conversational mode
+        Where: Called by generate() for Auto mode responses
+        How: Balances reflection, information, and engagement
+        """
         t = text.strip()
         parts = [f"Got it — {t}."]
         # Quick actionable next-step suggestions from keywords

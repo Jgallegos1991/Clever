@@ -162,7 +162,7 @@ class CleverDebugger:
             os.path.join(
                 self.debug_dir, f"clever_errors_{self.session_id}.log"
             )
-        
+        )
     def setup_logging(self):
         """Setup comprehensive logging system"""
         
@@ -250,8 +250,6 @@ class CleverDebugger:
     def warning(
         self, component: str, message: str, data: Optional[Dict] = None
     ):
-    
-    def warning(self, component: str, message: str, data: Optional[Dict] = None):
         """Log warning message"""
         self.warning_count += 1
         log_msg = f"[{component.upper()}] {message}"
