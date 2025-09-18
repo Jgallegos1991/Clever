@@ -11,10 +11,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/stale@v9
         with:
-          stale-branch-message: 'This branch has been inactive for 30 days and will be closed soon.'
           days-before-stale: 30
-          days-before-delete: 7
-          delete-branch: true
+          days-before-close: 7
           stale-pr-message: 'This PR has been inactive for 30 days and will be closed soon.'
+          stale-issue-message: 'This issue has been inactive for 30 days and will be closed soon.'
           days-before-pr-stale: 30
           days-before-pr-close: 7
