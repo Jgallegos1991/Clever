@@ -1,5 +1,23 @@
 # Clever AI: Coding Agent Instructions
 
+## UI Vision
+- The stage (particle engine) is the focus
+- Chat bubbles should float and fade in/out, not stay boxed
+- Input bar should be minimal and unobtrusive
+- Give Clever center stage, remove persistent chat card
+
+## Code Conventions
+- Use modern JS and CSS (flex, transitions)
+- Keep markup minimal
+- Animate chat bubbles via CSS/JS
+- Prefer modular code (split JS/CSS if needed)
+
+## Feature Requests
+- Add fade-in/fade-out for chat bubbles
+- Remove persistent chat box/card
+- Make input bar glow and float at bottom center
+- Messages auto-hide after a few seconds
+
 ## Unbreakable Rules
 1. **Strictly Offline:** Never add code that makes external network calls at runtime. All libraries and models must be local. Enforce with `utils.offline_guard.enable()`.
 2. **Single-User Only:** The system is for "Jordan" (Jay). No user accounts, logins, or multi-tenancy. Personalize via `user_config.py`. The persona is a witty, empathetic female AI named "Clever".
