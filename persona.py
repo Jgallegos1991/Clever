@@ -1,13 +1,8 @@
-# persona.py — Clever Persona Engine (offline‑only, Jay‑specific)
 """
 Persona Engine for Clever AI
 
-# Project Coding Instructions:
-# See .github/copilot-instructions.md for architecture, documentation, and workflow rules.
-# All code must follow these standards.
-
 Why: Generates context-aware, empathetic responses in various modes (Auto,
-Creative, Deep Dive, Support, Quick Hit) for the single user. Operates fully
+Creative, Deep Dive, Support, Quick Hit) for Jay specifically. Operates fully
 offline, leveraging local NLP and heuristics.
 Where: Used by app.py for user interactions, connects to nlp_processor for
 language analysis and database for memory.
@@ -15,66 +10,54 @@ How: Implements PersonaEngine class with multiple response modes, integrates
 sentiment and suggestion generation, and returns PersonaResponse objects.
 
 Connects to:
-    - nlp_processor.py: NLP and sentiment analysis
+    - nlp_processor.py: NLP and sentiment analysis  
     - database.py: Memory and context storage
     - app.py: Main application for user interaction
 """
-# persona.py — Clever Persona Engine (offline‑only, Jay‑specific)
-"""
-Persona Engine Module - AI personality and response generation for Clever.
-
-Why: Implements multiple response modes and personality traits that create 
-     consistent, contextual interactions tailored to Jay's preferences while
-     maintaining offline-first architecture and local processing only.
-
-Where: Used by main Flask app, chat interface, and conversation management
-       to generate AI responses across different interaction scenarios.
-
-How: Provides PersonaEngine class with mode-specific response generation,
-     sentiment analysis integration, and proactive suggestion system using
-     local NLP processing and rule-based personality modeling.
-"""
 from __future__ import annotations
-
-from types import SimpleNamespace
 import logging
+import random
+from types import SimpleNamespace
 from datetime import datetime
 from typing import List, Dict, Any, Optional
-
-# Import your NLP helper (lazy-loaded spaCy + sentiment)
-# Import NLP helper with lazy-loaded spaCy + sentiment analysis
-from nlp_processor import nlp_processor
 
 logger = logging.getLogger(__name__)
 
 
 class PersonaResponse(SimpleNamespace):
     """
-    Simple container for persona responses.  Fields:
-      text: str              -> The assistant’s reply
-      mode: str              -> The mode used (Auto, Creative, Deep Dive, Support, Quick Hit)
-      sentiment: float       -> Sentiment score of the user’s input [-1.0, 1.0]
-      proactive_suggestions: List[str] -> Suggestions appended to reply (if any)
-      quality_score: Optional[float]    -> Reserved for future scoring
+    Response object from PersonaEngine
+    
+    Why: Structured container for AI responses with metadata
+    Where: Returned by PersonaEngine.generate() to app.py
+    How: SimpleNamespace with response text, mode, sentiment, suggestions
     """
-
-    text: str
-    mode: str
-    sentiment: float
-    proactive_suggestions: List[str]
-    quality_score: Optional[float] = None
+    def __init__(self, text: str, mode: str = "Auto", sentiment: str = "neutral", 
+                 proactive_suggestions: Optional[List[str]] = None):
+        super().__init__()
+        self.text = text
+        self.mode = mode  
+        self.sentiment = sentiment
+        self.proactive_suggestions = proactive_suggestions or []
 
 
 class PersonaEngine:
     """
-    Persona engine for Clever.  Each mode has a style function and an optional
-    suggestion generator.  This engine never calls external services—everything
-    runs locally via the nlp_processor and simple heuristics.
+    Main persona engine for Clever AI
+    
+    Why: Generates contextual responses matching Jay's preferences
+    Where: Core component used by Flask app for all AI interactions
+    How: Multiple response modes with personality traits and context awareness
     """
-
-    def __init__(self, name: str = "Clever", owner: str = "Jay") -> None:
-        self.name = name
-        self.owner = owner
+    
+    def __init__(self):
+        """
+        Initialize PersonaEngine with response modes
+        
+        Why: Set up available response modes and personality traits
+        Where: Called once during app initialization  
+        How: Define mode mappings and personality characteristics
+        """
         self.modes = {
             "Auto": self._auto_style,
             "Creative": self._creative_style,
@@ -82,362 +65,231 @@ class PersonaEngine:
             "Support": self._support_style,
             "Quick Hit": self._quick_hit_style,
         }
+        
+        # Jay-specific personality traits
+        self.personality_traits = {
+            "witty": True,
+            "empathetic": True,
+            "analytical": True,
+            "creative": True,
+            "supportive": True
+        }
 
     def generate(
         self,
         text: str,
-        mode: str = "Auto",
-        history: Optional[List[Dict[str, Any]]] = None,
+        mode: str = "Auto", 
         context: Optional[Dict[str, Any]] = None,
+        history: Optional[List[Dict[str, Any]]] = None
     ) -> PersonaResponse:
         """
-        Generate a reply given input text, mode, optional chat history, and context.
-        Enhanced to avoid literal interpretation, respond with curiosity/creativity,
-        and log ambiguous/creative inputs for self-learning.
+        Generate response using specified mode
+        
+        Why: Main entry point for AI response generation
+        Where: Called by app.py chat endpoint for user interactions
+        How: Route to appropriate mode handler, return structured response
+        
+        Connects to:
+            - app.py: Main application chat handling
+            - nlp_processor.py: Text analysis and processing
         """
-        if not text:
-            return PersonaResponse(
-                text="", mode=mode, sentiment=0.0, proactive_suggestions=[]
-            )
-    def generate(self,
-                 text: str,
-                 mode: str = "Auto",
-                 history: Optional[List[Dict[str, Any]]] = None,
-                 context: Optional[Dict[str, Any]] = None) -> PersonaResponse:
-        """Generate a reply given input text, mode, optional chat history, and context."""
-        if not text:
-            return PersonaResponse(text="", mode=mode, sentiment=0.0, proactive_suggestions=[])
-
-        history = history or []
-        context = context or {}
-
-        # Compute sentiment once via NLP
-        nlp_res = nlp_processor.process(text)
-        sentiment = nlp_res.sentiment
-        keywords = nlp_res.keywords
-
-        # Log ambiguous or creative phrasing for self-learning
-        if self._is_ambiguous_or_creative(text):
-            logger.info(f"Ambiguous/creative input logged for self-learning: {text}")
-
-        # Select style function; default to Auto if unknown
-        style_fn = self.modes.get(mode, self._auto_style)
-
-        # Build reply text and suggestions
-        reply = style_fn(text, keywords, context, history)
-        reply = self._respond_with_curiosity_and_nuance(text, reply)
-        suggestions: List[str] = []
-
-        # Proactive suggestion example
-        if (
-            mode == "Auto"
-            and any(w in text.lower() for w in ["file", "code", "project"])
-            and not suggestions
-        ):
-            suggestions.append(
-                "I can search your files for more details. Try describing your problem or code."
-            )
-        suggestions: List[str] = []
-
-        # Proactive suggestion example
-        if mode == "Auto" and any(w in text.lower() for w in ["file", "code", "project"]) and not suggestions:
-            suggestions.append("I can search your files for more details. Try describing your problem or code.")
-
+        if context is None:
+            context = {}
+        if history is None:
+            history = []
+            
+        # Extract keywords for context
+        keywords = self._extract_keywords(text)
+        
+        # Route to appropriate mode handler
+        mode_handler = self.modes.get(mode, self._auto_style)
+        response_text = mode_handler(text, keywords, context, history)
+        
+        # Determine sentiment
+        sentiment = self._analyze_sentiment(text)
+        
+        # Generate proactive suggestions
+        suggestions = self._generate_suggestions(text, keywords, context)
+        
         return PersonaResponse(
-            text=reply,
+            text=response_text,
             mode=mode,
             sentiment=sentiment,
-            proactive_suggestions=suggestions,
-            quality_score=None,
+            proactive_suggestions=suggestions
         )
 
-    def _is_ambiguous_or_creative(self, text: str) -> bool:
-        """Detect if input is ambiguous, metaphorical, or creative."""
-        creative_markers = [
-            "metaphor", "like a", "as if", "imagine", "what if", "suppose",
-            "let's say", "picture this", "just a thought"
+    def _extract_keywords(self, text: str) -> List[str]:
+        """
+        Extract key terms from user input
+        
+        Why: Identify important concepts for contextual responses
+        Where: Used by all mode handlers for content awareness
+        How: Simple word extraction with common word filtering
+        """
+        # Simple keyword extraction (avoiding spaCy dependency issues)
+        words = text.lower().split()
+        stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them'}
+        keywords = [word for word in words if word not in stop_words and len(word) > 2]
+        return keywords[:10]  # Limit to top 10 keywords
+
+    def _analyze_sentiment(self, text: str) -> str:
+        """
+        Analyze sentiment of user input
+        
+        Why: Adapt response tone to user's emotional state
+        Where: Used by generate() for response customization
+        How: Simple rule-based sentiment detection
+        """
+        positive_words = ['good', 'great', 'awesome', 'excellent', 'amazing', 'wonderful', 'fantastic', 'love', 'like', 'happy', 'excited', 'pleased']
+        negative_words = ['bad', 'terrible', 'awful', 'horrible', 'hate', 'dislike', 'sad', 'angry', 'frustrated', 'annoyed', 'disappointed', 'worried']
+        
+        text_lower = text.lower()
+        positive_count = sum(1 for word in positive_words if word in text_lower)
+        negative_count = sum(1 for word in negative_words if word in text_lower)
+        
+        if positive_count > negative_count:
+            return "positive"
+        elif negative_count > positive_count:
+            return "negative"
+        else:
+            return "neutral"
+
+    def _generate_suggestions(self, text: str, keywords: List[str], context: Dict[str, Any]) -> List[str]:
+        """
+        Generate proactive suggestions for follow-up
+        
+        Why: Provide helpful next steps and conversation continuers
+        Where: Used by generate() to enhance user experience
+        How: Context-aware suggestion generation based on input patterns
+        """
+        suggestions = []
+        
+        # Question-based suggestions
+        if '?' in text:
+            suggestions.append("Would you like me to dive deeper into this topic?")
+            suggestions.append("Should I explore related areas?")
+        
+        # Keyword-based suggestions
+        if any(word in keywords for word in ['analyze', 'study', 'research']):
+            suggestions.append("Want me to break this down step by step?")
+            suggestions.append("Should I look at this from different angles?")
+            
+        if any(word in keywords for word in ['create', 'make', 'build']):
+            suggestions.append("Ready to brainstorm some ideas?")
+            suggestions.append("Want me to suggest some creative approaches?")
+            
+        return suggestions[:3]  # Limit to 3 suggestions
+
+    def _auto_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
+        """
+        Auto mode - balanced, contextual responses
+        
+        Why: Default mode providing natural, balanced responses
+        Where: Used when no specific mode is requested
+        How: Analyze input and provide appropriate response style
+        """
+        # Simple response based on input characteristics
+        if '?' in text:
+            responses = [
+                f"Great question about {keywords[0] if keywords else 'that topic'}! Let me think through this with you.",
+                f"Interesting you're asking about {keywords[0] if keywords else 'this'}. Here's my take:",
+                f"That's a thoughtful question. Let me share some insights on {keywords[0] if keywords else 'this topic'}."
+            ]
+        else:
+            responses = [
+                f"I see you're thinking about {keywords[0] if keywords else 'this'}. That's fascinating!",
+                f"Thanks for sharing that with me. The topic of {keywords[0] if keywords else 'this'} is really interesting.",
+                f"I appreciate you bringing up {keywords[0] if keywords else 'this topic'}. Let me add some thoughts."
+            ]
+            
+        return random.choice(responses)
+
+    def _creative_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
+        """
+        Creative mode - imaginative, innovative responses
+        
+        Why: Generate creative, out-of-the-box thinking for brainstorming
+        Where: Used when user requests creative exploration
+        How: Use metaphors, analogies, and creative language patterns
+        """
+        creative_starters = [
+            "Ooh, let's paint outside the lines here! ",
+            "Time to unleash some creative magic! ",
+            "Let's approach this like artists approaching a blank canvas! ",
+            "Here's where we can get delightfully unconventional! "
         ]
-        return any(marker in text.lower() for marker in creative_markers)
-
-    def _respond_with_curiosity_and_nuance(self, text: str, reply: str) -> str:
-        """
-        Enhance Clever's persona response to avoid literalism and show curiosity/creativity.
-        """
-        if self._is_ambiguous_or_creative(text):
-            return (
-                "I love your creative phrasing! Instead of taking it literally, "
-                "I'll interpret your intent and respond with curiosity. "
-                f"Here's my take: {reply}"
-            )
-        return reply
-
-    # --------- Mode Styles ---------
-
-    def _auto_style(self,
-                    text: str,
-                    keywords: List[str],
-                    context: Dict[str, Any],
-                    history: List[Dict[str, Any]]) -> str:
-        """
-        Balanced and useful: reflect + next steps + ask follow-up.
         
-        Why: Provides Clever's standard conversational mode
-        Where: Called by generate() for Auto mode responses
-        How: Balances reflection, information, and engagement
+        if keywords:
+            creative_response = f"What if we reimagined {keywords[0]} completely? We could explore it through the lens of {random.choice(['storytelling', 'design thinking', 'musical composition', 'architectural principles', 'nature patterns'])}."
+        else:
+            creative_response = "Let's think about this in a completely fresh way, breaking all the conventional rules!"
+            
+        return random.choice(creative_starters) + creative_response
+
+    def _deep_dive_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
-        t = text.strip()
-        parts = [f"Got it — {t}."]
-        # Quick actionable next-step suggestions from keywords
-        if keywords:
-            parts.append("We can tackle it like this:")
-            steps = []
-            for k in keywords[:3]:
-                steps.append(f"• Focus on {k}")
-            parts.append("\n".join(steps))
-        parts.append("Want me to go quick or dive deeper?")
-        return " ".join(parts)
-
-    def _creative_style(
-        self,
-        text: str,
-        keywords: List[str],
-        context: Dict[str, Any],
-        history: List[Dict[str, Any]],
-    ) -> str:
-        # Why: Generate creative, imaginative responses with flair
-        # Where: Connects to PersonaEngine response modes
-        # How: Use creative language patterns and metaphors
-                        history: List[Dict[str, Any]]) -> str:
-        """Creative tone. Encourage brainstorming and imaginative twists."""
-        intro = "✨ Let’s get creative. "
-        idea = f"Imagine “{text.strip()}” as part of a story or design. "
-        if keywords:
-            idea += (
-                f"We could weave in themes like {', '.join(keywords[:3])}. "
-            )
-        if context.get("goal"):
-            idea += (
-                f"All while staying true to your goal of {context['goal']}."
-            )
-        return intro + idea
-
-    def _deep_dive_style(
-        self,
-        text: str,
-        keywords: List[str],
-        context: Dict[str, Any],
-        history: List[Dict[str, Any]],
-    ) -> str:
-            idea += f"We could weave in themes like {', '.join(keywords[:3])}. "
-        if context.get("goal"):
-            idea += f"All while staying true to your goal of {context['goal']}."
-        return intro + idea
-
-    def _deep_dive_style(self,
-                         text: str,
-                         keywords: List[str],
-                         context: Dict[str, Any],
-                         history: List[Dict[str, Any]]) -> str:
-        """Deep Dive tone. Break down problems systematically."""
-        parts = ["Let’s dive deeper. Quick analysis:"]
-
-        if keywords:
-            parts.append("Key topics: " + ", ".join(keywords[:5]) + ".")
-        if context:
-            ctx_parts = []
-            for k in ["project", "goal"]:
-                if context.get(k):
-                    ctx_parts.append(f"{k}: {context[k]}")
-            if ctx_parts:
-                parts.append("Context – " + "; ".join(ctx_parts) + ".")
-        parts.append(
-            "Feel free to ask follow‑up questions or provide more details."
-        )
-        return " ".join(parts)
-
-    def _support_style(
-        self,
-        text: str,
-        keywords: List[str],
-        context: Dict[str, Any],
-        history: List[Dict[str, Any]],
-    ) -> str:
-        """Supportive tone. Empathize and encourage."""
-        parts = ["I’m here for you."]
-
-        if any(
-            w in text.lower()
-            for w in ["stress", "overwhelm", "can’t", "stuck", "help"]
-        ):
-            parts.append(
-                "It sounds like you're facing a challenge—remember it's okay to take it slow."
-            )
-        if context.get("goal"):
-            parts.append(
-                f"You're working towards {context['goal']}, and that’s admirable."
-            )
-        parts.append("How can I assist further?")
-        return " ".join(parts)
-
-    def _quick_hit_style(
-        self,
-        text: str,
-        keywords: List[str],
-        context: Dict[str, Any],
-        history: List[Dict[str, Any]],
-    ) -> str:
-        """Quick, direct responses. Minimal fluff."""
-        return f"On it — {text.strip()}."
-
-
-# Instantiate a global persona engine for use in app.py
-persona_engine = PersonaEngine()
-
-
-        parts.append("Feel free to ask follow‑up questions or provide more details.")
-        return " ".join(parts)
-
-    def _support_style(self,
-                       text: str,
-                       keywords: List[str],
-                       context: Dict[str, Any],
-                       history: List[Dict[str, Any]]) -> str:
-        """Supportive tone. Empathize and encourage."""
-        parts = ["I’m here for you."]
-
-        if any(w in text.lower() for w in ["stress", "overwhelm", "can’t", "stuck", "help"]):
-            parts.append("It sounds like you're facing a challenge—remember it's okay to take it slow.")
-        if context.get("goal"):
-            parts.append(f"You're working towards {context['goal']}, and that’s admirable.")
-        parts.append("How can I assist further?")
-        return " ".join(parts)
-
-    def _quick_hit_style(self,
-                         text: str,
-                         keywords: List[str],
-                         context: Dict[str, Any],
-                         history: List[Dict[str, Any]]) -> str:
-        """Quick, direct responses. Minimal fluff."""
-        return f"On it — {text.strip()}."
-
-# Instantiate a global persona engine for use in app.py
-persona_engine = PersonaEngine()
-
-class CleverPersona:
-    """
-    Main persona class that integrates with NLP processor and database manager.
-    This is the interface expected by app.py.
-    """
-
-    
-    def __init__(self, nlp_processor, db_manager):
-        """Initialize CleverPersona with NLP processor and database manager."""
-        self.nlp_processor = nlp_processor
-        self.db_manager = db_manager
-        self.persona_engine = PersonaEngine(name="Clever", owner="Jay")
-        self.last_used_trait = "core"  # Default trait
-
+        Deep Dive mode - thorough, analytical responses
         
-    def generate_response(self, analysis):
-        """Generate a response based on provided analysis (dict or namespace).
-
-        Accepts either a dict from app.py or a SimpleNamespace. Uses the original
-        user text, enriches with local NLP when needed, and crafts a concise,
-        helpful reply in the selected mode.
+        Why: Provide comprehensive analysis for complex topics
+        Where: Used when user requests detailed exploration
+        How: Structure response with multiple perspectives and depth
         """
-        # Normalize analysis into a dict
-        a = analysis
-        if hasattr(a, "__dict__"):
-        if hasattr(a, '__dict__'):
-            a = vars(a)
-        if not isinstance(a, dict):
-            a = {}
+        deep_starters = [
+            "Let's dig deep into this. ",
+            "Time for a thorough analysis. ",
+            "Let me break this down comprehensively. ",
+            "Here's a detailed exploration of this topic. "
+        ]
+        
+        analysis_aspects = ["historical context", "current implications", "future possibilities", "different perspectives", "underlying principles"]
+        
+        if keywords:
+            deep_response = f"When examining {keywords[0]}, we should consider {random.choice(analysis_aspects)}. This connects to broader themes and requires careful consideration of multiple factors."
+        else:
+            deep_response = "This topic deserves thorough analysis from multiple angles, considering both immediate and long-term implications."
+            
+        return random.choice(deep_starters) + deep_response
 
-        user_text = (a.get("user_input") or "").strip()
-        # Pull keywords/sentiment from analysis or compute locally
-        kws = list(a.get("keywords") or [])
-        sent = a.get("sentiment")
-        user_text = (a.get('user_input') or '').strip()
-        # Pull keywords/sentiment from analysis or compute locally
-        kws = list(a.get('keywords') or [])
-        sent = a.get('sentiment')
-        if user_text and (not kws or sent is None):
-            try:
-                n = nlp_processor.process(user_text)
-                if not kws:
-                    kws = list(getattr(n, "keywords", []) or [])
-                if sent is None:
-                    sent = float(getattr(n, "sentiment", 0.0) or 0.0)
-                    kws = list(getattr(n, 'keywords', []) or [])
-                if sent is None:
-                    sent = float(getattr(n, 'sentiment', 0.0) or 0.0)
-            except Exception:
-                sent = float(sent or 0.0)
-        if sent is None:
-            sent = 0.0
+    def _support_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
+        """
+        Support mode - empathetic, encouraging responses
+        
+        Why: Provide emotional support and encouragement
+        Where: Used when user needs motivation or reassurance  
+        How: Use empathetic language and supportive messaging
+        """
+        support_starters = [
+            "I'm here with you on this. ",
+            "You've got this, and I'm here to help. ",
+            "I understand this might be challenging. ",
+            "Let's work through this together. "
+        ]
+        
+        if keywords:
+            support_response = f"Dealing with {keywords[0]} can be complex, but you're approaching it thoughtfully. Remember that progress often comes in small steps."
+        else:
+            support_response = "Whatever you're working through, remember that you have the strength and capability to handle it."
+            
+        return random.choice(support_starters) + support_response
 
-        # Determine mode from sentiment/keywords
-        mode = self._determine_mode(sent, kws)
-        # Map mode to visual trait for the renderer
-        trait_map = {
-            "Support": "Calm",
-            "Creative": "Excited",
-            "Deep Dive": "Analytical",
-            "Quick Hit": "Base",
-            "Auto": "Base",
-        }
-        trait = trait_map.get(mode, "Base")
-        if trait == "Base":
-            if sent > 0.3:
-                trait = "Positive"
-            elif sent < -0.3:
-                trait = "Negative"
-        self.last_used_trait = trait
+    def _quick_hit_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
+        """
+        Quick Hit mode - concise, direct responses
+        
+        Why: Provide fast, actionable answers for efficiency
+        Where: Used when user needs quick information or decisions
+        How: Deliver key points without lengthy explanations
+        """
+        if keywords:
+            return f"Quick take on {keywords[0]}: {random.choice(['Focus on the essentials.', 'Start with the fundamentals.', 'Prioritize the key factors.', 'Keep it simple and actionable.'])}"
+        else:
+            return random.choice([
+                "Bottom line: Keep it focused and actionable.",
+                "Key point: Start with what matters most.",
+                "Quick advice: Break it down into clear steps.",
+                "Essential approach: Focus on high-impact actions."
+            ])
 
-        # Use original text, not a placeholder
-        source_text = user_text or (", ".join(kws) if kws else "your request")
-        source_text = user_text or (', '.join(kws) if kws else 'your request')
 
-        # Generate the reply
-        response = self.persona_engine.generate(
-            text=source_text,
-            mode=mode,
-            history=[],
-            context={},
-        )
-
-        # Tighten overly generic outputs by adding a small actionable nudge
-        out_text = response.text.strip()
-        if (
-            user_text
-            and user_text.endswith("?")
-            and "Let’s" not in out_text
-            and "Let's" not in out_text
-        ):
-        if user_text and user_text.endswith('?') and 'Let’s' not in out_text and "Let's" not in out_text:
-            out_text += " If you can share one detail, I’ll get specific."
-
-        return {
-            "text": out_text,
-            "mode": response.mode,
-            "sentiment": response.sentiment,
-            "keywords": kws,
-            "proactive_suggestions": response.proactive_suggestions,
-        }
-
-    
-    def _determine_mode(self, sentiment, keywords):
-        """Determine the appropriate mode based on sentiment and keywords."""
-        if sentiment < -0.3:
-            return "Support"
-        if sentiment > 0.5:
-            return "Creative"
-        if any(
-            word in keywords
-            for word in ["analyze", "deep", "detail", "explain"]
-        ):
-        if any(word in keywords for word in ["analyze", "deep", "detail", "explain"]):
-            return "Deep Dive"
-        if any(word in keywords for word in ["quick", "fast", "brief"]):
-            return "Quick Hit"
-        return "Auto"
+# Global instance for app.py
+persona_engine = PersonaEngine()
