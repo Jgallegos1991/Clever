@@ -103,7 +103,7 @@ const perf = { target: 45, minCount: 3500, step: 500 };
 **Key Settings**:
 ```python
 PROJECT_PATH = BASE_DIR
-MEMORY_DB_PATH = os.path.join(PROJECT_PATH, "clever_memory.db")
+DB_PATH = os.path.join(PROJECT_PATH, "clever.db")
 OFFLINE_ONLY = True
 ALLOW_REMOTE_SYNC = False
 ```

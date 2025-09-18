@@ -27,18 +27,18 @@ fi
 # Database backup
 echo
 echo "💾 Backing up SQLite database..."
-if [ -f "$PROJECT_DIR/clever_memory.db" ]; then
-    cp "$PROJECT_DIR/clever_memory.db" "$BACKUP_DIR/clever_memory_${TIMESTAMP}.db"
-    echo "✅ Database backed up: clever_memory_${TIMESTAMP}.db"
+if [ -f "$PROJECT_DIR/clever.db" ]; then
+    cp "$PROJECT_DIR/clever.db" "$BACKUP_DIR/clever_${TIMESTAMP}.db"
+    echo "✅ Database backed up: clever_${TIMESTAMP}.db"
     
     # Verify backup
-    if sqlite3 "$BACKUP_DIR/clever_memory_${TIMESTAMP}.db" ".tables" > /dev/null 2>&1; then
+    if sqlite3 "$BACKUP_DIR/clever_${TIMESTAMP}.db" ".tables" > /dev/null 2>&1; then
         echo "✅ Database backup verified"
     else
         echo "❌ Database backup verification failed"
     fi
 else
-    echo "⚠️  Database file not found: clever_memory.db"
+    echo "⚠️  Database file not found: clever.db"
 fi
 
 # Full application backup
@@ -83,9 +83,9 @@ fi
 
 echo
 echo "✅ Backup completed successfully!"
-echo "💾 Database: $BACKUP_DIR/clever_memory_${TIMESTAMP}.db"
+echo "💾 Database: $BACKUP_DIR/clever_${TIMESTAMP}.db"
 echo "📦 Full backup: $BACKUP_DIR/$BACKUP_NAME"
 echo
 echo "💡 To restore:"
-echo "   Database: cp backups/clever_memory_${TIMESTAMP}.db clever_memory.db"
+echo "   Database: cp backups/clever_${TIMESTAMP}.db clever.db"
 echo "   Full restore: tar -xzf backups/$BACKUP_NAME"

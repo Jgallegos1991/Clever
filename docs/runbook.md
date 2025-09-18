@@ -14,7 +14,7 @@
 Clever is an offline-first Flask application serving as Jordan's AI co-pilot and strategic thinking partner. The application uses:
 - **Backend:** Flask 3.1.1 with SQLite database
 - **NLP:** spaCy (en_core_web_sm), NLTK, TextBlob for natural language processing  
-- **Storage:** SQLite (`clever_memory.db`) for persistent data
+- **Storage:** SQLite (`clever.db`) for persistent data
 - **UI:** Dark theme with particle effects, responsive design
 - **Dependencies:** 50+ Python packages (see `requirements.txt`)
 
@@ -62,7 +62,7 @@ EOF
 ```
 
 **Configuration locations:**
-- Database: `./clever_memory.db` (auto-created)
+- Database: `./clever.db` (auto-created)
 - Uploads: `./uploads/` (auto-created)
 - Backups: `./backups/` (auto-created)
 - Static files: `./static/`
@@ -108,18 +108,22 @@ The database initializes automatically on first startup via `database.py`:
 
 ### Manual Database Verification
 ```bash
-# Check if database exists and is accessible
-sqlite3 clever_memory.db ".tables"
-# Expected output: conversations  knowledge  sources  system_state
+```bash
+sqlite3 clever.db ".tables"
+```
 
-# Verify table schemas
-sqlite3 clever_memory.db ".schema sources"
+```bash
+sqlite3 clever.db ".schema sources"
+```
+
+```bash
+rm clever.db
 ```
 
 ### Database Reset (if needed)
 ```bash
 # ⚠️  WARNING: This destroys all data
-rm clever_memory.db
+rm clever.db
 python3 app.py  # Will recreate database
 ```
 
@@ -171,8 +175,8 @@ python3 -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt');
 **Fix:**
 ```bash
 # Check directory permissions
-ls -la clever_memory.db
-chmod 664 clever_memory.db
+ls -la clever.db
+chmod 664 clever.db
 chmod 755 .
 ```
 
@@ -284,10 +288,10 @@ echo "🏁 Smoke tests completed"
 ```bash
 # Create timestamped backup
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-cp clever_memory.db "backups/clever_memory_${TIMESTAMP}.db"
+cp clever.db "backups/clever_${TIMESTAMP}.db"
 
 # Verify backup
-sqlite3 "backups/clever_memory_${TIMESTAMP}.db" ".tables"
+sqlite3 "backups/clever_${TIMESTAMP}.db" ".tables"
 ```
 
 **Automated backup using BackupManager:**
@@ -331,7 +335,7 @@ echo "✅ Full backup created: ${BACKUP_DIR}/${BACKUP_NAME}.tar.gz"
 pkill -f "python3 app.py"
 
 # Restore from backup
-cp backups/clever_memory_20250904_143000.db clever_memory.db
+cp backups/clever_20250904_143000.db clever.db
 
 # Restart application
 python3 app.py
@@ -362,7 +366,7 @@ echo "🔄 Stopping Clever..."
 pkill -f "python3 app.py"
 
 echo "📦 Restoring from $1..."
-cp "backups/$1" clever_memory.db
+cp "backups/$1" clever.db
 
 echo "🚀 Restarting Clever..."
 python3 app.py &
@@ -395,8 +399,8 @@ ps aux | grep python3 | grep app.py
 tail -f clever.log
 
 # Database size monitoring
-ls -lh clever_memory.db
-sqlite3 clever_memory.db "SELECT COUNT(*) as conversations FROM conversations;"
+ls -lh clever.db
+sqlite3 clever.db "SELECT COUNT(*) as conversations FROM conversations;"
 ```
 
 ---
@@ -414,11 +418,11 @@ When running with `debug=True` (default):
 2. Verify all required files exist (`ls -la`)
 3. Test with `SAFE_MODE = True` to isolate NLP issues
 4. Check browser developer console for frontend errors
-5. Examine SQLite database integrity: `sqlite3 clever_memory.db "PRAGMA integrity_check;"`
+5. Examine SQLite database integrity: `sqlite3 clever.db "PRAGMA integrity_check;"`
 
 ### Getting Help
 - Check application logs: `tail -50 clever.log`
-- Review database status: `sqlite3 clever_memory.db ".tables"`
+- Review database status: `sqlite3 clever.db ".tables"`
 - Test with minimal config: Enable `SAFE_MODE` in `app.py`
 - Verify Python environment: `pip list | grep -E "(flask|spacy|nltk)"`
 
@@ -448,7 +452,7 @@ python app.py
 ```
 
 ### Health Checks
-- **Database Connection**: Verify `clever_memory.db` accessibility
+- **Database Connection**: Verify `clever.db` accessibility
 - **spaCy Model**: Confirm `en_core_web_sm` is loaded
 - **Static Assets**: Check Three.js and frontend resources
 - **Port Availability**: Default Flask port (typically 5000)
@@ -467,13 +471,13 @@ python backup_manager.py --create-backup
 ### Database Maintenance
 ```bash
 # Check database integrity
-sqlite3 clever_memory.db "PRAGMA integrity_check;"
+sqlite3 clever.db "PRAGMA integrity_check;"
 
 # Vacuum database to reclaim space
-sqlite3 clever_memory.db "VACUUM;"
+sqlite3 clever.db "VACUUM;"
 
 # View database schema
-sqlite3 clever_memory.db ".schema"
+sqlite3 clever.db ".schema"
 ```
 
 ### Data Recovery
@@ -556,7 +560,7 @@ python file_ingestor.py --process <file_path>
 #### Database Connection Errors
 ```bash
 # Check database file permissions
-ls -la clever_memory.db
+ls -la clever.db
 # Verify SQLite installation
 sqlite3 --version
 ```
@@ -582,7 +586,7 @@ ls -la static/vendor/three*
 # Monitor system resources
 htop
 # Check database size
-du -h clever_memory.db
+du -h clever.db
 # Monitor Flask process
 ps aux | grep python
 ```

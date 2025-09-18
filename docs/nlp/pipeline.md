@@ -385,7 +385,7 @@ def _extract_keywords(self, doc):
 ## Database Integration
 
 ### Storage Schema
-**Database**: SQLite (`clever_memory.db`)  
+**Database**: SQLite (`clever.db`)  
 **Manager**: `database.py` - DatabaseManager class
 
 ### Data Flow

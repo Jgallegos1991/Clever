@@ -49,7 +49,7 @@ The following image assets were removed to slim the repo. Key UI concepts were e
 ├── README.md
 ├── app.py
 ├── backup_manager.py
-├── clever_memory.db
+├── clever.db
 ├── config.py
 ├── conversations.json
 ├── core_nlp_logic.py
@@ -112,7 +112,7 @@ The following image assets were removed to slim the repo. Key UI concepts were e
 | `README.md` | Documentation | Markdown | 1 | 513 | Project documentation and overview |
 | `app.py` | Source Code | Python | 232 | 8,240 | Main Flask application entry point |
 | `backup_manager.py` | Source Code | Python | 55 | 1,600 | Database backup and restore functionality |
-| `clever_memory.db` | Database | Database | 0 | 45,056 | SQLite database file |
+| `clever.db` | Database | Database | 0 | 45,056 | SQLite database file |
 | `config.py` | Source Code | Python | 62 | 1,735 | Application configuration settings |
 | `conversations.json` | Data/Config | JSON | 200 | 4,919 | Conversation history storage |
 | `core_nlp_logic.py` | Source Code | Python | 155 | 5,227 | Core NLP logic and command detection |

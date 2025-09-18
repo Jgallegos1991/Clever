@@ -81,7 +81,7 @@ sudo -u clever /home/clever/clever-ai/venv/bin/pip install -r /home/clever/cleve
 OFFLINE_ONLY = True
 SAFE_MODE = False  # Enable full NLP stack
 DEBUG = True
-DATABASE_NAME = "clever_memory.db"
+DATABASE_NAME = "clever.db"
 ```
 
 #### Production Environment  
@@ -96,7 +96,7 @@ KEEP_LATEST_BACKUPS = 3  # More backups in production
 ### Environment Variables (Recommended)
 ```bash
 # .env file support (future enhancement)
-CLEVER_DB_PATH=/data/clever/clever_memory.db
+CLEVER_DB_PATH=/data/clever/clever.db
 CLEVER_BACKUP_DIR=/data/clever/backups
 CLEVER_UPLOAD_DIR=/data/clever/uploads
 CLEVER_DEBUG=false
@@ -109,7 +109,7 @@ CLEVER_LOG_LEVEL=info
 ├── app.py                 # Main application
 ├── config.py             # Configuration
 ├── requirements.txt      # Dependencies
-├── clever_memory.db      # SQLite database
+├── clever.db      # SQLite database
 ├── backups/              # Automated backups
 ├── uploads/              # File ingestion
 ├── static/               # Frontend assets
@@ -253,7 +253,7 @@ sudo chown -R clever:clever /home/clever/clever-ai
 # Secure permissions
 chmod 750 /home/clever/clever-ai
 chmod 644 /home/clever/clever-ai/*.py
-chmod 600 /home/clever/clever-ai/clever_memory.db
+chmod 600 /home/clever/clever-ai/clever.db
 chmod 755 /home/clever/clever-ai/static
 ```
 
@@ -373,7 +373,7 @@ class ProductionBackupManager(BackupManager):
 # Database recovery from backup
 cd /home/clever/clever-ai/backups
 unzip backup_2025-09-04_06-00-00.zip
-cp clever_memory.db ../clever_memory.db.restore
+cp clever.db ../clever.db.restore
 
 # Service restart after recovery
 sudo systemctl restart clever-ai
@@ -395,10 +395,10 @@ PRAGMA foreign_key_check;
 #### 1. Database Connection Errors
 ```bash
 # Check database file permissions
-ls -la clever_memory.db
+ls -la clever.db
 
 # Test database connectivity
-sqlite3 clever_memory.db ".tables"
+sqlite3 clever.db ".tables"
 ```
 
 #### 2. NLP Model Loading Failures

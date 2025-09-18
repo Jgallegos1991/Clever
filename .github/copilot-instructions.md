@@ -11,7 +11,7 @@
 
 ## Architecture Overview
 - **Framework:** Python 3.12 + Flask (`app.py`)
-- **Database:** SQLite (`clever.db`, `clever_memory.db`) via `DatabaseManager` in `database.py`
+- **Database:** SQLite (`clever.db`) via `DatabaseManager` in `database.py`
 - **Modular Monolith:** Key modules:
   - `app.py`: Flask routes, main logic
   - `persona.py`: PersonaEngine, response modes

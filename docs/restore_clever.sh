@@ -66,22 +66,22 @@ case $REPLY in
             sleep 2
             
             # Backup current database
-            if [ -f "$PROJECT_DIR/clever_memory.db" ]; then
-                mv "$PROJECT_DIR/clever_memory.db" "$PROJECT_DIR/clever_memory.db.bak"
-                echo "📋 Current database backed up as clever_memory.db.bak"
+            if [ -f "$PROJECT_DIR/clever.db" ]; then
+                mv "$PROJECT_DIR/clever.db" "$PROJECT_DIR/clever.db.bak"
+                echo "📋 Current database backed up as clever.db.bak"
             fi
             
             # Restore
-            cp "$SELECTED_BACKUP" "$PROJECT_DIR/clever_memory.db"
+            cp "$SELECTED_BACKUP" "$PROJECT_DIR/clever.db"
             echo "✅ Database restored from: $(basename "$SELECTED_BACKUP")"
             
             # Verify
-            if sqlite3 "$PROJECT_DIR/clever_memory.db" ".tables" > /dev/null 2>&1; then
+            if sqlite3 "$PROJECT_DIR/clever.db" ".tables" > /dev/null 2>&1; then
                 echo "✅ Database verification successful"
             else
                 echo "❌ Database verification failed"
-                if [ -f "$PROJECT_DIR/clever_memory.db.bak" ]; then
-                    mv "$PROJECT_DIR/clever_memory.db.bak" "$PROJECT_DIR/clever_memory.db"
+                if [ -f "$PROJECT_DIR/clever.db.bak" ]; then
+                    mv "$PROJECT_DIR/clever.db.bak" "$PROJECT_DIR/clever.db"
                     echo "🔄 Restored original database"
                 fi
                 exit 1

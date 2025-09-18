@@ -15,7 +15,7 @@ This audit examined the Clever AI system configuration to ensure compliance with
 #### 📋 Configuration Summary
 - **Port**: 5000 (configurable via `PORT` environment variable)
 - **Host**: 0.0.0.0 (configurable via `HOST` environment variable) 
-- **Database**: Local SQLite (`clever_memory.db`)
+- **Database**: Local SQLite (`clever.db`)
 - **AI Model**: Local spaCy (`en_core_web_sm`)
 - **Logging**: DEBUG level for persona module, console output for app
 - **Modes**: 4 operational modes (deep_dive, quick_hit, creative, support)

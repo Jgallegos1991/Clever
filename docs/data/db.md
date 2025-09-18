@@ -3,9 +3,9 @@ copilot/fix-645d4672-a183-4fe7-a0a8-c6ff0d030ac5
 
 ## SQLite Database Structure
 
-### Database File: `clever_memory.db`
+### Database File: `clever.db`
 
-**Location:** `/home/runner/work/projects/projects/clever_memory.db`  
+**Location:** `/home/runner/work/projects/projects/clever.db`  
 **Size:** ~45KB  
 **Engine:** SQLite 3  
 **ACID Compliance:** Full transactional support  
@@ -267,7 +267,7 @@ PRAGMA table_info(user_utterances);
 
 ## Overview
 
-Clever uses SQLite as its primary database (`clever_memory.db`) for offline-first operation. The database stores conversation history, file sources, knowledge facts, and system state.
+Clever uses SQLite as its primary database (`clever.db`) for offline-first operation. The database stores conversation history, file sources, knowledge facts, and system state.
 
 ## Database Schema
 
@@ -429,13 +429,13 @@ BACKUP_ZIP_FORMAT = "backup_%Y-%m-%d_%H-%M-%S.zip"
 **Manual Restoration:**
 1. Stop Clever application
 2. Extract backup ZIP to project directory
-3. Verify database file integrity: `clever_memory.db`
+3. Verify database file integrity: `clever.db`
 4. Restart application
 5. Verify functionality through `/capabilities` endpoint
 
 **Database-Only Restore:**
 - SQLite database can be restored independently
-- Copy `clever_memory.db` from backup
+- Copy `clever.db` from backup
 - No schema migration required (SQLite handles table creation)
 
 ### Backup Best Practices

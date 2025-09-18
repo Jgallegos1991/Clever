@@ -295,9 +295,9 @@ graph TD
 - `BASE_DIR`: Absolute path of project root directory
 - `PROJECT_PATH`: Same as BASE_DIR
 - `BACKUP_DIR`: Path to backup directory
-- `MEMORY_DB_PATH`: Path to SQLite database file (`clever_memory.db`)
+- `DB_PATH`: Path to SQLite database file (`clever.db`)
 - `SYNC_DIR`: Path to sync directory (`Clever_Sync`)
-- `DATABASE_NAME`: Alias for MEMORY_DB_PATH
+- `DATABASE_NAME`: Alias for DB_PATH
 - `UPLOAD_FOLDER`: Path to upload directory
 - `ALLOWED_EXTENSIONS`: `{'txt', 'md', 'pdf'}` - Allowed file types
 - `SPACY_MODEL`: `"en_core_web_sm"` - spaCy model name

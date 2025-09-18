@@ -119,7 +119,7 @@ const particleWorker = new Worker('/static/js/particle-worker.js');
 **Dependencies**: python-dotenv for environment variables
 ```python
 from dotenv import load_dotenv
-DATABASE_PATH = os.getenv('DATABASE_PATH', 'clever_memory.db')
+DATABASE_PATH = os.getenv('DATABASE_PATH', 'clever.db')
 ```
 
 ### Medium-Term Improvements (Sprint 2)

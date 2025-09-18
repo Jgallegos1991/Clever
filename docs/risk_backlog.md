@@ -11,7 +11,7 @@ copilot/fix-645d4672-a183-4fe7-a0a8-c6ff0d030ac5
 **Probability:** Medium
 
 **Current State:**
-- Single SQLite database file (`clever_memory.db`)
+- Single SQLite database file (`clever.db`)
 - Basic backup system via `backup_manager.py`
 - No real-time backup or replication
 
@@ -438,7 +438,7 @@ const particleWorker = new Worker('/static/js/particle-worker.js');
 ```python
 from dotenv import load_dotenv
 load_dotenv()
-DATABASE_PATH = os.getenv('DATABASE_PATH', 'clever_memory.db')
+DATABASE_PATH = os.getenv('DATABASE_PATH', 'clever.db')
 ```
 
 #### Task 2.2: Improve Error Handling ⏰ 60 min
