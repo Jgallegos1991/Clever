@@ -204,10 +204,9 @@ class PersonaEngine:
         context: Dict[str, Any],
         history: List[Dict[str, Any]],
     ) -> str:
-    def _creative_style(self,
-                        text: str,
-                        keywords: List[str],
-                        context: Dict[str, Any],
+        # Why: Generate creative, imaginative responses with flair
+        # Where: Connects to PersonaEngine response modes
+        # How: Use creative language patterns and metaphors
                         history: List[Dict[str, Any]]) -> str:
         """Creative tone. Encourage brainstorming and imaginative twists."""
         intro = "✨ Let’s get creative. "
