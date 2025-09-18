@@ -71,22 +71,34 @@
             opacity: 0.6;
         }
 
-        /* Minimal input styling */
+        /* Minimal glowing input bar */
         .entrybar {
             position: fixed;
             bottom: 2rem;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(11, 15, 20, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(105, 234, 203, 0.3);
-            border-radius: 25px;
-            padding: 0.5rem 1rem;
+            background: rgba(11, 15, 20, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 234, 203, 0.4);
+            border-radius: 30px;
+            padding: 0.75rem 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            z-index: 10;
+            gap: 0.75rem;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(105, 234, 203, 0.1);
+            z-index: 20;
+            transition: all 0.3s ease;
+            min-width: 400px;
+        }
+
+        .entrybar:focus-within {
+            border-color: rgba(105, 234, 203, 0.6);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(105, 234, 203, 0.3);
+            transform: translateX(-50%) translateY(-2px);
         }
 
         .entrybar input {
@@ -96,60 +108,97 @@
             font-size: 1rem;
             outline: none;
             flex: 1;
-            min-width: 300px;
+            font-weight: 300;
         }
 
         .entrybar input::placeholder {
-            color: #95a3b3;
+            color: #7a8a9a;
+            font-weight: 300;
         }
 
         .entrybar .icon-btn {
-            background: transparent;
-            border: none;
+            background: rgba(105, 234, 203, 0.1);
+            border: 1px solid rgba(105, 234, 203, 0.3);
             color: #69EACB;
             cursor: pointer;
             padding: 0.5rem;
             border-radius: 50%;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .entrybar .icon-btn:hover {
-            background: rgba(105, 234, 203, 0.1);
-            box-shadow: 0 0 15px rgba(105, 234, 203, 0.3);
+            background: rgba(105, 234, 203, 0.2);
+            border-color: rgba(105, 234, 203, 0.5);
+            box-shadow: 0 0 15px rgba(105, 234, 203, 0.4);
+            transform: scale(1.1);
         }
 
-        /* Chat display area (hidden by default) */
-        #chat-display {
+        /* Floating chat bubbles container */
+        #chat-bubbles {
             position: fixed;
-            top: 20%;
+            top: 15%;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(11, 15, 20, 0.9);
+            width: 100%;
+            max-width: 800px;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        /* Individual floating message bubbles */
+        .chat-bubble {
+            position: relative;
+            margin: 0.5rem auto;
+            padding: 1rem 1.5rem;
+            max-width: 70%;
+            border-radius: 20px;
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(105, 234, 203, 0.2);
-            border-radius: 15px;
-            padding: 1rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 50%;
-            overflow-y: auto;
-            z-index: 5;
-            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: fadeInBubble 0.5s ease forwards;
         }
 
-        .message {
-            margin-bottom: 1rem;
-            padding: 0.5rem;
+        .chat-bubble.fade-out {
+            animation: fadeOutBubble 0.8s ease forwards;
         }
 
-        .message.user {
-            text-align: right;
+        .chat-bubble.user {
+            background: linear-gradient(135deg, rgba(105, 234, 203, 0.15), rgba(105, 234, 203, 0.05));
+            border: 1px solid rgba(105, 234, 203, 0.3);
             color: #69EACB;
+            margin-left: auto;
+            margin-right: 1rem;
+            text-align: right;
         }
 
-        .message.ai {
-            text-align: left;
+        .chat-bubble.ai {
+            background: linear-gradient(135deg, rgba(51, 204, 255, 0.15), rgba(51, 204, 255, 0.05));
+            border: 1px solid rgba(51, 204, 255, 0.3);
             color: #e9f1fb;
+            margin-left: 1rem;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        @keyframes fadeInBubble {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes fadeOutBubble {
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
         }
     </style>
 </head>
@@ -160,8 +209,8 @@
     <!-- Particle canvas for background effects -->
     <canvas id="particles" aria-hidden="true"></canvas>
 
-    <!-- Chat display area (appears when chatting) -->
-    <div id="chat-display"></div>
+    <!-- Floating chat bubbles container -->
+    <div id="chat-bubbles"></div>
 
     <!-- Minimal input bar at bottom -->
     <div class="entrybar">
@@ -410,25 +459,53 @@
             };
         })();
         
-        // Chat functionality
+        // Chat functionality with floating bubbles
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
-        const chatDisplay = document.getElementById('chat-display');
+        const chatBubbles = document.getElementById('chat-bubbles');
         
-        function addMessage(text, isUser = false) {
-            const message = document.createElement('div');
-            message.className = `message ${isUser ? 'user' : 'ai'}`;
-            message.textContent = text;
-            chatDisplay.appendChild(message);
-            chatDisplay.style.display = 'block';
-            chatDisplay.scrollTop = chatDisplay.scrollHeight;
+        function addFloatingMessage(text, isUser = false) {
+            // Why: Create floating chat bubble that fades in/out automatically
+            // Where: Connects to UI vision for non-persistent, elegant chat display
+            // How: DOM manipulation with CSS animations and auto-removal timer
+            
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${isUser ? 'user' : 'ai'}`;
+            bubble.textContent = text;
+            
+            // Add bubble to container
+            chatBubbles.appendChild(bubble);
+            
+            // Auto-remove bubble after 4 seconds with fade out animation
+            setTimeout(() => {
+                bubble.classList.add('fade-out');
+                // Remove from DOM after fade animation completes
+                setTimeout(() => {
+                    if (bubble.parentNode) {
+                        bubble.parentNode.removeChild(bubble);
+                    }
+                }, 800); // Match fade-out animation duration
+            }, 4000);
+            
+            // Clean up old bubbles to prevent accumulation
+            const bubbles = chatBubbles.children;
+            if (bubbles.length > 6) {
+                const oldestBubble = bubbles[0];
+                oldestBubble.classList.add('fade-out');
+                setTimeout(() => {
+                    if (oldestBubble.parentNode) {
+                        oldestBubble.parentNode.removeChild(oldestBubble);
+                    }
+                }, 800);
+            }
         }
         
         async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
             
-            addMessage(message, true);
+            // Add user message as floating bubble
+            addFloatingMessage(message, true);
             chatInput.value = '';
             
             // Trigger thinking particle formation
@@ -451,12 +528,13 @@
                 }
                 
                 if (data.status === 'success') {
-                    addMessage(data.reply);
+                    // Add AI response as floating bubble
+                    addFloatingMessage(data.reply);
                 } else {
-                    addMessage('Sorry, I encountered an error.');
+                    addFloatingMessage('Sorry, I encountered an error.');
                 }
             } catch (error) {
-                addMessage('Sorry, I couldn\'t connect right now.');
+                addFloatingMessage('Sorry, I couldn\'t connect right now.');
                 
                 // Return to swarm on error
                 if (window.particleRespond) {
