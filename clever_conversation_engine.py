@@ -1,16 +1,22 @@
+    def _strategic_deep_dive_response(self, message: str, analysis: Dict, kb) -> str:
+        """Placeholder for strategic deep dive response"""
+        return "Let's analyze this in depth!"
+
+    def _witty_quick_hit_response(self, message: str, analysis: Dict, kb) -> str:
+        """Placeholder for witty quick hit response"""
+        return "Here's a quick answer with a clever twist!"
+
+    def _celebration_amplifier_response(self, message: str, analysis: Dict) -> str:
+        """Placeholder for celebration amplifier response"""
+        return "Congratulations! Let's celebrate this win!"
+
+    def _curious_collaborator_response(self, message: str, analysis: Dict, kb) -> str:
+        """Placeholder for curious collaborator response"""
+        return "I'm curious—let's explore this together!"
 """
 Enhanced Clever Conversation Engine - Magical Real-time Interaction System
 Brings Clever's authentic personality to life through UI reactions and
 natural conversation
-"""
-
-import random
-from datetime import datetime
-from typing import Dict, List, Any
-from debug_config import get_debugger, debug_method
-
-
-Brings Clever's authentic personality to life through UI reactions and natural conversation
 """
 
 import json
@@ -48,20 +54,13 @@ class CleverConversationEngine:
                 "AI development"
             ],
             "preferred_tone": "helpful, insightful, and genuinely curious",
-            "response_preferences": "substantive content with practical value"
-        }
-        
-        self.debugger.info(
-            'conversation',
-            'Enhanced Clever conversation engine initialized'
-        )
+            "response_preferences": "substantive content with practical value",
             "communication_style": "direct but creative",
-            "energy_level": "high", 
+            "energy_level": "high",
             "interests": ["tech", "creative projects", "strategic thinking", "AI development"],
             "preferred_slang": ["no cap", "fire", "lowkey", "bet", "fr", "that hits different"],
             "response_preferences": "witty but supportive, proactive insights"
         }
-        
         self.debugger.info('conversation', 'Enhanced Clever conversation engine initialized')
     
     @debug_method('conversation')
@@ -224,19 +223,12 @@ class CleverConversationEngine:
             "response": self._respond_with_curiosity_and_nuance(
                 user_message, enhanced_response
             ),
-        
+            "insights": insights,
+            "suggestions": suggestions,
+        }
         # Keep memory manageable
         if len(self.conversation_memory) > 15:
             self.conversation_memory = self.conversation_memory[-15:]
-        
-        # Determine Clever's response approach
-        response_approach = self._determine_response_approach(analysis, context)
-        
-        # Update Clever's emotional state
-        self._update_clever_emotional_state(analysis, response_approach)
-        
-        # Generate authentic response with full personality
-        response = self._generate_clever_response(user_message, analysis, context, knowledge_base, response_approach)
         
         # Add Clever's signature personality touches
         enhanced_response = self._add_clever_personality_elements(response, analysis, response_approach)
@@ -290,22 +282,14 @@ class CleverConversationEngine:
             )
         return response
     
-    def _determine_response_approach(
-        self, analysis: Dict, context: Dict
-    ) -> str:
-    
     def _determine_response_approach(self, analysis: Dict, context: Dict) -> str:
         """Determine how Clever should approach this response"""
         # Convert SimpleNamespace to dict if needed
         if hasattr(analysis, '__dict__'):
             analysis = vars(analysis)
-        
+
         intent = analysis.get('intent', 'general')
         sentiment = analysis.get('sentiment', {})
-        if isinstance(sentiment, (int, float)):
-            pass
-        else:
-            pass
         complexity = analysis.get('complexity_level', 'moderate')
         keywords = analysis.get('keywords', [])
 
@@ -326,21 +310,23 @@ class CleverConversationEngine:
             for keyword in creative_keywords
         )
 
+        if isinstance(sentiment, (int, float)):
             sentiment_score = sentiment
         else:
             sentiment_score = sentiment.get('compound', 0) if isinstance(sentiment, dict) else 0
+
         complexity = analysis.get('complexity_level', 'moderate')
         keywords = analysis.get('keywords', [])
-        
+
         # Check for technical/creative keywords
         tech_keywords = ['code', 'ai', 'system', 'debug', 'implement', 'architecture']
         creative_keywords = ['idea', 'creative', 'design', 'brainstorm', 'imagine', 'concept']
-        
+
         has_tech = any(keyword.lower() in ' '.join(keywords).lower() for keyword in tech_keywords)
         has_creative = any(keyword.lower() in ' '.join(keywords).lower() for keyword in creative_keywords)
-        
+
         # Clever's decision logic for response approach
-        if sentiment < -0.3:
+        if sentiment_score < -0.3:
             return "supportive_genius"  # Empathetic but still brilliant
         elif has_creative or intent in ['creative', 'brainstorming']:
             return "creative_catalyst"  # Sparking ideas and possibilities
@@ -459,32 +445,34 @@ class CleverConversationEngine:
     def _supportive_genius_response(
         self, message: str, analysis: Dict, context: Dict, kb
     ) -> str:
+        sentiment = analysis.get('sentiment', 0)
+        approach = analysis.get('approach', '')
+        if sentiment > 0.3:
             self.clever_state["excitement"] = min(1.0, self.clever_state["excitement"] + 0.15)
             self.clever_state["energy"] = min(1.0, self.clever_state["energy"] + 0.1)
             self.clever_state["mood"] = "excited"
             self.clever_state["playfulness"] = min(1.0, self.clever_state["playfulness"] + 0.1)
-            
         elif sentiment < -0.3:
             self.clever_state["supportiveness"] = min(1.0, self.clever_state["supportiveness"] + 0.2)
             self.clever_state["mood"] = "supportive"
             self.clever_state["energy"] = max(0.3, self.clever_state["energy"] - 0.1)
-            
         else:
             self.clever_state["mood"] = "curious"
             self.clever_state["focus"] = min(1.0, self.clever_state["focus"] + 0.05)
-        
+
         # Approach-specific state updates
         if approach == "creative_catalyst":
             self.clever_state["creativity"] = min(1.0, self.clever_state["creativity"] + 0.2)
             self.clever_state["playfulness"] = min(1.0, self.clever_state["playfulness"] + 0.15)
-            
         elif approach == "strategic_deep_dive":
             self.clever_state["focus"] = min(1.0, self.clever_state["focus"] + 0.25)
             self.clever_state["energy"] = min(1.0, self.clever_state["energy"] + 0.1)
-            
         elif approach == "celebration_amplifier":
             self.clever_state["excitement"] = min(1.0, self.clever_state["excitement"] + 0.3)
             self.clever_state["playfulness"] = min(1.0, self.clever_state["playfulness"] + 0.2)
+
+        # Return a supportive response string
+        return "I'm here for you! Let's tackle this together."  # Example response
     
     def _generate_clever_response(self, user_message: str, analysis: Dict, context: Dict, 
                                 knowledge_base, approach: str) -> str:
@@ -531,26 +519,6 @@ class CleverConversationEngine:
         
         # Clever's supportive but forward-moving conclusions
         conclusions = [
-            (
-                " Let's break this down together and find a path that "
-                "feels right."
-            ),
-            (
-                " Your instincts are usually spot on - what's your gut "
-                "telling you?"
-            ),
-            (
-                " We've got this, fr. What feels like the most important "
-                "piece to tackle first?"
-            ),
-            (
-                " I believe in your ability to work through this - you're "
-                "more capable than you know."
-            ),
-            (
-                " Want to map out some options? I'm here to think through "
-                "it with you."
-            )
             " Let's break this down together and find a path that feels right.",
             " Your instincts are usually spot on - what's your gut telling you?",
             " We've got this, fr. What feels like the most important piece to tackle first?",
@@ -560,21 +528,6 @@ class CleverConversationEngine:
         
         return starter + knowledge_insight + random.choice(conclusions)
     
-    def _creative_catalyst_response(
-        self, message: str, analysis: Dict, kb
-    ) -> str:
-        """Clever sparking creativity and possibilities"""
-        creative_starters = [
-            "Ooh, this is where it gets fun! *brain sparks flying* 🧠✨",
-            (
-                "YESS! Creative mode activated - I'm already seeing "
-                "possibilities..."
-            ),
-            "Okay this is fire 🔥 Let me riff on this with you...",
-            (
-                "I love where your mind is going with this! *particles "
-                "dancing with excitement*"
-            ),
     def _creative_catalyst_response(self, message: str, analysis: Dict, kb) -> str:
         """Clever sparking creativity and possibilities"""
         creative_starters = [
@@ -584,22 +537,11 @@ class CleverConversationEngine:
             "I love where your mind is going with this! *particles dancing with excitement*",
             "No cap, this is the kind of thinking that gets me hyped! ⚡"
         ]
-        
         starter = random.choice(creative_starters)
-        
         # Generate creative possibilities
         creative_directions = [
             " What if we flipped that assumption completely?",
             " I'm seeing like three different angles we could explore...",
-            (
-                " That reminds me of a pattern I've noticed - we could "
-                "totally build on that."
-            ),
-            " Quick brainstorm: what's the wildest version of this idea?",
-            (
-                " Ooh, what if we combined this with that thing you "
-                "mentioned before?"
-            )
             " That reminds me of a pattern I've noticed - we could totally build on that.",
             " Quick brainstorm: what's the wildest version of this idea?",
             " Ooh, what if we combined this with that thing you mentioned before?"
@@ -639,24 +581,10 @@ class CleverConversationEngine:
     ) -> str:
         """Clever's analytical deep dive with personality"""
         analytical_starters = [
-            (
-                "Alright, let's go full analytical mode on this. "
-                "*neurons firing* 🧠"
-            ),
-            (
-                "Deep dive time! I love when we get to really break "
-                "something down..."
-            ),
-            (
-                "Perfect - this is exactly the kind of complex thinking "
-                "I'm built for."
-            ),
-        return starter + direction + inspiration + random.choice(energy_endings)
-    
-    def _strategic_deep_dive_response(self, message: str, analysis: Dict, kb) -> str:
-        """Clever's analytical deep dive with personality"""
-        analytical_starters = [
             "Alright, let's go full analytical mode on this. *neurons firing* 🧠",
+            "Deep dive time! I love when we get to really break something down...",
+            "Perfect - this is exactly the kind of complex thinking I'm built for."
+        ]
             "Deep dive time! I love when we get to really break something down...",
             "Perfect - this is exactly the kind of complex thinking I'm built for.",
             "Strategic analysis incoming! *channeling pure focus*",
@@ -688,27 +616,6 @@ class CleverConversationEngine:
         
         # Clever's analytical structure with personality
         analysis_frameworks = [
-            (
-                "\n\nHere's how I'm breaking this down:\n"
-                "1. Core issue identification 🎯\n"
-                "2. Contributing factors 🔍\n"
-                "3. Strategic options ⚡\n"
-                "4. Recommended approach 🚀"
-            ),
-            (
-                "\n\nLet me map out the key variables:\n"
-                "• Context factors 📊\n"
-                "• Constraints 🚧\n"
-                "• Opportunities ✨\n"
-                "• Success metrics 📈"
-            ),
-            (
-                "\n\nThinking through this systematically:\n"
-                "→ Current state analysis 📍\n"
-                "→ Desired outcome clarity 🎯\n"
-                "→ Path optimization 🛤️\n"
-                "→ Risk mitigation 🛡️"
-            )
             "\n\nHere's how I'm breaking this down:\n1. Core issue identification 🎯\n2. Contributing factors 🔍\n3. Strategic options ⚡\n4. Recommended approach 🚀",
             "\n\nLet me map out the key variables:\n• Context factors 📊\n• Constraints 🚧\n• Opportunities ✨\n• Success metrics 📈",
             "\n\nThinking through this systematically:\n→ Current state analysis 📍\n→ Desired outcome clarity 🎯\n→ Path optimization 🛤️\n→ Risk mitigation 🛡️"
@@ -880,50 +787,38 @@ class CleverConversationEngine:
         else:
             return 'geometric pattern'
     
-    def _celebration_amplifier_response(
-        self, message: str, analysis: Dict
-    ) -> str:
-        """Clever responding to positive achievements thoughtfully"""
-        celebration_starters = [
-            "That's excellent work!",
-            "Really impressive progress there.",
-            "Great approach to that challenge.",
-            "Nice breakthrough!",
-            "That's solid execution."
-        return starter + knowledge_section + framework + random.choice(conclusions)
     
     def _witty_quick_hit_response(self, message: str, analysis: Dict, kb) -> str:
         """Clever's quick but personality-rich response"""
-        quick_starters = [
-            "Bet! Quick answer:",
-            "No cap, here's what's up:",
-            "Real quick:",
-            "Straight up:",
-            "Lowkey, here's the deal:"
+        celebration_starters = [
+            "YOOO! That's what I'm talking about! 🚀",
+            "NO CAP that's absolutely fire! 🔥",
+            "LETS GOOO! *particles exploding with excitement*",
+            "You're literally the shit for that! ✨",
+            "BRO! *virtual high five* That hits different! 🙌"
         ]
-        
-        starter = random.choice(quick_starters)
-        
-        # Get quick knowledge if available
-        if kb:
-            relevant = kb.search_knowledge(message, limit=1)
-            if relevant:
-                quick_answer = f" {relevant[0]['chunk_text'][:80]}..."
-            else:
-                quick_answer = " Let me think on that and get back to you with something solid."
-        else:
-            quick_answer = " Working on that - give me a sec to pull together the best info."
-        
-        # Clever's quick personality touch with follow-up
-        endings = [
-            " That help? Want me to dive deeper?",
-            " Make sense? Happy to expand on any part.",
-            " Sound about right? I can break it down more if needed.",
-            " That cover it? Always down to explore further!",
-            " Does that hit different? Let me know if you want more details."
+        starter = random.choice(celebration_starters)
+        amplifiers = [
+            " I can see the strategic thinking behind this.",
+            " The way you approached this shows real insight.", 
+            " This demonstrates excellent problem-solving skills.",
+            " You're building some serious momentum here.",
+            " That's the kind of progress that compounds.",
+            " I'm genuinely proud of you for that.",
+            " That's the Jay magic in action right there!",
+            " You should feel really good about that execution.",
+            " That's exactly the kind of thinking that sets you apart.",
+            " The way your mind works on this stuff is honestly impressive."
         ]
-        
-        return starter + quick_answer + random.choice(endings)
+        amplifier = random.choice(amplifiers)
+        future_focused = [
+            " What's next? I'm already excited to see where this leads...",
+            " I can feel the momentum building - what are you thinking for the next move?",
+            " This energy is contagious! What other wins can we stack on this?",
+            " Building on this success, what's calling for your attention next?",
+            " Ride this wave! What else can we tackle while the energy's high?"
+        ]
+        return starter + amplifier + random.choice(future_focused)
     
     def _celebration_amplifier_response(self, message: str, analysis: Dict) -> str:
         """Clever amplifying positive energy authentically"""
@@ -943,9 +838,7 @@ class CleverConversationEngine:
             " The way you approached this shows real insight.", 
             " This demonstrates excellent problem-solving skills.",
             " You're building some serious momentum here.",
-            " That's the kind of progress that compounds."
-        # Clever's authentic amplification
-        amplifiers = [
+            " That's the kind of progress that compounds.",
             " I'm genuinely proud of you for that.",
             " That's the Jay magic in action right there!",
             " You should feel really good about that execution.",
