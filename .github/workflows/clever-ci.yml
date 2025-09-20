@@ -6,9 +6,17 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: clever-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.11', '3.12' ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,13 +25,13 @@ jobs:
         id: setup_python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
 
       - name: Cache pip
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: pip-${{ runner.os }}-${{ hashFiles('requirements*.txt') }}-${{ steps.setup_python.outputs.python-version }}
+          key: pip-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements*.txt') }}
           restore-keys: |
             pip-${{ runner.os }}-
 
@@ -43,11 +51,12 @@ jobs:
           pip install flake8
           flake8 --max-line-length=100 --exclude .venv,.git
 
-      - name: Security audit (non-blocking)
-        continue-on-error: true
+      - name: Dependency security audit (fail on any vulnerability)
         run: |
           . .venv/bin/activate
-          pip-audit -r requirements.txt || echo "Security audit issues (logged)"
+          pip install pip-audit
+          # Fail pipeline if any vulnerabilities detected
+          pip-audit -r requirements.txt
 
       - name: Documentation pattern check (Why/Where/How)
         run: |
@@ -66,8 +75,8 @@ jobs:
       - name: Docstring enforcement (strict)
         run: |
           . .venv/bin/activate
-          echo "Running strict docstring enforcement (min 85% coverage)"
-          python tools/docstring_enforcer.py --min-coverage 0.85 --fail-on-missing
+          echo "Running strict docstring enforcement (min 90% coverage)"
+          python tools/docstring_enforcer.py --min-coverage 0.90 --fail-on-missing
 
       - name: Run tests (if any)
         run: |

@@ -61,7 +61,7 @@ test:
 
 # Enforce Why/Where/How docstring presence across codebase
 docstrings:
-	$(ACTIVATE) && $(PY) tools/docstring_enforcer.py --fail-on-missing --min-coverage 0.85 || (echo "❌ Docstring enforcement failed" && exit 1)
+	$(ACTIVATE) && $(PY) tools/docstring_enforcer.py --fail-on-missing --min-coverage 0.90 || (echo "❌ Docstring enforcement failed" && exit 1)
 
 # Auto-generate file inventory
 file-inventory:
