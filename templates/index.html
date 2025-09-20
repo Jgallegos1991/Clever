@@ -157,6 +157,13 @@ How:
     <!-- Hidden particle canvas for subtle background effect -->
     <canvas id="particles" aria-hidden="true"></canvas>
 
+    <!-- Live region for screen reader announcements of new AI messages -->
+    <div id="sr-live" aria-live="polite" aria-atomic="false" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+        <!-- Why: Accessibility live updates for assistive tech without visual noise -->
+        <!-- Where: Updated by main.js appendMessage when role='ai' -->
+        <!-- How: Text content replaced with latest AI bubble snippet -->
+    </div>
+
     <!-- Chat stream container (was hidden) -->
     <div id="chat-log" aria-live="polite" class="chat-stream"></div>
 

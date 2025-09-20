@@ -15,6 +15,7 @@ All notable changes to Clever are documented here. This is the canonical changel
 
 - Placeholder tests `tests/test_util_placeholders.py` safeguarding return contracts for `summarize_repo.summarize()` and `self_fix.plan_self_fixes()`.
 - Runtime introspection system: `introspection.py`, `/api/runtime_introspect` endpoint, and optional `?debug=1` overlay. Converts Why/Where/How docstring pattern into live navigational graph ("arrows between dots") showing recent template renders, endpoint reasoning metadata, persona mode, last error, and git hash for effortless debugging.
+- Follow-up introspection enhancements: slow render flag (heuristic threshold), evolution interaction counters, drift warnings (missing Why/Where/How), accessible ARIA live region announcing AI messages, CLI snapshot tool (`tools/runtime_dump.py`).
 
 ### Security
 

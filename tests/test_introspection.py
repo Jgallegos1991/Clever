@@ -54,6 +54,12 @@ def test_runtime_introspect_basic(client):
     assert home_meta, 'Home endpoint metadata missing'
     for key in ('why', 'where', 'how'):
         assert key in home_meta, f"Missing {key} in endpoint meta"
+    # New fields: slow flag optional, threshold, warnings list
+    assert 'render_threshold_ms' in data
+    assert 'warnings' in data
+    assert isinstance(data['warnings'], list)
+    if data['last_render']:
+        assert 'slow' in data['last_render']
 
 
 def test_runtime_introspect_reasoning_richness(client):
@@ -82,8 +88,24 @@ def test_runtime_introspect_schema_keys(client):
     """
     client.get('/')
     data = client.get('/api/runtime_introspect').get_json()
-    for key in ['last_render', 'recent_renders', 'endpoints', 'persona_mode', 'last_error', 'version', 'generated_ts']:
+    for key in ['last_render', 'recent_renders', 'endpoints', 'persona_mode', 'last_error', 'version', 'generated_ts', 'warnings', 'render_threshold_ms', 'evolution']:
         assert key in data, f"Missing key {key} in runtime introspection response"
+
+
+def test_runtime_introspect_evolution_summary(client):
+    """Ensure evolution summary keys exist after at least one chat interaction.
+
+    Why: Confirms interaction counts surface in runtime JSON for overlay.
+    Where: Evolution summary nested under 'evolution'.
+    How: Simulate a chat post then fetch runtime state and assert fields.
+    """
+    client.post('/chat', json={'message': 'hello clever'})
+    data = client.get('/api/runtime_introspect').get_json()
+    evo = data.get('evolution')
+    # May be None if evolution engine not present, so tolerate None gracefully
+    if evo is not None:
+        assert 'total_interactions' in evo
+        assert 'recent_interactions' in evo
 
 
 def test_runtime_introspect_includes_version(client):

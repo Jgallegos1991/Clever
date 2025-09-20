@@ -37,6 +37,12 @@ _last_error: Optional[Dict[str, Any]] = None
 # Cache for parsed docstring metadata keyed by object id
 _doc_meta_cache: Dict[int, Dict[str, str]] = {}
 
+# Threshold (ms) above which a render is flagged as slow. Chosen conservatively
+# to surface potential server-side slowness before it becomes user-visible.
+# This can be tuned; kept internal to avoid config sprawl. Typical fast render
+# under light load should be < 25ms; we set 40ms as initial heuristic.
+RENDER_SLOW_THRESHOLD_MS = 40.0
+
 
 def extract_doc_meta(obj: Any) -> Dict[str, str]:
     """Extract Why / Where / How sections from a callable or object docstring.
@@ -90,11 +96,13 @@ def record_render(template: str, route: str, duration_ms: float, context_size: i
         duration_ms: Duration of render call.
         context_size: Approximate size (len of keys) of the context mapping.
     """
+    slow = duration_ms >= RENDER_SLOW_THRESHOLD_MS
     with _registry_lock:
         _render_events.append({
             "template": template,
             "route": route,
             "duration_ms": round(duration_ms, 3),
+            "slow": slow,
             "ts": time.time(),
             "context_size": context_size,
         })
@@ -160,14 +168,40 @@ def detect_git_version() -> Optional[str]:
 _GIT_HASH = detect_git_version()
 
 
+def _compute_warnings(endpoints: List[Dict[str, Any]]) -> List[str]:
+    """Compute drift warnings for endpoints missing reasoning sections.
+
+    Why: Proactively signal documentation drift (missing Why/Where/How) so the
+    runtime overlay acts as early warning before CI enforcement or confusion.
+    Where: Used inside runtime_state assembly prior to JSON response.
+    How: Iterates endpoint metadata and emits human-readable notes when any
+    section is blank; keeps list small for overlay readability.
+    """
+    warnings: List[str] = []
+    for ep in endpoints:
+        missing = [k for k in ("why", "where", "how") if not (ep.get(k) or '').strip()]
+        if missing:
+            warnings.append(f"Endpoint {ep.get('rule')} missing: {', '.join(missing)}")
+    return warnings
+
+
 def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
     """Assemble full runtime introspection state.
 
-    Why: Single aggregation point turning raw registries + persona context into
-    a JSON-serializable snapshot for debugging overlays.
-    Where: Returned by `/api/runtime_introspect` endpoint in `app.py`.
-    How: Pulls recent renders, last error, endpoint metadata, persona mode, and
-    version hash into one dictionary.
+    Why: Central aggregation converting docstring reasoning + live telemetry
+    (renders, errors, evolution stats) into a navigational map—the "arrows"
+    that show what connected to what, why, and how at the moment of inspection.
+    Where: Returned by `/api/runtime_introspect` endpoint in `app.py`, consumed
+    by optional frontend debug overlay and CLI snapshot tool.
+    How: Gathers recent renders (with slow flag), endpoint reasoning metadata,
+    persona mode, evolution interaction summary (best-effort), last error,
+    version hash, computed drift warnings, and the render slow threshold for
+    client display.
+
+    Connects to:
+        - evolution_engine.py: Interaction summary (if available)
+        - app.py: Persona engine reference & endpoint registration
+        - tools/runtime_dump.py: CLI dump utility
     """
     renders = get_recent_renders()
     last_render = renders[-1] if renders else None
@@ -175,13 +209,29 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
     if persona_engine is not None:
         # Attempt to read an internal current mode attribute if present
         persona_mode = getattr(persona_engine, "_last_mode", None) or getattr(persona_engine, "default_mode", None)
+    endpoints = build_endpoints_snapshot(app)
+    # Evolution summary (best-effort, never raises)
+    evolution_summary: Optional[Dict[str, Any]] = None
+    try:
+        from evolution_engine import get_evolution_engine  # type: ignore
+        evo = get_evolution_engine()
+        evolution_summary = {
+            "total_interactions": getattr(evo, 'total_interactions', None),
+            "recent_interactions": len(getattr(evo, 'interactions', [])),
+        }
+    except Exception:
+        evolution_summary = None
+    warnings = _compute_warnings(endpoints)
     return {
         "last_render": last_render,
         "recent_renders": renders,
-        "endpoints": build_endpoints_snapshot(app),
+        "endpoints": endpoints,
         "persona_mode": persona_mode,
+        "evolution": evolution_summary,
         "last_error": get_last_error(),
         "version": {"git": _GIT_HASH},
+        "render_threshold_ms": RENDER_SLOW_THRESHOLD_MS,
+        "warnings": warnings,
         "generated_ts": time.time(),
     }
 

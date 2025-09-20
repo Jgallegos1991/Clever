@@ -168,6 +168,8 @@ async function fetchIntrospectionAndRender() {
       endpoints: (data.endpoints||[]).slice(0,6).map(e => ({r:e.rule, why:e.why.slice(0,60)})),
       last_error: data.last_error,
       version: data.version,
+      warnings: data.warnings || [],
+      evolution: data.evolution || null,
       modules: (window.CLEVER_RUNTIME && window.CLEVER_RUNTIME.modules) || []
     };
     pre.textContent = JSON.stringify(slim, null, 2);
@@ -298,6 +300,13 @@ function appendMessage(who, text) {
   // animate in
   requestAnimationFrame(() => wrap.classList.add('manifested'));
   log.scrollTop = log.scrollHeight;
+  if (who === 'ai') {
+    // Accessibility announcement: update polite live region with trimmed text
+    const live = document.getElementById('sr-live');
+    if (live) {
+      live.textContent = 'Clever: ' + String(text).slice(0, 160);
+    }
+  }
   return wrap;
 }
 

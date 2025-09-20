@@ -153,7 +153,15 @@ class PersonaEngine:
             "Let me layer a nuance on that.",
             "Here's a slightly refined framing." 
         ]
-        varied = base + " " + random.choice(variants)
+        suffix = random.choice(variants)
+        # To ensure the signature (first line) changes—not just trailing text—we
+        # inject a subtle prefix marker if the first line would otherwise be identical.
+        first_line, *rest = base.split('\n')
+        prefix_markers = ["Alt:", "Perspective:", "Variant:"]
+        # Only add prefix if first_line already seen (collision scenario here)
+        varied_first = random.choice(prefix_markers) + " " + first_line
+        rebuilt = "\n".join([varied_first] + rest) if rest else varied_first
+        varied = rebuilt + " " + suffix
         varied_sig = self._response_signature(varied)
         self._recent_responses.append(varied_sig)
         return varied
