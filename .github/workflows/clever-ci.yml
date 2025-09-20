@@ -92,8 +92,8 @@ jobs:
       - name: Enforce minimum reasoning coverage
         run: |
           . .venv/bin/activate
-          echo "Checking reasoning coverage threshold (55% min initial)"
-          python tools/generate_reasoning_graph.py --fail-under 55 || (echo "Reasoning coverage below threshold" && exit 1)
+          echo "Checking reasoning coverage threshold (60% min)"
+          python tools/generate_reasoning_graph.py --fail-under 60 || (echo "Reasoning coverage below threshold" && exit 1)
 
       - name: Generate file inventory
         run: |
