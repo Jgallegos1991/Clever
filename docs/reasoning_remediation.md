@@ -2,73 +2,22 @@
 
 Priority ordered by outstanding nodes per file (high → low).
 
-Total incomplete nodes: 232
+Total incomplete nodes: 194
 
-## enhanced_conversation_engine.py (27 incomplete)
+## system_validator.py (12 incomplete)
 
-- function `__init__` (line 54) – missing Why/Where/How
-- function `_discover_capabilities` (line 63) – missing Why/Where/How
-- function `update_from_interaction` (line 96) – missing Why/Where/How
-- function `__init__` (line 148) – missing Why/Where/How
-- function `_perform_comprehensive_analysis` (line 216) – missing Why/Where/How
-- function `_analyze_intent` (line 244) – missing Why/Where/How
-- function `_classify_request_type` (line 278) – missing Why/Where/How
-- function `_identify_required_capabilities` (line 299) – missing Why/Where/How
-- function `_build_enhanced_context` (line 318) – missing Why/Where/How
-- function `_route_request` (line 353) – missing Why/Where/How
-- function `_identify_file_operations` (line 384) – missing Why/Where/How
-- function `_generate_comprehensive_response` (line 400) – missing Why/Where/How
-- function `_process_file_requests` (line 462) – missing Why/Where/How
-- function `_safe_read_file` (line 517) – missing Why/Where/How
-- function `_analyze_file_content` (line 533) – missing Why/Where/How
-- function `_detect_content_type` (line 548) – missing Why/Where/How
-- function `_retrieve_relevant_memory` (line 565) – missing Why/Where/How
-- function `_generate_clever_state` (line 604) – missing Why/Where/How
-- function `_generate_ui_reactions` (line 619) – missing Why/Where/How
-- function `_determine_mood` (line 648) – missing Why/Where/How
-- function `_generate_insights` (line 662) – missing Why/Where/How
-- function `_determine_approach` (line 699) – missing Why/Where/How
-- function `_integrate_learning` (line 714) – missing Why/Where/How
-- function `_process_text_file` (line 736) – missing Why/Where/How
-- function `_process_code_file` (line 748) – missing Why/Where/How
-- function `_process_json_file` (line 774) – missing Why/Where/How
-- function `_process_csv_file` (line 797) – missing Why/Where/How
-
-## ai_enhancement.py (17 incomplete)
-
-- function `_extract_concepts` (line 99) – missing Why/Where/How
-- function `_build_concept_connections` (line 123) – missing Why/Where/How
-- function `_calculate_relevance` (line 131) – missing Why/Where/How
-- function `_update_memory_weights` (line 153) – missing Why/Where/How
-- function `__init__` (line 181) – missing Why/Where/How
-- function `_generate_proactive_suggestions` (line 211) – missing Why/Where/How
-- class `PatternDetector` (line 230) – missing Why/Where/How
-- function `analyze_patterns` (line 233) – missing Why/Where/How
-- function `_find_frequent_topics` (line 243) – missing Why/Where/How
-- function `_analyze_time_patterns` (line 253) – missing Why/Where/How
-- function `_analyze_interaction_style` (line 266) – missing Why/Where/How
-- function `_analyze_technical_focus` (line 280) – missing Why/Where/How
-- class `ResponseOptimizer` (line 292) – missing Why/Where/How
-- function `optimize_response` (line 295) – missing Why/Where/How
-- function `_make_concise` (line 318) – missing Why/Where/How
-- function `_add_detail` (line 325) – missing Why/Where/How
-- function `_add_contextual_reference` (line 333) – missing Why/Where/How
-
-## system_validator.py (13 incomplete)
-
-- class `ValidationResult` (line 38) – missing Why/Where/How
-- function `__init__` (line 73) – missing Why/Where/How
-- function `_validate_offline_enforcement` (line 149) – missing Why/Where/How
-- function `_validate_single_user_config` (line 201) – missing Why/Where/How
-- function `_validate_single_database` (line 243) – missing Why/Where/How
-- function `_validate_jay_personalization` (line 268) – missing Why/Where/How
-- function `_validate_clever_persona` (line 308) – missing Why/Where/How
-- function `_validate_file_structure_compliance` (line 362) – missing Why/Where/How
-- function `_validate_nlp_capabilities` (line 417) – missing Why/Where/How
-- function `_validate_evolution_engine_access` (line 480) – missing Why/Where/How
-- function `_validate_documentation_standards` (line 528) – missing Why/Where/How
-- function `_validate_performance_optimization` (line 577) – missing Why/Where/How
-- function `_generate_recommendations` (line 638) – missing Why/Where/How
+- function `__init__` (line 82) – missing Why/Where/How
+- function `_validate_offline_enforcement` (line 159) – missing Why/Where/How
+- function `_validate_single_user_config` (line 211) – missing Why/Where/How
+- function `_validate_single_database` (line 253) – missing Why/Where/How
+- function `_validate_jay_personalization` (line 278) – missing Why/Where/How
+- function `_validate_clever_persona` (line 318) – missing Why/Where/How
+- function `_validate_file_structure_compliance` (line 372) – missing Why/Where/How
+- function `_validate_nlp_capabilities` (line 427) – missing Why/Where/How
+- function `_validate_evolution_engine_access` (line 490) – missing Why/Where/How
+- function `_validate_documentation_standards` (line 538) – missing Why/Where/How
+- function `_validate_performance_optimization` (line 587) – missing Why/Where/How
+- function `_generate_recommendations` (line 656) – missing Why/Where/How
 
 ## automated_monitor.py (12 incomplete)
 
@@ -115,14 +64,14 @@ Total incomplete nodes: 232
 ## nlp_processor.py (9 incomplete)
 
 - function `_safe_lower` (line 36) – missing Why/Where/How
-- function `__init__` (line 240) – missing Why/Where/How
-- function `process_text` (line 251) – missing Why/Where/How
-- function `_extract_entities_advanced` (line 272) – missing Why/Where/How
-- function `_readability` (line 322) – missing Why/Where/How
-- function `_question_type` (line 336) – missing Why/Where/How
-- function `_concept_density` (line 348) – missing Why/Where/How
-- function `_topic_vector` (line 355) – missing Why/Where/How
-- function `_estimate_syllables` (line 365) – missing Why/Where/How
+- function `__init__` (line 253) – missing Why/Where/How
+- function `process_text` (line 264) – missing Why/Where/How
+- function `_extract_entities_advanced` (line 285) – missing Why/Where/How
+- function `_readability` (line 335) – missing Why/Where/How
+- function `_question_type` (line 349) – missing Why/Where/How
+- function `_concept_density` (line 361) – missing Why/Where/How
+- function `_topic_vector` (line 368) – missing Why/Where/How
+- function `_estimate_syllables` (line 378) – missing Why/Where/How
 
 ## pdf_ingestor.py (9 incomplete)
 
@@ -261,6 +210,13 @@ Total incomplete nodes: 232
 - function `get_last_modified` (line 44) – missing Why/Where/How
 - function `generate_inventory` (line 72) – missing Why/Where/How
 
+## tools/reasoning_focus.py (4 incomplete)
+
+- function `parse_remediation` (line 33) – missing Why/Where/How
+- function `load_or_fail` (line 62) – missing Why/Where/How
+- function `get_code_excerpt` (line 68) – missing Why/Where/How
+- function `main` (line 85) – missing Why/Where/How
+
 ## run_tests.py (3 incomplete)
 
 - function `run_tooltip_tests` (line 25) – missing Why/Where/How
@@ -295,6 +251,16 @@ Total incomplete nodes: 232
 - function `scan_file` (line 29) – missing Why/Where/How
 - function `main` (line 63) – missing Why/Where/How
 
+## ai_enhancement.py (2 incomplete)
+
+- function `__init__` (line 213) – missing Why/Where/How
+- function `_generate_proactive_suggestions` (line 243) – missing Why/Where/How
+
+## enhanced_conversation_engine.py (2 incomplete)
+
+- function `__init__` (line 54) – missing Why/Where/How
+- function `__init__` (line 166) – missing Why/Where/How
+
 ## error_recovery.py (2 incomplete)
 
 - function `__init__` (line 42) – missing Why/Where/How
@@ -308,7 +274,7 @@ Total incomplete nodes: 232
 ## persona.py (2 incomplete)
 
 - function `__init__` (line 61) – missing Why/Where/How
-- function `_regen` (line 296) – missing Why/Where/How
+- function `_regen` (line 301) – missing Why/Where/How
 
 ## tests/test_ui_brief_acceptance.py (2 incomplete)
 
@@ -339,10 +305,6 @@ Total incomplete nodes: 232
 
 - function `connect` (line 48) – missing Why/Where/How
 - function `connect_ex` (line 53) – missing Why/Where/How
-
-## fix_line_lengths.py (1 incomplete)
-
-- function `fix_app_py` (line 14) – missing Why/Where/How
 
 ## app.py (1 incomplete)
 

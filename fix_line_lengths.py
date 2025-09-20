@@ -12,7 +12,27 @@ from pathlib import Path
 
 
 def fix_app_py():
-    """Fix line length issues in app.py"""
+    """Fix line length issues in app.py.
+
+    Why: The main application file accumulates long f-strings and messages
+    during rapid iteration; exceeding style limits reduces readability and
+    causes noisy diffs when auto-formatters wrap inconsistently. Centralizing
+    surgical replacements keeps history clean and prevents manual line wraps
+    drifting across commits.
+    Where: Invoked manually or via maintenance scripts when style checks or
+    reviewers flag overlength lines in `app.py`—isolated to that file to avoid
+    unintended global rewrites.
+    How: Performs deterministic string replacements and targeted regex-based
+    rewrites for specific long literals/f-strings. Does NOT attempt generic
+    formatting; intentionally limited scope so changes remain predictable and
+    auditable. Writes the modified content back to disk and emits a console
+    confirmation.
+
+    Connects to:
+        - app.py: Source file whose long lines are normalized
+        - CI / code review: Keeps diffs minimal by preemptively enforcing
+          consistent wrapping for known problematic strings
+    """
     app_file = Path("/workspaces/projects/app.py")
     content = app_file.read_text()
 

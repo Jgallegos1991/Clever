@@ -1,33 +1,33 @@
 # Clever Reasoning Graph
 
-Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
+Total nodes: 553  |  Complete Why/Where/How: 359 (64.92%)
 
 ## Nodes
 
 - **ai_enhancement:ai_enhancement** (module) – Extends Clever's intelligence with advanced memory, learning, and contextual awareness capabilities beyond basic NLP processing.
 - **ai_enhancement:MemoryNetwork** (class) – Gives Clever long-term memory and context understanding
 - **ai_enhancement:IntelligenceAmplifier** (class) – Makes Clever smarter through pattern recognition and adaptive learning
-- **ai_enhancement:PatternDetector** (class) – No Why
-- **ai_enhancement:ResponseOptimizer** (class) – No Why
+- **ai_enhancement:PatternDetector** (class) – Surface recurring themes, interaction cadence, style, and technical focus to inform response tailoring and proactive suggestions.
+- **ai_enhancement:ResponseOptimizer** (class) – Adjusts raw persona output to align with user style, context recency, and pattern signals, increasing perceived intelligence and usefulness.
 - **ai_enhancement:__init__** (function) – Set up advanced memory storage and retrieval system
 - **ai_enhancement:store_interaction** (function) – Build long-term understanding of user patterns and preferences
 - **ai_enhancement:retrieve_relevant_context** (function) – Provide Clever with relevant past context for better responses
-- **ai_enhancement:_extract_concepts** (function) – No Why
-- **ai_enhancement:_build_concept_connections** (function) – No Why
-- **ai_enhancement:_calculate_relevance** (function) – No Why
-- **ai_enhancement:_update_memory_weights** (function) – No Why
+- **ai_enhancement:_extract_concepts** (function) – Converts raw user input into structured concept tags (action, tech, emotion) that downstream pattern analysis and memory relevance scoring d…
+- **ai_enhancement:_build_concept_connections** (function) – Establishes co-occurrence strengths so indirectly related concepts can boost relevance even when exact tokens don't overlap in future turns.
+- **ai_enhancement:_calculate_relevance** (function) – Ranks stored memories for contextual retrieval ensuring responses leverage the most semantically aligned prior interactions.
+- **ai_enhancement:_update_memory_weights** (function) – Prioritizes memories more likely to improve future personalization (positive sentiment, length, technical content) so retrieval skews toward…
 - **ai_enhancement:__init__** (function) – No Why
 - **ai_enhancement:enhance_response** (function) – Make responses more intelligent and contextually aware
 - **ai_enhancement:_generate_proactive_suggestions** (function) – No Why
-- **ai_enhancement:analyze_patterns** (function) – No Why
-- **ai_enhancement:_find_frequent_topics** (function) – No Why
-- **ai_enhancement:_analyze_time_patterns** (function) – No Why
-- **ai_enhancement:_analyze_interaction_style** (function) – No Why
-- **ai_enhancement:_analyze_technical_focus** (function) – No Why
-- **ai_enhancement:optimize_response** (function) – No Why
-- **ai_enhancement:_make_concise** (function) – No Why
-- **ai_enhancement:_add_detail** (function) – No Why
-- **ai_enhancement:_add_contextual_reference** (function) – No Why
+- **ai_enhancement:analyze_patterns** (function) – Produce unified pattern signal set (topics, timing, style, technical focus) enabling adaptive response optimization.
+- **ai_enhancement:_find_frequent_topics** (function) – Identifies high-salience concepts to reference or expand upon in future responses to reinforce continuity and personalization.
+- **ai_enhancement:_analyze_time_patterns** (function) – Captures temporal usage signals (active hour, session length) that can guide scheduling of proactive suggestions or pacing adjustments.
+- **ai_enhancement:_analyze_interaction_style** (function) – Tunes verbosity and detail level for generated responses.
+- **ai_enhancement:_analyze_technical_focus** (function) – Highlights dominant technical domains for enriched elaboration and proactive follow-up prompts.
+- **ai_enhancement:optimize_response** (function) – Final transformation stage before returning answer to user; raises relevance and personalization.
+- **ai_enhancement:_make_concise** (function) – Prevents verbosity fatigue for users with concise style.
+- **ai_enhancement:_add_detail** (function) – Enrich sparse responses for users favoring detailed guidance.
+- **ai_enhancement:_add_contextual_reference** (function) – Reinforces continuity, signaling memory of prior discussion.
 - **app:app** (module) – Acts as the orchestration hub (root DOT) of the Clever reasoning graph: binds routing, persona interaction, evolution logging, and offline e…
 - **app:SimpleDebugger** (class) – Provides basic logging without complex dependencies
 - **app:home** (function) – Serves the primary user interface with particle system and chat
@@ -149,33 +149,33 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - **enhanced_conversation_engine:EnhancedConversationEngine** (class) – Orchestrates all conversation processing with complete access to system capabilities, ensuring Clever can handle any request perfectly with …
 - **enhanced_conversation_engine:get_conversation_engine** (function) – Provides singleton access to enhanced conversation capabilities for consistent processing across all chat interactions.
 - **enhanced_conversation_engine:__init__** (function) – No Why
-- **enhanced_conversation_engine:_discover_capabilities** (function) – No Why
-- **enhanced_conversation_engine:update_from_interaction** (function) – No Why
+- **enhanced_conversation_engine:_discover_capabilities** (function) – Establishes a capability feature map so routing logic can make informed decisions about which advanced processing paths (file access, learni…
+- **enhanced_conversation_engine:update_from_interaction** (function) – Evolves dynamic conversation state (depth, focus, history) that downstream response generation and UI signaling rely upon for personalizatio…
 - **enhanced_conversation_engine:__init__** (function) – No Why
 - **enhanced_conversation_engine:process_conversation** (function) – Provides comprehensive conversation processing with access to all system capabilities including file processing, memory retrieval, and intel…
-- **enhanced_conversation_engine:_perform_comprehensive_analysis** (function) – No Why
-- **enhanced_conversation_engine:_analyze_intent** (function) – No Why
-- **enhanced_conversation_engine:_classify_request_type** (function) – No Why
-- **enhanced_conversation_engine:_identify_required_capabilities** (function) – No Why
-- **enhanced_conversation_engine:_build_enhanced_context** (function) – No Why
-- **enhanced_conversation_engine:_route_request** (function) – No Why
-- **enhanced_conversation_engine:_identify_file_operations** (function) – No Why
-- **enhanced_conversation_engine:_generate_comprehensive_response** (function) – No Why
-- **enhanced_conversation_engine:_process_file_requests** (function) – No Why
-- **enhanced_conversation_engine:_safe_read_file** (function) – No Why
-- **enhanced_conversation_engine:_analyze_file_content** (function) – No Why
-- **enhanced_conversation_engine:_detect_content_type** (function) – No Why
-- **enhanced_conversation_engine:_retrieve_relevant_memory** (function) – No Why
-- **enhanced_conversation_engine:_generate_clever_state** (function) – No Why
-- **enhanced_conversation_engine:_generate_ui_reactions** (function) – No Why
-- **enhanced_conversation_engine:_determine_mood** (function) – No Why
-- **enhanced_conversation_engine:_generate_insights** (function) – No Why
-- **enhanced_conversation_engine:_determine_approach** (function) – No Why
-- **enhanced_conversation_engine:_integrate_learning** (function) – No Why
-- **enhanced_conversation_engine:_process_text_file** (function) – No Why
-- **enhanced_conversation_engine:_process_code_file** (function) – No Why
-- **enhanced_conversation_engine:_process_json_file** (function) – No Why
-- **enhanced_conversation_engine:_process_csv_file** (function) – No Why
+- **enhanced_conversation_engine:_perform_comprehensive_analysis** (function) – Generates a normalized semantic + structural feature bundle that powers routing, mood derivation, UI reactions, and learning logs.
+- **enhanced_conversation_engine:_analyze_intent** (function) – Classifies high-level user objective (file operation, creative, analysis, info, task) to influence routing and persona angle.
+- **enhanced_conversation_engine:_classify_request_type** (function) – Distinguishes complexity & shape (multi-step, simple question, instruction) enabling specialized handling for compound tasks.
+- **enhanced_conversation_engine:_identify_required_capabilities** (function) – Determines which subsystem hooks (file, memory, learning, creative) must be activated for this request to succeed fully.
+- **enhanced_conversation_engine:_build_enhanced_context** (function) – Consolidates mutable conversation, system, and user facets into a single structure passed to persona generation & response synthesis.
+- **enhanced_conversation_engine:_route_request** (function) – Decides which processing augmentations (file ops, memory fetch, multi-step specialization) must execute to satisfy the request.
+- **enhanced_conversation_engine:_identify_file_operations** (function) – Narrows broad file capability into concrete actions (read, analyze, search, list) for precise downstream execution.
+- **enhanced_conversation_engine:_generate_comprehensive_response** (function) – Synthesizes persona output, file/memory augmentation, UI reaction data, telemetry, and proactive suggestions into a single payload.
+- **enhanced_conversation_engine:_process_file_requests** (function) – Executes user-requested file operations providing content slices and lightweight analyses to enrich response context.
+- **enhanced_conversation_engine:_safe_read_file** (function) – Provides robust file IO that won't derail conversation flow on permission or encoding errors.
+- **enhanced_conversation_engine:_analyze_file_content** (function) – Extracts semantic + structural signals from file slices to supply enriched context (keywords, sentiment, type) for persona and insights.
+- **enhanced_conversation_engine:_detect_content_type** (function) – Classifies file slice into coarse category guiding downstream explanation tone or formatting hints.
+- **enhanced_conversation_engine:_retrieve_relevant_memory** (function) – Surfaces recent and topically similar past interactions that increase coherence and personalization of current response.
+- **enhanced_conversation_engine:_generate_clever_state** (function) – Supplies UI + telemetry layer with synthesized cognitive/emotional state metrics derived from analysis & dynamic context.
+- **enhanced_conversation_engine:_generate_ui_reactions** (function) – Translates semantic + sentiment signals into visual animation directives for the holographic particle UI to reflect AI state.
+- **enhanced_conversation_engine:_determine_mood** (function) – Provides a human-relatable emotional label supporting UI theming and potential stylistic adjustments in subsequent turns.
+- **enhanced_conversation_engine:_generate_insights** (function) – Adds reflective meta-observations that increase user perception of depth, awareness, and adaptive engagement.
+- **enhanced_conversation_engine:_determine_approach** (function) – Produces a strategic stance label influencing client display and potential downstream adaptive logic.
+- **enhanced_conversation_engine:_integrate_learning** (function) – Captures interaction telemetry for longitudinal evolution metrics and adaptive capability refinement.
+- **enhanced_conversation_engine:_process_text_file** (function) – Supplies quick semantic snapshot of plain-text files to enrich context and potential suggestions.
+- **enhanced_conversation_engine:_process_code_file** (function) – Extracts lightweight structural metrics (functions/classes/imports) to contextualize code discussions without heavy parsing.
+- **enhanced_conversation_engine:_process_json_file** (function) – Provides quick glance at JSON shape (keys, size) aiding follow-up queries or targeted inspection.
+- **enhanced_conversation_engine:_process_csv_file** (function) – Summarizes tabular file dimensions enabling immediate reasoning about dataset scope.
 - **error_recovery:error_recovery** (module) – The original error recovery subsystem was overly complex, duplicated localized try/except patterns, and generated continual lint/type noise.…
 - **error_recovery:ErrorRecoverySystem** (class) – Prevent accidental use of the removed centralized recovery system.
 - **error_recovery:get_error_recovery** (function) – No Why
@@ -212,7 +212,7 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - **final_integration_test:test_integration_workflow** (function) – Validates all components work together seamlessly
 - **final_integration_test:run_comprehensive_test** (function) – Provides comprehensive validation of all enhancements
 - **fix_line_lengths:fix_line_lengths** (module) – Ensures code quality compliance for smooth system operation
-- **fix_line_lengths:fix_app_py** (function) – No Why
+- **fix_line_lengths:fix_app_py** (function) – The main application file accumulates long f-strings and messages during rapid iteration; exceeding style limits reduces readability and cau…
 - **fixer:fixer** (module) – No Why
 - **fixer:list_operations** (function) – Provides safe, whitelisted operations for automated system maintenance and UI enhancements without manual intervention.
 - **fixer:apply** (function) – Provides controlled execution of whitelisted repair operations to maintain system functionality and enhance user experience.
@@ -303,6 +303,7 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - **nlp_processor:get_nlp_processor** (function) – Central place for persona or other modules to obtain NLP features without duplicating capability detection.
 - **nlp_processor:__init__** (function) – Set up basic text processing capabilities
 - **nlp_processor:process_text** (function) – Provide comprehensive text analysis for system use
+- **nlp_processor:process** (function) – Some higher-level engines (e.g., enhanced conversation engine) invoke `process`; adding an alias avoids widespread refactors while maintaini…
 - **nlp_processor:extract_keywords** (function) – Identify important concepts for contextual responses
 - **nlp_processor:_noise_metrics** (function) – Persona needs to recognize when user input is accidental (keyboard smash) or heavily typo-laden to prompt clarification.
 - **nlp_processor:analyze_sentiment** (function) – Understand emotional tone for appropriate responses
@@ -402,6 +403,11 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - **persona_simple:PersonaEngine** (class) – Generates responses with Clever's personality
 - **persona_simple:__init__** (function) – Sets up Clever's personality and user context
 - **persona_simple:generate** (function) – Main interface for AI response generation
+- **reasoning_focus:reasoning_focus** (module) – Provides contributors with a fast, actionable view of the largest remaining Why/Where/How documentation gaps so effort targets maximum cover…
+- **reasoning_focus:parse_remediation** (function) – No Why
+- **reasoning_focus:load_or_fail** (function) – No Why
+- **reasoning_focus:get_code_excerpt** (function) – No Why
+- **reasoning_focus:main** (function) – No Why
 - **run_tests:run_tests** (module) – Provides a unified entry point for running all test suites, including UI tooltip tests, to ensure system reliability and feature coverage.
 - **run_tests:run_tooltip_tests** (function) – No Why
 - **run_tests:run_main_test_suite** (function) – Provides thorough validation of Clever AI's core functionality including database, NLP, persona, and system integration tests.
@@ -436,7 +442,7 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - **sync_watcher:on_any_event** (function) – No Why
 - **sync_watcher:trigger_ingestion** (function) – No Why
 - **system_validator:system_validator** (module) – Ensures continuous adherence to all Unbreakable Rules and instructions by monitoring system state, detecting deviations, and automatically c…
-- **system_validator:ValidationResult** (class) – No Why
+- **system_validator:ValidationResult** (class) – Standardizes structure for all validation outcomes so reporting, aggregation, and remediation logic can treat heterogeneous checks uniformly…
 - **system_validator:SystemValidator** (class) – Maintains system integrity by continuously validating against Unbreakable Rules and automatically correcting any deviations to ensure Clever…
 - **system_validator:get_system_validator** (function) – Provides singleton access to system validator for consistent validation and monitoring across all system components.
 - **system_validator:validate_system_startup** (function) – Ensures system integrity and rule compliance before operation begins
@@ -678,6 +684,8 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - final_integration_test:final_integration_test → automated_monitor.py
 - final_integration_test:final_integration_test → enhanced_conversation_engine.py
 - final_integration_test:final_integration_test → system_validator.py
+- fix_line_lengths:fix_app_py → CI
+- fix_line_lengths:fix_app_py → app.py
 - fixer_legacy:fixer_legacy → fixer.py
 - fixer_legacy:fixer_legacy → tools/
 - generate_reasoning_graph:generate_reasoning_graph → docs/reasoning_graph.md
@@ -787,6 +795,9 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - persona:persona → introspection.py
 - persona:persona → memory_engine.py
 - persona:persona → nlp_processor.py
+- reasoning_focus:reasoning_focus → docs/reasoning_remediation.md
+- reasoning_focus:reasoning_focus → tools/generate_reasoning_graph.py
+- reasoning_focus:reasoning_focus → verification
 - run_tests:run_tests → Other
 - run_tests:run_tests → tests/test_ui_functionality.py
 - run_tests_legacy:run_tests_legacy → Makefile
@@ -1003,7 +1014,6 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - final_integration_test:test_integration_workflow
 - final_integration_test:run_comprehensive_test
 - fix_line_lengths:fix_line_lengths
-- fix_line_lengths:fix_app_py
 - fixer:fixer
 - fixer:list_operations
 - fixer:apply
@@ -1074,6 +1084,7 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - nlp_processor:SimpleNLPProcessor
 - nlp_processor:get_nlp_processor
 - nlp_processor:__init__
+- nlp_processor:process
 - nlp_processor:extract_keywords
 - nlp_processor:_noise_metrics
 - nlp_processor:analyze_sentiment
@@ -1151,6 +1162,10 @@ Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 - persona_simple:PersonaEngine
 - persona_simple:__init__
 - persona_simple:generate
+- reasoning_focus:parse_remediation
+- reasoning_focus:load_or_fail
+- reasoning_focus:get_code_excerpt
+- reasoning_focus:main
 - run_tests:run_tooltip_tests
 - run_tests:run_main_test_suite
 - run_tests:run_pytest_tests
