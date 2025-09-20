@@ -1,4 +1,38 @@
+"""Central database management module for Clever's single-file SQLite persistence layer.
 
+Why:
+    The project enforces a strict offline, single-user, single-database paradigm. All
+    persisted state (ingested source documents, chat utterances, interaction telemetry,
+    and contextual key/value notes) must live inside one SQLite file referenced by
+    ``config.DB_PATH``. Centralizing schema creation, thread safety, and CRUD helpers
+    here eliminates duplication and prevents accidental creation of additional
+    databases elsewhere in the codebase.
+Where:
+    This module is imported by ingestion utilities (``file_ingestor.py``,
+    ``pdf_ingestor.py``), synchronization/watch components (``sync_watcher.py``),
+    conversational systems (``persona.py``, ``clever_conversation_engine.py``), the
+    evolution / learning layer (``evolution_engine.py``), health / validation utilities
+    (``system_validator.py``, ``health_monitor.py``), and various tooling scripts that
+    need read‑only analytics. A shared singleton instance ``db_manager`` is exposed at
+    the bottom and reused by modules that don't need custom lifecycle management.
+How:
+    Provides the ``DatabaseManager`` class which lazily initializes (idempotent) schema
+    tables on first construction and applies backward-compatible column backfills using
+    PRAGMA inspection. Thread safety is ensured with a re-entrant lock (``RLock``)
+    guarding every connection context to avoid concurrent write hazards under the
+    Flask app's multi-threaded request model. Higher-level helper methods encapsulate
+    insert/select logic for each table, always returning primitive Python structures
+    (dicts / lists / ints) to keep calling code decoupled from SQL details. Only this
+    module opens SQLite connections; callers should never manage raw connections.
+
+Connects to:
+    - config.py: Source of the authoritative ``DB_PATH`` constant.
+    - evolution_engine.py: Logs interactions for adaptive learning.
+    - persona.py: Persists utterances and retrieves recent context windows.
+    - file_ingestor.py / pdf_ingestor.py: Store and update ingested source documents.
+    - sync_watcher.py: Detects file changes and triggers source re-ingestion.
+    - health_monitor.py / system_validator.py: Perform integrity & readiness checks.
+"""
 
 import threading
 from dataclasses import dataclass
@@ -100,9 +134,16 @@ CREATE TABLE IF NOT EXISTS context_notes (
     def set_context_note(self, key: str, value: str, ts: float | None = None) -> None:
         """
         Store or update a context note in the database.
-        Why: Provides persistent key-value storage for application context and state,
-        Where: Used by application for storing context notes,
-        How: Inserts or updates the context_notes table with key, value, and timestamp.
+
+        Why:
+            Provides persistent key-value storage for application context and state
+            that must survive process restarts (e.g., last processed sync marker).
+        Where:
+            Used by application logic (e.g., sync components, evolution engine) for
+            storing small ephemeral control values without creating new tables.
+        How:
+            Executes an INSERT OR REPLACE into the ``context_notes`` table with the
+            provided key/value and float timestamp for chronological auditing.
         """
         import time as _time
         if ts is None:

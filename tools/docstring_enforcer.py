@@ -16,7 +16,7 @@ import pathlib
 import sys
 from typing import Iterable, List, Tuple
 
-EXCLUDE_DIRS = {".venv", "__pycache__", ".git"}
+EXCLUDE_DIRS = {".venv", "venv", "__pycache__", ".git", "home"}
 OPTIONAL_EXCLUDE = {"tests"}
 REQUIRED_TOKENS = ["Why:", "Where:", "How:"]
 
@@ -33,10 +33,20 @@ def iter_python_files(root: pathlib.Path, include_tests: bool) -> Iterable[pathl
         - docstring pattern enforcement pipeline
     """
     for path in root.rglob("*.py"):
-        parts = set(path.parts)
-        if parts & EXCLUDE_DIRS:
+        # Use relative parts so that system path prefixes (e.g. /home/username) do not
+        # trigger exclusions erroneously. This allows us to intentionally exclude a
+        # nested duplicate project directory named 'home' inside the repo while still
+        # scanning the actual root files located at /home/username/... on disk.
+        try:
+            rel_parts = path.relative_to(root).parts
+        except ValueError:  # pragma: no cover - should not happen but safe guard
+            rel_parts = path.parts
+        rel_set = set(rel_parts)
+        if rel_set & EXCLUDE_DIRS:
             continue
-        if not include_tests and "tests" in parts:
+        if "site-packages" in rel_set:
+            continue
+        if not include_tests and "tests" in rel_set:
             continue
         yield path
 
