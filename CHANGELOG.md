@@ -6,6 +6,19 @@ All notable changes to Clever are documented here. This is the canonical changel
 
 - (Add upcoming changes here)
 
+### Changed
+
+- Documentation coverage raised to 100% (module-level Why/Where/How across all scanned Python files).
+- Refined `tools/docstring_enforcer.py` to use relative path exclusion (eliminates false duplicate-path hits and preserves accurate coverage metrics).
+
+### Added (Unreleased)
+
+- Placeholder tests `tests/test_util_placeholders.py` safeguarding return contracts for `summarize_repo.summarize()` and `self_fix.plan_self_fixes()`.
+
+### Security
+
+- Identified one moderate dependency vulnerability via GitHub advisory (Dependabot alert #2) – assessment pending; remediation path to be evaluated in next cycle.
+
 ## 2025-09-20
 
 ### Added
