@@ -2,6 +2,22 @@
 let lastAiEl = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Runtime module registration (introspection) -------------------------
+  try {
+    window.CLEVER_RUNTIME = window.CLEVER_RUNTIME || { modules: [] };
+    window.CLEVER_RUNTIME.modules.push({
+      name: 'main.js',
+      initTs: Date.now(),
+    });
+  } catch (e) { /* non-fatal */ }
+
+  const debugFlag = /[?&]debug=1/.test(location.search);
+  if (debugFlag) {
+    injectDebugOverlay();
+    // Poll runtime introspection every 4s
+    setInterval(fetchIntrospectionAndRender, 4000);
+    fetchIntrospectionAndRender();
+  }
   const userInput = document.getElementById('chat-input');
   const sendButton = document.getElementById('send-btn');
   const chatLog = document.getElementById('chat-log');
@@ -121,6 +137,44 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lastAiEl) snapAnalysisTo(lastAiEl);
   });
 });
+
+// --- Debug overlay (optional) ------------------------------------------------
+function injectDebugOverlay() {
+  if (document.getElementById('clever-debug-overlay')) return;
+  const panel = document.createElement('div');
+  panel.id = 'clever-debug-overlay';
+  panel.style.cssText = [
+    'position:fixed','top:8px','right:8px','z-index:9999','max-width:360px',
+    'font:12px/1.4 monospace','background:rgba(10,12,20,0.82)',
+    'color:#9fe7ff','padding:8px 10px','border:1px solid #1d3a50',
+    'backdrop-filter:blur(6px)','border-radius:8px','box-shadow:0 0 0 1px #133, 0 4px 14px -4px #000',
+    'overflow:hidden','display:flex','flex-direction:column','gap:4px'
+  ].join(';');
+  panel.innerHTML = '<div style="font-weight:600">Clever Runtime</div><pre id="clever-debug-pre" style="margin:0;white-space:pre-wrap;max-height:260px;overflow:auto"></pre>';
+  document.body.appendChild(panel);
+}
+
+async function fetchIntrospectionAndRender() {
+  try {
+    const res = await fetch('/api/runtime_introspect');
+    if (!res.ok) return;
+    const data = await res.json();
+    const pre = document.getElementById('clever-debug-pre');
+    if (!pre) return;
+    // Light transform to shrink noise
+    const slim = {
+      last_render: data.last_render,
+      persona_mode: data.persona_mode,
+      endpoints: (data.endpoints||[]).slice(0,6).map(e => ({r:e.rule, why:e.why.slice(0,60)})),
+      last_error: data.last_error,
+      version: data.version,
+      modules: (window.CLEVER_RUNTIME && window.CLEVER_RUNTIME.modules) || []
+    };
+    pre.textContent = JSON.stringify(slim, null, 2);
+  } catch (e) {
+    // swallow errors to avoid UI disruption
+  }
+}
 
 async function sendMessage() {
   const inputElem = document.getElementById('chat-input');

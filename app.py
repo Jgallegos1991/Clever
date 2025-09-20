@@ -18,12 +18,15 @@ from flask import Flask, request, jsonify, render_template
 from database import db_manager
 from user_config import USER_NAME, USER_EMAIL
 from utils import offline_guard  # Enforce offline constraints
+from introspection import traced_render, runtime_state, register_error_handler  # Runtime introspection utilities
 
 # Enforce offline operation immediately (Unbreakable Rule #1)
 offline_guard.enable()
 
 # Create Flask app
 app = Flask(__name__)
+# Install global error capture for introspection (still lets Flask debug raise)
+register_error_handler(app)
 
 
 # Simple debugger for now
@@ -74,8 +77,11 @@ def home():
     #   main.js could not append messages—causing invisible responses.
     #   Keeping index_new.html for now (deprecated) in case visual experiments
     #   are revisited; future cleanup can remove it once confirmed obsolete.
-    return render_template(
+    return traced_render(
+        app,
         'index.html',
+        route='/',
+        render_func=render_template,
         cache_buster=cache_buster,
         user_name=USER_NAME,
         user_email=USER_EMAIL,
@@ -263,6 +269,25 @@ def search():
             'error': 'Search failed',
             'status': 'error'
         }), 500
+
+
+@app.route('/api/runtime_introspect', methods=['GET'])
+def api_runtime_introspect():
+    """Runtime introspection snapshot endpoint
+
+    Why: Exposes real-time system state (recent renders, endpoint Why/Where/How,
+    persona mode, last error, git hash) to power debugging overlays and quickly
+    diagnose UI rendering mismatches.
+    Where: Called by optional frontend debug overlay (e.g., when ?debug=1) or
+    manual curl requests during development sessions.
+    How: Aggregates data via `runtime_state` helper in `introspection.py` and
+    returns JSON.
+
+    Connects to:
+        - introspection.py: runtime_state assembly
+        - templates/index.html: primary template tracked in recent renders
+    """
+    return jsonify(runtime_state(app, persona_engine=clever_persona))
 
     
     
