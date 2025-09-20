@@ -20,11 +20,8 @@ How:
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Clever AI</title>
 
-    <!-- Core minimal landing styles -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}?v={{ cache_buster }}">
-    <!-- Additional advanced styles -->
+    <!-- Single consolidated stylesheet after UI minimization -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ cache_buster }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
 
     <!-- Custom minimal styles -->
     <style>

@@ -61,7 +61,17 @@ class ConversationContext:
         self.available_capabilities = self._discover_capabilities()
 
     def _discover_capabilities(self) -> Dict[str, bool]:
-        """Discover all available system capabilities"""
+        """Discover all available system capabilities
+
+        Why: Establishes a capability feature map so routing logic can make
+        informed decisions about which advanced processing paths (file access,
+        learning, memory) are safe to invoke.
+        Where: Called during ConversationContext initialization; results
+        feed into `_route_request` and enhanced context assembly.
+        How: Seeds a default dict of expected capabilities then performs
+        lightweight runtime checks (filesystem, database accessor, evolution
+        engine presence) with defensive try/except to avoid startup failure.
+        """
         capabilities = {
             "nlp_analysis": True,
             "file_access": True,
@@ -94,7 +104,15 @@ class ConversationContext:
         return capabilities
 
     def update_from_interaction(self, user_message: str, analysis: Dict[str, Any]):
-        """Update context based on user interaction"""
+        """Update context based on user interaction
+
+        Why: Evolves dynamic conversation state (depth, focus, history) that
+        downstream response generation and UI signaling rely upon for
+        personalization and continuity.
+        Where: Invoked each turn by `EnhancedConversationEngine.process_conversation`.
+        How: Appends structured record to history then derives depth/focus
+        using keyword density and intent heuristics; updates scoped fields.
+        """
         self.conversation_history.append(
             {
                 "timestamp": datetime.now().isoformat(),
@@ -214,7 +232,14 @@ class EnhancedConversationEngine:
         return response
 
     def _perform_comprehensive_analysis(self, user_message: str) -> Dict[str, Any]:
-        """Perform comprehensive NLP analysis with all capabilities"""
+        """Perform comprehensive NLP analysis with all capabilities
+
+        Why: Generates a normalized semantic + structural feature bundle that
+        powers routing, mood derivation, UI reactions, and learning logs.
+        Where: Early stage in `process_conversation` before context building.
+        How: Calls shared `nlp_processor.process`, computes complexity score,
+        derives intent, request type, and required capabilities via helpers.
+        """
         # Base NLP analysis
         nlp_result = nlp_processor.process(user_message)
 
@@ -242,7 +267,14 @@ class EnhancedConversationEngine:
         return analysis
 
     def _analyze_intent(self, message: str, nlp_result) -> str:
-        """Analyze user intent from message"""
+        """Analyze user intent from message
+
+        Why: Classifies high-level user objective (file operation, creative,
+        analysis, info, task) to influence routing and persona angle.
+        Where: Called inside `_perform_comprehensive_analysis`.
+        How: Applies ordered keyword pattern checks against a lowercase copy
+        returning the first matching intent label else generic fallback.
+        """
         message_lower = message.lower()
 
         # File operations
@@ -276,7 +308,14 @@ class EnhancedConversationEngine:
         return "general_conversation"
 
     def _classify_request_type(self, message: str) -> str:
-        """Classify the type of request"""
+        """Classify the type of request
+
+        Why: Distinguishes complexity & shape (multi-step, simple question,
+        instruction) enabling specialized handling for compound tasks.
+        Where: Used by analysis stage to enrich the analysis dict.
+        How: Heuristic checks on punctuation, conjunctions, length, and
+        leading phrases returning categorical tag.
+        """
         message_lower = message.lower()
 
         # Multi-step complex requests
@@ -297,7 +336,15 @@ class EnhancedConversationEngine:
         return "conversational"
 
     def _identify_required_capabilities(self, message: str) -> List[str]:
-        """Identify what system capabilities are needed"""
+        """Identify what system capabilities are needed
+
+        Why: Determines which subsystem hooks (file, memory, learning,
+        creative) must be activated for this request to succeed fully.
+        Where: Called in analysis to supply `required_capabilities` consumed
+        by `_route_request`.
+        How: Simple keyword presence scanning producing a list of capability
+        flags for downstream routing logic.
+        """
         required = []
         message_lower = message.lower()
 
@@ -321,7 +368,14 @@ class EnhancedConversationEngine:
         analysis: Dict[str, Any],
         context_data: Optional[Dict[str, Any]],
     ) -> Dict[str, Any]:
-        """Build comprehensive context for conversation"""
+        """Build comprehensive context for conversation
+
+        Why: Consolidates mutable conversation, system, and user facets into
+        a single structure passed to persona generation & response synthesis.
+        Where: Stage 3 of `process_conversation` after analysis & history update.
+        How: Assembles nested dict with conversation, system, user sections
+        plus merges any external provided context payload.
+        """
         enhanced_context = {
             "conversation_context": {
                 "current_focus": self.context.current_focus,
@@ -353,7 +407,14 @@ class EnhancedConversationEngine:
     def _route_request(
         self, message: str, analysis: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Route request to appropriate processing capabilities"""
+        """Route request to appropriate processing capabilities
+
+        Why: Decides which processing augmentations (file ops, memory fetch,
+        multi-step specialization) must execute to satisfy the request.
+        Where: Invoked mid-pipeline by `process_conversation` post context build.
+        How: Inspects `required_capabilities` and analysis tags to populate
+        a routing result dict (handlers, operations, special flags).
+        """
         routing_result = {
             "primary_handler": "persona_engine",
             "additional_processing": [],
@@ -382,7 +443,13 @@ class EnhancedConversationEngine:
         return routing_result
 
     def _identify_file_operations(self, message: str) -> List[str]:
-        """Identify specific file operations requested"""
+        """Identify specific file operations requested
+
+        Why: Narrows broad file capability into concrete actions (read, analyze,
+        search, list) for precise downstream execution.
+        Where: Used within `_route_request` when file access flagged.
+        How: Keyword scanning mapping to canonical operation strings list.
+        """
         operations = []
         message_lower = message.lower()
 
@@ -405,7 +472,14 @@ class EnhancedConversationEngine:
         routing: Dict[str, Any],
         mode: str,
     ) -> Dict[str, Any]:
-        """Generate comprehensive response with all requested capabilities"""
+        """Generate comprehensive response with all requested capabilities
+
+        Why: Synthesizes persona output, file/memory augmentation, UI reaction
+        data, telemetry, and proactive suggestions into a single payload.
+        Where: Stage 5 in `process_conversation` just before learning log.
+        How: Executes conditional file + memory pipelines, builds persona context,
+        invokes persona engine, computes derived signals (state, mood, insights).
+        """
 
         # Process file operations if requested
         file_results = {}
@@ -462,7 +536,15 @@ class EnhancedConversationEngine:
     def _process_file_requests(
         self, message: str, operations: List[str]
     ) -> Dict[str, Any]:
-        """Process file-related requests"""
+        """Process file-related requests
+
+        Why: Executes user-requested file operations providing content slices
+        and lightweight analyses to enrich response context.
+        Where: Called from comprehensive response generation when routing adds
+        `file_processor` augmentation.
+        How: Lists directory, parses candidate filenames from message, safely
+        reads permitted files, truncates content, runs content analyzer per file.
+        """
         results = {
             "files_accessed": [],
             "file_contents": {},
@@ -515,7 +597,14 @@ class EnhancedConversationEngine:
         return results
 
     def _safe_read_file(self, file_path: Path) -> Optional[str]:
-        """Safely read file content with error handling"""
+        """Safely read file content with error handling
+
+        Why: Provides robust file IO that won't derail conversation flow on
+        permission or encoding errors.
+        Where: Utilized by file processing helpers when reading candidate files.
+        How: Validates extension, attempts read with ignore errors, logs and
+        returns None on exceptions for graceful degradation.
+        """
         try:
             if file_path.suffix.lower() in [
                 ".txt",
@@ -531,7 +620,14 @@ class EnhancedConversationEngine:
         return None
 
     def _analyze_file_content(self, content: str) -> Dict[str, Any]:
-        """Analyze file content using NLP capabilities"""
+        """Analyze file content using NLP capabilities
+
+        Why: Extracts semantic + structural signals from file slices to supply
+        enriched context (keywords, sentiment, type) for persona and insights.
+        Where: Used inside file processing pipeline for each accessed file.
+        How: Truncates overly large content, runs shared NLP processor, counts
+        words/lines, determines a coarse content type via `_detect_content_type`.
+        """
         if len(content) > 500:
             content = content[:500]  # Analyze first 500 chars
 
@@ -546,7 +642,14 @@ class EnhancedConversationEngine:
         }
 
     def _detect_content_type(self, content: str) -> str:
-        """Detect the type of content"""
+        """Detect the type of content
+
+        Why: Classifies file slice into coarse category guiding downstream
+        explanation tone or formatting hints.
+        Where: Called by `_analyze_file_content`.
+        How: Pattern checks for language constructs or structural markers
+        (code tokens, JSON braces, CSV heuristics) returning label fallback.
+        """
         content_lower = content.lower()
 
         if any(keyword in content_lower for keyword in ["def ", "import ", "class "]):
@@ -565,7 +668,15 @@ class EnhancedConversationEngine:
     def _retrieve_relevant_memory(
         self, message: str, analysis: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Retrieve relevant conversation memory and context"""
+        """Retrieve relevant conversation memory and context
+
+        Why: Surfaces recent and topically similar past interactions that
+        increase coherence and personalization of current response.
+        Where: Invoked during comprehensive response generation if memory
+        retrieval flagged in routing.
+        How: Slices recent history, performs keyword containment scans to
+        collect small conversation clusters per keyword.
+        """
         memory_results = {
             "recent_conversations": [],
             "relevant_topics": [],
@@ -604,7 +715,14 @@ class EnhancedConversationEngine:
     def _generate_clever_state(
         self, analysis: Dict[str, Any], context: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Generate Clever's internal state information"""
+        """Generate Clever's internal state information
+
+        Why: Supplies UI + telemetry layer with synthesized cognitive/emotional
+        state metrics derived from analysis & dynamic context.
+        Where: Embedded in comprehensive response payload consumed by client.
+        How: Computes normalized floats (focus, creativity, excitement) using
+        simple arithmetic over complexity, energy and keyword counts.
+        """
         return {
             "processing": False,
             "focus": min(1.0, analysis.get("complexity_score", 0.5) + 0.1),
@@ -619,7 +737,14 @@ class EnhancedConversationEngine:
     def _generate_ui_reactions(
         self, analysis: Dict[str, Any], persona_response
     ) -> Dict[str, Any]:
-        """Generate UI reaction instructions for particle system"""
+        """Generate UI reaction instructions for particle system
+
+        Why: Translates semantic + sentiment signals into visual animation
+        directives for the holographic particle UI to reflect AI state.
+        Where: Called during comprehensive response creation to embed reaction meta.
+        How: Chooses animation archetype and color scheme based on complexity
+        and sentiment thresholds; returns structured directive dict.
+        """
         complexity = analysis.get("complexity_score", 0.5)
 
         if complexity > 0.7:
@@ -646,7 +771,14 @@ class EnhancedConversationEngine:
         }
 
     def _determine_mood(self, analysis: Dict[str, Any], persona_response) -> str:
-        """Determine Clever's current mood"""
+        """Determine Clever's current mood
+
+        Why: Provides a human-relatable emotional label supporting UI theming
+        and potential stylistic adjustments in subsequent turns.
+        Where: Used when constructing both clever state and final response payload.
+        How: Threshold logic over sentiment and complexity producing stable
+        mood labels.
+        """
         sentiment = analysis.get("sentiment", 0)
         complexity = analysis.get("complexity_score", 0.5)
 
@@ -665,7 +797,14 @@ class EnhancedConversationEngine:
         context: Dict[str, Any],
         file_results: Dict[str, Any],
     ) -> List[str]:
-        """Generate intelligent insights about the conversation"""
+        """Generate intelligent insights about the conversation
+
+        Why: Adds reflective meta-observations that increase user perception
+        of depth, awareness, and adaptive engagement.
+        Where: Called at end of response synthesis to attach optional insights.
+        How: Appends templated lines based on thresholds (complexity, file access,
+        depth, keyword count) producing a concise list.
+        """
         insights = []
 
         # Complexity insights
@@ -697,7 +836,13 @@ class EnhancedConversationEngine:
         return insights
 
     def _determine_approach(self, analysis: Dict[str, Any], mode: str) -> str:
-        """Determine the approach Clever should take"""
+        """Determine the approach Clever should take
+
+        Why: Produces a strategic stance label influencing client display and
+        potential downstream adaptive logic.
+        Where: Included in final response metadata.
+        How: Intent-derived conditional mapping returning canonical approach.
+        """
         intent = analysis.get("intent", "general_conversation")
 
         if intent == "creative_generation":
@@ -714,7 +859,14 @@ class EnhancedConversationEngine:
     def _integrate_learning(
         self, message: str, analysis: Dict[str, Any], response: Dict[str, Any]
     ):
-        """Integrate learning from the conversation"""
+        """Integrate learning from the conversation
+
+        Why: Captures interaction telemetry for longitudinal evolution metrics
+        and adaptive capability refinement.
+        Where: Final stage in `process_conversation` pipeline post response creation.
+        How: Builds interaction record and invokes evolution engine log API
+        under exception guard to avoid user-facing failures.
+        """
         try:
             evo_engine = get_evolution_engine()
             if evo_engine:
@@ -734,7 +886,13 @@ class EnhancedConversationEngine:
             logger.warning("conversation_engine", f"Learning integration error: {e}")
 
     def _process_text_file(self, file_path: Path) -> Dict[str, Any]:
-        """Process text file with NLP analysis"""
+        """Process text file with NLP analysis
+
+        Why: Supplies quick semantic snapshot of plain-text files to enrich
+        context and potential suggestions.
+        Where: Part of file processing pipeline when .txt/.md encountered.
+        How: Reads safely, truncates, analyzes content with NLP, returns summary.
+        """
         content = self._safe_read_file(file_path)
         if not content:
             return {}
@@ -746,7 +904,13 @@ class EnhancedConversationEngine:
         }
 
     def _process_code_file(self, file_path: Path) -> Dict[str, Any]:
-        """Process code file with special handling"""
+        """Process code file with special handling
+
+        Why: Extracts lightweight structural metrics (functions/classes/imports)
+        to contextualize code discussions without heavy parsing.
+        Where: Invoked for .py/.js extensions inside file processing stage.
+        How: Reads, counts line patterns, truncates content, attaches NLP summary.
+        """
         content = self._safe_read_file(file_path)
         if not content:
             return {}
@@ -772,7 +936,13 @@ class EnhancedConversationEngine:
         }
 
     def _process_json_file(self, file_path: Path) -> Dict[str, Any]:
-        """Process JSON file with structure analysis"""
+        """Process JSON file with structure analysis
+
+        Why: Provides quick glance at JSON shape (keys, size) aiding follow-up
+        queries or targeted inspection.
+        Where: File processing path for .json extension.
+        How: Parses JSON inside try/except, records structural metadata + NLP summary.
+        """
         content = self._safe_read_file(file_path)
         if not content:
             return {}
@@ -795,7 +965,13 @@ class EnhancedConversationEngine:
         }
 
     def _process_csv_file(self, file_path: Path) -> Dict[str, Any]:
-        """Process CSV file with data analysis"""
+        """Process CSV file with data analysis
+
+        Why: Summarizes tabular file dimensions enabling immediate reasoning
+        about dataset scope.
+        Where: CSV branch of file processing pipeline.
+        How: Splits lines, derives header/row counts, truncates content, adds NLP summary.
+        """
         content = self._safe_read_file(file_path)
         if not content:
             return {}
