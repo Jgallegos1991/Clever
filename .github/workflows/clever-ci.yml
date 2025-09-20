@@ -1,0 +1,143 @@
+name: Clever CI
+
+on:
+  push:
+    branches: [ main, feature/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('requirements*.txt') }}-${{ steps.setup-python.outputs.python-version || '3.12' }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Install minimal deps (offline-capable)
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -U pip
+          if [ -f requirements-min.txt ]; then pip install -r requirements-min.txt; fi
+          if [ -f requirements-base.txt ]; then pip install -r requirements-base.txt || true; fi
+          # Security audit deps (pip-audit) kept lightweight; ignore failures to stay non-blocking
+          pip install pip-audit || true
+
+      - name: Lint (basic)
+        run: |
+          . .venv/bin/activate
+          pip install flake8
+          flake8 --max-line-length=100 --exclude .venv,.git
+
+      - name: Security audit (non-blocking)
+        continue-on-error: true
+        run: |
+          . .venv/bin/activate
+            pip-audit -r requirements.txt || echo "Security audit issues (logged)"
+
+      - name: Documentation pattern check (Why/Where/How)
+        run: |
+          . .venv/bin/activate
+          echo "Scanning for Why/Where/How docstring patterns"
+          missing=0
+          while IFS= read -r f; do
+            if grep -q "def " "$f"; then
+              if ! grep -q "Why:" "$f" || ! grep -q "Where:" "$f" || ! grep -q "How:" "$f"; then
+                echo "[DOC] Missing Why/Where/How in $f"; missing=$((missing+1));
+              fi
+            fi
+          done < <(find . -name '*.py' -not -path './.venv/*')
+          if [ "$missing" -gt 0 ]; then echo "Documentation gaps: $missing (non-blocking)"; fi
+
+      - name: Docstring enforcement (strict)
+        run: |
+          . .venv/bin/activate
+          echo "Running strict docstring enforcement (min 85% coverage)"
+          python tools/docstring_enforcer.py --min-coverage 0.85 --fail-on-missing
+
+      - name: Run tests (if any)
+        run: |
+          . .venv/bin/activate
+          if [ -d tests ]; then pytest -q || pytest -q --maxfail=1; else echo "No tests directory"; fi
+
+      - name: Generate file inventory
+        run: |
+          . .venv/bin/activate
+          make file-inventory || echo "file-inventory generation skipped"
+
+      - name: Upload artifact (inventory)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: file-inventory
+          path: file-inventory.md
+
+      - name: Commit updated file inventory (non-blocking)
+        if: success()
+        run: |
+          if [ -f file-inventory.md ]; then \
+            git config --global user.name "github-actions"; \
+            git config --global user.email "github-actions@github.com"; \
+            git add file-inventory.md; \
+            git commit -m "CI: auto-update file inventory" || echo "No inventory changes"; \
+            git push || echo "Push skipped"; \
+          else \
+            echo "Inventory file missing, skip commit"; \
+          fi
+
+  # Optional lightweight performance placeholder (runs only on main pushes)
+  perf-scan:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set perf thresholds env
+        run: |
+          echo "MAX_MEAN_LATENCY=0.60" >> $GITHUB_ENV
+          echo "MIN_VARIATION_RATIO=0.70" >> $GITHUB_ENV
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-perf-${{ runner.os }}-${{ hashFiles('requirements*.txt') }}
+          restore-keys: |
+            pip-perf-${{ runner.os }}-
+      - name: Install deps (minimal)
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -U pip
+          if [ -f requirements-min.txt ]; then pip install -r requirements-min.txt; fi
+          if [ -f requirements-base.txt ]; then pip install -r requirements-base.txt || true; fi
+      - name: Run persona performance benchmark
+        run: |
+          . .venv/bin/activate
+          python tools/perf_benchmark.py
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-results
+          path: perf_results.txt
+      - name: Upload performance history
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-history
+          path: perf_history.jsonl

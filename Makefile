@@ -9,7 +9,7 @@
 #   make freeze         # write requirements-lock.txt
 #   make clean-venv     # remove .venv
 
-.PHONY: default venv install setup setup-full setup-min run fmt lint test ingest ingest-pdfs freeze clean-venv watch watch-pdfs sync-and-ingest tailscale-setup tailscale-status help
+.PHONY: default venv install setup setup-full setup-min run fmt lint test ingest ingest-pdfs freeze clean-venv watch watch-pdfs sync-and-ingest tailscale-setup tailscale-status help docstrings
 
 PY ?= python3
 VENV ?= .venv
@@ -58,6 +58,10 @@ lint:
 	$(ACTIVATE) && flake8 .
 test:
 	$(ACTIVATE) && pytest
+
+# Enforce Why/Where/How docstring presence across codebase
+docstrings:
+	$(ACTIVATE) && $(PY) tools/docstring_enforcer.py --fail-on-missing --min-coverage 0.85 || (echo "❌ Docstring enforcement failed" && exit 1)
 
 # Auto-generate file inventory
 file-inventory:
