@@ -58,10 +58,11 @@ backups/
 *CHECKLIST*.md
 *STATUS*.md
 *SETUP*.md
-test_*.py
-test_*.sh
-test_*.html
-test_*.json
+# Limit ad-hoc root-level scratch test artifacts while allowing real suite under tests/
+/test_*.py
+/test_*.sh
+/test_*.html
+/test_*.json
 
 # --- Local sync folders (never commit) ---
 Clever_Sync/
