@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<!--
+Canonical Clever UI Template (index.html)
+
+Why:
+    Serves as the single authoritative chat + particle interface after cleanup
+    of multiple experimental variants (index_new, classic, clean, working, etc.).
+Where:
+    Referenced by Flask home route in app.py and targeted by acceptance tests
+    (tests/test_ui_brief_acceptance.py) which assert presence of #particles,
+    .grid-overlay, and #chat-log placeholders.
+How:
+    Provides minimal structural DOM for particle canvas + ephemeral chat bubble
+    system (see injected JS/CSS). Older variants removed or marked legacy in
+    templates/README.md to reduce maintenance surface.
+-->
 <html lang="en">
 <head>
     <meta charset="utf-8" />
