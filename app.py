@@ -1,16 +1,29 @@
 """
 Clever AI Main Application
 
-Why: Serves as the entry point and orchestrator for all Clever AI operations,
-including web server, API endpoints, and system integrations. Ensures offline
-operation, single-user focus, and centralized control.
-Where: Connects to persona, database, and user_config modules.
-How: Initializes Flask app, loads config, handles requests, and manages system lifecycle.
+Why:
+    Acts as the orchestration hub (root DOT) of the Clever reasoning graph: binds
+    routing, persona interaction, evolution logging, and offline enforcement into
+    a single control surface. Keeping coordination centralized prevents drift and
+    makes tracing request → response → persistence a straight arrow rather than
+    a scattered search.
+Where:
+    Sits at the top of the server stack, delegating downward to persona (dialogue
+    generation), database (single-file persistence), evolution engine (learning
+    telemetry), and introspection (live reasoning map). Each outbound call forms
+    an arrow recorded in runtime_state for instant render + dependency forensics.
+How:
+    Creates the Flask app, enables offline guard early (network hard stop), wires
+    global error capture, exposes HTTP routes, and uses `traced_render` to surface
+    real-time template events. All handlers follow the Why/Where/How contract so
+    the introspection overlay can reconstruct intent and flow.
 
 Connects to:
-    - persona.py: Persona engine for responses
-    - database.py: Database manager
-    - user_config.py: User-specific settings
+    - persona.py: Response generation + mode adaptation
+    - database.py: Single authoritative persistence layer
+    - evolution_engine.py: Interaction telemetry logging
+    - introspection.py: Live runtime reasoning snapshot
+    - user_config.py: Personalization values (Jay specific)
 """
 
 import time

@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 """
-Remove unreferenced legacy UI assets safely.
-- Scans templates for referenced static files.
-- Deletes known legacy files if not referenced.
+Clean unused legacy UI asset files.
+
+Why: Keeps the repository lightweight and ensures only actively referenced static assets
+are retained, reducing noise, bundle size, and potential confusion for future UI work.
+Where: Invoked manually via the `make clean-ui` target in the project `Makefile`. It
+interfaces with the `templates/` directory and the `static/` tree to discover which
+files are currently referenced by HTML templates.
+How: Scans all HTML templates for static asset references (JS/CSS). Builds a set of
+referenced filenames, merges with a small allow‑list of always‑kept core assets, then
+iterates a curated list of known legacy asset filenames and deletes those not referenced.
+Also optionally prunes a handful of obsolete template files. Execution is best‑effort;
+failures to delete are logged and do not abort the script.
+
+Connects to:
+    - Makefile (clean-ui target): Provides developer entry point
+    - templates/*.html: Source of truth for active asset usage
+    - static/js & static/css: Asset directories subject to pruning
 """
 import re
 from pathlib import Path

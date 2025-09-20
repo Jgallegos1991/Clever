@@ -222,6 +222,16 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
     except Exception:
         evolution_summary = None
     warnings = _compute_warnings(endpoints)
+    # Coverage stats: count endpoints with all tokens vs total
+    complete = 0
+    for ep in endpoints:
+        if all((ep.get(k) or '').strip() for k in ('why','where','how')):
+            complete += 1
+    reasoning_coverage = {
+        'endpoints_total': len(endpoints),
+        'endpoints_complete': complete,
+        'percent': (complete / len(endpoints) * 100.0) if endpoints else 100.0,
+    }
     return {
         "last_render": last_render,
         "recent_renders": renders,
@@ -232,6 +242,7 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
         "version": {"git": _GIT_HASH},
         "render_threshold_ms": RENDER_SLOW_THRESHOLD_MS,
         "warnings": warnings,
+        "reasoning_coverage": reasoning_coverage,
         "generated_ts": time.time(),
     }
 

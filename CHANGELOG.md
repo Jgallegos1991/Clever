@@ -16,6 +16,11 @@ All notable changes to Clever are documented here. This is the canonical changel
 - Placeholder tests `tests/test_util_placeholders.py` safeguarding return contracts for `summarize_repo.summarize()` and `self_fix.plan_self_fixes()`.
 - Runtime introspection system: `introspection.py`, `/api/runtime_introspect` endpoint, and optional `?debug=1` overlay. Converts Why/Where/How docstring pattern into live navigational graph ("arrows between dots") showing recent template renders, endpoint reasoning metadata, persona mode, last error, and git hash for effortless debugging.
 - Follow-up introspection enhancements: slow render flag (heuristic threshold), evolution interaction counters, drift warnings (missing Why/Where/How), accessible ARIA live region announcing AI messages, CLI snapshot tool (`tools/runtime_dump.py`).
+- Reasoning coverage metrics exposed via `/api/runtime_introspect` (`reasoning_coverage` block: endpoints_total, endpoints_complete, percent) enabling quantitative tracking of documentation completeness.
+- Pre-commit enforcement hook (`tools/verify_reasoning_docs.py` + `tools/install_hooks.sh`) blocking commits introducing Python functions/classes without Why/Where/How tokens (unless explicitly skipped) to prevent reasoning drift.
+- Automated reasoning graph generator (`tools/generate_reasoning_graph.py`) producing `docs/reasoning_graph.md` adjacency map (nodes, edges, orphan detection) turning docstrings into auditable architecture artifact.
+- Enhanced core docstrings (`app.py`, `evolution_engine.py`, `persona.py`) with "arrows between dots" narrative clarifying orchestration, temporal telemetry, and semantic layering responsibilities.
+- Initial reasoning graph artifact (`docs/reasoning_graph.md`) – updates recommended after significant feature merges (invoke generator script post-change).
 
 ### Security
 
@@ -40,6 +45,7 @@ All notable changes to Clever are documented here. This is the canonical changel
 ### Removed
 
 - Redundant legacy GitHub workflows (documentation enforcement, coverage, performance monitor, dependency security duplicates, release notes, stale branch cleanup, inventory updater). Replaced by consolidated `clever-ci.yml`.
+- Deprecated experimental template `templates/index_new.html` removed (superseded by primary `templates/index.html` with overlay + particle system integration).
 
 ### Moved / Consolidated
 

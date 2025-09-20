@@ -1,19 +1,30 @@
 """
 Persona Engine for Clever AI
 
-Why: Generates context-aware, empathetic responses in various modes (Auto,
-Creative, Deep Dive, Support, Quick Hit) for Jay specifically. Operates fully
-offline, leveraging advanced memory system and local NLP.
-Where: Used by app.py for user interactions, connects to memory_engine for
-intelligent context and nlp_processor for language analysis.
-How: Implements PersonaEngine class with multiple response modes, integrates
-advanced memory system, predictive capabilities, and returns PersonaResponse objects.
+Why:
+    Converts raw user intent + localized analysis signals into tailored, empathetic
+    replies across five adaptive modes (Auto, Creative, Deep Dive, Support, Quick Hit).
+    It is the semantic forge where contextual arrows are created: each response embeds
+    memory references, inferred mode, and reasoning layers—fuel for downstream logging
+    and introspection.
+Where:
+    Invoked by `app.py` chat endpoints; draws from `memory_engine` for relevance,
+    `nlp_processor` for linguistic and sentiment cues, and surfaces debug metrics the
+    evolution and introspection systems can consume. Feeds database only indirectly
+    via memory storage pathways.
+How:
+    Lazily initializes NLP + memory, predicts or confirms mode, synthesizes response via
+    mode-specific style handlers, enforces anti-repetition variation, layers structured
+    reasoning (especially for why/how queries), generates proactive suggestions, and
+    emits a `PersonaResponse` annotated with debug metrics (arrows for observability).
 
 Connects to:
-    - memory_engine.py: Advanced memory and learning system
-    - nlp_processor.py: NLP and sentiment analysis  
-    - database.py: Persistent storage via memory engine
-    - app.py: Main application for user interaction
+    - memory_engine.py: Contextual memory retrieval & storage hooks
+    - nlp_processor.py: Analysis pipeline (keywords, entities, sentiment)
+    - evolution_engine.py: Interaction logging consumer of mode + telemetry
+    - app.py: Primary caller routing user input to persona
+    - database.py: Underlying persistence via memory interactions
+    - introspection.py: Exposes persona_mode & metrics in runtime snapshot
 """
 from __future__ import annotations
 import logging

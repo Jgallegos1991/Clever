@@ -1,13 +1,26 @@
 """
 Simple Evolution Engine for Clever AI
 
-Why: Provides basic learning and interaction tracking without complex dependencies
-Where: Tracks user interactions and system evolution
-How: Simple logging and basic learning capabilities
+Why:
+    Captures each interaction as a temporal arrow in the system's growth
+    narrative—enabling retrospective analysis (patterns, mode usage) and future
+    adaptive behaviors without introducing heavy external services. Light, fast,
+    and memory-first to respect offline constraints.
+Where:
+    Positioned between the chat surface (`app.py`) and deeper analytics: it is
+    invoked post-response generation to log context and mode, feeding telemetry
+    into both memory insights and runtime introspection (`runtime_state.evolution`).
+How:
+    Maintains an in-memory rolling list plus counters, offering summary methods
+    for quick dashboards. Interaction objects carry timestamps, raw data, and
+    session-relative timing. Persistence (if/when needed) flows through the
+    database layer—keeping this engine side-effect minimal.
 
 Connects to:
-    - app.py: Interaction logging from chat
-    - database.py: Persistent storage via DB_PATH
+    - app.py: Receives log_interaction calls after persona replies
+    - persona.py: Supplies mode / sentiment fields embedded in interaction data
+    - database.py: Potential future persistence hand-off
+    - introspection.py: Exposes counts (total/recent) in runtime snapshot
 """
 import time
 from typing import Dict, Any, List
