@@ -66,8 +66,16 @@ def home():
         - user_config.py: User personalization data
     """
     cache_buster = int(time.time())
+    # NOTE:
+    #   Switched from 'index_new.html' back to canonical 'index.html'. The new
+    #   frontend chat bubble + fade logic and acceptance tests target elements
+    #   (e.g., #chat-log) defined in 'index.html'. The legacy experimental
+    #   template 'index_new.html' used different IDs (e.g., #chat-bubbles), so
+    #   main.js could not append messages—causing invisible responses.
+    #   Keeping index_new.html for now (deprecated) in case visual experiments
+    #   are revisited; future cleanup can remove it once confirmed obsolete.
     return render_template(
-        'index_new.html',
+        'index.html',
         cache_buster=cache_buster,
         user_name=USER_NAME,
         user_email=USER_EMAIL,

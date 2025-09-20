@@ -142,6 +142,9 @@
     <!-- Hidden particle canvas for subtle background effect -->
     <canvas id="particles" aria-hidden="true"></canvas>
 
+    <!-- Chat stream container (was hidden) -->
+    <div id="chat-log" aria-live="polite" class="chat-stream"></div>
+
     <!-- Minimal input bar at bottom -->
     <div class="entrybar">
         <input id="chat-input" type="text" placeholder="Ask me anything..." autocomplete="off" autofocus />
@@ -153,7 +156,7 @@
 
     <!-- Core panel structure & placeholders (hidden/minimal but present for tests) -->
     <div class="panel" id="core-panel" style="display:none"></div>
-    <div id="chat-log" style="display:none"></div>
+    <!-- (Removed inline hidden chat-log; now visible above input) -->
     <div id="intent" style="display:none"></div>
     <div id="sentiment" style="display:none"></div>
     <div id="entities" style="display:none"></div>
@@ -169,6 +172,34 @@
     <script src="{{ url_for('static', filename='js/particles.js') }}?v={{ cache_buster }}"></script>
     <script src="{{ url_for('static', filename='js/holographic-chamber.js') }}?v={{ cache_buster }}"></script>
     <script src="{{ url_for('static', filename='js/core/app.js') }}?v={{ cache_buster }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
+        <script>
+            // Lightweight CSS injection for message bubbles & fade lifecycle
+            (function(){
+                const style = document.createElement('style');
+                style.textContent = `
+                    .chat-stream { position:fixed; bottom:6.5rem; left:50%; transform:translateX(-50%); width: min(840px, 92vw); display:flex; flex-direction:column; gap:.5rem; padding:0 1rem; max-height:60vh; overflow-y:auto; scrollbar-width:none; }
+                    .chat-stream::-webkit-scrollbar { display:none; }
+                    .message { font-family: system-ui,-apple-system,Segoe UI,Roboto; display:flex; align-items:flex-start; gap:.5rem; opacity:0; transform:translateY(6px) scale(.98); transition:opacity .4s ease, transform .45s cubic-bezier(.4,.16,.2,1); }
+                    .message.manifested { opacity:1; transform:translateY(0) scale(1); }
+                    .message.user .bubble { background:linear-gradient(135deg,#24404d,#16323d); align-self:flex-end; }
+                    .message.ai .bubble { background:linear-gradient(135deg,#12302a,#0e1f2a); box-shadow:0 0 0 1px rgba(105,234,203,.15),0 0 22px -6px #69EACB; }
+                    .bubble { padding:.75rem 1rem; border-radius:18px; line-height:1.35; font-size:.95rem; max-width:70ch; color:#d9e7ef; position:relative; }
+                    .chip { font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; background:rgba(105,234,203,.08); padding:.35rem .5rem; border-radius:1rem; color:#69EACB; margin-top:.15rem; box-shadow:0 0 0 1px rgba(105,234,203,.25); }
+                    .message.manifested.fade-out { opacity:0; transform:translateY(-4px) scale(.985); transition:opacity .8s ease, transform .9s ease; }
+                `;
+                document.head.appendChild(style);
+            })();
+            // Auto-fade old messages after a few seconds
+            const AUTO_HIDE_MS = 9000;
+            const observer = new MutationObserver(muts => {
+                muts.forEach(m => m.addedNodes.forEach(n => {
+                    if(!(n instanceof HTMLElement) || !n.classList.contains('message')) return;
+                    setTimeout(()=>{ n.classList.add('fade-out'); setTimeout(()=> n.remove(), 1400); }, AUTO_HIDE_MS);
+                }));
+            });
+            const log = document.getElementById('chat-log');
+            if (log) observer.observe(log, { childList:true });
+        </script>
 </body>
 </html>
