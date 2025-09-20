@@ -1,0 +1,35 @@
+iterations: 12
+mean_latency_sec: 0.23174
+std_latency_sec: 0.04099
+max_latency_sec: 0.3386
+p95_latency_sec: 0.3386
+cold_mean_latency_sec: 0.50957
+warm_mean_latency_sec: 0.23107
+unique_first_lines: 11
+unique_first_line_ratio: 0.917
+unique_signatures: 11
+avg_chars: 247.25
+memory_items_considered_avg: 3
+memory_items_used_avg: 2.583
+memory_utilization_ratio: 0.861
+predicted_mode_change_count: 0
+timestamp: 1758373326.4328625
+
+JSON={
+  "iterations": 12,
+  "mean_latency_sec": 0.23174,
+  "std_latency_sec": 0.04099,
+  "max_latency_sec": 0.3386,
+  "p95_latency_sec": 0.3386,
+  "cold_mean_latency_sec": 0.50957,
+  "warm_mean_latency_sec": 0.23107,
+  "unique_first_lines": 11,
+  "unique_first_line_ratio": 0.917,
+  "unique_signatures": 11,
+  "avg_chars": 247.25,
+  "memory_items_considered_avg": 3,
+  "memory_items_used_avg": 2.583,
+  "memory_utilization_ratio": 0.861,
+  "predicted_mode_change_count": 0,
+  "timestamp": 1758373326.4328625
+}

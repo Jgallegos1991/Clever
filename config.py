@@ -20,7 +20,8 @@ Connects to:
 import os
 from pathlib import Path
 
-from user_config import *
+# Import user configuration explicitly to avoid star-import issues (F403/F405)
+import user_config as _user_config
 
 # Base directories
 ROOT_DIR = Path(__file__).resolve().parent
@@ -72,12 +73,12 @@ DB_PATH = os.environ.get("CLEVER_DB_PATH", str(ROOT_DIR / "clever.db"))
 
 # Server config
 APP_HOST = (
-    getattr(globals(), "CLEVER_HOST", "0.0.0.0")
-    if CLEVER_EXTERNAL_ACCESS
+    getattr(_user_config, "CLEVER_HOST", "0.0.0.0")
+    if getattr(_user_config, "CLEVER_EXTERNAL_ACCESS", False)
     else "127.0.0.1"
 )
-APP_PORT = getattr(globals(), "CLEVER_PORT", 5000)
-DEBUG = getattr(globals(), "DEBUG_MODE", False)
+APP_PORT = getattr(_user_config, "CLEVER_PORT", 5000)
+DEBUG = getattr(_user_config, "DEBUG_MODE", False)
 
 # rclone settings (optional)
 RCLONE_REMOTE = os.environ.get("RCLONE_REMOTE", "")

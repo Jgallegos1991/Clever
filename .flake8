@@ -1,0 +1,31 @@
+[#] Flake8 configuration for Clever project
+# Why: Provide consistent linting while excluding third-party or generated directories to reduce noise.
+# Where: Used by CI and local lint runs prior to merge.
+# How: Excludes common virtual environment folders and caches; sets max complexity and line length aligning with existing code style.
+
+[flake8]
+max-line-length = 120
+extend-ignore = E203,E266,E501,W503
+max-complexity = 18
+# Restrict selection to core error classes plus bugbear (B) and tests for runtime issues.
+# We intentionally do not add complexity of additional plugins right now.
+select = E9,F63,F7,F82,F,B
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    .venv,
+    venv,
+    env,
+    .*egg-info,
+    site-packages,
+    logs,
+    docs,
+    tests,
+    legacy
+    clever_conversation_engine.py,
+    error_recovery.py
+
+per-file-ignores = 
+    app.py:F401

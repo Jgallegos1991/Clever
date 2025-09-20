@@ -33,4 +33,3 @@ All notable changes to Clever are documented here. This is the canonical changel
 ### Notes
 
 - Future enhancements: extend variation to non-Auto modes, richer long-term memory weighting, CI-integrated performance thresholding, offline guard negative tests.
-

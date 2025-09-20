@@ -114,6 +114,8 @@ def _validate_config_files() -> Tuple[bool, str]:
     for fname in config_files:
         try:
             spec = importlib.util.spec_from_file_location("cfg", fname)
+            if spec is None or spec.loader is None:
+                raise ImportError(f"Cannot load spec for {fname}")
             cfg = importlib.util.module_from_spec(spec)
             sys.modules["cfg"] = cfg
             spec.loader.exec_module(cfg)
@@ -131,30 +133,25 @@ def _validate_config_files() -> Tuple[bool, str]:
 
 
 def _check_database_integrity() -> Tuple[bool, str]:
-    """
-    Check clever.db for corruption and attempt auto-repair or backup restore.
+    """Validate clever.db integrity; restore from backup if corrupted.
+    Why: Ensures single database reliability for persistence guarantees.
+    Where: Invoked by diagnostic tooling in fixer.
+    How: PRAGMA integrity_check; if failed attempt restore from optional backup.
     """
     import sqlite3
-
     db_path = "clever.db"
     try:
         con = sqlite3.connect(db_path)
-        con.execute("PRAGMA integrity_check;")
         result = con.execute("PRAGMA integrity_check;").fetchone()
         con.close()
         if result and result[0] == "ok":
             return True, "Database integrity OK."
-        else:
-            # Attempt restore from backup if available
-            backup = Path("clever.db.bak")
-            if backup.exists():
-                Path(db_path).write_bytes(backup.read_bytes())
-                return True, "Database restored from backup."
-            return (
-                False,
-                f"Database integrity failed: {result[0] if result else 'Unknown error'}",
-            )
-                db_path = config.DB_PATH
+        backup = Path("clever.db.bak")
+        if backup.exists():
+            Path(db_path).write_bytes(backup.read_bytes())
+            return True, "Database restored from backup."
+        return False, f"Database integrity failed: {result[0] if result else 'Unknown error'}"
+    except Exception as e:
         return False, f"Database integrity error: {e}"
 
 

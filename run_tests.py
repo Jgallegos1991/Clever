@@ -68,9 +68,7 @@ def run_tooltip_tests():
         print(f"❌ Error running tooltip tests: {e}")
         return {'status': 'error', 'error': str(e)}
 
-def run_main_test_suite():
-    """Run the main Clever test suite"""
-        raise  # Re-raise instead of swallowing
+
 
 def run_main_test_suite():
     """
@@ -110,52 +108,41 @@ def run_main_test_suite():
         return {'status': 'error', 'error': str(e)}
 
 def run_pytest_tests():
-    """Run pytest tests if available"""
-        raise  # Re-raise instead of swallowing
-
-def run_pytest_tests():
-    """
-    Execute pytest-based tests with subprocess and capture results.
-    
-    Why: Runs standard pytest test cases to validate application functionality
-         using industry-standard testing framework and methodologies.
-    Where: Called as part of comprehensive test suite to supplement custom
-           test runners with pytest-based validation coverage.
-    How: Uses subprocess to run pytest with verbose output, captures
-         results and provides formatted summary of test execution.
-         
-    Returns:
-        dict: Test results with status and execution details
+    """Run pytest test suite using subprocess and summarize results.
+    Why: Provides unified entry for external invocation without importing pytest API.
+    Where: Optional developer convenience alongside direct `pytest` usage.
+    How: Executes `python -m pytest tests -q`, captures output, returns structured status.
     """
     print("🧪 Checking for pytest tests...")
-    
+    import subprocess
     try:
-        import subprocess
-        result = subprocess.run(['python', '-m', 'pytest', 'tests/', '-v'], 
-                              capture_output=True, text=True, timeout=60)
-        
-        if result.returncode == 0:
-            print("✅ Pytest tests passed")
-            print(result.stdout.split('\n')[-3:-1])  # Show summary lines
-        else:
-            print("❌ Pytest tests failed")
-            print(result.stderr if result.stderr else result.stdout)
-            
-        return {
-            'status': 'passed' if result.returncode == 0 else 'failed',
-            'stdout': result.stdout,
-            'stderr': result.stderr
-        }
-        
-    except subprocess.TimeoutExpired:
-        print("⏰ Pytest tests timed out")
-        return {'status': 'timeout'}
+        result = subprocess.run(
+            ['python', '-m', 'pytest', 'tests/', '-q'],
+            capture_output=True,
+            text=True,
+            timeout=90,
+        )
     except FileNotFoundError:
         print("⚠️  pytest not available, skipping")
-        return {'status': 'skipped', 'reason': 'pytest not found'}
-    except Exception as e:
-        print(f"❌ Error running pytest: {e}")
-        return {'status': 'error', 'error': str(e)}
+        return {"status": "skipped"}
+    except subprocess.TimeoutExpired:
+        print("⏰ Pytest tests timed out")
+        return {"status": "timeout"}
+    except Exception as e:  # Fallback unexpected error
+        print(f"❌ Error invoking pytest: {e}")
+        return {"status": "error", "error": str(e)}
+
+    if result.returncode == 0:
+        print("✅ Pytest tests passed")
+        summary_lines = [l for l in result.stdout.split('\n') if l.strip()][-2:]
+        for line in summary_lines:
+            print(f"   {line}")
+        return {"status": "passed"}
+    else:
+        print("❌ Pytest tests failed")
+        output = result.stderr if result.stderr else result.stdout
+        print(output)
+        return {"status": "failed", "output": output[-500:]}
 
 def create_test_report(tooltip_results, main_results, pytest_results):
     """Create a comprehensive test report"""
@@ -234,7 +221,7 @@ def main():
     print("📊 GENERATING TEST REPORT")
     print("=" * 30)
     
-    report = create_test_report(tooltip_results, main_results, pytest_results)
+    _ = create_test_report(tooltip_results, main_results, pytest_results)
     
     # Overall summary
     all_passed = (

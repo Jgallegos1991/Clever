@@ -26,7 +26,6 @@ import shutil
 import json
 import datetime
 import tarfile
-import hashlib
 from pathlib import Path
 from database import DatabaseManager
 from typing import Dict, List, Any, Optional
@@ -44,26 +43,6 @@ class CleverBackupSystem:
     How: Creates timestamped backup archives with manifest tracking and
     integrity verification for reliable restoration capabilities.
     """
-
-    def __init__(self, backup_dir: str = "./backups"):
-        """
-        Initialize the backup system
-
-        Why: Sets up backup directory structure and timestamp for organized
-        backup management and easy identification of backup versions.
-        Where: Called when creating backup instances for scheduled or manual
-        backup operations throughout the system lifecycle.
-        How: Creates backup directory structure and generates timestamp-based
-        naming for backup identification and chronological organization.
-
-        Args:
-            backup_dir: Directory path for storing backup files
-
-        Connects to:
-            - File system: Creates backup storage directory structure
-        """
-
-    """Complete backup system for Clever AI"""
 
     def __init__(self, backup_dir: str = "./backups"):
         self.backup_dir = Path(backup_dir)
@@ -332,7 +311,7 @@ class CleverBackupSystem:
                 count = cursor.fetchone()[0]
                 db_info["tables"][table] = count
                 db_info["total_records"] += count
-            except:
+            except sqlite3.Error:
                 db_info["tables"][table] = "error"
 
         conn.close()

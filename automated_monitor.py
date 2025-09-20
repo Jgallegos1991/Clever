@@ -22,7 +22,7 @@ import threading
 import time
 import schedule
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from dataclasses import dataclass
 
 # Core system imports

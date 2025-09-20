@@ -14,11 +14,9 @@ Environment Variables:
     FLASK_URL: Flask server URL (default: http://localhost:5000)
 """
 
-import os
-import sys  # keep for exit, but requests removed
+ 
 import time
 import logging
-import sys
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -32,49 +30,30 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class SyncEventHandler(FileSystemEventHandler):
-    """Handles file system events in sync directories"""
-    
-    def __init__(self):
-    """
-    File system event handler for automatic ingestion of sync directory changes.
+    """File system event handler for automatic ingestion of sync directory changes.
     
     Why: Enables real-time processing of files added to sync directories,
-         ensuring Clever AI's knowledge base stays current with external changes.
+        ensuring Clever AI's knowledge base stays current with external changes.
     Where: Used by the sync watcher system to monitor Clever_Sync and 
-           synaptic_hub_sync directories for file system events.
+         synaptic_hub_sync directories for file system events.
     How: Inherits from FileSystemEventHandler, debounces events to prevent
-         rapid-fire ingestion, and directly uses FileIngestor for processing.
+        rapid-fire ingestion, and directly uses FileIngestor for processing.
     """
-    
     def __init__(self):
-        """
-        Initialize the sync event handler with debouncing and direct ingestion.
+        """Initialize sync event handler with debouncing + FileIngestor.
         
-        Why: Sets up debouncing to prevent excessive ingestion calls and
-             establishes direct connection to FileIngestor for efficient processing.
-        Where: Called when SyncEventHandler is instantiated by the sync watcher.
-        How: Configures debounce timing, imports FileIngestor, and initializes
-             with the configured sync directory from config.SYNC_DIR.
+        Why: Prevent repeated rapid ingestion and centralize ingestion logic.
+        Where: Constructed in main() when watcher starts.
+        How: Sets timestamp, debounce interval, and instantiates FileIngestor.
         """
         self.last_trigger = 0
         self.debounce_seconds = 2  # Prevent rapid-fire ingestion
-        # Direct ingestion via FileIngestor
-        from file_ingestor import FileIngestor
-        import config
+        # Lazy import to avoid circulars during certain test contexts
+        from file_ingestor import FileIngestor  # local import by design
         self.ingestor = FileIngestor(base_dir=config.SYNC_DIR)
         
     def on_any_event(self, event):
-        """React to any file system event"""
-        """
-        Process any file system event with intelligent filtering and debouncing.
-        
-        Why: Automatically detects file changes in sync directories to maintain
-             up-to-date knowledge base without manual intervention.
-        Where: Called by the watchdog Observer when any file system event occurs
-               in monitored directories.
-        How: Filters out directories and temporary files, applies debouncing to
-             prevent rapid-fire triggers, then initiates ingestion for valid files.
-        """
+        """Process filesystem events with debouncing and filtering."""
         if event.is_directory:
             return
         # Debounce rapid events
@@ -113,15 +92,6 @@ class SyncEventHandler(FileSystemEventHandler):
                 logger.info(f"No ingestion needed for {file_path} (status: {status})")
         except Exception as e:
             logger.error(f"Error during ingestion of {file_path}: {e}")
-
-def main():
-    """Main function to set up watchers and start monitoring"""
-    
-    # Get configuration from environment
-    clever_sync_dir = os.getenv('CLEVER_SYNC_DIR', './Clever_Sync')
-    synaptic_hub_sync_dir = os.getenv('SYNAPTIC_HUB_SYNC_DIR', './synaptic_hub_sync')
-    flask_url = os.getenv('FLASK_URL', 'http://localhost:5000')
-            raise  # Re-raise instead of swallowing the exception
 
 def main():
     """

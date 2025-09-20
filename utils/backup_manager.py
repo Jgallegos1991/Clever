@@ -31,21 +31,7 @@ class BackupManager:
          backup folder from recursion, maintains configurable retention policy.
     """
     
-    def __init__(self, project_path, keep_latest=1):
-        """
-        Initialize backup manager with project path and retention policy.
-        
-        Why: Sets up backup configuration and ensures backup directory exists
-             for storing compressed project archives.
-        Where: Called when backup operations are initiated, typically from
-               scheduled processes or manual backup triggers.
-        How: Creates backup directory structure, expands user paths,
-             configures retention count for automatic cleanup.
-        
-        Args:
-            project_path: Path to the project root directory to backup
-            keep_latest: Number of most recent backups to retain (default: 1)
-        """
+    # Removed duplicate __init__ stub that caused F811 redefinition
 
     # Automated backup system with ZIP compression and retention management.
     # Why: Provides systematic data protection for Clever AI with efficient
@@ -99,10 +85,6 @@ class BackupManager:
         # Zip project folder
         with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, dirs, files in os.walk(self.project_path):
-                # Skip backups folder itself
-        # Create ZIP archive of project folder
-        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for root, dirs, files in os.walk(self.project_path):
                 # Skip backups folder to prevent recursive inclusion
                 if str(self.backup_dir) in root:
                     continue
@@ -114,26 +96,27 @@ class BackupManager:
 
         # Clean old backups
         self.cleanup_old_backups()
+        return backup_path
 
 
     def cleanup_old_backups(self) -> None:
-       """
-       Remove old backup files beyond retention policy limit.
+        """
+        Remove old backup files beyond retention policy limit.
         
-       Why: Prevents unlimited backup accumulation that would consume disk
-           space while maintaining recent backups for recovery needs.
+        Why: Prevents unlimited backup accumulation that would consume disk
+            space while maintaining recent backups for recovery needs.
         
-       Where: Called automatically after backup creation and by maintenance
+        Where: Called automatically after backup creation and by maintenance
             scripts to enforce storage policies and prevent disk issues.
         
-       How: Lists backup files sorted by modification time, identifies excess
-           backups beyond keep_latest limit, and removes older files safely.
-       """
-       backups = sorted(self.backup_dir.glob("backup_*.zip"), key=os.path.getmtime, reverse=True)
-       if len(backups) > self.keep_latest:
-          for old_backup in backups[self.keep_latest:]:
-             old_backup.unlink()
-             print(f"Deleted old backup: {old_backup}")
+        How: Lists backup files sorted by modification time, identifies excess
+            backups beyond keep_latest limit, and removes older files safely.
+        """
+        backups = sorted(self.backup_dir.glob("backup_*.zip"), key=os.path.getmtime, reverse=True)
+        if len(backups) > self.keep_latest:
+            for old_backup in backups[self.keep_latest:]:
+                old_backup.unlink()
+                print(f"Deleted old backup: {old_backup}")
 
 if __name__ == "__main__":
     bm = BackupManager(project_path=config.ROOT_DIR, keep_latest=3)

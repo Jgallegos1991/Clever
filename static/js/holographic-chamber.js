@@ -112,46 +112,65 @@ class HolographicChamber {
     this.particles.forEach((particle, i) => {
       // Add some randomness for organic feel
       const randomOffset = () => (Math.random() - 0.5) * 20;
-      
+      // 3D projection helper
+      function project3D(x, y, z, camera) {
+        // Simple perspective projection
+        const scale = camera / (camera - z);
+        return {
+          x: centerX + x * scale,
+          y: centerY + y * scale
+        };
+      }
+      const camera = radius * 2.5;
       switch (formation) {
-        case 'sphere':
-          const angle = (i / this.particles.length) * Math.PI * 2;
-          const layers = Math.floor(i / 30); // Multiple concentric circles
-          const layerRadius = radius * (0.4 + layers * 0.2);
-          particle.targetX = centerX + Math.cos(angle) * layerRadius + randomOffset();
-          particle.targetY = centerY + Math.sin(angle) * layerRadius + randomOffset();
+        case 'sphere': {
+          // Spherical coordinates
+          const phi = Math.acos(1 - 2 * (i + 1) / this.particles.length);
+          const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 1);
+          const r = radius * 0.8;
+          const x = r * Math.sin(phi) * Math.cos(theta);
+          const y = r * Math.sin(phi) * Math.sin(theta);
+          const z = r * Math.cos(phi);
+          const p = project3D(x, y, z, camera);
+          particle.targetX = p.x + randomOffset();
+          particle.targetY = p.y + randomOffset();
           break;
-          
-        case 'cube':
-          // Form a 3D-looking cube wireframe
-          const face = Math.floor(i / (this.particles.length / 6));
-          const progress = (i % (this.particles.length / 6)) / (this.particles.length / 6);
+        }
+        case 'cube': {
+          // 3D cube vertices
           const cubeSize = radius * 1.2;
-          
-          if (face === 0) { // Front face
-            particle.targetX = centerX + (progress - 0.5) * cubeSize;
-            particle.targetY = centerY + (Math.sin(progress * Math.PI * 2) * 0.5) * cubeSize;
-          } else if (face === 1) { // Back face (smaller perspective)
-            particle.targetX = centerX + (progress - 0.5) * cubeSize * 0.6;
-            particle.targetY = centerY + (Math.sin(progress * Math.PI * 2) * 0.3) * cubeSize;
-          } else { // Connecting edges
-            const edgeProgress = progress * 2 - 1;
-            particle.targetX = centerX + edgeProgress * cubeSize * 0.8;
-            particle.targetY = centerY + Math.sin(edgeProgress * Math.PI) * cubeSize * 0.6;
+          const faces = 6;
+          const vertsPerFace = Math.floor(this.particles.length / faces);
+          const face = Math.floor(i / vertsPerFace);
+          const idx = i % vertsPerFace;
+          let x = 0, y = 0, z = 0;
+          switch (face) {
+            case 0: x = -cubeSize/2; y = -cubeSize/2 + idx * cubeSize / vertsPerFace; z = -cubeSize/2; break;
+            case 1: x = cubeSize/2; y = -cubeSize/2 + idx * cubeSize / vertsPerFace; z = -cubeSize/2; break;
+            case 2: x = -cubeSize/2 + idx * cubeSize / vertsPerFace; y = -cubeSize/2; z = -cubeSize/2; break;
+            case 3: x = -cubeSize/2 + idx * cubeSize / vertsPerFace; y = cubeSize/2; z = -cubeSize/2; break;
+            case 4: x = -cubeSize/2 + idx * cubeSize / vertsPerFace; y = -cubeSize/2; z = cubeSize/2; break;
+            case 5: x = -cubeSize/2 + idx * cubeSize / vertsPerFace; y = cubeSize/2; z = cubeSize/2; break;
           }
-          particle.targetX += randomOffset();
-          particle.targetY += randomOffset();
+          const p = project3D(x, y, z, camera);
+          particle.targetX = p.x + randomOffset();
+          particle.targetY = p.y + randomOffset();
           break;
-          
-        case 'torus':
-          const torusAngle = (i / this.particles.length) * Math.PI * 4;
-          const ringRadius = radius * 0.8;
-          const tubeRadius = radius * 0.3;
-          const tubeAngle = (i / this.particles.length) * Math.PI * 8;
-          
-          particle.targetX = centerX + (ringRadius + Math.cos(tubeAngle) * tubeRadius) * Math.cos(torusAngle);
-          particle.targetY = centerY + (ringRadius + Math.cos(tubeAngle) * tubeRadius) * Math.sin(torusAngle);
+        }
+        case 'torus': {
+          // 3D torus
+          const r1 = radius * 0.7; // major radius
+          const r2 = radius * 0.25; // minor radius
+          const u = (i / this.particles.length) * Math.PI * 2;
+          const v = ((i * 7) % this.particles.length) / this.particles.length * Math.PI * 2;
+          const x = (r1 + r2 * Math.cos(v)) * Math.cos(u);
+          const y = (r1 + r2 * Math.cos(v)) * Math.sin(u);
+          const z = r2 * Math.sin(v);
+          const p = project3D(x, y, z, camera);
+          particle.targetX = p.x + randomOffset();
+          particle.targetY = p.y + randomOffset();
           break;
+        }
           
         case 'helix':
           const helixAngle = (i / this.particles.length) * Math.PI * 6;

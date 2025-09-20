@@ -23,6 +23,7 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
+
 def upgrade_configurations() -> None:
     """
     Upgrade configuration settings to latest version
@@ -65,6 +66,7 @@ def upgrade_configurations() -> None:
         logger.error(f"Error during configuration upgrade: {e}")
         # Don't raise the exception to avoid blocking app startup
 
+
 def finalize_configurations() -> None:
     """
     Finalize and validate all configurations
@@ -80,23 +82,12 @@ def finalize_configurations() -> None:
     Connects to:
         - app.py: Called during application startup after upgrades
         - config.py: Validates final configuration state
-        # In production, you might want to handle this differently
-
-
-def finalize_configurations() -> None:
-    """
-    Finalize and validate all configurations.
-    
-    This function performs final validation and setup of all
-    configuration settings after upgrades are complete.
     """
     logger.info("Starting configuration finalization...")
-    
     try:
         # Configuration finalization implementation
         # Why: Validate all configuration values are within acceptable ranges
         logger.info("Configuration validation completed")
-        
         # Where: Set up derived configuration values for components
         logger.info("Derived configuration setup completed")
         
@@ -140,23 +131,9 @@ def classify_intent(text: str, context: Optional[Dict[str, Any]] = None) -> Dict
     # Intent classification based on keyword patterns
     # Why: Simple but effective approach for basic intent detection
     text_lower = text.lower()
-    
     # Define intent patterns for common user interactions
-    Classify the intent of user input text.
-    
-    Args:
-        text: The user input text to classify
-        context: Optional context dictionary for better classification
-        
-    Returns:
-        Dictionary containing intent classification results
-    """
     # Simple intent classification based on keywords
     # This is a basic implementation - could be enhanced with ML models
-    
-    text_lower = text.lower()
-    
-    # Define intent patterns
     intent_patterns = {
         "question": ["what", "how", "why", "when", "where", "who", "?"],
         "request": ["please", "can you", "could you", "would you", "help"],
@@ -217,12 +194,7 @@ def extract_entities(text: str) -> Dict[str, Any]:
         - knowledge_base.py: Can store extracted entities for future reference
     """
     import re
-    
     # Why: Define regex patterns for common entity types
-        Dictionary containing extracted entities
-    """
-    import re
-    
     entities = {
         "emails": re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', text),
         "urls": re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text),
@@ -257,24 +229,11 @@ def build_context(text: str, history: Optional[list] = None, metadata: Optional[
         
     Returns:
         Context dictionary containing all analysis results and history data
-        
+    
     Connects to:
         - persona.py: Provides complete context for response generation
         - app.py: Supplies conversation history for context building
         - knowledge_base.py: Can retrieve relevant knowledge for context
-    """
-    context = {
-        "current_input": text,
-        "timestamp": None,  # Can be added by caller
-    Build context for processing user input.
-    
-    Args:
-        text: Current user input
-        history: Previous conversation history
-        metadata: Additional metadata
-        
-    Returns:
-        Context dictionary for processing
     """
     context = {
         "current_input": text,

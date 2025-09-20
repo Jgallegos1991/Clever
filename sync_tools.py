@@ -17,7 +17,7 @@ Connects to:
 from __future__ import annotations
 
 import subprocess
-from typing import List, Tuple
+from typing import Tuple
 
 import config
 
@@ -82,11 +82,6 @@ def run_rclone_sync(
     except FileNotFoundError:
         # rclone not installed; remain offline-friendly
         return 127, "", "rclone not installed"
-
-
-def sync_clever_from_remote() -> Tuple[int, str, str]:
-    # Graceful handling if rclone is not installed
-    return 127, "", "rclone not found: is it installed and in PATH?"
 
 
 def sync_clever_from_remote() -> Tuple[int, str, str]:

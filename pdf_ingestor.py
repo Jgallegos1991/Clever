@@ -9,17 +9,10 @@ How: Detects supported files, extracts content and metadata, chunks large docume
 
 import os
 import hashlib
-
 from pathlib import Path
 from typing import List, Dict, Tuple
-
-import os
-import json
-import hashlib
-import time
-from pathlib import Path
-from typing import List, Dict, Optional, Tuple
 import logging
+ 
 
 # Core dependencies
 from database import db_manager

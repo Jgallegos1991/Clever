@@ -10,8 +10,7 @@ Connects to:
     - database.py: Persistent storage via DB_PATH
 """
 import time
-import json
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from datetime import datetime
 
 

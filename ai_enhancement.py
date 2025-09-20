@@ -11,10 +11,9 @@ Connects to:
     - evolution_engine.py: Advanced learning and growth tracking
     - database.py: Persistent memory storage and retrieval
 """
-import json
 import hashlib
-from typing import Dict, List, Any, Optional, Tuple
-from datetime import datetime, timedelta
+from typing import Dict, List, Any, Tuple
+from datetime import datetime
 from collections import defaultdict, deque
 import logging
 
@@ -124,7 +123,7 @@ class MemoryNetwork:
     def _build_concept_connections(self, concepts: List[str], context: Dict[str, Any]):
         """Build weighted connections between concepts"""
         for i, concept1 in enumerate(concepts):
-            for concept2 in concepts[i+1:]:
+            for concept2 in concepts[i + 1:]:
                 # Increase connection weight
                 self.concept_graph[concept1][concept2] += 1.0
                 self.concept_graph[concept2][concept1] += 1.0
@@ -293,8 +292,13 @@ class PatternDetector:
 class ResponseOptimizer:
     """Optimizes responses based on context and patterns"""
     
-    def optimize_response(self, base_response: str, patterns: Dict[str, Any], 
-                         context: Dict[str, Any], memories: List[Dict[str, Any]]) -> str:
+    def optimize_response(
+        self,
+        base_response: str,
+        patterns: Dict[str, Any],
+        context: Dict[str, Any],
+        memories: List[Dict[str, Any]],
+    ) -> str:
         """Optimize response based on patterns and context"""
         response = base_response
         

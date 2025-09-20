@@ -15,13 +15,11 @@ Connects to:
 - app.py: Integration testing with Flask application
 """
 
-import os
 import sys
 import time
 import json
-import tempfile
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 # Add project root to path for imports
 sys.path.insert(0, "/workspaces/projects")
@@ -263,7 +261,7 @@ class FinalIntegrationTester:
                     f"{len(accessible_files)} test files accessible"
                 )
             else:
-                print(f"❌ File access test failed")
+                print("❌ File access test failed")
 
             return result
 

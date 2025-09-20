@@ -499,24 +499,30 @@ body {
   animation: messageSlideIn 0.3s ease-out;
 }
 
-.message .chip {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--muted);
-  margin-bottom: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.message .bubble {
-  padding: 16px 20px;
-  border-radius: 20px;
-  font-size: 15px;
-  line-height: 1.5;
+.chat-text {
+  display: block;
+  font-size: 1.18rem;
   color: var(--fg);
-  word-wrap: break-word;
+  margin: 12px 0 0 0;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.25,0.46,0.45,0.94), filter 1.2s;
+  filter: drop-shadow(0 2px 8px rgba(105,234,203,0.12));
 }
-
+.chat-text.manifesting {
+  opacity: 0;
+}
+.chat-text.manifested {
+  opacity: 1;
+  filter: drop-shadow(0 2px 16px rgba(105,234,203,0.18));
+}
+.chat-text.fading {
+  opacity: 0;
+  transition: opacity 4s linear;
+}
 .message.user { 
   align-self: flex-end;
 }

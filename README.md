@@ -102,6 +102,30 @@ For full details, see `CURRENT_FILE_STRUCTURE.md` and `static/README.md`.
 - **`knowledge_base.py`** - SQLite database with learning capabilities
 - **`evolution_engine.py`** - Autonomous learning and capability tracking
 
+### Legacy Quarantine & Deprecated Engine Stubs
+
+The original `clever_conversation_engine.py` and related oversized legacy modules
+contained duplicated logic, merge artifacts, and unstable patterns that produced
+syntax/lint noise. They have been archived under `legacy/` and replaced at their
+original import paths with minimal, explicit stubs.
+
+Why: Preserve historical reference while guaranteeing active runtime code stays
+clean, deterministic, and CI-friendly.
+Where: Active code imports `persona.PersonaEngine`. Any lingering import of the
+deprecated engine raises a clear `NotImplementedError` with migration guidance.
+How: `.flake8` now excludes `legacy/`, tests, docs, and virtual environment paths
+while enforcing strict error classes (E9/F63/F7/F82 plus core E/F/B) across active
+modules to block syntax/runtime hazards without drowning in legacy noise.
+
+Migration Guidance:
+1. Use `persona.PersonaEngine` for all conversational features.
+2. Treat everything under `legacy/` as immutable history (do not modify).
+3. If a stub raises during development, refactor the caller to the supported path
+	instead of reviving deprecated logic.
+
+This pattern reduces cognitive load, speeds reviews, and maintains a provably
+stable baseline for future enhancements.
+
 ### Advanced Systems
 
 - **Debug Infrastructure** - Health monitoring, error recovery, automated testing
@@ -318,3 +342,26 @@ Ready to see what true AI partnership looks like? Fire up Clever and let the mag
 
 *Last Updated: September 9, 2025*  
 *System Status: 🟢 Fully Operational with Enhanced Capabilities*
+
+## 🧰 Legacy quarantine and watcher entrypoint
+
+To keep the codebase stable and offline-first, deeply corrupted or deprecated modules have been quarantined under `legacy/`. This preserves history without impacting runtime or CI.
+
+
+- Quarantined examples: `clever_conversation_engine.py`, `knowledge_base_full.py`, `utils_watcher_full.py`, `test_suite_full.py`, `run_tests_legacy.py`, `fixer_legacy.py`.
+- Lint excludes `legacy/` to avoid noise while keeping artifacts for reference.
+
+
+Watcher entrypoint consolidation:
+
+
+- The active filesystem watcher is implemented in `sync_watcher.py`.
+- The previous `utils/watcher.py` is now a thin compatibility shim that delegates to `sync_watcher.main()`.
+
+
+Usage tips:
+
+
+- Start watcher: run `python sync_watcher.py` (or call `utils/watcher.py` which forwards to the same implementation).
+- Ingestion: the watcher uses `file_ingestor.FileIngestor.ingest_file()` and writes to the single SQLite DB at `config.DB_PATH`.
+- Tests: ingestion behavior is covered by unit tests in `tests/test_file_ingestor_ingest.py`.

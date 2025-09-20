@@ -4,7 +4,7 @@ Remove unreferenced legacy UI assets safely.
 - Scans templates for referenced static files.
 - Deletes known legacy files if not referenced.
 """
-import os, re, sys
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]

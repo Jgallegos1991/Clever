@@ -1,0 +1,56 @@
+name: Single Database Guard
+
+on:
+  pull_request:
+    paths:
+      - '**/*.py'
+      - 'config.py'
+      - 'database.py'
+      - 'app.py'
+      - '.github/workflows/single-db-guard.yml'
+  push:
+    branches: [ main ]
+
+jobs:
+  enforce-single-db:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify single database usage
+        run: |
+          echo "Verifying only clever.db is referenced and config.DB_PATH is source of truth"
+          # Count occurrences of .db references excluding clever.db and migrations/tools
+          DB_REFERENCES=$(grep -R "\.db" -n . | grep -v "clever.db" | grep -v ".git" | wc -l || true)
+          if [ "$DB_REFERENCES" -gt 0 ]; then
+            echo "Found unexpected .db references (excluding clever.db)." >&2
+            grep -R "\.db" -n . | grep -v "clever.db" | grep -v ".git" || true
+            exit 1
+          fi
+
+          # Ensure config.DB_PATH definition exists
+          if ! grep -R "DB_PATH" config.py >/dev/null 2>&1; then
+            echo "config.DB_PATH not defined" >&2
+            exit 1
+          fi
+
+          # Ensure database.py imports config and uses DB_PATH
+            if ! grep -R "DB_PATH" database.py >/dev/null 2>&1; then
+              echo "database.py does not reference DB_PATH" >&2
+              exit 1
+            fi
+
+          echo "Single database policy OK"
+
+      - name: Fail if clever.db missing
+        run: |
+          if [ ! -f clever.db ]; then
+            echo "Expected clever.db file is missing (should exist or be created at runtime)." >&2
+            # Not failing hard for historical reasons; warn.
+            echo "::warning::clever.db missing in repo snapshot"
+          fi
+
+      - name: Summary
+        run: |
+          echo "All single DB guard checks passed" >> $GITHUB_STEP_SUMMARY

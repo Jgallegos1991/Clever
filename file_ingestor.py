@@ -1,9 +1,6 @@
 import os
-import json
 import hashlib
-import time
-import pypdf as PyPDF2  # Import pypdf with PyPDF2 alias for compatibility
-import PyPDF2
+import pypdf as PyPDF2  # Use pypdf (modern fork) but alias as PyPDF2 for clarity
 import re
 
 # --- CHANGE 1: Import the shared instances and config ---
@@ -13,99 +10,26 @@ from evolution_engine import get_evolution_engine
 import config
 
 class FileIngestor:
-    """
-    FileIngestor class for ingesting files and extracting knowledge
+    """Ingest files (PDF/text) into the single database with NLP enrichment.
 
-    Why: Ensures Clever is resilient, adaptive, and nearly invisible—always
-    operating in the background, never cutting short on capability, and ready
-    to evolve with the user. Centralizes file ingestion logic for robust,
-    automated knowledge extraction and database updates.
-    Where: Connects to shared DatabaseManager (db_manager), NLP processor
-    (nlp_processor), and evolution engine (get_evolution_engine).
-    How: Walks through files in a directory, processes each file (PDF/text),
-    extracts content and metadata, performs NLP analysis, and updates the
-    database. Triggers evolution learning for meaningful content, all while
-    maintaining seamless, resilient operation.
+    Why: Centralizes knowledge ingestion to keep Clever's context fresh.
+    Where: Used by sync watchers, CLI ops, or manual runs.
+    How: Recursively scans a directory, extracts text, runs NLP, hashes content,
+    and upserts into the unified database; triggers evolution learning when meaningful.
+    """
 
-    Connects to:
-        - database.py: Uses db_manager for database operations
-        - nlp_processor.py: Uses nlp_processor for NLP analysis
-        - evolution_engine.py: Triggers evolution learning
-        - config.py: Uses config for directory paths
-    """
-    def __init__(self, base_dir):
-        """
-        Initialize FileIngestor with a base directory
-        
-        Why: Sets up the ingestion root for scanning files
-        Where: Used by ingest_all_files and main script entry
-        How: Expands user path, checks directory existence, stores path
-        
-        Args:
-            base_dir: Path to the directory to ingest
-        """
-        self.base_dir = os.path.expanduser(base_dir)
-        if not os.path.isdir(self.base_dir):
-            print(
-                f"Warning: Ingestion directory not found at '{self.base_dir}'"
-            )
-            
-    def ingest_all_files(self):
-        """
-        Walk through the base directory and ingest each file
-        
-    Why: Automates bulk ingestion for knowledge extraction and
-    database updates
-        Where: Entry point for file ingestion, called by main script
-    How: Recursively scans directory, processes each file, tracks status,
-    handles errors
-    File processing and knowledge base ingestion system for Clever AI.
-    
-    Why: Converts various file formats into structured knowledge base entries
-         with NLP analysis to enable intelligent search and reasoning.
-    Where: Core component used by sync watchers, CLI tools, and automation
-           systems to process files from sync directories.
-    How: Extracts content from text and PDF files, performs NLP analysis,
-         computes metadata hashes, and stores structured data in database.
-    """
-    
-    def __init__(self, base_dir):
-        """
-        Initialize file ingestor for specified base directory.
-        
-        Why: Sets up ingestion scope for a specific directory to enable
-             batch processing and automatic file monitoring capabilities.
-        Where: Called by sync systems, CLI tools, and scheduled processes
-               that need to process files from specific locations.
-        How: Expands user path and validates directory existence, using
-             shared database and NLP processor instances for efficiency.
-        
-        Args:
-            base_dir: Directory path to process for file ingestion
-        """
+    def __init__(self, base_dir: str):
         self.base_dir = os.path.expanduser(base_dir)
         if not os.path.isdir(self.base_dir):
             print(f"Warning: Ingestion directory not found at '{self.base_dir}'")
-            
+
     def ingest_all_files(self):
-        """
-        Process all files in base directory recursively for knowledge base ingestion.
-        
-        Why: Enables batch processing of entire directory structures to build
-             comprehensive knowledge base from file collections.
-        Where: Called by CLI ingest commands and batch processing operations
-               to populate knowledge base with existing file content.
-        How: Walks directory tree, filters hidden files, processes each file
-             through ingest_file, aggregates and reports processing statistics.
-        """
+        """Recursively process all non-hidden files under base directory."""
         print(f"Starting ingestion process for directory: {self.base_dir}")
         inserted = updated = unchanged = failed = 0
         for root, _, files in os.walk(self.base_dir):
             for file in files:
                 # Ignore hidden files like .DS_Store
-                if file.startswith('.'):
-                    continue
-                # We want to ignore hidden files like .DS_Store
                 if file.startswith('.'):
                     continue
                 
@@ -126,276 +50,133 @@ class FileIngestor:
         print(
             f"Ingestion complete. inserted={inserted} updated={updated} "
             f"unchanged={unchanged} failed={failed}"
-                    raise  # Re-raise to maintain error visibility
-        print(
-            f"Ingestion complete. inserted={inserted} updated={updated} unchanged={unchanged} failed={failed}"
         )
     
-    def ingest_file(self, file_path):
+    def clean_pdf_text(self, text: str) -> str:
+        """Normalize extracted PDF text.
+        Why: Remove artefacts + normalize whitespace before NLP.
+        How: Regex collapse, strip page markers, filter symbols, condense blanks.
         """
-        Ingest a single file and add its content to the database
+        if not text:
+            return ""
+        cleaned = re.sub(r"\s+", " ", text)
+        cleaned = re.sub(r"--- Page \d+ ---\s*", "\n\n", cleaned)
+        cleaned = re.sub(r"[^\w\s.,!?;:()\[\]{}\"'\-]", "", cleaned)
+        cleaned = re.sub(r"\n\s*\n", "\n\n", cleaned)
+        return cleaned.strip()
+    
+    def ingest_file(self, file_path: str) -> str:
+        """Ingest a single file (PDF or text) into the knowledge source table.
         
-        Why: Enables granular ingestion and knowledge extraction for each file
-        Where: Called by ingest_all_files for every file found
-    How: Checks file existence, extracts content (PDF/text), performs NLP,
-    computes hash, upserts to DB, triggers evolution learning
+        Why: Enables incremental updates when the sync watcher detects a change
+             rather than reprocessing the entire directory tree.
+        Where: Called by SyncEventHandler.trigger_ingestion and can be used by
+               ad-hoc maintenance scripts or tests.
+        How: Determines file type, extracts / cleans content, performs optional
+             NLP enrichment, hashes content to detect changes, upserts into the
+             database, and (on meaningful updates) triggers evolution learning.
         
         Args:
-            file_path: Path to the file to ingest
+            file_path: Absolute or relative path to the file to ingest.
+        
         Returns:
-            Status string: 'inserted', 'updated', 'unchanged', or 'failed'
+            str: One of "inserted", "updated", "unchanged", "empty", or "failed".
+        
         Connects to:
-            - db_manager.add_or_update_source: Database upsert
-            - nlp_processor.process: NLP analysis
-            - get_evolution_engine().process_pdf_knowledge: Evolution learning
-        Process single file for knowledge base ingestion with NLP analysis and metadata tracking.
-        
-        Why: Converts individual files into searchable knowledge base entries
-             with intelligent content analysis and change detection.
-        Where: Called by file watchers, batch processors, and manual ingestion
-               operations to handle specific file updates.
-        How: Extracts content by file type (PDF/text), performs NLP analysis,
-             computes content hashes, handles metadata updates, integrates with evolution engine.
-             
-        Args:
-            file_path: Path to the file to process and ingest
-            
-        Returns:
-            str: Status of ingestion - "inserted", "updated", "unchanged", or "failed"
+            - database.py via db_manager.add_or_update_source
+            - evolution_engine.py for autonomous learning triggers
+            - nlp_processor for local NLP enrichment (entities / keywords)
         """
-        if not os.path.exists(file_path):
-            print(f"File not found: {file_path}")
-            return "failed"
-        
-        # Compute metadata early for quick-skip check
-        filename = os.path.basename(file_path)
-        size = os.path.getsize(file_path)
-        modified_ts = os.path.getmtime(file_path)
-
-    # Quick-skip: if DB has same size and mtime, assume unchanged
-    # (avoids read/hash)
-        existing = db_manager.get_source_by_path(file_path)
-        if (
-            existing
-            and existing.size == size
-            and existing.modified_ts == modified_ts
-        ):
-        # Quick-skip: if DB has same size and mtime, assume unchanged (avoids read/hash)
-        existing = db_manager.get_source_by_path(file_path)
-        if existing and existing.size == size and existing.modified_ts == modified_ts:
-            print(f"unchanged: {filename} (fast-skip)")
-            return "unchanged"
-
-        # Extract content based on file type
-        content = ""
-        entities = []
-        keywords = []
-        
         try:
+            file_path = os.path.abspath(file_path)
+            if not os.path.isfile(file_path):
+                return "failed"
+            filename = os.path.basename(file_path)
+            stat = os.stat(file_path)
+            size = stat.st_size
+            modified_ts = stat.st_mtime
+
+            entities: list = []
+            keywords: list = []
+
+            # Extract content + lightweight NLP
             if filename.lower().endswith('.pdf'):
                 content, entities, keywords = self.process_pdf(file_path)
             else:
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                     content = f.read()
-                
-                # Basic NLP analysis for text files
                 if nlp_processor and content.strip():
                     try:
-                        analysis = nlp_processor.process(content)
-                        if hasattr(analysis, '__dict__'):
-                            analysis_dict = vars(analysis)
-                            entities = analysis_dict.get('entities', [])
-                            keywords = analysis_dict.get('keywords', [])
+                        analysis = nlp_processor.process_text(content)
+                        entities = analysis.get('entities', [])
+                        keywords = analysis.get('keywords', [])
                     except Exception as e:
                         print(f"NLP analysis failed for {filename}: {e}")
-                        
+
+            if not content.strip():
+                print(f"No content extracted from {filename}")
+                return "empty"
+
+            content_hash = hashlib.sha256(content.encode("utf-8", errors="ignore")).hexdigest()
+
+            # Upsert into DB; skip if unchanged
+            id_, status = db_manager.add_or_update_source(
+                filename,
+                file_path,
+                content,
+                content_hash=content_hash,
+                size=size,
+                modified_ts=modified_ts,
+            )
+
+            # Trigger Evolution Learning for meaningful content
+            if status in ["inserted", "updated"] and len(content) > 100:
+                try:
+                    # For now we just log an interaction-like event into the evolution engine
+                    evolution_engine = get_evolution_engine()
+                    evolution_engine.log_interaction({
+                        'source_file': filename,
+                        'ingest_status': status,
+                        'entities': entities,
+                        'keywords': keywords,
+                        'content_chars': len(content)
+                    })
+                except Exception as e:
+                    print(f"Evolution logging failed for {filename}: {e}")
+
+            print(f"{status}: {filename} (id={id_})")
+            return status
         except Exception as e:
-            print(f"Error processing {file_path}: {e}")
+            print(f"Ingestion failed for {file_path}: {e}")
             return "failed"
-        if filename.lower().endswith('.pdf'):
-            content, entities, keywords = self.process_pdf(file_path)
-        else:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                content = f.read()
-            
-            # Basic NLP analysis for text files
-            if nlp_processor and content.strip():
-                analysis = nlp_processor.process(content)
-                if hasattr(analysis, '__dict__'):
-                    analysis_dict = vars(analysis)
-                    entities = analysis_dict.get('entities', [])
-                    keywords = analysis_dict.get('keywords', [])
-
-        if not content.strip():
-            print(f"No content extracted from {filename}")
-            return "failed"
-
-        content_hash = hashlib.sha256(content.encode("utf-8", errors="ignore")).hexdigest()
-
-        # Upsert into DB; skip if unchanged
-        id_, status = db_manager.add_or_update_source(
-            filename,
-            file_path,
-            content,
-            content_hash=content_hash,
-            size=size,
-            modified_ts=modified_ts,
-        )
-        
-        # Trigger Evolution Learning for meaningful content
-        if status in ["inserted", "updated"] and len(content) > 100:
+    
+    def process_pdf(self, pdf_path: str):
+        """Extract text & basic NLP metadata from a PDF file."""
+        content = []
+        entities: list = []
+        keywords: list = []
+        try:
+            with open(pdf_path, 'rb') as fh:
+                reader = PyPDF2.PdfReader(fh)
+                for i, page in enumerate(reader.pages):
+                    txt = page.extract_text() or ''
+                    if txt.strip():
+                        content.append(f"\n--- Page {i+1} ---\n{txt}")
+        except Exception as e:
+            print(f"PDF read error {pdf_path}: {e}")
+            return "", entities, keywords
+        merged = self.clean_pdf_text(''.join(content))
+        if nlp_processor and merged.strip():
             try:
-                evolution_engine = get_evolution_engine()
-                
-                # Process for autonomous learning
-                learning_results = evolution_engine.process_pdf_knowledge(
-                    filename, content, entities, keywords
-                )
-                
-                if learning_results['concepts_learned'] > 0 or learning_results['connections_formed'] > 0:
-                    print(f"🧠 Clever learned from {filename}: "
-                          f"{learning_results['concepts_learned']} concepts, "
-                          f"{learning_results['connections_formed']} connections")
-                    
-                    if learning_results['evolution_triggered']:
-                        print(f"✨ Evolution cascade triggered by {filename}!")
-                        
+                analysis = nlp_processor.process_text(merged)
+                if hasattr(analysis, '__dict__'):
+                    ad = vars(analysis)
+                    entities = ad.get('entities', [])
+                    keywords = ad.get('keywords', [])
             except Exception as e:
-                print(f"Evolution learning failed for {filename}: {e}")
-        
-        print(f"{status}: {filename} (id={id_})")
-        return status
+                print(f"NLP analysis failed for PDF: {e}")
+        return merged, entities, keywords
     
-    def process_pdf(self, pdf_path):
-        """
-        Extract content, entities, and keywords from a PDF file
-        
-        Why: Enables knowledge extraction from PDF documents for ingestion
-        Where: Called by ingest_file for PDF files
-        How: Reads PDF pages, cleans text, performs NLP analysis for entities/keywords
-        
-        Args:
-            pdf_path: Path to the PDF file
-        Returns:
-            Tuple: (content, entities, keywords)
-        Connects to:
-            - nlp_processor.process: NLP analysis
-        Extract and analyze content from PDF files with NLP processing.
-        
-        Why: Enables knowledge base ingestion from PDF documents with
-             structured text extraction and intelligent content analysis.
-        Where: Called by ingest_file when processing PDF file types to
-               convert document content into searchable text format.
-        How: Uses PyPDF2 to extract text by page, applies text cleaning,
-             performs NLP analysis for entities and keywords extraction.
-             
-        Args:
-            pdf_path: File system path to the PDF document to process
-            
-        Returns:
-            Tuple[str, List, List]: (cleaned_content, entities, keywords)
-        """
-        content = ""
-        entities = []
-        keywords = []
-        try:
-            with open(pdf_path, 'rb') as file:
-                reader = PyPDF2.PdfReader(file)
-        
-        try:
-            with open(pdf_path, 'rb') as file:
-                reader = PyPDF2.PdfReader(file)
-                
-                for page_num, page in enumerate(reader.pages):
-                    page_text = page.extract_text()
-                    if page_text.strip():
-                        content += f"\n--- Page {page_num + 1} ---\n{page_text}"
-                # Enhanced text cleaning
-                content = self.clean_pdf_text(content)
-                # Extract entities and keywords using NLP
-                if nlp_processor and content.strip():
-                    try:
-                        analysis = nlp_processor.process(content)
-                        if hasattr(analysis, '__dict__'):
-                            analysis_dict = vars(analysis)
-                            entities = analysis_dict.get('entities', [])
-                            keywords = analysis_dict.get('keywords', [])
-                    except Exception as e:
-                        print(f"NLP analysis failed for PDF: {e}")
-        except Exception as e:
-            print(f"PDF processing error: {e}")
-                
-                # Enhanced text cleaning
-                content = self.clean_pdf_text(content)
-                
-                # Extract entities and keywords using NLP
-                if nlp_processor and content.strip():
-                    analysis = nlp_processor.process(content)
-                    if hasattr(analysis, '__dict__'):
-                        analysis_dict = vars(analysis)
-                        entities = analysis_dict.get('entities', [])
-                        keywords = analysis_dict.get('keywords', [])
-                
-        except Exception as e:
-            print(f"PDF processing error: {e}")
-            raise  # Re-raise instead of swallowing
-            
-        return content, entities, keywords
-    
-    def clean_pdf_text(self, text):
-        """
-        Clean and normalize PDF text for ingestion
-        
-        Why: Improves quality of extracted text for NLP and database storage
-        Where: Used by process_pdf after extracting raw text
-        How: Removes excessive whitespace, page markers, artifacts, normalizes line breaks
-        
-        Args:
-            text: Raw text extracted from PDF
-        Returns:
-            Cleaned and normalized text string
-        """
-        if not text:
-            return ""
-        # Remove excessive whitespace
-        text = re.sub(r'\s+', ' ', text)
-        # Remove page headers/footers patterns
-        text = re.sub(r'--- Page \d+ ---\s*', '\n\n', text)
-        # Remove common PDF artifacts
-        text = re.sub(r'[^\w\s.,!?;:()\[\]{}"\'-]', '', text)
-        # Normalize line breaks
-        text = re.sub(r'\n\s*\n', '\n\n', text)
-        Normalize and clean extracted PDF text for consistent processing.
-        
-        Why: PDF text extraction often contains formatting artifacts and
-             irregular spacing that needs normalization for quality analysis.
-        Where: Called by process_pdf after text extraction to prepare
-               content for NLP processing and database storage.
-        How: Applies regex patterns to remove excessive whitespace,
-             normalize line breaks, and standardize text formatting.
-             
-        Args:
-            text: Raw text extracted from PDF document
-            
-        Returns:
-            str: Cleaned and normalized text ready for analysis
-        """
-        if not text:
-            return ""
-        
-        # Remove excessive whitespace
-        text = re.sub(r'\s+', ' ', text)
-        
-        # Remove page headers/footers patterns
-        text = re.sub(r'--- Page \d+ ---\s*', '\n\n', text)
-        
-        # Remove common PDF artifacts
-        text = re.sub(r'[^\w\s.,!?;:()\[\]{}"\'-]', '', text)
-        
-        # Normalize line breaks
-        text = re.sub(r'\n\s*\n', '\n\n', text)
-        
-        return text.strip()
 
 # --------------------------
 # Example usage

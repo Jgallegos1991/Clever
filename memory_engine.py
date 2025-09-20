@@ -17,11 +17,10 @@ Connects to:
 import time
 import json
 import hashlib
-from typing import Dict, Any, List, Optional, Tuple
-from datetime import datetime, timedelta
+from typing import Dict, Any, List, Optional
+from datetime import datetime
 from collections import defaultdict, Counter
-from dataclasses import dataclass, asdict
-import sqlite3
+from dataclasses import dataclass
 import threading
 
 from database import DatabaseManager
@@ -670,7 +669,8 @@ class AdvancedMemoryEngine:
             context_keywords = [word.lower() for word in context.split() if len(word) > 2]
             
             # Analyze mode preferences
-            mode_scores = defaultdict(float)
+            # Explicit typing for static analyzers
+            mode_scores: Dict[str, float] = defaultdict(float)
             
             for keyword in context_keywords:
                 pref_key = f"topic_interest_{keyword}"
@@ -685,7 +685,8 @@ class AdvancedMemoryEngine:
                         predictions['reasoning'].append(f"Keyword '{keyword}' suggests {most_common_mode} mode")
             
             if mode_scores:
-                best_mode = max(mode_scores, key=mode_scores.get)
+                # Using .get as key is fine at runtime; static analyzer may need a hint
+                best_mode = max(mode_scores, key=lambda k: mode_scores.get(k, 0.0))
                 predictions['suggested_mode'] = best_mode
                 predictions['confidence'] = min(0.9, mode_scores[best_mode])
             

@@ -10,8 +10,32 @@ Connects to:
     - evolution_engine.py: Text processing for learning
 """
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from collections import Counter
+import math
+
+try:  # Optional heavy libs – never required
+    import spacy  # type: ignore
+    _SPACY_AVAILABLE = True
+except Exception:  # pragma: no cover - environment dependent
+    _SPACY_AVAILABLE = False
+
+try:  # TextBlob sentiment (polarity / subjectivity)
+    from textblob import TextBlob  # type: ignore
+    _TEXTBLOB_AVAILABLE = True
+except Exception:  # pragma: no cover
+    _TEXTBLOB_AVAILABLE = False
+
+try:  # NLTK VADER (already in requirements)
+    from nltk.sentiment import SentimentIntensityAnalyzer  # type: ignore
+    _VADER_AVAILABLE = True
+except Exception:  # pragma: no cover
+    _VADER_AVAILABLE = False
+
+
+def _safe_lower(text: str) -> str:
+    """Internal helper to guard against non-string input."""
+    return text.lower() if isinstance(text, str) else ""
 
 
 class SimpleNLPProcessor:
@@ -52,12 +76,20 @@ class SimpleNLPProcessor:
             - persona.py: Response generation analysis
             - evolution_engine.py: Learning and context extraction
         """
+        # Compute base extraction
+        keywords = self.extract_keywords(text)
+        sentiment = self.analyze_sentiment(text)
+        entities = self.extract_entities(text)
+        word_count = len(text.split())
+        char_count = len(text)
+        noise_metrics = self._noise_metrics(text)
         return {
-            'keywords': self.extract_keywords(text),
-            'sentiment': self.analyze_sentiment(text),
-            'entities': self.extract_entities(text),
-            'word_count': len(text.split()),
-            'char_count': len(text)
+            'keywords': keywords,
+            'sentiment': sentiment,
+            'entities': entities,
+            'word_count': word_count,
+            'char_count': char_count,
+            **noise_metrics
         }
     
     def extract_keywords(self, text: str) -> List[str]:
@@ -75,6 +107,54 @@ class SimpleNLPProcessor:
         # Count frequency and return most common
         word_freq = Counter(keywords)
         return [word for word, count in word_freq.most_common(10)]
+
+    # ---------- Noise / gibberish detection helpers ----------
+    def _noise_metrics(self, text: str) -> Dict[str, Any]:
+        """Estimate noise characteristics (typos, gibberish, smash).
+
+        Why: Persona needs to recognize when user input is accidental
+        (keyboard smash) or heavily typo-laden to prompt clarification.
+        Where: Included in analysis dict used by persona.generate.
+        How: Heuristics: consonant run lengths, vowel ratio, non-dictionary
+        token ratio, repeated char bursts, entropy approximation.
+
+        Returns keys:
+            - typo_ratio: float 0..1 approximate tokens likely misspelled
+            - smash_score: float 0..1 intensity of random input patterns
+            - needs_clarification: bool high noise composite flag
+        """
+        lowered = text.lower()
+        tokens = re.findall(r"[a-zA-Z]+", lowered)
+        if not tokens:
+            return {"typo_ratio": 0.0, "smash_score": 0.0, "needs_clarification": False}
+        # Simple english core set (small to stay offline/light)
+        core_vocab = {"the","and","that","this","you","for","with","have","are","but","not","can","your","from","what","about","just","like","time","need","want","make","code","test","file","data","project"}
+        misspelled = 0
+        consonant_runs = 0
+        long_repeats = 0
+        total_chars = sum(len(t) for t in tokens)
+        for t in tokens:
+            if t not in core_vocab and len(t) > 3:
+                # crude heuristic: lacks vowel or has improbable pattern
+                if not re.search(r"[aeiou]", t) or re.search(r"[^aeiou]{5,}", t):
+                    misspelled += 1
+            # consonant run length measure
+            cruns = re.findall(r"[^aeiou\W]{4,}", t)
+            consonant_runs += sum(len(c) for c in cruns)
+            # repeated char sequences
+            if re.search(r"(.)\1{3,}", t):
+                long_repeats += 1
+        typo_ratio = misspelled / max(1, len(tokens))
+        # Shannon-like entropy proxy: unique chars / length
+        unique_chars = len(set(lowered))
+        entropy_proxy = unique_chars / max(1, len(lowered))
+        smash_score = min(1.0, 0.4*typo_ratio + 0.3*(consonant_runs/ max(1,total_chars)) + 0.3*(long_repeats / max(1,len(tokens))))
+        needs = (typo_ratio > 0.55 and smash_score > 0.4) or (long_repeats >= 2) or (entropy_proxy < 0.28)
+        return {
+            "typo_ratio": round(typo_ratio, 3),
+            "smash_score": round(smash_score, 3),
+            "needs_clarification": needs,
+        }
     
     def analyze_sentiment(self, text: str) -> str:
         """
@@ -137,6 +217,180 @@ class SimpleNLPProcessor:
         How: Simple regex-based word extraction
         """
         return re.findall(r'\b\w+\b', text.lower())
+
+
+class AdvancedNLPProcessor(SimpleNLPProcessor):
+    """Advanced (still offline) NLP processor.
+
+    Why: Provide richer semantic signal for the persona engine so responses can
+    feel analytical, insightful, and *Einstein-level* without any external API.
+    Where: Consumed by `persona.py` when available (graceful degradation to
+    `SimpleNLPProcessor`). Integrated anywhere deeper text understanding is
+    useful (e.g., evolution engine, future knowledge ranking).
+    How: Layered capability detection (spaCy → TextBlob → VADER → rule-based).
+    Extracts: keywords, entities (NER if spaCy), sentiment (hybrid), readability,
+    question type, conceptual density, and generates a lightweight topic vector.
+
+    Connects to:
+        - persona.py: Supplies enriched analysis dict
+        - evolution_engine.py: (potential future) richer interaction features
+        - memory_engine.py: Can store enhanced semantic descriptors
+    """
+
+    def __init__(self):  # noqa: D401
+        super().__init__()
+        self._nlp = None
+        if _SPACY_AVAILABLE:
+            try:  # Load small English model if present; never downloads
+                self._nlp = spacy.load("en_core_web_sm")  # pragma: no cover (env)
+            except Exception:
+                self._nlp = None
+        self._vader = SentimentIntensityAnalyzer() if _VADER_AVAILABLE else None
+
+    # ---------- Public API ----------
+    def process_text(self, text: str) -> Dict[str, Any]:  # type: ignore[override]
+        """Enhance base processing with deeper semantic layers.
+
+        Returns extended dict while preserving base keys so existing code
+        remains compatible.
+        """
+        base = super().process_text(text)
+        doc = self._nlp(text) if self._nlp else None
+
+        enriched: Dict[str, Any] = {
+            **base,
+            "entities": self._extract_entities_advanced(text, doc),
+            "sentiment": self._hybrid_sentiment(text),
+            "readability": self._readability(text),
+            "question_type": self._question_type(text),
+            "concept_density": self._concept_density(base["keywords"], text),
+            "topic_vector": self._topic_vector(base["keywords"]),
+        }
+        return enriched
+
+    # ---------- Enriched Feature Methods ----------
+    def _extract_entities_advanced(self, text: str, doc) -> List[str]:
+        if doc is not None:
+            ents = {e.text for e in doc.ents if len(e.text) < 60}
+        else:
+            ents = set(super().extract_entities(text))
+        # Add math / physics heuristic entities (Einstein vibe)
+        lower = _safe_lower(text)
+        for token in ["relativity", "quantum", "tensor", "entropy", "vector", "matrix"]:
+            if token in lower:
+                ents.add(token)
+        return list(ents)
+
+    def _hybrid_sentiment(self, text: str) -> str:
+        """Hybrid sentiment cascade.
+
+        Why: Improve robustness and analyzer friendliness (avoid static type
+        complaints about attribute access) while keeping offline operation.
+        Where: Used by process_text for enriched sentiment classification.
+        How: Try VADER → guarded TextBlob access → fallback to base rule set.
+        """
+        # VADER first (fast + compound score)
+        try:
+            if self._vader:
+                score = self._vader.polarity_scores(text)["compound"]
+                if score >= 0.25:
+                    return "positive"
+                if score <= -0.25:
+                    return "negative"
+                return "neutral"
+        except Exception:
+            pass  # Silent fallback
+
+        # TextBlob second — add attribute guards to appease static analysis
+        if _TEXTBLOB_AVAILABLE:
+            try:
+                blob = TextBlob(text)
+                sentiment_obj = getattr(blob, 'sentiment', None)
+                polarity = getattr(sentiment_obj, 'polarity', None) if sentiment_obj is not None else None
+                if isinstance(polarity, (int, float)):
+                    if polarity > 0.2:
+                        return "positive"
+                    if polarity < -0.2:
+                        return "negative"
+                    return "neutral"
+            except Exception:
+                pass
+
+        # Fallback to rule-based sentiment
+        return super().analyze_sentiment(text)
+
+    def _readability(self, text: str) -> Dict[str, float]:
+        words = re.findall(r"\b\w+\b", text)
+        if not words:
+            return {"flesch_like": 0.0, "avg_word_len": 0.0}
+        syllables = sum(self._estimate_syllables(w) for w in words)
+        sentences = max(1, text.count(".") + text.count("?") + text.count("!"))
+        words_count = len(words)
+        # Simplified Flesch-like score (no external libs)
+        flesch_like = 206.835 - 1.015 * (words_count / sentences) - 84.6 * (syllables / words_count)
+        return {
+            "flesch_like": round(flesch_like, 2),
+            "avg_word_len": round(sum(len(w) for w in words) / words_count, 2),
+        }
+
+    def _question_type(self, text: str) -> str:
+        lower = _safe_lower(text).strip()
+        if not lower.endswith("?"):
+            return "none"
+        for w, label in [
+            ("why", "why"), ("how", "how"), ("what", "what"), ("when", "when"),
+            ("where", "where"), ("who", "who"), ("which", "which"), ("can", "can"),
+        ]:
+            if lower.startswith(w):
+                return label
+        return "generic"
+
+    def _concept_density(self, keywords: List[str], text: str) -> float:
+        words = re.findall(r"\b\w+\b", text)
+        if not words:
+            return 0.0
+        unique_kw = len(set(keywords))
+        return round(unique_kw / len(words), 3)
+
+    def _topic_vector(self, keywords: List[str]) -> List[int]:
+        # Deterministic lightweight vector (hash mod a small prime set)
+        primes = [3, 5, 7, 11, 13]
+        vec = [0] * len(primes)
+        for kw in keywords:
+            for i, p in enumerate(primes):
+                vec[i] = (vec[i] + (hash(kw) % p)) % 97
+        return vec
+
+    # ---------- Helpers ----------
+    def _estimate_syllables(self, word: str) -> int:
+        word = word.lower()
+        vowels = "aeiouy"
+        count = 0
+        prev_vowel = False
+        for ch in word:
+            if ch in vowels:
+                if not prev_vowel:
+                    count += 1
+                prev_vowel = True
+            else:
+                prev_vowel = False
+        if word.endswith("e") and count > 1:
+            count -= 1
+        return max(1, count)
+
+
+def get_nlp_processor() -> SimpleNLPProcessor:
+    """Factory returning the most capable available processor.
+
+    Why: Central place for persona or other modules to obtain NLP features
+    without duplicating capability detection.
+    Where: Imported by persona.py (and future modules) to obtain analysis.
+    How: Returns AdvancedNLPProcessor if optional libs load, else SimpleNLPProcessor.
+    """
+    try:
+        return AdvancedNLPProcessor()
+    except Exception:  # Safety net – never break core flow
+        return SimpleNLPProcessor()
     
     def get_word_frequency(self, text: str) -> Dict[str, int]:
         """
