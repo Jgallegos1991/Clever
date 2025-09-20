@@ -97,7 +97,17 @@ class MemoryNetwork:
         return [memory for score, memory in relevance_scores[:max_items]]
     
     def _extract_concepts(self, text: str) -> List[str]:
-        """Extract key concepts from text"""
+        """Extract key concepts from text
+
+        Why: Converts raw user input into structured concept tags (action, tech,
+        emotion) that downstream pattern analysis and memory relevance scoring
+        depend on for semantic weighting and recall precision.
+        Where: Feeds concept lists into `_build_concept_connections`, relevance
+        computation (`_calculate_relevance`), and pattern detectors.
+        How: Applies lightweight regex passes (verbs, tech terms, emotion terms)
+        over a lowercase copy of the text, prefixes each with a category, and
+        returns a de-duplicated list for stable downstream processing.
+        """
         # Enhanced concept extraction with NLP patterns
         import re
         
@@ -121,7 +131,14 @@ class MemoryNetwork:
         return list(set(concepts))
     
     def _build_concept_connections(self, concepts: List[str], context: Dict[str, Any]):
-        """Build weighted connections between concepts"""
+        """Build weighted connections between concepts
+
+        Why: Establishes co-occurrence strengths so indirectly related concepts
+        can boost relevance even when exact tokens don't overlap in future turns.
+        Where: Supports `_calculate_relevance` indirect scoring path.
+        How: Iterates pairwise over current concept set and increments symmetric
+        edge weights in `concept_graph` (defaultdict of defaultdict(float)).
+        """
         for i, concept1 in enumerate(concepts):
             for concept2 in concepts[i + 1:]:
                 # Increase connection weight
@@ -129,7 +146,14 @@ class MemoryNetwork:
                 self.concept_graph[concept2][concept1] += 1.0
     
     def _calculate_relevance(self, current_concepts: List[str], memory_concepts: List[str]) -> float:
-        """Calculate relevance score between concept sets"""
+        """Calculate relevance score between concept sets
+
+        Why: Ranks stored memories for contextual retrieval ensuring responses
+        leverage the most semantically aligned prior interactions.
+        Where: Used by `retrieve_relevant_context` to assemble memory window.
+        How: Blends direct overlap ratio (70%) with normalized indirect graph
+        connection strength (30%) to produce a composite float score.
+        """
         if not current_concepts or not memory_concepts:
             return 0.0
         
@@ -151,7 +175,15 @@ class MemoryNetwork:
         return direct_score * 0.7 + indirect_score * 0.3
     
     def _update_memory_weights(self, interaction_id: str, context: Dict[str, Any]):
-        """Update memory importance weights"""
+        """Update memory importance weights
+
+        Why: Prioritizes memories more likely to improve future personalization
+        (positive sentiment, length, technical content) so retrieval skews toward
+        influential interactions.
+        Where: Called post-store in `store_interaction` before relevance usage.
+        How: Multiplies a base weight by heuristic boosters (sentiment, word
+        count, presence of technical keywords) and caches in `memory_weights`.
+        """
         base_weight = 1.0
         
         # Boost weight for positive interactions
@@ -228,10 +260,23 @@ class IntelligenceAmplifier:
 
 
 class PatternDetector:
-    """Detects patterns in user behavior and preferences"""
+    """Detects patterns in user behavior and preferences
+
+    Why: Surface recurring themes, interaction cadence, style, and technical
+    focus to inform response tailoring and proactive suggestions.
+    Where: Consumed by `IntelligenceAmplifier.enhance_response`.
+    How: Aggregates outputs from helper analyzers (_find_frequent_topics,
+    _analyze_time_patterns, etc.) into a consolidated pattern dict.
+    """
     
     def analyze_patterns(self, current_input: str, memories: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze patterns in user interactions"""
+        """Analyze patterns in user interactions
+
+        Why: Produce unified pattern signal set (topics, timing, style,
+        technical focus) enabling adaptive response optimization.
+        Where: Called each enhancement cycle by `IntelligenceAmplifier`.
+        How: Delegates to individual private analyzers and assembles a dict.
+        """
         patterns = {
             'frequent_topics': self._find_frequent_topics(memories),
             'time_patterns': self._analyze_time_patterns(memories),
@@ -241,7 +286,13 @@ class PatternDetector:
         return patterns
     
     def _find_frequent_topics(self, memories: List[Dict[str, Any]]) -> List[str]:
-        """Find most frequently discussed topics"""
+        """Find most frequently discussed topics
+
+        Why: Identifies high-salience concepts to reference or expand upon in
+        future responses to reinforce continuity and personalization.
+        Where: Included in pattern dict consumed by response optimizer.
+        How: Counts concept tokens with tech/action prefixes and returns top 5.
+        """
         topic_counts = defaultdict(int)
         for memory in memories:
             for concept in memory.get('concepts', []):
@@ -251,7 +302,13 @@ class PatternDetector:
         return [topic for topic, count in sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:5]]
     
     def _analyze_time_patterns(self, memories: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze temporal patterns in interactions"""
+        """Analyze temporal patterns in interactions
+
+        Why: Captures temporal usage signals (active hour, session length) that
+        can guide scheduling of proactive suggestions or pacing adjustments.
+        Where: Part of holistic patterns returned to the amplifier.
+        How: Derives hour histogram from timestamps and simple session stats.
+        """
         if not memories:
             return {}
         
@@ -264,7 +321,13 @@ class PatternDetector:
         }
     
     def _analyze_interaction_style(self, memories: List[Dict[str, Any]]) -> str:
-        """Analyze user's preferred interaction style"""
+        """Analyze user's preferred interaction style
+
+        Why: Tunes verbosity and detail level for generated responses.
+        Where: Style flag drives branch logic in `ResponseOptimizer`.
+        How: Computes average user input length and buckets into concise /
+        balanced / detailed categories with simple thresholds.
+        """
         if not memories:
             return "balanced"
         
@@ -278,7 +341,13 @@ class PatternDetector:
             return "balanced"
     
     def _analyze_technical_focus(self, memories: List[Dict[str, Any]]) -> List[str]:
-        """Analyze technical areas of focus"""
+        """Analyze technical areas of focus
+
+        Why: Highlights dominant technical domains for enriched elaboration and
+        proactive follow-up prompts.
+        Where: Included in patterns influencing optimization and suggestions.
+        How: Counts tech:* concept occurrences and returns top three areas.
+        """
         tech_focus = defaultdict(int)
         for memory in memories:
             for concept in memory.get('concepts', []):
@@ -290,7 +359,14 @@ class PatternDetector:
 
 
 class ResponseOptimizer:
-    """Optimizes responses based on context and patterns"""
+    """Optimizes responses based on context and patterns
+
+    Why: Adjusts raw persona output to align with user style, context recency,
+    and pattern signals, increasing perceived intelligence and usefulness.
+    Where: Invoked within `IntelligenceAmplifier.enhance_response` flow.
+    How: Applies style compression/expansion, inserts contextual references,
+    and augments detail using heuristics grounded in extracted patterns.
+    """
     
     def optimize_response(
         self,
@@ -299,7 +375,14 @@ class ResponseOptimizer:
         context: Dict[str, Any],
         memories: List[Dict[str, Any]],
     ) -> str:
-        """Optimize response based on patterns and context"""
+        """Optimize response based on patterns and context
+
+        Why: Final transformation stage before returning answer to user; raises
+        relevance and personalization.
+        Where: Called from `IntelligenceAmplifier.enhance_response`.
+        How: Mutates base text via style adaptation, detail injection, and
+        memory-based contextual referencing.
+        """
         response = base_response
         
         # Adjust for interaction style
@@ -316,14 +399,24 @@ class ResponseOptimizer:
         return response
     
     def _make_concise(self, response: str) -> str:
-        """Make response more concise"""
+        """Make response more concise
+
+        Why: Prevents verbosity fatigue for users with concise style.
+        Where: Branch within `optimize_response` style adaptation.
+        How: Truncates to first two sentences when longer than threshold.
+        """
         sentences = response.split('. ')
         if len(sentences) > 2:
             return '. '.join(sentences[:2]) + '.'
         return response
     
     def _add_detail(self, response: str, context: Dict[str, Any]) -> str:
-        """Add relevant detail to response"""
+        """Add relevant detail to response
+
+        Why: Enrich sparse responses for users favoring detailed guidance.
+        Where: Triggered in `optimize_response` when style == 'detailed'.
+        How: Appends a brief clause referencing primary keyword if available.
+        """
         keywords = context.get('keywords', [])
         if keywords:
             detail = f" Focusing on {keywords[0]} specifically,"
@@ -331,7 +424,13 @@ class ResponseOptimizer:
         return response
     
     def _add_contextual_reference(self, response: str, recent_memory: Dict[str, Any]) -> str:
-        """Add subtle reference to recent context"""
+        """Add subtle reference to recent context
+
+        Why: Reinforces continuity, signaling memory of prior discussion.
+        Where: Last step inside `optimize_response` if memory present.
+        How: Extracts first concept, ensures not already mentioned, appends
+        lightweight parenthetical reference.
+        """
         if recent_memory and 'concepts' in recent_memory:
             concepts = recent_memory['concepts']
             if concepts:

@@ -1,6 +1,6 @@
 # Clever Reasoning Graph
 
-Total nodes: 544  |  Complete Why/Where/How: 312 (57.35%)
+Total nodes: 547  |  Complete Why/Where/How: 315 (57.59%)
 
 ## Nodes
 
@@ -237,6 +237,9 @@ Total nodes: 544  |  Complete Why/Where/How: 312 (57.35%)
 - **generate_reasoning_graph:scan_python_files** (function) – No Why
 - **generate_reasoning_graph:build_nodes** (function) – No Why
 - **generate_reasoning_graph:generate_markdown** (function) – No Why
+- **generate_reasoning_graph:build_remediation** (function) – Provide an actionable, sorted backlog so maintainers can rapidly raise reasoning coverage by fixing the highest value gaps first.
+- **generate_reasoning_graph:generate_badge** (function) – Provides at-a-glance visual indicator in README and PR diffs to incentivize continual improvement of reasoning docs.
+- **generate_reasoning_graph:run** (function) – Allows reuse from CLI and potential future programmatic imports.
 - **generate_reasoning_graph:main** (function) – No Why
 - **health_monitor:health_monitor** (module) – Provides comprehensive system health monitoring and alerting to ensure optimal performance, resource management, and early detection of issu…
 - **health_monitor:SystemHealthMonitor** (class) – Provide centralized, lightweight visibility into core runtime health (resources, database, evolution engine, NLP components) so issues are s…
@@ -1023,6 +1026,9 @@ Total nodes: 544  |  Complete Why/Where/How: 312 (57.35%)
 - generate_reasoning_graph:scan_python_files
 - generate_reasoning_graph:build_nodes
 - generate_reasoning_graph:generate_markdown
+- generate_reasoning_graph:build_remediation
+- generate_reasoning_graph:generate_badge
+- generate_reasoning_graph:run
 - generate_reasoning_graph:main
 - health_monitor:get_health_monitor
 - health_monitor:__init__

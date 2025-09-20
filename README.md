@@ -4,6 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white)]
 [![Framework](https://img.shields.io/badge/Framework-Flask-black?style=for-the-badge&logo=flask&logoColor=white)]
 [![UI](https://img.shields.io/badge/UI-Synaptic%20Hub%20%2B%20Particle%20UI-purple?style=for-the-badge)]
+[![Reasoning Coverage](./docs/reasoning_coverage_badge.svg)](./docs/reasoning_graph.md)
 
 **The Synaptic Hub** is your all-in-one Personal Operating System for intentional living, learning, and building. It’s a unified ecosystem—part lab, part tracker, part personal mirror—optimized for offline use and fluid creative flow.
 

@@ -26,10 +26,14 @@ import ast
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
+import argparse
+import sys
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_PATH = REPO_ROOT / 'docs' / 'reasoning_graph.md'
+REMEDIATION_PATH = REPO_ROOT / 'docs' / 'reasoning_remediation.md'
+BADGE_PATH = REPO_ROOT / 'docs' / 'reasoning_coverage_badge.svg'
 TOKEN_KEYS = ('Why:', 'Where:', 'How:')
 CONNECTS_HEADER = 'Connects to:'
 
@@ -138,7 +142,7 @@ def generate_markdown(nodes: List[Node]) -> str:
     coverage_pct = (with_tokens / total * 100.0) if total else 100.0
     # Build adjacency
     edges: List[Tuple[str, str]] = []
-    name_map = {f"{n.file.stem}:{n.name}" for n in nodes}
+    # name_map previously used for validation; retained logic simplified (unused)
     for n in nodes:
         for tgt in n.connects:
             # Remove trailing punctuation and split off inline description
@@ -178,11 +182,117 @@ def generate_markdown(nodes: List[Node]) -> str:
     return '\n'.join(out)
 
 
-def main() -> int:
+def build_remediation(nodes: List[Node]) -> str:
+    """Build remediation markdown listing nodes missing Why/Where/How.
+
+    Why: Provide an actionable, sorted backlog so maintainers can rapidly
+    raise reasoning coverage by fixing the highest value gaps first.
+    Where: Generated alongside the main reasoning graph artifact; consumed
+    by engineers & CI review to plan docstring improvements.
+    How: Filter nodes missing at least one token, group by file, sort by
+    descending count, and emit bullet lists with line references.
+    """
+    missing = [n for n in nodes if not (n.why and n.where and n.how)]
+    if not missing:
+        return ("# Reasoning Remediation Backlog\n\n"  # pragma: no cover - trivial
+                "All nodes have complete Why/Where/How coverage. \n")
+    # Group by file
+    grouped: Dict[Path, List[Node]] = {}
+    for n in missing:
+        grouped.setdefault(n.file, []).append(n)
+    # Sort groups by number of missing descending
+    ordered = sorted(grouped.items(), key=lambda kv: len(kv[1]), reverse=True)
+    lines: List[str] = []
+    lines.append('# Reasoning Remediation Backlog')
+    lines.append('')
+    lines.append('Priority ordered by outstanding nodes per file (high → low).')
+    lines.append('')
+    total_missing = len(missing)
+    lines.append(f'Total incomplete nodes: {total_missing}')
+    lines.append('')
+    for path, nodes_list in ordered:
+        rel = path.relative_to(REPO_ROOT)
+        lines.append(f'## {rel} ({len(nodes_list)} incomplete)')
+        lines.append('')
+        for n in sorted(nodes_list, key=lambda x: (x.lineno, x.kind, x.name)):
+            missing_parts = [p for p, v in (('Why', n.why), ('Where', n.where), ('How', n.how)) if not v]
+            parts_str = '/'.join(missing_parts)
+            lines.append(f'- {n.kind} `{n.name}` (line {n.lineno}) – missing {parts_str}')
+        lines.append('')
+    return '\n'.join(lines) + '\n'
+
+
+def generate_badge(coverage_pct: float) -> str:
+    """Return simple SVG badge string representing reasoning coverage.
+
+    Why: Provides at-a-glance visual indicator in README and PR diffs to
+    incentivize continual improvement of reasoning docs.
+    Where: Saved to docs/reasoning_coverage_badge.svg and referenced from
+    README.md near top section.
+    How: Minimal handcrafted SVG (no external deps) with dynamic width and
+    color gradient based on percentage thresholds.
+    """
+    pct_text = f"{coverage_pct:.1f}%"
+    # Color thresholds (red < 50, amber < 75, green otherwise)
+    if coverage_pct < 50:
+        color = '#d9534f'
+    elif coverage_pct < 75:
+        color = '#f0ad4e'
+    else:
+        color = '#5cb85c'
+    label = 'reasoning'
+    # Basic width estimation (approx 8px per char + padding)
+    label_w = 8 * len(label) + 20
+    pct_w = 8 * len(pct_text) + 20
+    total_w = label_w + pct_w
+    label_mid = label_w / 2
+    pct_mid = label_w + pct_w / 2
+    return f"""<svg xmlns='http://www.w3.org/2000/svg' width='{total_w}' height='20' role='img' aria-label='{label}: {pct_text}'>\n  <linearGradient id='g' x2='0' y2='100%'>\n    <stop offset='0' stop-color='#fff' stop-opacity='.7'/>\n    <stop offset='1' stop-opacity='.7'/>\n  </linearGradient>\n  <rect rx='3' width='{total_w}' height='20' fill='#555'/>\n  <rect rx='3' x='{label_w}' width='{pct_w}' height='20' fill='{color}'/>\n  <rect rx='3' width='{total_w}' height='20' fill='url(#g)'/>\n  <g fill='#fff' text-anchor='middle' font-family='DejaVu Sans,Verdana,Geneva,sans-serif' font-size='11'>\n    <text x='{label_mid}' y='14'>{label}</text>\n    <text x='{pct_mid}' y='14'>{pct_text}</text>\n  </g>\n</svg>\n"""
+
+
+def run(args: Optional[argparse.Namespace] = None) -> float:
+    """Core execution function returning coverage percentage.
+
+    Why: Allows reuse from CLI and potential future programmatic imports.
+    Where: Invoked by main() and could be called in CI steps.
+    How: Builds nodes, writes graph, optional remediation & badge, enforces
+    threshold if provided via arguments.
+    """
     nodes = build_nodes()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(generate_markdown(nodes), encoding='utf-8')
-    print(f"Generated reasoning graph markdown at {OUTPUT_PATH}")
+    markdown = generate_markdown(nodes)
+    OUTPUT_PATH.write_text(markdown, encoding='utf-8')
+    # Extract coverage from header line
+    first_lines = markdown.splitlines()
+    coverage_pct = 0.0
+    for line in first_lines:
+        if line.startswith('Total nodes:'):
+            # parse trailing (...) percentage
+            import re as _re
+            m = _re.search(r'\((\d+\.\d+)%\)', line)
+            if m:
+                coverage_pct = float(m.group(1))
+            break
+    if args and args.remediation:
+        REMEDIATION_PATH.write_text(build_remediation(nodes), encoding='utf-8')
+    if args and args.badge:
+        BADGE_PATH.write_text(generate_badge(coverage_pct), encoding='utf-8')
+    if args and args.fail_under is not None and coverage_pct < args.fail_under:
+        print(f"Coverage {coverage_pct:.2f}% below threshold {args.fail_under:.2f}%", file=sys.stderr)
+        return coverage_pct
+    print(f"Generated reasoning graph markdown at {OUTPUT_PATH} (coverage {coverage_pct:.2f}%)")
+    return coverage_pct
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description='Generate Clever reasoning graph and optional remediation list.')
+    parser.add_argument('--remediation', action='store_true', help='Also generate remediation backlog markdown.')
+    parser.add_argument('--badge', action='store_true', help='Generate SVG badge for reasoning coverage.')
+    parser.add_argument('--fail-under', type=float, default=None, help='If provided, exits non-zero when coverage below this percent.')
+    ns = parser.parse_args()
+    coverage = run(ns)
+    if ns.fail_under is not None and coverage < ns.fail_under:
+        return 1
     return 0
 
 
