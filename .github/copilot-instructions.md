@@ -27,6 +27,26 @@
    - **Where:** How it connects to other parts of the system  
    - **How:** Technical implementation details
 
+### Why / Where / How Rationale ("Arrows Between Dots")
+
+The enforced Why / Where / How pattern is not cosmetic documentation; it is an execution-time navigation system:
+
+- Think of every function or module as a DOT in a knowledge graph.
+- The Why / Where / How tokens form the ARROWS that tell us direction: why this dot exists, where it points, and how the transition happens.
+- When every new piece of code declares these arrows, debugging becomes path tracing instead of guesswork—resulting in a domino effect of faster fixes and safer refactors.
+- Runtime tooling (e.g. `introspection.py` + `/api/runtime_introspect` + debug overlay + `tools/runtime_dump.py`) parses these tokens to build a live map of system intent.
+- Missing tokens = missing edges; that triggers drift warnings and slows future work.
+
+Golden Rule: If you add code and cannot clearly express the Why / Where / How, the design is not ready—refine first, then implement.
+
+Operational Impact:
+1. Faster onboarding (the reasoning graph is self-explanatory).
+2. Low-friction incident triage (follow arrows to source of mismatch).
+3. Prevents architectural erosion (new code must declare its integration contract).
+4. Enables automated tooling to surface drift immediately (warnings in runtime introspection overlay).
+
+Treat the pattern as the metabolic wiring of Clever—keep the arrows unbroken so changes propagate with confidence.
+
 ## Architecture Overview
 - **Framework:** Python 3.12 + Flask (`app.py`)
 - **Database:** SQLite (`clever.db`) via `DatabaseManager` in `database.py`
