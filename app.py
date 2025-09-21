@@ -27,6 +27,7 @@ Connects to:
 """
 
 import time
+import re
 from flask import Flask, request, jsonify, render_template
 from database import db_manager
 from user_config import USER_NAME, USER_EMAIL
@@ -40,6 +41,61 @@ offline_guard.enable()
 app = Flask(__name__)
 # Install global error capture for introspection (still lets Flask debug raise)
 register_error_handler(app)
+
+
+def _sanitize_persona_text(raw: str) -> str:
+    """Strip meta reasoning tokens from persona output.
+
+    Why: User requires only natural, human-like conversational responses; internal
+         reasoning / diagnostics such as "Time-of-day: afternoon" or "Vector: 1.15"
+         must never surface. Initial line-prefix filtering missed cases where these
+         markers appeared inline within a sentence.
+    Where: Applied in chat() right after persona.generate() and before JSON response
+           formation so downstream UI code never sees unsanitized text.
+    How: Two-phase cleaning:
+         1. Remove any standalone lines beginning with known markers.
+         2. For residual inline occurrences, surgically excise fragments matching
+            token patterns (case-insensitive) while preserving surrounding prose.
+            Repeated whitespace is collapsed and trailing artifact punctuation trimmed.
+
+    Connects to:
+        - persona.py: Source of original text (unchanged for internal metrics)
+        - static/js/main.js: Expects already-cleaned text to render bubbles
+        - tests (future): Can assert absence of banned markers using same patterns
+    """
+    if not isinstance(raw, str):
+        return ''
+    text = raw
+    # Phase 1: drop whole lines that start with markers
+    line_prefix = re.compile(r"^(?:\s*)(Time-of-day:|focal lens:|Vector:|complexity index|essence\b).*$", re.IGNORECASE)
+    kept = [ln for ln in text.splitlines() if not line_prefix.match(ln.strip())]
+    text = "\n".join(kept)
+    # Phase 2: remove inline fragments e.g. 'Time-of-day: afternoon;' or 'Vector: 1.15'
+    inline_patterns = [
+        r"Time-of-day:\s*[^;.,\n]+[;,.]?",
+        r"focal lens:\s*[^;.,\n]+[;,.]?",
+        r"Vector:\s*[^;.,\n]+[;,.]?",
+        r"complexity index[^;.,\n]*[;,.]?",
+        r"essence:\s*[^;.,\n]+[;,.]?",
+    ]
+    for pat in inline_patterns:
+        text = re.sub(pat, '', text, flags=re.IGNORECASE)
+    # Phase 3: sentence-level purge if any residual marker fragments linger
+    banned_tokens = ("time-of-day", "focal lens", "vector:", "complexity index", "essence:")
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    kept_sentences = [s for s in sentences if not any(bt in s.lower() for bt in banned_tokens)]
+    if kept_sentences:
+        text = ' '.join(kept_sentences)
+    # Collapse repeated spaces / stray punctuation combos
+    text = re.sub(r"\s{2,}", ' ', text)
+    text = re.sub(r"\s*([,;:.])\s*\1+", r"\1", text)  # dedupe repeated punctuation
+    # Remove leftover empty parentheses or double spaces produced by removals
+    text = re.sub(r"\(\s*\)", '', text)
+    text = re.sub(r"\s{2,}", ' ', text).strip()
+    # Remove leading/trailing stray punctuation characters
+    text = re.sub(r"^[;:,.-]+", '', text).strip()
+    text = re.sub(r"[;:,.-]+$", '', text).strip()
+    return text
 
 
 # Simple debugger for now
@@ -128,6 +184,11 @@ def chat():
         # Generate response using persona engine if available
         if clever_persona:
             persona_response = clever_persona.generate(user_message, mode="Auto")
+            pre_raw = persona_response.text
+            persona_response.text = _sanitize_persona_text(persona_response.text)
+            # Debug trace (trim to 140 chars each) to verify sanitizer effect
+            debugger.info("sanitizer", f"pre={{ {pre_raw[:140].replace('\n',' ')} }}")
+            debugger.info("sanitizer", f"post={{ {persona_response.text[:140].replace('\n',' ')} }}")
             # Legacy compatible schema expected by tests: response + analysis dict
             response = {
                 'response': persona_response.text,

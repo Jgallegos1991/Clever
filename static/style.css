@@ -31,6 +31,32 @@ body {
   overflow: hidden;
 }
 
+/* Pixels-only minimal chat stream (hidden chrome) */
+#chat-log, .chat-stream { position: fixed; bottom: 6.5rem; left: 50%; transform: translateX(-50%); width: min(840px, 92vw); display: flex; flex-direction: column; gap: .5rem; pointer-events: none; z-index: 3; padding: 0 1rem; max-height: 60vh; overflow-y: auto; scrollbar-width: none; }
+.chat-stream::-webkit-scrollbar, #chat-log::-webkit-scrollbar { display: none; }
+.message { font-family: system-ui,-apple-system,Segoe UI,Roboto; display:flex; gap:.4rem; opacity:0; transform:translateY(6px) scale(.97); transition:opacity .5s ease, transform .6s cubic-bezier(.4,.16,.2,1); }
+.message.manifested { opacity:1; transform:translateY(0) scale(1); }
+.message.fade-out { opacity:0 !important; transform:translateY(-6px) scale(.985); transition:opacity .8s ease, transform .85s ease; }
+.bubble { background:rgba(10,18,24,0.55); backdrop-filter:blur(6px); padding:.6rem .9rem; border-radius:16px; font-size:.9rem; line-height:1.3; color:#d9e7ef; box-shadow:0 0 0 1px rgba(105,234,203,.18),0 0 18px -6px rgba(105,234,203,.5); max-width:68ch; }
+.message.user .bubble { background:rgba(18,40,48,0.55); }
+.chip { 
+  /* Why: Hide role/status chips to remove visible boxes and keep stage clean */
+  /* Where: Chips are still created by appendMessage for structure but are invisible */
+  /* How: Use display:none to remove from layout without impacting logic */
+  display: none !important;
+}
+
+/* Input is now visible within the floating pill; remove legacy off-screen rule */
+
+/* Floating input bar (minimal UI) */
+#floating-input.floating-input { position:fixed; left:50%; transform:translateX(-50%); bottom:24px; z-index:4; display:flex; align-items:center; justify-content:center; padding:10px 14px; background:rgba(11,15,20,0.65); backdrop-filter:blur(10px); border:1px solid rgba(105,234,203,0.20); border-radius:24px; box-shadow:0 6px 24px rgba(0,0,0,0.35); transition: box-shadow .3s ease, border-color .3s ease, background .3s ease; pointer-events: auto; }
+#floating-input.floating-input input { width:min(720px, 78vw); background:transparent; border:0; outline:none; color:#d9e7ef; font:500 15px Inter, system-ui, -apple-system, Segoe UI, Roboto; padding:6px 4px; letter-spacing:.1px; }
+#floating-input.floating-input.active, #floating-input.floating-input:focus-within { background:rgba(11,15,20,0.78); border-color:rgba(105,234,203,0.35); box-shadow:0 10px 34px rgba(0,0,0,0.45); }
+#send-btn, #mode-btn { display:none !important; }
+
+/* Hide analysis placeholders to keep only human-like responses visible */
+#intent, #sentiment, #entities, #keywords, .analysis-panel { display: none !important; visibility: hidden !important; }
+
 /* Particle Canvas - legacy Clever UI */
 #particles {
   position: fixed;
@@ -590,26 +616,9 @@ body {
 }
 
 /* Subtle analysis panel */
-.analysis-panel {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: rgba(11, 15, 20, 0.6);
-  border: 1px solid rgba(105, 234, 203, 0.1);
-  backdrop-filter: blur(15px);
-  z-index: 2;
-  max-width: 280px;
-  font-size: 12px;
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
-}
+.analysis-panel { display: none !important; }
 
-.analysis-panel:hover {
-  opacity: 1;
-}
-.analysis-panel h3 { margin: 0 0 8px 0; font-size: 14px; color: var(--muted); }
+
 
 /* Chat container layout */
 .hud .chat { 

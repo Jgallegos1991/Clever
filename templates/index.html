@@ -23,136 +23,38 @@ How:
     <!-- Single consolidated stylesheet after UI minimization -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ cache_buster }}">
 
-    <!-- Custom minimal styles -->
+    <!-- Custom minimal styles (pixels-only view) -->
     <style>
-        /* Clean, centered layout with particle support */
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
+        /* Fullscreen canvas stage; center everything via particles only */
+        body { margin:0; padding:0; min-height:100vh; background:#000; overflow:hidden; }
 
-        /* Hide demo/status elements but keep particles */
-        .status, #legacy-debug-status, #magical-status, #selfcheck,
-        .hud, .chat-panel, #chat-log, .conversation-stream,
-        .analysis-panel, .panel, .grid-overlay,
-        .microcopy, .fallback-panel {
-            display: none !important;
-        }
+        /* Keep required elements in DOM for tests, but make them invisible */
+        .grid-overlay { position:fixed; inset:0; pointer-events:none; z-index:2; opacity:0; }
+        .panel { display:none; }
 
-        /* Style the main title */
-        h1 {
-            font-size: 3rem;
-            font-weight: 300;
-            color: #69EACB;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 20px rgba(105, 234, 203, 0.5);
-            z-index: 10;
-            position: relative;
-        }
+    /* Floating input bar: minimal, centered, glows on focus */
+    .floating-input { position:fixed; left:50%; transform:translateX(-50%); bottom:24px; z-index:4; display:flex; align-items:center; justify-content:center; padding:10px 14px; background:rgba(11,15,20,0.65); backdrop-filter:blur(10px); border:1px solid rgba(105,234,203,0.20); border-radius:24px; box-shadow:0 6px 24px rgba(0,0,0,0.35); transition: box-shadow .3s ease, border-color .3s ease, background .3s ease; }
+    .floating-input input { width:min(720px, 78vw); background:transparent; border:0; outline:none; color:#d9e7ef; font:500 15px Inter, system-ui, -apple-system, Segoe UI, Roboto; padding:6px 4px; letter-spacing:.1px; }
+    .floating-input::before { content:""; position:absolute; inset:-1px; border-radius:24px; pointer-events:none; box-shadow:0 0 0 1px rgba(105,234,203,0.22), 0 0 18px -6px rgba(105,234,203,0.45); opacity:.6; transition:opacity .25s ease; }
+    .floating-input.active, .floating-input:focus-within { background:rgba(11,15,20,0.78); border-color:rgba(105,234,203,0.35); box-shadow:0 10px 34px rgba(0,0,0,0.45); }
+    .floating-input.active::before, .floating-input:focus-within::before { opacity:1; }
+    /* Hide any legacy buttons if present (robustness across templates) */
+    #send-btn, #mode-btn { display:none !important; }
 
-        /* Minimal input styling */
-        .entrybar {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(11, 15, 20, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(105, 234, 203, 0.3);
-            border-radius: 25px;
-            padding: 0.5rem 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-
-        .entrybar input {
-            background: transparent;
-            border: none;
-            color: #e9f1fb;
-            font-size: 1rem;
-            outline: none;
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .entrybar input::placeholder {
-            color: #95a3b3;
-        }
-
-        .entrybar .icon-btn {
-            background: transparent;
-            border: none;
-            color: #69EACB;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .entrybar .icon-btn:hover {
-            background: rgba(105, 234, 203, 0.1);
-            box-shadow: 0 0 15px rgba(105, 234, 203, 0.3);
-        }
-
-        /* Allow particles to show properly */
-        #particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.8;
-        }
+        /* Particles stage dominates visuals */
+        #particles { position:fixed; inset:0; pointer-events:none; z-index:1; opacity:1; }
     </style>
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .entrybar input::placeholder {
-            color: #95a3b3;
-        }
-
-        .entrybar .icon-btn {
-            background: transparent;
-            border: none;
-            color: #69EACB;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .entrybar .icon-btn:hover {
-            background: rgba(105, 234, 203, 0.1);
-            box-shadow: 0 0 15px rgba(105, 234, 203, 0.3);
-        }
-
-        /* Keep particles but subtle */
-        #particles {
-            opacity: 0.3;
-        }
-    </style>
+    
 
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self';">
 </head>
 <body>
-    <!-- Main centered title -->
-    <h1>Clever</h1>
-
     <!-- Hidden particle canvas for subtle background effect -->
     <canvas id="particles" aria-hidden="true"></canvas>
+
+    <!-- Removed debug-info element (quiet mode) -->
+
 
     <!-- Live region for screen reader announcements of new AI messages -->
     <div id="sr-live" aria-live="polite" aria-atomic="false" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
@@ -161,16 +63,20 @@ How:
         <!-- How: Text content replaced with latest AI bubble snippet -->
     </div>
 
-    <!-- Chat stream container (was hidden) -->
+    <!-- Chat stream container (ephemeral bubbles fade in/out) -->
     <div id="chat-log" aria-live="polite" class="chat-stream"></div>
 
-    <!-- Minimal input bar at bottom -->
-    <div class="entrybar">
-        <input id="chat-input" type="text" placeholder="Ask me anything..." autocomplete="off" autofocus />
-        <button class="icon-btn" id="send-btn" title="Send" aria-label="Send">➤</button>
+    <!-- Minimal floating input bar (no persistent chat card) -->
+    <!--
+        Why: Provide a visible, unobtrusive place to type so users can see their text.
+        Where: Replaces prior offscreen input; connects to static/js/main.js handlers.
+        How: Bottom-centered glass pill that glows on focus; Enter submits to /chat.
+    -->
+    <div id="floating-input" class="floating-input" role="group" aria-label="Chat input">
+        <input id="chat-input" type="text" autocomplete="off" placeholder="Talk to Clever…" />
     </div>
 
-    <!-- Grid overlay (required by acceptance tests) -->
+    <!-- Grid overlay (kept for tests; fully transparent) -->
     <div class="grid-overlay" aria-hidden="true"></div>
 
     <!-- Core panel structure & placeholders (hidden/minimal but present for tests) -->
@@ -181,44 +87,13 @@ How:
     <div id="entities" style="display:none"></div>
     <div id="keywords" style="display:none"></div>
 
-    <!-- Microcopy placeholders for experiential feel -->
-    <div class="microcopy" style="display:none">
-        <span>Ambient creativity</span>
-        <span>Your thought enters the flow</span>
-    </div>
+    <!-- Microcopy removed to keep stage fully empty unless user interacts -->
 
     <!-- Scripts (keeping minimal functionality) -->
     <script src="{{ url_for('static', filename='js/particles.js') }}?v={{ cache_buster }}"></script>
     <script src="{{ url_for('static', filename='js/holographic-chamber.js') }}?v={{ cache_buster }}"></script>
-    <script src="{{ url_for('static', filename='js/core/app.js') }}?v={{ cache_buster }}"></script>
-        <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
-        <script>
-            // Lightweight CSS injection for message bubbles & fade lifecycle
-            (function(){
-                const style = document.createElement('style');
-                style.textContent = `
-                    .chat-stream { position:fixed; bottom:6.5rem; left:50%; transform:translateX(-50%); width: min(840px, 92vw); display:flex; flex-direction:column; gap:.5rem; padding:0 1rem; max-height:60vh; overflow-y:auto; scrollbar-width:none; }
-                    .chat-stream::-webkit-scrollbar { display:none; }
-                    .message { font-family: system-ui,-apple-system,Segoe UI,Roboto; display:flex; align-items:flex-start; gap:.5rem; opacity:0; transform:translateY(6px) scale(.98); transition:opacity .4s ease, transform .45s cubic-bezier(.4,.16,.2,1); }
-                    .message.manifested { opacity:1; transform:translateY(0) scale(1); }
-                    .message.user .bubble { background:linear-gradient(135deg,#24404d,#16323d); align-self:flex-end; }
-                    .message.ai .bubble { background:linear-gradient(135deg,#12302a,#0e1f2a); box-shadow:0 0 0 1px rgba(105,234,203,.15),0 0 22px -6px #69EACB; }
-                    .bubble { padding:.75rem 1rem; border-radius:18px; line-height:1.35; font-size:.95rem; max-width:70ch; color:#d9e7ef; position:relative; }
-                    .chip { font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; background:rgba(105,234,203,.08); padding:.35rem .5rem; border-radius:1rem; color:#69EACB; margin-top:.15rem; box-shadow:0 0 0 1px rgba(105,234,203,.25); }
-                    .message.manifested.fade-out { opacity:0; transform:translateY(-4px) scale(.985); transition:opacity .8s ease, transform .9s ease; }
-                `;
-                document.head.appendChild(style);
-            })();
-            // Auto-fade old messages after a few seconds
-            const AUTO_HIDE_MS = 9000;
-            const observer = new MutationObserver(muts => {
-                muts.forEach(m => m.addedNodes.forEach(n => {
-                    if(!(n instanceof HTMLElement) || !n.classList.contains('message')) return;
-                    setTimeout(()=>{ n.classList.add('fade-out'); setTimeout(()=> n.remove(), 1400); }, AUTO_HIDE_MS);
-                }));
-            });
-            const log = document.getElementById('chat-log');
-            if (log) observer.observe(log, { childList:true });
-        </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
+    <!-- Externalized fade logic to satisfy CSP (no inline scripts) -->
+    <script src="{{ url_for('static', filename='js/chat-fade.js') }}?v={{ cache_buster }}"></script>
 </body>
 </html>

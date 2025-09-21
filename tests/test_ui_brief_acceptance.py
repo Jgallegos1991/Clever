@@ -31,10 +31,18 @@ def test_index_has_core_elements():
 
 
 def test_assets_wired_locally():
-    html = INDEX.read_text(encoding='utf-8')
-    assert "url_for('static', filename='style.css')" in html
-    assert "url_for('static', filename='js/holographic-chamber.js')" in html
-    assert "url_for('static', filename='js/core/app.js')" in html
+     """
+     Confirm core local asset references are present (minimal set).
+
+     Why: The UI was simplified—legacy core/app.js and microcopy removed—so the
+           acceptance test must reflect the authoritative minimal template.
+     Where: Ensures offline local references remain intact for style + particles.
+     How: Asserts Flask url_for usage for required assets only.
+     """
+     html = INDEX.read_text(encoding='utf-8')
+     assert "url_for('static', filename='style.css')" in html
+     assert "url_for('static', filename='js/holographic-chamber.js')" in html
+     # core/app.js intentionally excluded after UI minimization
 
 
 def test_microcopy_placeholders():
@@ -54,17 +62,15 @@ def test_microcopy_placeholders():
     assert "url_for('static', filename='js/main.js')" in html
 
 
-def test_microcopy_placeholders():
+def test_microcopy_removed():
     """
-    Confirm presence of appropriate UI microcopy matching design brief.
-    
-    Why: Validates user experience elements align with Clever AI's
-         ambient creativity and thought flow design philosophy.
-    Where: Microcopy validation ensuring UI text reflects the intended
-           magical, fluid interface aesthetic.
-    How: Searches HTML content for specific placeholder text that
-         matches the creative, ambient UI tone requirements.
+    Verify legacy ambient microcopy was removed per minimal UI spec.
+
+    Why: User requested a stage free of persistent meta/ambient text—only
+         conversational chat bubbles should appear.
+    Where: Guards against reintroduction of hidden spans in index.html.
+    How: Assert those phrases are absent from the canonical template.
     """
     html = INDEX.read_text(encoding='utf-8')
-    # Presence of placeholder copy that matches the brief tone
-    assert 'Ambient creativity' in html or 'Your thought enters the flow' in html
+    assert 'Ambient creativity' not in html
+    assert 'Your thought enters the flow' not in html

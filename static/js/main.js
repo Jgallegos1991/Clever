@@ -1,11 +1,61 @@
-// Track last AI bubble globally for positioning the analysis card
-let lastAiEl = null;
+// Track last AI bubble globally for positioning the analysis card (scoped)
+let lastAiElMain = null;
+// Ephemeral preview bubble and idle timer must be module-scoped (used in sendMessage/scheduleAutoHideBar)
+let typingGhostEl = null;
+let hideBarTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Defensive microcopy scrub -------------------------------------------------
+  (function scrubAmbientMicrocopy(){
+    /**
+     * Why: Despite removing microcopy from the canonical template, the served HTML
+     *       (likely from a stale cached template variant) still contains hidden
+     *       spans ("Ambient creativity", "Your thought enters the flow"). These
+     *       leak unintended text onto the stage. We proactively remove them at
+     *       runtime to guarantee a clean, minimal surface.
+     * Where: Runs immediately on DOMContentLoaded inside main.js—the active
+     *       frontend controller—so it neutralizes any legacy template artifacts
+     *       before user interaction.
+     * How: Query for any elements whose textContent matches the disallowed phrases
+     *       (case‑insensitive), remove them, then set up a MutationObserver to
+     *       continue stripping if dynamically reinserted by legacy scripts.
+     *
+     * Connects to:
+     *  - templates/index.html (canonical) which no longer defines these spans.
+     *  - static/js/core/app.js (legacy) which is suppressed but could still load.
+     *  - tests/test_ui_brief_acceptance.py (updated to drop microcopy assertion).
+     */
+    const BLOCKED = [/ambient creativity/i, /your thought enters the flow/i];
+    function purge(root=document){
+      const walker = document.createTreeWalker(root.body || root, NodeFilter.SHOW_ELEMENT, null);
+      const toRemove = [];
+      while(walker.nextNode()){
+        const el = walker.currentNode;
+        if(!(el instanceof HTMLElement)) continue;
+        const txt = el.textContent?.trim() || '';
+        if(!txt) continue;
+        if(BLOCKED.some(r=> r.test(txt))) toRemove.push(el);
+      }
+      toRemove.forEach(el=> el.remove());
+    }
+    purge();
+    // Observe future insertions
+    const mo = new MutationObserver(muts => {
+      muts.forEach(m => m.addedNodes.forEach(n => {
+        if(!(n instanceof HTMLElement)) return;
+        if(BLOCKED.some(r=> r.test(n.textContent||''))) n.remove();
+        // Also scan small subtrees quickly
+        n.querySelectorAll && n.querySelectorAll('*').forEach(child => {
+          if(BLOCKED.some(r=> r.test(child.textContent||''))) child.remove();
+        });
+      }));
+    });
+    try { mo.observe(document.documentElement, { childList:true, subtree:true }); } catch(_){}
+  })();
   // --- Runtime module registration (introspection) -------------------------
   try {
-    window.CLEVER_RUNTIME = window.CLEVER_RUNTIME || { modules: [] };
-    window.CLEVER_RUNTIME.modules.push({
+    window['CLEVER_RUNTIME'] = window['CLEVER_RUNTIME'] || { modules: [] };
+    window['CLEVER_RUNTIME'].modules.push({
       name: 'main.js',
       initTs: Date.now(),
     });
@@ -19,43 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchIntrospectionAndRender();
   }
   const userInput = document.getElementById('chat-input');
-  const sendButton = document.getElementById('send-btn');
+  const floatingInput = document.getElementById('floating-input');
   const chatLog = document.getElementById('chat-log');
+  const sendButton = document.getElementById('send-btn');
   const analysisPanel = document.querySelector('.analysis-panel');
   const modeBtn = document.getElementById('mode-btn');
 
-  // Initialize holographic chamber with debugging
-  const debugDiv = document.getElementById('debug-info');
+  // Initialize holographic chamber (quiet mode)
   const canvasElem = document.getElementById('particles');
-  
-  debugDiv.innerHTML = 'Canvas found: ' + (canvasElem ? 'YES' : 'NO');
-  console.log('🔧 Main.js initializing holographic chamber...');
-  console.log('🎯 Canvas element found:', canvasElem);
-  console.log('🎨 Canvas dimensions:', canvasElem?.offsetWidth, 'x', canvasElem?.offsetHeight);
-  
-  debugDiv.innerHTML += '<br/>startFunction: ' + typeof window['startHolographicChamber'];
-  
+  // Why: Remove runtime debug text injection to keep stage visually clean
+  // Where: Replaces prior debugDiv population of #debug-info element
+  // How: Silently start holographic chamber if available; no DOM or console spam unless debug flag present
   if (canvasElem instanceof HTMLCanvasElement && typeof window['startHolographicChamber'] === 'function') {
-    console.log('🚀 Starting holographic chamber from main.js...');
-    debugDiv.innerHTML += '<br/>Initializing particles...';
-    try {
-      window['holographicChamber'] = window['startHolographicChamber'](canvasElem);
-      console.log('✅ Holographic chamber initialized:', window['holographicChamber']);
-      debugDiv.innerHTML += '<br/>✅ Particles initialized!';
-    } catch (error) {
-      console.error('❌ Particle initialization failed:', error);
-      debugDiv.innerHTML += '<br/>❌ Init failed: ' + error.message;
-    }
-  } else {
-    console.error('❌ Cannot initialize holographic chamber:', {
-      canvas: canvasElem,
-      startFunction: typeof window['startHolographicChamber']
-    });
-    debugDiv.innerHTML += '<br/>❌ Missing function or canvas';
-  // Initialize particle canvas if present
-  const canvasElem = document.getElementById('particles');
-  if (canvasElem instanceof HTMLCanvasElement && typeof window.startParticles === 'function') {
-    window.startParticles(canvasElem, { count: 4000 });
+    try { window['holographicChamber'] = window['startHolographicChamber'](canvasElem); } catch (_) { /* silent */ }
+  } else if (canvasElem instanceof HTMLCanvasElement && typeof window.startParticles === 'function') {
+    try { window.startParticles(canvasElem, { count: 800 }); } catch (_) { /* silent */ }
   }
 
   // Send on click or Enter
@@ -63,8 +91,35 @@ document.addEventListener('DOMContentLoaded', () => {
   userInput?.addEventListener('keypress', e => {
     if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
   });
+  // Visual glow on focus/blur
+  if (userInput instanceof HTMLInputElement && floatingInput) {
+    userInput.addEventListener('focus', () => floatingInput.classList.add('active'));
+    userInput.addEventListener('blur', () => floatingInput.classList.remove('active'));
+    // Show what you're typing as a subtle ghost bubble
+    userInput.addEventListener('input', () => {
+      const val = userInput.value;
+      if (!val) {
+        if (typingGhostEl) { typingGhostEl.remove(); typingGhostEl = null; }
+        return;
+      }
+      if (!typingGhostEl) {
+        typingGhostEl = document.createElement('div');
+        typingGhostEl.className = 'message user manifested';
+        // Why: Remove label chips to keep stage minimal (no boxes), show only raw text while typing
+        // Where: This connects to the chat stream (#chat-log) as a transient preview node
+        // How: Create a minimal bubble element with the current input value; no role chips are appended
+        const bubble = document.createElement('div'); bubble.className = 'bubble';
+        typingGhostEl.append(bubble);
+        chatLog?.append(typingGhostEl);
+        chatLog && (chatLog.scrollTop = chatLog.scrollHeight);
+      }
+      const bubbleEl = typingGhostEl.querySelector('.bubble');
+      if (bubbleEl) bubbleEl.textContent = val;
+    });
+  }
 
-  showStatus('Ambient creativity waiting…');
+  // Removed idle microcopy display (stage must remain visually clean)
+  // showStatus('Ambient creativity waiting…');
 
   // Animate panels in as if condensing from the swarm
   const panels = document.querySelectorAll('.panel');
@@ -94,6 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Focus the input field when clicking anywhere else
     if (userInput instanceof HTMLInputElement) {
       userInput.focus();
+      floatingInput?.classList.add('active');
+  scheduleAutoHideBar();
       // Trigger the same grid ripple effect as manual focus
       const grid = document.querySelector('.grid-overlay');
       if (grid) {
@@ -119,6 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Focus input and let the character through
     if (userInput instanceof HTMLInputElement) {
       userInput.focus();
+      floatingInput?.classList.add('active');
+      scheduleAutoHideBar();
     }
   });
 
@@ -131,10 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Maintain snap on resize and when user scrolls chat
   window.addEventListener('resize', () => {
-    if (lastAiEl) snapAnalysisTo(lastAiEl);
+    if (lastAiElMain) snapAnalysisTo(lastAiElMain);
   });
   chatLog?.addEventListener('scroll', () => {
-    if (lastAiEl) snapAnalysisTo(lastAiEl);
+    if (lastAiElMain) snapAnalysisTo(lastAiElMain);
   });
 });
 
@@ -170,7 +229,7 @@ async function fetchIntrospectionAndRender() {
       version: data.version,
       warnings: data.warnings || [],
       evolution: data.evolution || null,
-      modules: (window.CLEVER_RUNTIME && window.CLEVER_RUNTIME.modules) || []
+      modules: (window['CLEVER_RUNTIME'] && window['CLEVER_RUNTIME'].modules) || []
     };
     pre.textContent = JSON.stringify(slim, null, 2);
   } catch (e) {
@@ -183,6 +242,8 @@ async function sendMessage() {
   if (!(inputElem instanceof HTMLInputElement)) return;
   const text = inputElem.value.trim();
   if (!text) return;
+  // Clear typing ghost immediately on send
+  if (typingGhostEl) { typingGhostEl.remove(); typingGhostEl = null; }
   appendMessage('user', text);
   // Update status indicator (thinking) and mode chip based on initial guess
   setSelfcheckState('thinking', 'Thinking…');
@@ -204,6 +265,7 @@ async function sendMessage() {
     setTimeout(() => grid.classList.remove('ripple'), 600);
   }
   inputElem.value = '';
+  scheduleAutoHideBar();
   showStatus('Ideas crystallizing...');
   try {
     const res = await fetch('/chat', {
@@ -234,7 +296,7 @@ async function sendMessage() {
       }
       // Snap analysis panel under the latest AI message and animate highlight
       if (aiEl) {
-        lastAiEl = aiEl;
+        lastAiElMain = aiEl;
         snapAnalysisTo(aiEl);
         const panel = document.querySelector('.analysis-panel');
         if (panel) {
@@ -272,9 +334,9 @@ async function sendMessage() {
   showStatus('Energy takes shape.');
     // After a delay, return to idle microcopy
     setTimeout(() => {
-      showStatus('Ambient creativity waiting...');
-  const dissolve = window['dissolveToSwarm'];
-  if (typeof dissolve === 'function') dissolve();
+      // Removed ambient microcopy reinsertion
+      const dissolve = window['dissolveToSwarm'];
+      if (typeof dissolve === 'function') dissolve();
     }, 2000);
   } catch (err) {
     appendMessage('ai', 'Error.');
@@ -284,18 +346,40 @@ async function sendMessage() {
   }
 }
 
+function scheduleAutoHideBar() {
+  const bar = document.getElementById('floating-input');
+  if (!bar) return;
+  if (hideBarTimer) clearTimeout(hideBarTimer);
+  hideBarTimer = setTimeout(() => {
+    bar.classList.remove('active');
+  }, 3500);
+}
+
 function appendMessage(who, text) {
+  if (who === 'ai') {
+    // Final client-side scrub: remove any residual meta markers if server missed
+    // Why: Belt-and-suspenders protection so UI never shows internal reasoning.
+    // Where: Right before DOM insertion of AI bubble.
+    // How: Regex removes fragments like 'Time-of-day: ...', 'focal lens: ...', 'Vector: ...', 'complexity index', 'essence:' plus stray double spaces.
+    try {
+      const patterns = [
+        /Time-of-day:\s*[^;.,\n]+[;,.]?/gi,
+        /focal lens:\s*[^;.,\n]+[;,.]?/gi,
+        /Vector:\s*[^;.,\n]+[;,.]?/gi,
+        /complexity index[^;.,\n]*[;,.]?/gi,
+        /essence:\s*[^;.,\n]+[;,.]?/gi
+      ];
+      patterns.forEach(p => { text = text.replace(p, ''); });
+      text = text.replace(/\s{2,}/g,' ').trim();
+    } catch(_) { /* silent */ }
+  }
   const log = document.getElementById('chat-log');
   const wrap = document.createElement('div');
   wrap.classList.add('message', who, 'manifesting');
-  // Optional role chip like screenshot (User / Clever)
-  const chip = document.createElement('div');
-  chip.className = 'chip';
-  chip.textContent = who === 'user' ? 'User' : 'Clever';
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
   bubble.textContent = text;
-  wrap.append(chip, bubble);
+  wrap.append(bubble);
   log.append(wrap);
   // animate in
   requestAnimationFrame(() => wrap.classList.add('manifested'));
@@ -323,29 +407,13 @@ function mapApproachToIntent(approach, fallbackIntent){
 }
 
 function updateAnalysis(analysis) {
-  const intentEl = document.getElementById('intent');
-  const sentimentEl = document.getElementById('sentiment');
-  const entitiesEl = document.getElementById('entities');
-  const keywordsEl = document.getElementById('keywords');
-  if (!intentEl || !sentimentEl || !entitiesEl || !keywordsEl) return;
-
-  intentEl.textContent = 'Intent: ' + (analysis.intent || '—');
-  const s = analysis.sentiment;
-  // Compute sentiment text
-  let sentimentText = '—';
-  if (s && typeof s.compound === 'number') {
-    sentimentText = s.compound.toFixed(2);
-  } else if (typeof s === 'number') {
-    sentimentText = s.toString();
-  }
-  sentimentEl.textContent = 'Sentiment: ' + sentimentText;
-  entitiesEl.textContent = 'Entities: ' + ((analysis.entities||[]).join(', ') || '—');
-  keywordsEl.textContent = 'Keywords: ' + ((analysis.keywords||[]).join(', ') || '—');
+  // Intentionally no-op: prevent any analysis/meta text from rendering on stage
+  return;
 }
 
 function showStatus(msg) {
-  const status = document.getElementById('selfcheck');
-  if (status) status.textContent = msg;
+  // Status chip intentionally removed to keep stage minimal; enforce no-op.
+  return; // Guard against any legacy calls trying to surface microcopy
 }
 
 // Position the analysis panel under the target element (AI message)

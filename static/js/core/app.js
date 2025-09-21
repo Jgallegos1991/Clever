@@ -1,6 +1,28 @@
 // Track last AI bubble globally for positioning the analysis card
 let lastAiEl = null;
 
+/**
+ * Why: Legacy UI script was still emitting ambient microcopy (e.g. "Ambient creativity waiting…",
+ *       "Energy takes shape.") that the user explicitly requested to suppress so only natural
+ *       conversational bubbles appear. Caching or residual template references could still load
+ *       this file even though newer minimal template no longer includes it directly, resulting
+ *       in stray status text leaking into the top‑left.
+ * Where: This sits at the very top of the legacy core/app.js so it executes before any DOMContentLoaded
+ *       handlers in this file call showStatus(). It cooperates with the minimal UI now driven by
+ *       static/js/main.js (primary) while neutralizing legacy status pathways.
+ * How: Introduce a global flag (__CLEVER_SUPPRESS_STATUS) and redefine showStatus into a guarded
+ *       no‑op later. Also remove / comment the initial ambient showStatus invocation inside the
+ *       DOMContentLoaded block. Any residual calls become inert without needing to refactor deeper
+ *       logic (defensive deactivation pattern). This preserves function signatures to avoid errors
+ *       if other legacy code still references showStatus.
+ *
+ * Connects to:
+ *  - templates/index.html: New minimal template no longer surfaces status chips.
+ *  - static/js/main.js: Provides the active chat bubble logic; no longer depends on legacy status.
+ *  - app.py: Backend sanitization already strips meta / reasoning lines; this prevents frontend re‑adds.
+ */
+window.__CLEVER_SUPPRESS_STATUS = true; // hard suppression toggle (can be flipped in console for debugging)
+
 document.addEventListener('DOMContentLoaded', () => {
   const userInput = document.getElementById('chat-input');
   const sendButton = document.getElementById('send-btn');
@@ -31,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
   });
 
-  showStatus('Ambient creativity waiting…');
+  // (Suppressed) Legacy ambient status removed per minimal UI spec.
+  // showStatus('Ambient creativity waiting…');
 
   // Animate panels in as if condensing from the swarm
   const panels = document.querySelectorAll('.panel');
@@ -259,6 +282,10 @@ function updateAnalysis(analysis) {
 }
 
 function showStatus(msg) {
+  // Why: Guard against any legacy status text surfacing in the minimal interface.
+  // Where: Called throughout this legacy script; now short‑circuits when suppression flag enabled.
+  // How: Simple runtime flag check; preserves silent compatibility with existing calls.
+  if (window.__CLEVER_SUPPRESS_STATUS) return; // inert when suppression active
   const status = document.getElementById('selfcheck');
   if (status) status.textContent = msg;
 }
