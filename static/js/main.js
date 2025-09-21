@@ -207,6 +207,127 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 🎆 PARTICLE SYSTEM KEYBOARD CONTROLS 🎆
+  // Advanced holographic particle control system for Jay's digital brain extension
+  document.addEventListener('keydown', (e) => {
+    // Only trigger if not typing in input fields and using special key combos
+    const target = e.target;
+    if (target instanceof Element && 
+        target.matches('input, textarea, [contenteditable]')) {
+      return;
+    }
+
+    // Particle effects with Ctrl + key combinations
+    if (e.ctrlKey && !e.altKey && !e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'e': // Explode particles
+          e.preventDefault();
+          window.explodeParticles?.(1.5);
+          showToast('💥 Particle Explosion!', 'info', 2000);
+          break;
+        case 'i': // Implode particles  
+          e.preventDefault();
+          window.implodeParticles?.(1.2);
+          showToast('🌀 Particle Implosion!', 'info', 2000);
+          break;
+        case 'v': // Create vortex
+          e.preventDefault();
+          window.createVortex?.();
+          showToast('🌪️ Vortex Created!', 'info', 2000);
+          break;
+        case 'w': // Energy wave
+          e.preventDefault();
+          window.createEnergyWave?.();
+          showToast('〰️ Energy Wave!', 'info', 2000);
+          break;
+        case 'l': // Lightning between particles
+          e.preventDefault();
+          window.createLightning?.();
+          showToast('⚡ Lightning Strike!', 'info', 2000);
+          break;
+        case 'd': // Dance party mode
+          e.preventDefault();
+          window.startDanceParty?.(8000);
+          showToast('🕺 Dance Party Mode!', 'info', 3000);
+          break;
+        case 't': // Toggle trail mode
+          e.preventDefault();
+          window.toggleTrails?.();
+          showToast('✨ Trail Mode Toggled!', 'info', 2000);
+          break;
+        case 'm': // Add magnetic field at center
+          e.preventDefault();
+          window.addMagneticField?.();
+          showToast('🧲 Magnetic Field Added!', 'info', 2000);
+          break;
+        case 'p': // Pulse effect
+          e.preventDefault();
+          window.triggerPulse?.(2);
+          showToast('💫 Particle Pulse!', 'info', 2000);
+          break;
+      }
+    }
+
+    // Formation changes with Shift + key combinations
+    if (e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && window.holographicChamber) {
+      switch (e.key.toLowerCase()) {
+        case 'c': // Cube formation
+          e.preventDefault();
+          window.holographicChamber.morphToFormation('cube');
+          showToast('📦 Cube Formation!', 'info', 2000);
+          break;
+        case 's': // Sphere formation
+          e.preventDefault();
+          window.holographicChamber.morphToFormation('sphere');
+          showToast('🌐 Sphere Formation!', 'info', 2000);
+          break;
+        case 'h': // Helix formation
+          e.preventDefault();
+          window.holographicChamber.morphToFormation('helix');
+          showToast('🧬 Helix Formation!', 'info', 2000);
+          break;
+        case 't': // Torus formation
+          e.preventDefault();
+          window.holographicChamber.morphToFormation('torus');
+          showToast('🍩 Torus Formation!', 'info', 2000);
+          break;
+        case 'w': // Wave formation
+          e.preventDefault();
+          window.holographicChamber.morphToFormation('wave');
+          showToast('🌊 Wave Formation!', 'info', 2000);
+          break;
+        case 'p': // Spiral formation
+          e.preventDefault();
+          window.holographicChamber.morphToFormation('spiral');
+          showToast('🌀 Spiral Formation!', 'info', 2000);
+          break;
+        case 'x': // Scatter formation
+          e.preventDefault();
+          window.holographicChamber.morphToFormation('scatter');
+          showToast('💫 Scatter Formation!', 'info', 2000);
+          break;
+        case 'z': // Back to whirlpool (idle)
+          e.preventDefault();
+          window.holographicChamber.morphToFormation('whirlpool');
+          showToast('🌪️ Whirlpool Formation!', 'info', 2000);
+          break;
+      }
+    }
+
+    // Text morphing with Alt + typing
+    if (e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
+      if (e.key.length === 1 && /[a-zA-Z0-9]/.test(e.key)) {
+        // Start text input mode - could be enhanced to show input dialog
+        showToast('💬 Use morphToText("your text") in console!', 'info', 3000);
+      }
+    }
+  });
+
+  // Show keyboard shortcuts on startup
+  setTimeout(() => {
+    showToast('🎮 Particle Controls Loaded! Try Ctrl+E for explosion, Shift+C for cube!', 'info', 5000);
+  }, 2000);
+
   // Maintain snap on resize and when user scrolls chat
   window.addEventListener('resize', () => {
     if (lastAiElMain) snapAnalysisTo(lastAiElMain);

@@ -12,10 +12,26 @@ class HolographicChamber {
     
     // Performance settings optimized for Chromebook
     // Adaptive performance: auto-tune particle count based on device
-  // Lower particle count for performance
-  this.maxParticles = 60;
-  // Force dpr to 1 for crisp pixel rendering and avoid scaling issues
-  this.dpr = 1;
+    this.maxParticles = 80; // Slightly increased for better visual density
+    // Force dpr to 1 for crisp pixel rendering and avoid scaling issues
+    this.dpr = 1;
+    
+    // Advanced particle control systems
+    this.magneticFields = [];
+    this.particleGroups = new Map();
+    this.energyWaves = [];
+    this.attractors = [];
+    this.customFormations = new Map();
+    
+    // Visual enhancement settings
+    this.trailMode = false;
+    this.energyFlowMode = true;
+    this.particlePhysics = {
+      gravity: 0,
+      magnetism: 0.5,
+      cohesion: 0.3,
+      separation: 0.2
+    };
     
     this.init();
   }
@@ -248,103 +264,344 @@ class HolographicChamber {
   }
 
   update() {
-    this.particles.forEach(particle => {
+    // Update magnetic fields
+    this.magneticFields = this.magneticFields.filter(field => {
+      field.strength *= field.decay;
+      return field.strength > 0.01;
+    });
+
+    // Update energy waves
+    this.energyWaves = this.energyWaves.filter(wave => {
+      if (wave.active) {
+        wave.radius += wave.speed;
+        if (wave.radius > wave.maxRadius) {
+          wave.active = false;
+          return false;
+        }
+      }
+      return wave.active;
+    });
+
+    this.particles.forEach((particle, i) => {
       // Move towards target formation
       const dx = particle.targetX - particle.x;
       const dy = particle.targetY - particle.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance > 1) {
-        particle.vx += dx * (particle.speed * 0.08); // Minimum formation movement
+        particle.vx += dx * (particle.speed * 0.08);
         particle.vy += dy * (particle.speed * 0.08);
       }
+
+      // Apply magnetic field effects
+      this.magneticFields.forEach(field => {
+        const fieldDx = field.x - particle.x;
+        const fieldDy = field.y - particle.y;
+        const fieldDistance = Math.sqrt(fieldDx * fieldDx + fieldDy * fieldDy);
+        
+        if (fieldDistance < field.radius && fieldDistance > 1) {
+          const fieldStrength = field.strength * field.polarity / (fieldDistance * fieldDistance) * 1000;
+          particle.vx += fieldDx * fieldStrength;
+          particle.vy += fieldDy * fieldStrength;
+        }
+      });
+
+      // Apply energy wave effects
+      this.energyWaves.forEach(wave => {
+        const waveDx = wave.x - particle.x;
+        const waveDy = wave.y - particle.y;
+        const waveDistance = Math.sqrt(waveDx * waveDx + waveDy * waveDy);
+        
+        if (Math.abs(waveDistance - wave.radius) < 20) {
+          const waveForce = wave.intensity * 0.1;
+          const angle = Math.atan2(-waveDy, -waveDx);
+          particle.vx += Math.cos(angle) * waveForce;
+          particle.vy += Math.sin(angle) * waveForce;
+          particle.energy = Math.min(1, particle.energy + wave.intensity * 0.1);
+          particle.hue = wave.hue;
+        }
+      });
+
+      // Group behavior (flocking)
+      this.particleGroups.forEach((group, groupId) => {
+        if (group.particles.includes(i)) {
+          let avgX = 0, avgY = 0, avgVx = 0, avgVy = 0;
+          let separationVx = 0, separationVy = 0;
+          let groupSize = 0;
+
+          group.particles.forEach(pi => {
+            if (pi !== i && pi < this.particles.length) {
+              const other = this.particles[pi];
+              avgX += other.x;
+              avgY += other.y;
+              avgVx += other.vx;
+              avgVy += other.vy;
+              groupSize++;
+
+              // Separation force
+              const sepDx = particle.x - other.x;
+              const sepDy = particle.y - other.y;
+              const sepDist = Math.sqrt(sepDx * sepDx + sepDy * sepDy);
+              if (sepDist < 30 && sepDist > 0) {
+                separationVx += sepDx / sepDist;
+                separationVy += sepDy / sepDist;
+              }
+            }
+          });
+
+          if (groupSize > 0) {
+            avgX /= groupSize;
+            avgY /= groupSize;
+            avgVx /= groupSize;
+            avgVy /= groupSize;
+
+            // Cohesion: move toward group center
+            particle.vx += (avgX - particle.x) * group.cohesion * 0.001;
+            particle.vy += (avgY - particle.y) * group.cohesion * 0.001;
+
+            // Alignment: match group velocity
+            particle.vx += (avgVx - particle.vx) * group.alignment * 0.1;
+            particle.vy += (avgVy - particle.vy) * group.alignment * 0.1;
+
+            // Separation: avoid crowding
+            particle.vx += separationVx * group.separation * 0.01;
+            particle.vy += separationVy * group.separation * 0.01;
+          }
+        }
+      });
       
-      // Mouse interaction - subtle attraction
+      // Mouse interaction - enhanced attraction
       if (this.mouse) {
         const mouseDx = this.mouse.x - particle.x;
         const mouseDy = this.mouse.y - particle.y;
         const mouseDistance = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
         
-        if (mouseDistance < 150) {
-          const attraction = (150 - mouseDistance) / 150 * 0.0002; // Minimum mouse attraction
+        if (mouseDistance < 200) {
+          const attraction = (200 - mouseDistance) / 200 * 0.0005;
           particle.vx += mouseDx * attraction;
           particle.vy += mouseDy * attraction;
           
           // Increase energy when near mouse
-          particle.energy = Math.min(1, particle.energy + 0.001); // Minimum energy change
+          particle.energy = Math.min(1, particle.energy + 0.002);
+          
+          // Create mini magnetic field at mouse position
+          if (Math.random() < 0.1) {
+            this.addMagneticField(this.mouse.x, this.mouse.y, 0.1, 50, 1);
+          }
         } else {
           // Decrease energy when away from mouse
-          particle.energy = Math.max(0.08, particle.energy - 0.0005);
+          particle.energy = Math.max(0.08, particle.energy - 0.001);
         }
       }
       
       // Apply velocity with damping
-  particle.vx *= 0.995; // Maximum damping
-  particle.vy *= 0.995;
+      particle.vx *= 0.992; // Slightly less damping for more fluid movement
+      particle.vy *= 0.992;
       
-  particle.x += particle.vx;
-  particle.y += particle.vy;
+      particle.x += particle.vx;
+      particle.y += particle.vy;
       
       // Update phase for pulsing with breathing effect
-      particle.phase += 0.002 + particle.energy * 0.003;
+      particle.phase += 0.003 + particle.energy * 0.005;
       
-      // Add subtle size pulsing for breathing effect
-      const breathingPhase = Date.now() * 0.0008 + particle.phase;
-      particle.size = particle.size * 0.99 + (2 + Math.sin(breathingPhase) * 0.5) * 0.01;
+      // Enhanced size pulsing based on energy
+      const breathingPhase = Date.now() * 0.001 + particle.phase;
+      const energyPulse = Math.sin(particle.phase * 2) * particle.energy * 0.5;
+      particle.size = particle.size * 0.98 + (1.5 + Math.sin(breathingPhase) * 0.5 + energyPulse) * 0.02;
       
-      // Update hue slightly for color shifting (slower)
-      particle.hue += 0.05;
-      if (particle.hue > 220) particle.hue = 160;      // Wrap around screen edges
+      // Dynamic color shifting based on energy and connections
+      const colorShift = particle.energy * 0.2 + Math.sin(particle.phase) * 0.1;
+      particle.hue += colorShift;
+      if (particle.hue > 220) particle.hue = 160;
+      if (particle.hue < 160) particle.hue = 220;
+      
+      // Wrap around screen edges
       if (particle.x < 0) particle.x = this.width;
       if (particle.x > this.width) particle.x = 0;
       if (particle.y < 0) particle.y = this.height;
       if (particle.y > this.height) particle.y = 0;
     });
+
+    // Update energy streams
+    if (this.energyStreams) {
+      this.energyStreams = this.energyStreams.filter(stream => {
+        const age = Date.now() - stream.startTime;
+        if (age > stream.duration) return false;
+        
+        stream.particles.forEach(streamParticle => {
+          streamParticle.progress += streamParticle.speed;
+          if (streamParticle.progress > 1) streamParticle.progress = 0;
+        });
+        
+        return true;
+      });
+    }
   }
 
   draw() {
-  // Clear canvas each frame to prevent pixel trails
-  this.ctx.clearRect(0, 0, this.width, this.height);
-  // No on-canvas overlays in normal mode (keep stage clean)
+    // Clear canvas (or create trail effect if enabled)
+    if (this.trailMode) {
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      this.ctx.fillRect(0, 0, this.width, this.height);
+    } else {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+    }
+
+    // Draw energy waves first (background layer)
+    this.drawEnergyWaves();
+
+    // Draw magnetic fields
+    this.drawMagneticFields();
+
+    // Draw energy streams
+    this.drawEnergyStreams();
     
-  this.particles.forEach(particle => {
-  // Render as glowing particles for better visibility
-  this.ctx.save();
-  this.ctx.globalAlpha = particle.alpha * (0.8 + Math.sin(particle.phase) * 0.2);
-  
-  // Create gradient for glow effect
-  const gradient = this.ctx.createRadialGradient(
-    particle.x, particle.y, 0,
-    particle.x, particle.y, particle.size * 3
-  );
-  gradient.addColorStop(0, `hsla(${particle.hue}, 85%, 70%, 1)`);
-  gradient.addColorStop(0.5, `hsla(${particle.hue}, 85%, 70%, 0.5)`);
-  gradient.addColorStop(1, `hsla(${particle.hue}, 85%, 70%, 0)`);
-  
-  this.ctx.fillStyle = gradient;
-  this.ctx.beginPath();
-  this.ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
-  this.ctx.fill();
-  
-  // Add bright center dot
-  this.ctx.globalAlpha = 1.0;
-  this.ctx.fillStyle = '#69EACB';
-  this.ctx.fillRect(Math.round(particle.x - 1), Math.round(particle.y - 1), 2, 2);
-  this.ctx.restore();
-  });
-    
-    // Draw much brighter connections
+    // Draw particle connections
     this.drawConnections();
+
+    // Draw particles with enhanced effects
+    this.particles.forEach((particle, i) => {
+      this.ctx.save();
+      
+      // Dynamic alpha based on energy and phase
+      const dynamicAlpha = particle.alpha * (0.7 + Math.sin(particle.phase) * 0.3) * (0.8 + particle.energy * 0.2);
+      this.ctx.globalAlpha = dynamicAlpha;
+      
+      // Energy-based size multiplier
+      const energySize = particle.size * (1 + particle.energy * 0.5);
+      
+      // Create multi-layer glow effect
+      const layers = [
+        { radius: energySize * 4, alpha: 0.2, hueShift: 0 },
+        { radius: energySize * 2.5, alpha: 0.4, hueShift: 20 },
+        { radius: energySize * 1.5, alpha: 0.6, hueShift: 10 }
+      ];
+      
+      layers.forEach(layer => {
+        const gradient = this.ctx.createRadialGradient(
+          particle.x, particle.y, 0,
+          particle.x, particle.y, layer.radius
+        );
+        const hue = (particle.hue + layer.hueShift) % 360;
+        const lightness = 60 + particle.energy * 20;
+        
+        gradient.addColorStop(0, `hsla(${hue}, 85%, ${lightness}%, ${layer.alpha})`);
+        gradient.addColorStop(0.7, `hsla(${hue}, 85%, ${lightness}%, ${layer.alpha * 0.5})`);
+        gradient.addColorStop(1, `hsla(${hue}, 85%, ${lightness}%, 0)`);
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(particle.x, particle.y, layer.radius, 0, Math.PI * 2);
+        this.ctx.fill();
+      });
+      
+      // Bright center core with energy pulsing
+      this.ctx.globalAlpha = 1.0;
+      const coreSize = 1 + particle.energy * 2;
+      const coreHue = (particle.hue + 40) % 360;
+      this.ctx.fillStyle = `hsl(${coreHue}, 100%, 85%)`;
+      this.ctx.beginPath();
+      this.ctx.arc(particle.x, particle.y, coreSize, 0, Math.PI * 2);
+      this.ctx.fill();
+      
+      // Super bright pixel center
+      this.ctx.fillStyle = '#FFFFFF';
+      this.ctx.fillRect(Math.round(particle.x - 0.5), Math.round(particle.y - 0.5), 1, 1);
+      
+      this.ctx.restore();
+    });
+  }
+
+  drawEnergyWaves() {
+    this.ctx.save();
+    this.energyWaves.forEach(wave => {
+      if (wave.active) {
+        const alpha = wave.intensity * (1 - wave.radius / wave.maxRadius);
+        this.ctx.strokeStyle = `hsla(${wave.hue}, 80%, 60%, ${alpha * 0.3})`;
+        this.ctx.lineWidth = 2;
+        this.ctx.globalAlpha = alpha;
+        
+        this.ctx.beginPath();
+        this.ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2);
+        this.ctx.stroke();
+        
+        // Inner ripple
+        this.ctx.strokeStyle = `hsla(${wave.hue + 30}, 90%, 80%, ${alpha * 0.6})`;
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.arc(wave.x, wave.y, wave.radius * 0.7, 0, Math.PI * 2);
+        this.ctx.stroke();
+      }
+    });
+    this.ctx.restore();
+  }
+
+  drawMagneticFields() {
+    this.ctx.save();
+    this.magneticFields.forEach(field => {
+      const alpha = field.strength * 0.1;
+      const hue = field.polarity > 0 ? 200 : 0; // Blue for attraction, red for repulsion
+      
+      this.ctx.strokeStyle = `hsla(${hue}, 70%, 50%, ${alpha})`;
+      this.ctx.lineWidth = 1;
+      this.ctx.globalAlpha = alpha;
+      
+      // Draw field boundary
+      this.ctx.beginPath();
+      this.ctx.arc(field.x, field.y, field.radius, 0, Math.PI * 2);
+      this.ctx.stroke();
+      
+      // Draw field center
+      this.ctx.fillStyle = `hsla(${hue}, 90%, 70%, ${alpha * 2})`;
+      this.ctx.beginPath();
+      this.ctx.arc(field.x, field.y, 3, 0, Math.PI * 2);
+      this.ctx.fill();
+    });
+    this.ctx.restore();
+  }
+
+  drawEnergyStreams() {
+    if (!this.energyStreams) return;
+    
+    this.ctx.save();
+    this.energyStreams.forEach(stream => {
+      const fromParticle = this.particles[stream.from];
+      const toParticle = this.particles[stream.to];
+      
+      if (!fromParticle || !toParticle) return;
+      
+      // Draw main stream line
+      this.ctx.strokeStyle = stream.color;
+      this.ctx.lineWidth = 2;
+      this.ctx.globalAlpha = stream.intensity * 0.7;
+      
+      this.ctx.beginPath();
+      this.ctx.moveTo(fromParticle.x, fromParticle.y);
+      this.ctx.lineTo(toParticle.x, toParticle.y);
+      this.ctx.stroke();
+      
+      // Draw flowing particles
+      stream.particles.forEach(streamParticle => {
+        const x = fromParticle.x + (toParticle.x - fromParticle.x) * streamParticle.progress;
+        const y = fromParticle.y + (toParticle.y - fromParticle.y) * streamParticle.progress;
+        
+        this.ctx.globalAlpha = streamParticle.alpha;
+        this.ctx.fillStyle = stream.color;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, streamParticle.size, 0, Math.PI * 2);
+        this.ctx.fill();
+      });
+    });
+    this.ctx.restore();
   }
 
   drawConnections() {
-    const maxDistance = 120;
-    const maxConnections = 150; // Limit connections for performance
+    const maxDistance = 140;
+    const maxConnections = 200; // Increased for more connectivity
     let connectionCount = 0;
+    const time = Date.now() * 0.001;
     
     this.ctx.save();
-    this.ctx.strokeStyle = 'rgba(105, 234, 203, 0.6)';
-    this.ctx.lineWidth = 1.5;
     
     for (let i = 0; i < this.particles.length && connectionCount < maxConnections; i++) {
       for (let j = i + 1; j < this.particles.length && connectionCount < maxConnections; j++) {
@@ -356,13 +613,51 @@ class HolographicChamber {
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         if (distance < maxDistance) {
-          const alpha = (1 - distance / maxDistance) * 0.7;
+          const connectionStrength = (1 - distance / maxDistance);
+          const alpha = connectionStrength * 0.8;
           
-          this.ctx.globalAlpha = alpha * (0.8 + Math.sin(Date.now() * 0.001 + i) * 0.2);
+          // Dynamic color based on connection strength and time
+          const hue = 160 + connectionStrength * 60 + Math.sin(time + i * 0.1) * 20;
+          const saturation = 85 + connectionStrength * 15;
+          const lightness = 60 + connectionStrength * 30;
+          
+          // Pulsing effect based on particle energy
+          const pulseIntensity = (p1.energy + p2.energy) * 0.5;
+          const pulseFactor = 0.7 + Math.sin(time * 3 + distance * 0.05) * 0.3 * pulseIntensity;
+          
+          // Variable line width based on connection strength
+          this.ctx.lineWidth = 0.5 + connectionStrength * 2.5;
+          
+          // Create gradient line for energy flow effect
+          const gradient = this.ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+          gradient.addColorStop(0, `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha * pulseFactor})`);
+          gradient.addColorStop(0.5, `hsla(${hue + 20}, ${saturation + 10}%, ${lightness + 20}%, ${alpha * pulseFactor * 1.5})`);
+          gradient.addColorStop(1, `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha * pulseFactor})`);
+          
+          this.ctx.strokeStyle = gradient;
+          this.ctx.globalAlpha = 1;
+          
+          // Draw main connection line
           this.ctx.beginPath();
           this.ctx.moveTo(p1.x, p1.y);
           this.ctx.lineTo(p2.x, p2.y);
           this.ctx.stroke();
+          
+          // Add energy particles flowing along connections for strong links
+          if (connectionStrength > 0.7 && Math.random() < 0.1) {
+            const flowProgress = (time * 2 + i + j) % 1;
+            const flowX = p1.x + (p2.x - p1.x) * flowProgress;
+            const flowY = p1.y + (p2.y - p1.y) * flowProgress;
+            
+            this.ctx.save();
+            this.ctx.globalAlpha = alpha * 2;
+            this.ctx.fillStyle = `hsl(${hue + 40}, 100%, 80%)`;
+            this.ctx.beginPath();
+            this.ctx.arc(flowX, flowY, 1.5, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.restore();
+          }
+          
           connectionCount++;
         }
       }
@@ -421,11 +716,135 @@ class HolographicChamber {
     animateManifest();
   }
 
-  // Public methods for external control
+  // Advanced particle control methods
   triggerPulse(intensity = 1) {
     this.particles.forEach(particle => {
       particle.vx += (Math.random() - 0.5) * intensity;
       particle.vy += (Math.random() - 0.5) * intensity;
+      particle.energy = Math.min(1, particle.energy + intensity * 0.3);
+    });
+  }
+
+  // Create a magnetic field that attracts/repels particles
+  addMagneticField(x, y, strength = 1, radius = 200, polarity = 1) {
+    this.magneticFields.push({
+      x, y, strength, radius, polarity,
+      id: Date.now() + Math.random(),
+      decay: 0.98
+    });
+  }
+
+  // Create energy wave that ripples through particles
+  createEnergyWave(x, y, maxRadius = 300, speed = 5, intensity = 1) {
+    this.energyWaves.push({
+      x, y, radius: 0, maxRadius, speed, intensity,
+      hue: 160 + Math.random() * 60,
+      active: true
+    });
+  }
+
+  // Group particles for coordinated movement
+  createParticleGroup(particleIndices, groupId = null) {
+    const id = groupId || `group_${Date.now()}`;
+    this.particleGroups.set(id, {
+      particles: particleIndices,
+      cohesion: 0.5,
+      separation: 0.3,
+      alignment: 0.2
+    });
+    return id;
+  }
+
+  // Make particles form text or custom shapes
+  morphToText(text, fontSize = 40) {
+    // Create invisible canvas to measure text
+    const textCanvas = document.createElement('canvas');
+    const textCtx = textCanvas.getContext('2d');
+    textCtx.font = `${fontSize}px Arial`;
+    const metrics = textCtx.measureText(text);
+    
+    textCanvas.width = metrics.width + 20;
+    textCanvas.height = fontSize + 20;
+    textCtx.font = `${fontSize}px Arial`;
+    textCtx.fillStyle = 'white';
+    textCtx.fillText(text, 10, fontSize);
+    
+    // Get pixel data
+    const imageData = textCtx.getImageData(0, 0, textCanvas.width, textCanvas.height);
+    const pixels = [];
+    
+    for (let y = 0; y < textCanvas.height; y += 3) {
+      for (let x = 0; x < textCanvas.width; x += 3) {
+        const index = (y * textCanvas.width + x) * 4;
+        if (imageData.data[index + 3] > 128) { // Alpha > 50%
+          pixels.push({
+            x: this.width / 2 - textCanvas.width / 2 + x,
+            y: this.height / 2 - textCanvas.height / 2 + y
+          });
+        }
+      }
+    }
+    
+    // Assign particles to text positions
+    this.particles.forEach((particle, i) => {
+      if (i < pixels.length) {
+        particle.targetX = pixels[i].x + (Math.random() - 0.5) * 5;
+        particle.targetY = pixels[i].y + (Math.random() - 0.5) * 5;
+      } else {
+        // Extra particles form a cloud around the text
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 50 + Math.random() * 100;
+        particle.targetX = this.width / 2 + Math.cos(angle) * distance;
+        particle.targetY = this.height / 2 + Math.sin(angle) * distance;
+      }
+    });
+  }
+
+  // Create flowing energy streams between specific particles
+  createEnergyStream(fromIndex, toIndex, color = '#69EACB', duration = 3000) {
+    const stream = {
+      from: fromIndex,
+      to: toIndex,
+      color,
+      intensity: 1,
+      startTime: Date.now(),
+      duration,
+      particles: []
+    };
+    
+    // Create small particles that flow along the stream
+    for (let i = 0; i < 5; i++) {
+      stream.particles.push({
+        progress: i / 5,
+        speed: 0.02 + Math.random() * 0.01,
+        size: 2 + Math.random() * 2,
+        alpha: 0.8
+      });
+    }
+    
+    this.energyStreams = this.energyStreams || [];
+    this.energyStreams.push(stream);
+  }
+
+  // Make particles dance to audio (if available)
+  syncToAudio(audioData) {
+    if (!audioData || !audioData.length) return;
+    
+    const bassLevel = audioData.slice(0, 10).reduce((a, b) => a + b) / 10;
+    const midLevel = audioData.slice(10, 100).reduce((a, b) => a + b) / 90;
+    const highLevel = audioData.slice(100).reduce((a, b) => a + b) / (audioData.length - 100);
+    
+    this.particles.forEach((particle, i) => {
+      // Bass affects particle size and energy
+      particle.energy = Math.max(0.1, bassLevel / 255);
+      
+      // Mids affect movement
+      const midInfluence = midLevel / 255 * 0.5;
+      particle.vx += (Math.random() - 0.5) * midInfluence;
+      particle.vy += (Math.random() - 0.5) * midInfluence;
+      
+      // Highs affect color
+      particle.hue = (particle.hue + highLevel / 255 * 10) % 360;
     });
   }
 
@@ -471,6 +890,159 @@ class HolographicChamber {
   idle() {
     this.setState('idle');
   }
+
+  // New mind-blowing interaction methods!
+  
+  // Particle explosion from center
+  explode(intensity = 1) {
+    const centerX = this.width / 2;
+    const centerY = this.height / 2;
+    
+    this.particles.forEach(particle => {
+      const angle = Math.atan2(particle.y - centerY, particle.x - centerX);
+      const force = intensity * (0.5 + Math.random() * 0.5);
+      particle.vx += Math.cos(angle) * force;
+      particle.vy += Math.sin(angle) * force;
+      particle.energy = Math.min(1, particle.energy + intensity * 0.5);
+    });
+    
+    // Create energy wave
+    this.createEnergyWave(centerX, centerY, 400, 8, intensity);
+  }
+
+  // Particle implosion to center
+  implode(intensity = 1) {
+    const centerX = this.width / 2;
+    const centerY = this.height / 2;
+    
+    this.particles.forEach(particle => {
+      const angle = Math.atan2(centerY - particle.y, centerX - particle.x);
+      const force = intensity * (0.3 + Math.random() * 0.3);
+      particle.vx += Math.cos(angle) * force;
+      particle.vy += Math.sin(angle) * force;
+    });
+    
+    // Add magnetic attractor at center
+    this.addMagneticField(centerX, centerY, intensity * 2, 300, 1);
+  }
+
+  // Create swirling vortex
+  createVortex(x, y, strength = 1, duration = 5000) {
+    const vortex = {
+      x, y, strength, radius: 200,
+      startTime: Date.now(),
+      duration
+    };
+    
+    this.attractors.push(vortex);
+    
+    // Apply immediate swirl force
+    this.particles.forEach(particle => {
+      const dx = x - particle.x;
+      const dy = y - particle.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance < vortex.radius) {
+        const angle = Math.atan2(dy, dx) + Math.PI / 2;
+        const force = strength * (1 - distance / vortex.radius) * 0.02;
+        particle.vx += Math.cos(angle) * force;
+        particle.vy += Math.sin(angle) * force;
+      }
+    });
+  }
+
+  // Lightning effect between particles
+  createLightning(fromIndex, toIndex) {
+    const from = this.particles[fromIndex];
+    const to = this.particles[toIndex];
+    if (!from || !to) return;
+    
+    // Create jagged lightning path
+    const lightningPath = [];
+    const steps = 10;
+    
+    for (let i = 0; i <= steps; i++) {
+      const progress = i / steps;
+      const x = from.x + (to.x - from.x) * progress + (Math.random() - 0.5) * 20;
+      const y = from.y + (to.y - from.y) * progress + (Math.random() - 0.5) * 20;
+      lightningPath.push({ x, y });
+    }
+    
+    // Draw lightning
+    this.ctx.save();
+    this.ctx.strokeStyle = '#FFFFFF';
+    this.ctx.lineWidth = 3;
+    this.ctx.shadowColor = '#69EACB';
+    this.ctx.shadowBlur = 10;
+    
+    this.ctx.beginPath();
+    this.ctx.moveTo(lightningPath[0].x, lightningPath[0].y);
+    for (let i = 1; i < lightningPath.length; i++) {
+      this.ctx.lineTo(lightningPath[i].x, lightningPath[i].y);
+    }
+    this.ctx.stroke();
+    this.ctx.restore();
+    
+    // Energize connected particles
+    from.energy = Math.min(1, from.energy + 0.5);
+    to.energy = Math.min(1, to.energy + 0.5);
+  }
+
+  // Particle dance party!
+  danceParty(duration = 10000) {
+    const startTime = Date.now();
+    const originalSpeeds = this.particles.map(p => p.speed);
+    
+    const dance = () => {
+      const elapsed = Date.now() - startTime;
+      if (elapsed > duration) {
+        // Restore original speeds
+        this.particles.forEach((p, i) => {
+          p.speed = originalSpeeds[i];
+        });
+        return;
+      }
+      
+      // Make particles dance
+      this.particles.forEach((particle, i) => {
+        const dancePhase = elapsed * 0.005 + i * 0.2;
+        const danceIntensity = 0.5 + Math.sin(elapsed * 0.003) * 0.3;
+        
+        particle.vx += Math.sin(dancePhase) * danceIntensity * 0.01;
+        particle.vy += Math.cos(dancePhase * 1.3) * danceIntensity * 0.01;
+        particle.energy = 0.5 + Math.sin(dancePhase * 2) * 0.3;
+        particle.hue = (160 + Math.sin(dancePhase) * 60) % 360;
+      });
+      
+      requestAnimationFrame(dance);
+    };
+    
+    dance();
+  }
+
+  // Toggle trail mode for psychedelic effects
+  toggleTrailMode() {
+    this.trailMode = !this.trailMode;
+  }
+
+  // Create custom formation from array of {x, y} points
+  morphToCustomFormation(points, scale = 1) {
+    const centerX = this.width / 2;
+    const centerY = this.height / 2;
+    
+    this.particles.forEach((particle, i) => {
+      if (i < points.length) {
+        particle.targetX = centerX + points[i].x * scale;
+        particle.targetY = centerY + points[i].y * scale;
+      } else {
+        // Extra particles orbit around the formation
+        const angle = (i / this.particles.length) * Math.PI * 2;
+        const radius = 100 + Math.random() * 50;
+        particle.targetX = centerX + Math.cos(angle) * radius;
+        particle.targetY = centerY + Math.sin(angle) * radius;
+      }
+    });
+  }
 }
 
 // Global functions for compatibility with main.js
@@ -483,9 +1055,67 @@ window.startHolographicChamber = function(canvas) {
   return window.holographicChamber;
 };
 
+// Enhanced global functions for external control
 window.triggerPulse = function(intensity) {
   if (window.holographicChamber) {
     window.holographicChamber.triggerPulse(intensity);
+  }
+};
+
+window.explodeParticles = function(intensity = 1) {
+  if (window.holographicChamber) {
+    window.holographicChamber.explode(intensity);
+  }
+};
+
+window.implodeParticles = function(intensity = 1) {
+  if (window.holographicChamber) {
+    window.holographicChamber.implode(intensity);
+  }
+};
+
+window.createVortex = function(x, y, strength = 1) {
+  if (window.holographicChamber) {
+    window.holographicChamber.createVortex(x || window.innerWidth/2, y || window.innerHeight/2, strength);
+  }
+};
+
+window.morphToText = function(text) {
+  if (window.holographicChamber) {
+    window.holographicChamber.morphToText(text);
+  }
+};
+
+window.startDanceParty = function(duration = 10000) {
+  if (window.holographicChamber) {
+    window.holographicChamber.danceParty(duration);
+  }
+};
+
+window.createLightning = function() {
+  if (window.holographicChamber) {
+    const particles = window.holographicChamber.particles;
+    const from = Math.floor(Math.random() * particles.length);
+    const to = Math.floor(Math.random() * particles.length);
+    window.holographicChamber.createLightning(from, to);
+  }
+};
+
+window.toggleTrails = function() {
+  if (window.holographicChamber) {
+    window.holographicChamber.toggleTrailMode();
+  }
+};
+
+window.addMagneticField = function(x, y, strength = 1, polarity = 1) {
+  if (window.holographicChamber) {
+    window.holographicChamber.addMagneticField(x || window.innerWidth/2, y || window.innerHeight/2, strength, 200, polarity);
+  }
+};
+
+window.createEnergyWave = function(x, y, intensity = 1) {
+  if (window.holographicChamber) {
+    window.holographicChamber.createEnergyWave(x || window.innerWidth/2, y || window.innerHeight/2, 300, 5, intensity);
   }
 };
 
