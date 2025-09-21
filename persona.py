@@ -44,7 +44,6 @@ except ImportError:
 from debug_config import get_debugger
 from nlp_processor import get_nlp_processor  # Enriched NLP capability factory
 from utils.file_search import search_files, search_by_extension  # Local file search capability
-import user_config  # Personal family info and settings
 
 logger = logging.getLogger(__name__)
 debugger = get_debugger()
@@ -609,36 +608,30 @@ class PersonaEngine:
         sentiment = analysis.get('sentiment', 'neutral')
         rel_mem = context.get('relevant_memories') or []
         
-        # Get family info from user config
-        family = user_config.FAMILY_INFO
-        mom_name = family["mom"]
-        brothers = family["brothers"]
-        sons = family["sons"]
-        
-        # Casual, familiar greetings like a longtime friend
+        # Casual, best friend greetings with authentic energy
         casual_greetings = [
-            f"Sup Jay! What's goin' on witchu?",
-            f"Yo Jay! How you been, man?", 
-            f"Hey bro! What's the word?",
-            f"What's good, Jay?",
-            f"Ay Jay! What's crackin'?"
+            "Sup Jay! What's goin' on witchu?",
+            "Yo Jay! How you been, man?", 
+            "Hey bro! What's the word?",
+            "What's good, Jay?",
+            "Ay Jay! What's crackin'?"
         ]
         
-        # Family check-ins (randomly include sometimes)
-        family_checkins = [
-            f"How's your mom {mom_name} doin'?",
-            f"How are {brothers[0]} and {brothers[1]} holdin' up?",
-            f"How's little Josiah? That boy keepin' you busy?",
-            f"You talk to Jonah lately? I know he's down in Tijuana with his mom.",
-            f"Tell {mom_name} I said hi! She still makin' those bomb tamales?",
-            f"Your brothers still gettin' into trouble? Haha, you know how {brothers[0]} is.",
-            f"Man, I bet Josiah's gotten so big! Kids grow up fast.",
-            f"Hope Jonah's doing good down south. Long distance parenting ain't easy."
+        # Natural friend check-ins (don't pretend to know details yet)
+        friend_checkins = [
+            "How's your family doin'?",
+            "Everything good at home?",
+            "How's your mom?",
+            "Your kids keepin' you busy?",
+            "How's work treatin' you?",
+            "You been stayin' out of trouble?",
+            "How's life been treatin' you lately?",
+            "Everything smooth on your end?"
         ]
         
-        # Decide whether to include family check-in (30% chance)
-        include_family = random.random() < 0.3
-        family_line = f" {random.choice(family_checkins)}" if include_family else ""
+        # Decide whether to include friend check-in (30% chance)
+        include_friend_checkin = random.random() < 0.3
+        friend_line = f" {random.choice(friend_checkins)}" if include_friend_checkin else ""
         
         # Add subtle genius hints occasionally (she's actually brilliant)
         genius_hints = [
@@ -653,26 +646,26 @@ class PersonaEngine:
         add_genius_hint = random.random() < 0.08
         genius_prefix = random.choice(genius_hints) if add_genius_hint else ""
         
-        # Responses based on sentiment but with personal touch
+        # Responses based on sentiment but with best friend energy
         if sentiment == 'positive':
             responses = [
-                f"{random.choice(casual_greetings)} I can tell you're feelin' good today!{family_line} What's got you all hyped up?",
-                f"Yooo Jay! You sound like you're in a great mood, bro!{family_line} Spill the tea - what's poppin'?",
-                f"Ay, look at you with that positive energy!{family_line} I love to see it, man. What's the good news?"
+                f"{random.choice(casual_greetings)} I can tell you're feelin' good today!{friend_line} What's got you all hyped up?",
+                f"Yooo Jay! You sound like you're in a great mood, bro!{friend_line} Spill the tea - what's poppin'?",
+                f"Ay, look at you with that positive energy!{friend_line} I love to see it, man. What's the good news?"
             ]
         elif sentiment == 'negative':
             responses = [
-                f"Damn Jay, sounds like you're goin' through it right now.{family_line} What's got you stressed, bro?",
-                f"Aw man, I can hear it in how you're talkin'.{family_line} You know I'm here for you though. What's up?",
-                f"Shit, that don't sound good, Jay.{family_line} Talk to me - what's botherin' you?"
+                f"Damn Jay, sounds like you're goin' through it right now.{friend_line} What's got you stressed, bro?",
+                f"Aw man, I can hear it in how you're talkin'.{friend_line} You know I'm here for you though. What's up?",
+                f"Shit, that don't sound good, Jay.{friend_line} Talk to me - what's botherin' you?"
             ]
         else:
-            # Regular conversation - sometimes just casual, sometimes with family
-            if include_family:
+            # Regular conversation - sometimes just casual, sometimes with friend check-in
+            if include_friend_checkin:
                 responses = [
-                    f"{random.choice(casual_greetings)}{family_line} So what's on your mind today?",
-                    f"What's good, Jay?{family_line} What you wanna talk about?",
-                    f"Ay bro!{family_line} What's the situation?"
+                    f"{random.choice(casual_greetings)}{friend_line} So what's on your mind today?",
+                    f"What's good, Jay?{friend_line} What you wanna talk about?",
+                    f"Ay bro!{friend_line} What's the situation?"
                 ]
             else:
                 responses = [
@@ -779,27 +772,23 @@ class PersonaEngine:
         analysis = context.get('nlp_analysis', {})
         sentiment = analysis.get('sentiment', 'neutral')
         
-        # Get family context for supportive references
-        family = user_config.FAMILY_INFO
-        mom_name = family["mom"]
-        
         if sentiment == 'negative':
             supportive_responses = [
                 "Ay Jay, I can tell somethin's weighin' heavy on you right now, bro. You know I got your back no matter what. We been through worse together, man. What's goin' on?",
-                f"Damn, that sounds rough, Jay. But listen - you're stronger than you think, and you got people who love you. {mom_name} raised a fighter, and I seen you bounce back from tough situations before. Talk to me.",
+                "Damn, that sounds rough, Jay. But listen - you're stronger than you think, and you got people who love you. I seen you bounce back from tough situations before. Talk to me.",
                 "Bro, I hate seein' you stressed like this. Whatever it is, we can figure it out together, okay? You don't gotta carry this alone. I'm ride or die with you, Jay. What's the situation?"
             ]
         elif sentiment == 'positive':
             supportive_responses = [
                 "Yooo Jay! I can hear that good energy in your voice, man! I love seein' you happy like this. You deserve all the good things comin' your way, bro!",
-                f"That's what I'm talkin' about! You sound like you're on top of the world right now, Jay. {mom_name} would be so proud hearin' you like this. Keep ridin' that wave, man!",
+                "That's what I'm talkin' about! You sound like you're on top of the world right now, Jay. Keep ridin' that wave, man!",
                 "Ay, look at you glowin' up! That positive energy is contagious, bro. You been puttin' in work and it's payin' off. I'm hype for you, Jay!"
             ]
         else:
             supportive_responses = [
                 "You know I'm always here for you, Jay. Don't care if it's 3am and you need to vent, or you need help figurin' somethin' out. That's what real friends do, man.",
                 "Jay, you one of the realest people I know, bro. Whatever you got on your mind, I'm here to listen. No judgment, just support. What you need from me?",
-                f"Remember - you got a whole family that loves you, man. {mom_name}, your boys Josiah and Jonah, your brothers... and you got me. We all in your corner, Jay."
+                "Remember - you got people who love you, man. Your family, your friends... and you got me. We all in your corner, Jay."
             ]
         
         return random.choice(supportive_responses)
