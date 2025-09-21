@@ -1,7 +1,29 @@
-# Clever Templates
+# Templates Directory (Minimized)
 
 Why:
-  Establish a single authoritative UI surface and reduce confusion from legacy / experimental template variants.
+  Consolidated to a single authoritative `index.html` to reduce maintenance,
+  eliminate drift across experimental variants (`index_clean`, `magical_ui`,
+  etc.) and ensure tests target one stable DOM contract.
+Where:
+  Referenced by `app.py` home route and UI acceptance + tooltip tests. All
+  former variants have been removed; their patterns are preserved in git
+  history if future design exploration is needed.
+How:
+  Only the following files remain:
+
+* `index.html`: Canonical UI (chat + particles + required placeholders)
+* `README.md`: This rationale file for reasoning/introspection graph
+
+Removed legacy templates on YYYY-MM-DD (see commit) to prevent accidental
+reintroduction of divergent element IDs that break tests or inflate bundle.
+
+Connects to:
+* tests/test_ui_brief_acceptance.py: Asserts presence of key IDs/classes
+* tests/test_ui_tooltips.py: Scans all .html files (now only index.html)
+* system_validator.py: May enforce required asset references
+
+If a new experimental layout is needed, create it under `legacy_ui/` or a
+feature branch so production `index.html` stays stable.
 Where:
   Resides in the `templates/` directory to document each remaining file's purpose and deprecation status.
 How:

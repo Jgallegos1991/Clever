@@ -1,19 +1,33 @@
 """
 Clever AI Main Application
 
-Why: Serves as the entry point and orchestrator for all Clever AI operations,
-including web server, API endpoints, and system integrations. Ensures offline
-operation, single-user focus, and centralized control.
-Where: Connects to persona, database, and user_config modules.
-How: Initializes Flask app, loads config, handles requests, and manages system lifecycle.
+Why:
+    Acts as the orchestration hub (root DOT) of the Clever reasoning graph: binds
+    routing, persona interaction, evolution logging, and offline enforcement into
+    a single control surface. Keeping coordination centralized prevents drift and
+    makes tracing request → response → persistence a straight arrow rather than
+    a scattered search.
+Where:
+    Sits at the top of the server stack, delegating downward to persona (dialogue
+    generation), database (single-file persistence), evolution engine (learning
+    telemetry), and introspection (live reasoning map). Each outbound call forms
+    an arrow recorded in runtime_state for instant render + dependency forensics.
+How:
+    Creates the Flask app, enables offline guard early (network hard stop), wires
+    global error capture, exposes HTTP routes, and uses `traced_render` to surface
+    real-time template events. All handlers follow the Why/Where/How contract so
+    the introspection overlay can reconstruct intent and flow.
 
 Connects to:
-    - persona.py: Persona engine for responses
-    - database.py: Database manager
-    - user_config.py: User-specific settings
+    - persona.py: Response generation + mode adaptation
+    - database.py: Single authoritative persistence layer
+    - evolution_engine.py: Interaction telemetry logging
+    - introspection.py: Live runtime reasoning snapshot
+    - user_config.py: Personalization values (Jay specific)
 """
 
 import time
+import re
 from flask import Flask, request, jsonify, render_template
 from database import db_manager
 from user_config import USER_NAME, USER_EMAIL
@@ -27,6 +41,61 @@ offline_guard.enable()
 app = Flask(__name__)
 # Install global error capture for introspection (still lets Flask debug raise)
 register_error_handler(app)
+
+
+def _sanitize_persona_text(raw: str) -> str:
+    """Strip meta reasoning tokens from persona output.
+
+    Why: User requires only natural, human-like conversational responses; internal
+         reasoning / diagnostics such as "Time-of-day: afternoon" or "Vector: 1.15"
+         must never surface. Initial line-prefix filtering missed cases where these
+         markers appeared inline within a sentence.
+    Where: Applied in chat() right after persona.generate() and before JSON response
+           formation so downstream UI code never sees unsanitized text.
+    How: Two-phase cleaning:
+         1. Remove any standalone lines beginning with known markers.
+         2. For residual inline occurrences, surgically excise fragments matching
+            token patterns (case-insensitive) while preserving surrounding prose.
+            Repeated whitespace is collapsed and trailing artifact punctuation trimmed.
+
+    Connects to:
+        - persona.py: Source of original text (unchanged for internal metrics)
+        - static/js/main.js: Expects already-cleaned text to render bubbles
+        - tests (future): Can assert absence of banned markers using same patterns
+    """
+    if not isinstance(raw, str):
+        return ''
+    text = raw
+    # Phase 1: drop whole lines that start with markers
+    line_prefix = re.compile(r"^(?:\s*)(Time-of-day:|focal lens:|Vector:|complexity index|essence\b).*$", re.IGNORECASE)
+    kept = [ln for ln in text.splitlines() if not line_prefix.match(ln.strip())]
+    text = "\n".join(kept)
+    # Phase 2: remove inline fragments e.g. 'Time-of-day: afternoon;' or 'Vector: 1.15'
+    inline_patterns = [
+        r"Time-of-day:\s*[^;.,\n]+[;,.]?",
+        r"focal lens:\s*[^;.,\n]+[;,.]?",
+        r"Vector:\s*[^;.,\n]+[;,.]?",
+        r"complexity index[^;.,\n]*[;,.]?",
+        r"essence:\s*[^;.,\n]+[;,.]?",
+    ]
+    for pat in inline_patterns:
+        text = re.sub(pat, '', text, flags=re.IGNORECASE)
+    # Phase 3: sentence-level purge if any residual marker fragments linger
+    banned_tokens = ("time-of-day", "focal lens", "vector:", "complexity index", "essence:")
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    kept_sentences = [s for s in sentences if not any(bt in s.lower() for bt in banned_tokens)]
+    if kept_sentences:
+        text = ' '.join(kept_sentences)
+    # Collapse repeated spaces / stray punctuation combos
+    text = re.sub(r"\s{2,}", ' ', text)
+    text = re.sub(r"\s*([,;:.])\s*\1+", r"\1", text)  # dedupe repeated punctuation
+    # Remove leftover empty parentheses or double spaces produced by removals
+    text = re.sub(r"\(\s*\)", '', text)
+    text = re.sub(r"\s{2,}", ' ', text).strip()
+    # Remove leading/trailing stray punctuation characters
+    text = re.sub(r"^[;:,.-]+", '', text).strip()
+    text = re.sub(r"[;:,.-]+$", '', text).strip()
+    return text
 
 
 # Simple debugger for now
@@ -127,6 +196,16 @@ def chat():
         # Generate response using persona engine if available
         if clever_persona:
             persona_response = clever_persona.generate(user_message, mode="Auto")
+            # Apply server-side scrub to remove any internal reasoning/meta tokens
+            # Why: Ensure only human-like natural text reaches client regardless of upstream persona layers
+            # Where: Chat endpoint directly before JSON serialization; complements client-side final scrub
+            # How: _sanitize_persona_text uses regex + sentence removal heuristics; logs pre/post for traceability
+            pre_raw = persona_response.text
+            persona_response.text = _sanitize_persona_text(persona_response.text)
+            pre_preview = pre_raw[:140].replace("\n", " ")
+            post_preview = persona_response.text[:140].replace("\n", " ")
+            debugger.info("sanitizer", f"pre={{ {pre_preview} }}")
+            debugger.info("sanitizer", f"post={{ {post_preview} }}")
             # Unified schema consumed by frontend (main.js) plus future fields
             response = {
                 'response': persona_response.text,

@@ -1,0 +1,1296 @@
+# Clever Reasoning Graph
+
+Total nodes: 553  |  Complete Why/Where/How: 359 (64.92%)
+
+## Nodes
+
+- **ai_enhancement:ai_enhancement** (module) – Extends Clever's intelligence with advanced memory, learning, and contextual awareness capabilities beyond basic NLP processing.
+- **ai_enhancement:MemoryNetwork** (class) – Gives Clever long-term memory and context understanding
+- **ai_enhancement:IntelligenceAmplifier** (class) – Makes Clever smarter through pattern recognition and adaptive learning
+- **ai_enhancement:PatternDetector** (class) – Surface recurring themes, interaction cadence, style, and technical focus to inform response tailoring and proactive suggestions.
+- **ai_enhancement:ResponseOptimizer** (class) – Adjusts raw persona output to align with user style, context recency, and pattern signals, increasing perceived intelligence and usefulness.
+- **ai_enhancement:__init__** (function) – Set up advanced memory storage and retrieval system
+- **ai_enhancement:store_interaction** (function) – Build long-term understanding of user patterns and preferences
+- **ai_enhancement:retrieve_relevant_context** (function) – Provide Clever with relevant past context for better responses
+- **ai_enhancement:_extract_concepts** (function) – Converts raw user input into structured concept tags (action, tech, emotion) that downstream pattern analysis and memory relevance scoring d…
+- **ai_enhancement:_build_concept_connections** (function) – Establishes co-occurrence strengths so indirectly related concepts can boost relevance even when exact tokens don't overlap in future turns.
+- **ai_enhancement:_calculate_relevance** (function) – Ranks stored memories for contextual retrieval ensuring responses leverage the most semantically aligned prior interactions.
+- **ai_enhancement:_update_memory_weights** (function) – Prioritizes memories more likely to improve future personalization (positive sentiment, length, technical content) so retrieval skews toward…
+- **ai_enhancement:__init__** (function) – No Why
+- **ai_enhancement:enhance_response** (function) – Make responses more intelligent and contextually aware
+- **ai_enhancement:_generate_proactive_suggestions** (function) – No Why
+- **ai_enhancement:analyze_patterns** (function) – Produce unified pattern signal set (topics, timing, style, technical focus) enabling adaptive response optimization.
+- **ai_enhancement:_find_frequent_topics** (function) – Identifies high-salience concepts to reference or expand upon in future responses to reinforce continuity and personalization.
+- **ai_enhancement:_analyze_time_patterns** (function) – Captures temporal usage signals (active hour, session length) that can guide scheduling of proactive suggestions or pacing adjustments.
+- **ai_enhancement:_analyze_interaction_style** (function) – Tunes verbosity and detail level for generated responses.
+- **ai_enhancement:_analyze_technical_focus** (function) – Highlights dominant technical domains for enriched elaboration and proactive follow-up prompts.
+- **ai_enhancement:optimize_response** (function) – Final transformation stage before returning answer to user; raises relevance and personalization.
+- **ai_enhancement:_make_concise** (function) – Prevents verbosity fatigue for users with concise style.
+- **ai_enhancement:_add_detail** (function) – Enrich sparse responses for users favoring detailed guidance.
+- **ai_enhancement:_add_contextual_reference** (function) – Reinforces continuity, signaling memory of prior discussion.
+- **app:app** (module) – Acts as the orchestration hub (root DOT) of the Clever reasoning graph: binds routing, persona interaction, evolution logging, and offline e…
+- **app:SimpleDebugger** (class) – Provides basic logging without complex dependencies
+- **app:home** (function) – Serves the primary user interface with particle system and chat
+- **app:chat** (function) – Handles user input and generates AI responses
+- **app:health** (function) – Provides system status for automated monitoring and tests
+- **app:ingest** (function) – Allows uploading files to expand Clever's knowledge
+- **app:summarize** (function) – Provides text summarization capabilities for user content
+- **app:search** (function) – Enables searching through ingested knowledge base
+- **app:api_runtime_introspect** (function) – Exposes real-time system state (recent renders, endpoint Why/Where/How, persona mode, last error, git hash) to power debugging overlays and …
+- **app:info** (function) – No Why
+- **auto_code_cleaner:auto_code_cleaner** (module) – Automates detection and correction of common syntax/indentation errors, stray SQL, and merge markers in Python files.
+- **auto_code_cleaner:scan_file** (function) – No Why
+- **auto_code_cleaner:main** (function) – No Why
+- **auto_code_cleaner_v2:auto_code_cleaner_v2** (module) – Upgrades the original cleaner to handle indentation errors inside functions/classes, misplaced code blocks, and stray SQL with AST/context a…
+- **auto_code_cleaner_v2:is_in_function_or_class** (function) – No Why
+- **auto_code_cleaner_v2:attach_parents** (function) – No Why
+- **auto_code_cleaner_v2:scan_file** (function) – No Why
+- **auto_code_cleaner_v2:main** (function) – No Why
+- **automated_monitor:automated_monitor** (module) – Provides continuous monitoring of system integrity, rule compliance, and performance optimization with automated self-correction capabilitie…
+- **automated_monitor:MonitoringAlert** (class) – No Why
+- **automated_monitor:AutomatedMonitor** (class) – Ensures continuous system integrity by monitoring all components against Unbreakable Rules and automatically correcting deviations to mainta…
+- **automated_monitor:get_automated_monitor** (function) – Provides singleton access to automated monitoring system for consistent system oversight and self-correction capabilities.
+- **automated_monitor:start_system_monitoring** (function) – Initiates continuous system monitoring for rule compliance and performance optimization with automated self-correction capabilities.
+- **automated_monitor:get_system_health** (function) – Provides comprehensive system health status for monitoring and debugging purposes with actionable recommendations.
+- **automated_monitor:__init__** (function) – No Why
+- **automated_monitor:start_monitoring** (function) – Initiates continuous system monitoring to ensure perfect compliance with all rules and optimal performance maintenance.
+- **automated_monitor:stop_monitoring** (function) – No Why
+- **automated_monitor:_monitoring_loop** (function) – No Why
+- **automated_monitor:_run_comprehensive_validation** (function) – No Why
+- **automated_monitor:_run_critical_checks** (function) – No Why
+- **automated_monitor:_monitor_performance** (function) – No Why
+- **automated_monitor:_log_alert** (function) – No Why
+- **automated_monitor:_log_correction** (function) – No Why
+- **automated_monitor:get_monitoring_status** (function) – No Why
+- **automated_monitor:get_system_health_summary** (function) – No Why
+- **automated_monitor:_generate_health_recommendations** (function) – No Why
+- **backup_manager:backup_manager** (module) – Provides reliable data protection through automated backup creation and retention management, ensuring project continuity and recovery capab…
+- **backup_manager:BackupManager** (class) – Provides data protection and recovery capabilities for Clever AI's local database, configuration, and project files to prevent data loss.
+- **backup_manager:__init__** (function) – Sets up backup system with configurable location and retention to support different deployment scenarios and storage constraints.
+- **backup_manager:create_backup** (function) – Provides point-in-time project snapshot for recovery, deployment rollback, or data migration with efficient compression.
+- **backup_manager:cleanup_old_backups** (function) – Prevents unlimited backup accumulation that would consume disk space while maintaining recent backups for recovery needs.
+- **backup_system:backup_system** (module) – Provides complete data protection and disaster recovery for all Clever components including the single database (clever.db), configurations,…
+- **backup_system:CleverBackupSystem** (class) – Ensures data safety and enables disaster recovery for all Clever components including the single database (clever.db), configurations, and k…
+- **backup_system:main** (function) – No Why
+- **backup_system:__init__** (function) – No Why
+- **backup_system:create_full_backup** (function) – Provides complete system protection by backing up all critical components including the single database (clever.db), configurations, logs, a…
+- **backup_system:_calculate_directory_size** (function) – No Why
+- **backup_system:_count_files** (function) – No Why
+- **backup_system:create_database_snapshot** (function) – No Why
+- **backup_system:_analyze_database** (function) – No Why
+- **backup_system:list_backups** (function) – No Why
+- **backup_system:cleanup_old_backups** (function) – No Why
+- **clean_ui_assets:clean_ui_assets** (module) – Keeps the repository lightweight and ensures only actively referenced static assets are retained, reducing noise, bundle size, and potential…
+- **clever_conversation_engine:clever_conversation_engine** (module) – The original conversation engine grew extremely large, duplicated logic, and introduced persistent lint/syntax issues. We've migrated to per…
+- **clever_conversation_engine:CleverConversationEngine** (class) – Prevent accidental runtime use of the deprecated legacy engine while keeping import compatibility for old references so refactors can procee…
+- **clever_conversation_engine:deprecated_engine_warning** (function) – Centralizes migration messaging so tools or diagnostics can surface consistent guidance.
+- **clever_conversation_engine:__init__** (function) – No Why
+- **clever_conversation_engine:get_dynamic_greeting** (function) – Some legacy UI code expected this method; keeping a harmless, predictable return avoids KeyErrors while migration completes.
+- **clever_conversation_engine:clever_conversation_engine** (module) – Original file accumulated duplicated method definitions, inconsistent return structures, and merge artifact text causing syntax errors (E999…
+- **cli:cli** (module) – No Why
+- **cli:cmd_ingest** (function) – Provides command-line interface for manually triggering file ingestion when automatic sync is not sufficient or available.
+- **cli:cmd_list** (function) – Provides visibility into ingested content for debugging and manual knowledge base management operations.
+- **cli:cmd_search** (function) – Enables command-line content discovery and knowledge base exploration for research and debugging purposes.
+- **cli:cmd_show** (function) – Provides detailed inspection of individual knowledge base entries for debugging and content verification purposes.
+- **cli:main** (function) – Provides command-line interface for Clever AI database operations and file management without requiring Flask server to be running.
+- **config:config** (module) – Provides centralized configuration management with environment variable support, user-specific settings, and default values to enable consis…
+- **config:_load_dotenv** (function) – Provides environment configuration loading without external dependencies to maintain offline-first operation while supporting development co…
+- **config:_split_paths** (function) – Provides consistent parsing of path lists from environment variables or configuration strings, ensuring proper path handling.
+- **conftest:conftest** (module) – Ensure local project modules (e.g., persona.py) are importable during tests without requiring installation as a package. Pytest sometimes ad…
+- **convert_inventory:convert_inventory** (module) – Automates the conversion of JSON-based file inventory into a human-readable Markdown report for project documentation and auditing.
+- **convert_inventory:load_inventory** (function) – Reads structured file data for further processing and reporting
+- **convert_inventory:group_by_language** (function) – Enables language-based statistics and breakdowns in the report
+- **convert_inventory:group_by_directory** (function) – Provides directory-based organization for inventory reporting
+- **convert_inventory:calculate_stats** (function) – Summarizes file count, lines of code, and language breakdowns
+- **convert_inventory:format_number** (function) – Improves readability of statistics in Markdown tables
+- **convert_inventory:create_markdown** (function) – Generates the Markdown report for project file inventory
+- **convert_inventory:main** (function) – Orchestrates loading, processing, and Markdown generation for file inventory
+- **core_nlp_logic:core_nlp_logic** (module) – Provides essential configuration management and intent classification functionality for Clever's startup process and natural language unders…
+- **core_nlp_logic:upgrade_configurations** (function) – Ensures configuration compatibility and applies necessary migrations when Clever starts up, maintaining system integrity across version upda…
+- **core_nlp_logic:finalize_configurations** (function) – Performs final validation and setup of configuration settings after upgrades are complete, ensuring all components have valid configuration …
+- **core_nlp_logic:classify_intent** (function) – Determines user intent from natural language input to enable appropriate response generation and conversation flow management, helping Cleve…
+- **core_nlp_logic:extract_entities** (function) – Identifies structured data elements like emails, URLs, and dates from user input to enable context-aware responses and data extraction for e…
+- **core_nlp_logic:build_context** (function) – Creates rich context information combining current input, conversation history, and metadata to enable more intelligent response generation …
+- **database:database** (module) – The project enforces a strict offline, single-user, single-database paradigm. All persisted state (ingested source documents, chat utterance…
+- **database:Source** (class) – No Why
+- **database:DatabaseManager** (class) – No Why
+- **database:add_conversation** (function) – No Why
+- **database:__init__** (function) – No Why
+- **database:_connect** (function) – No Why
+- **database:_init** (function) – Ensures single-file SQLite schema (sources, utterances, interactions, context_notes) exists before any operations; supports offline, single-…
+- **database:set_context_note** (function) – Provides persistent key-value storage for application context and state that must survive process restarts (e.g., last processed sync marker…
+- **database:add_utterance** (function) – Persist chat turns (user/assistant) for context building, analytics, and evolution engine metrics.
+- **database:list_utterances** (function) – Enables conversation history display, context building for responses, and conversation analysis for learning and improvement.
+- **database:add_or_update_source** (function) – No Why
+- **database:list_interactions** (function) – Provides access to structured interaction data for evolution engine analysis, pattern recognition, and system learning algorithms.
+- **database:add_interaction** (function) – Captures structured interaction data for evolution engine analysis and system learning.
+- **database:add_conversation** (function) – No Why
+- **database:database** (module) – No Why
+- **debug_config:debug_config** (module) – Provides basic debugging and logging without complex dependencies
+- **debug_config:SimpleDebugger** (class) – Provides basic logging without external dependencies
+- **debug_config:performance_monitor** (function) – Track execution time of critical functions
+- **debug_config:get_debugger** (function) – Provide singleton access to debugger across application
+- **debug_config:reset_debugger** (function) – Allow clean state for testing and reinitialization
+- **debug_config:__init__** (function) – Set up basic logging configuration
+- **debug_config:info** (function) – Provide status information during operation
+- **debug_config:debug** (function) – No Why
+- **debug_config:error** (function) – Track errors for debugging and monitoring
+- **debug_config:warning** (function) – No Why
+- **debug_config:track_performance** (function) – Monitor operation timing for optimization
+- **debug_config:get_debug_summary** (function) – Provide overview of debugging session status
+- **debug_config:decorator** (function) – No Why
+- **debug_config:wrapper** (function) – No Why
+- **docstring_enforcer:docstring_enforcer** (module) – Enforces documentation standard requiring Why/Where/How presence for each significant Python file to improve maintainability and architectur…
+- **docstring_enforcer:iter_python_files** (function) – Centralizes traversal logic to ensure consistent filtering in enforcement.
+- **docstring_enforcer:scan_file** (function) – Provides atomic evaluation to allow future parallelization.
+- **docstring_enforcer:main** (function) – Offers developers and CI a single executable interface.
+- **enhanced_conversation_engine:enhanced_conversation_engine** (module) – Provides comprehensive conversation processing with full access to all system capabilities, ensuring Clever can handle any request with perf…
+- **enhanced_conversation_engine:ConversationContext** (class) – Maintains comprehensive conversation state including user intent, system capabilities, file access, and memory integration for perfect conve…
+- **enhanced_conversation_engine:EnhancedConversationEngine** (class) – Orchestrates all conversation processing with complete access to system capabilities, ensuring Clever can handle any request perfectly with …
+- **enhanced_conversation_engine:get_conversation_engine** (function) – Provides singleton access to enhanced conversation capabilities for consistent processing across all chat interactions.
+- **enhanced_conversation_engine:__init__** (function) – No Why
+- **enhanced_conversation_engine:_discover_capabilities** (function) – Establishes a capability feature map so routing logic can make informed decisions about which advanced processing paths (file access, learni…
+- **enhanced_conversation_engine:update_from_interaction** (function) – Evolves dynamic conversation state (depth, focus, history) that downstream response generation and UI signaling rely upon for personalizatio…
+- **enhanced_conversation_engine:__init__** (function) – No Why
+- **enhanced_conversation_engine:process_conversation** (function) – Provides comprehensive conversation processing with access to all system capabilities including file processing, memory retrieval, and intel…
+- **enhanced_conversation_engine:_perform_comprehensive_analysis** (function) – Generates a normalized semantic + structural feature bundle that powers routing, mood derivation, UI reactions, and learning logs.
+- **enhanced_conversation_engine:_analyze_intent** (function) – Classifies high-level user objective (file operation, creative, analysis, info, task) to influence routing and persona angle.
+- **enhanced_conversation_engine:_classify_request_type** (function) – Distinguishes complexity & shape (multi-step, simple question, instruction) enabling specialized handling for compound tasks.
+- **enhanced_conversation_engine:_identify_required_capabilities** (function) – Determines which subsystem hooks (file, memory, learning, creative) must be activated for this request to succeed fully.
+- **enhanced_conversation_engine:_build_enhanced_context** (function) – Consolidates mutable conversation, system, and user facets into a single structure passed to persona generation & response synthesis.
+- **enhanced_conversation_engine:_route_request** (function) – Decides which processing augmentations (file ops, memory fetch, multi-step specialization) must execute to satisfy the request.
+- **enhanced_conversation_engine:_identify_file_operations** (function) – Narrows broad file capability into concrete actions (read, analyze, search, list) for precise downstream execution.
+- **enhanced_conversation_engine:_generate_comprehensive_response** (function) – Synthesizes persona output, file/memory augmentation, UI reaction data, telemetry, and proactive suggestions into a single payload.
+- **enhanced_conversation_engine:_process_file_requests** (function) – Executes user-requested file operations providing content slices and lightweight analyses to enrich response context.
+- **enhanced_conversation_engine:_safe_read_file** (function) – Provides robust file IO that won't derail conversation flow on permission or encoding errors.
+- **enhanced_conversation_engine:_analyze_file_content** (function) – Extracts semantic + structural signals from file slices to supply enriched context (keywords, sentiment, type) for persona and insights.
+- **enhanced_conversation_engine:_detect_content_type** (function) – Classifies file slice into coarse category guiding downstream explanation tone or formatting hints.
+- **enhanced_conversation_engine:_retrieve_relevant_memory** (function) – Surfaces recent and topically similar past interactions that increase coherence and personalization of current response.
+- **enhanced_conversation_engine:_generate_clever_state** (function) – Supplies UI + telemetry layer with synthesized cognitive/emotional state metrics derived from analysis & dynamic context.
+- **enhanced_conversation_engine:_generate_ui_reactions** (function) – Translates semantic + sentiment signals into visual animation directives for the holographic particle UI to reflect AI state.
+- **enhanced_conversation_engine:_determine_mood** (function) – Provides a human-relatable emotional label supporting UI theming and potential stylistic adjustments in subsequent turns.
+- **enhanced_conversation_engine:_generate_insights** (function) – Adds reflective meta-observations that increase user perception of depth, awareness, and adaptive engagement.
+- **enhanced_conversation_engine:_determine_approach** (function) – Produces a strategic stance label influencing client display and potential downstream adaptive logic.
+- **enhanced_conversation_engine:_integrate_learning** (function) – Captures interaction telemetry for longitudinal evolution metrics and adaptive capability refinement.
+- **enhanced_conversation_engine:_process_text_file** (function) – Supplies quick semantic snapshot of plain-text files to enrich context and potential suggestions.
+- **enhanced_conversation_engine:_process_code_file** (function) – Extracts lightweight structural metrics (functions/classes/imports) to contextualize code discussions without heavy parsing.
+- **enhanced_conversation_engine:_process_json_file** (function) – Provides quick glance at JSON shape (keys, size) aiding follow-up queries or targeted inspection.
+- **enhanced_conversation_engine:_process_csv_file** (function) – Summarizes tabular file dimensions enabling immediate reasoning about dataset scope.
+- **error_recovery:error_recovery** (module) – The original error recovery subsystem was overly complex, duplicated localized try/except patterns, and generated continual lint/type noise.…
+- **error_recovery:ErrorRecoverySystem** (class) – Prevent accidental use of the removed centralized recovery system.
+- **error_recovery:get_error_recovery** (function) – No Why
+- **error_recovery:__init__** (function) – No Why
+- **evolution_engine:evolution_engine** (module) – Captures each interaction as a temporal arrow in the system's growth narrative—enabling retrospective analysis (patterns, mode usage) and fu…
+- **evolution_engine:SimpleEvolutionEngine** (class) – Track user interactions and system learning
+- **evolution_engine:get_evolution_engine** (function) – Provide singleton access across application
+- **evolution_engine:reset_evolution_engine** (function) – Allow clean state for testing
+- **evolution_engine:__init__** (function) – Set up basic tracking capabilities
+- **evolution_engine:log_interaction** (function) – Track user patterns for system improvement
+- **evolution_engine:get_interaction_summary** (function) – Provide insights into user behavior
+- **evolution_engine:get_learning_insights** (function) – Provide feedback on system adaptation
+- **evolution_engine:reset_session** (function) – Allow clean session starts
+- **file_ingestor:file_ingestor** (module) – No Why
+- **file_ingestor:FileIngestor** (class) – Centralizes knowledge ingestion to keep Clever's context fresh.
+- **file_ingestor:__init__** (function) – No Why
+- **file_ingestor:ingest_all_files** (function) – No Why
+- **file_ingestor:clean_pdf_text** (function) – Remove artefacts + normalize whitespace before NLP.
+- **file_ingestor:ingest_file** (function) – Enables incremental updates when the sync watcher detects a change rather than reprocessing the entire directory tree.
+- **file_ingestor:process_pdf** (function) – No Why
+- **file_search:file_search** (module) – Allow PersonaEngine to fulfill user intents like "find all python files with memory in the name" or "locate pdf docs" by performing on-disk …
+- **file_search:_iter_candidate_files** (function) – Centralize traversal to ensure every higher-level search obeys safety and filtering rules.
+- **file_search:search_files** (function) – Bridge user natural language requests for locating files with deterministic local search—enabling the assistant to *do* what it says.
+- **file_search:search_by_extension** (function) – Common user queries revolve around extension classes ("find all .py files").
+- **final_integration_test:final_integration_test** (module) – Validates that all enhanced capabilities work together perfectly
+- **final_integration_test:FinalIntegrationTester** (class) – Ensures all enhancements work together to provide perfect conversational capability as requested by user
+- **final_integration_test:main** (function) – Provides command-line interface for comprehensive system testing
+- **final_integration_test:__init__** (function) – No Why
+- **final_integration_test:setup_test_environment** (function) – Creates isolated test environment to validate enhancements
+- **final_integration_test:test_system_validation** (function) – Ensures system validator correctly identifies and fixes issues
+- **final_integration_test:test_enhanced_conversation** (function) – Validates advanced conversation processing meets user requirements
+- **final_integration_test:test_file_access_capability** (function) – Ensures conversation engine has full access as requested by user
+- **final_integration_test:test_automated_monitoring** (function) – Ensures continuous system oversight works as designed
+- **final_integration_test:test_integration_workflow** (function) – Validates all components work together seamlessly
+- **final_integration_test:run_comprehensive_test** (function) – Provides comprehensive validation of all enhancements
+- **fix_line_lengths:fix_line_lengths** (module) – Ensures code quality compliance for smooth system operation
+- **fix_line_lengths:fix_app_py** (function) – The main application file accumulates long f-strings and messages during rapid iteration; exceeding style limits reduces readability and cau…
+- **fixer:fixer** (module) – No Why
+- **fixer:list_operations** (function) – Provides safe, whitelisted operations for automated system maintenance and UI enhancements without manual intervention.
+- **fixer:apply** (function) – Provides controlled execution of whitelisted repair operations to maintain system functionality and enhance user experience.
+- **fixer:_repair_dependencies** (function) – No Why
+- **fixer:_validate_config_files** (function) – No Why
+- **fixer:_check_database_integrity** (function) – Ensures single database reliability for persistence guarantees.
+- **fixer:_cleanup_logs** (function) – No Why
+- **fixer:_run_code_cleaner** (function) – No Why
+- **fixer:_ensure_service_worker_present** (function) – No Why
+- **fixer:_ensure_citations_chip** (function) – No Why
+- **fixer:_enable_autoswitch_mode** (function) – No Why
+- **fixer:_brighten_scene_constants** (function) – No Why
+- **fixer:_boost_particle_count** (function) – No Why
+- **fixer_legacy:fixer_legacy** (module) – Preserved for historical reference—shows pre‑refactor approach to code fixing logic that has since been superseded by `fixer.py` and automat…
+- **generate_file_inventory:generate_file_inventory** (module) – No Why
+- **generate_file_inventory:get_file_stats** (function) – No Why
+- **generate_file_inventory:get_last_modified** (function) – No Why
+- **generate_file_inventory:generate_inventory** (function) – No Why
+- **generate_reasoning_graph:generate_reasoning_graph** (module) – Transform distributed docstring reasoning metadata into a visualizable knowledge map so engineers can traverse Clever's architecture via dec…
+- **generate_reasoning_graph:Node** (class) – No Why
+- **generate_reasoning_graph:extract_sections** (function) – Central parser to keep semantics consistent with enforcement & graph.
+- **generate_reasoning_graph:scan_python_files** (function) – No Why
+- **generate_reasoning_graph:build_nodes** (function) – No Why
+- **generate_reasoning_graph:generate_markdown** (function) – No Why
+- **generate_reasoning_graph:build_remediation** (function) – Provide an actionable, sorted backlog so maintainers can rapidly raise reasoning coverage by fixing the highest value gaps first.
+- **generate_reasoning_graph:generate_badge** (function) – Provides at-a-glance visual indicator in README and PR diffs to incentivize continual improvement of reasoning docs.
+- **generate_reasoning_graph:run** (function) – Allows reuse from CLI and potential future programmatic imports.
+- **generate_reasoning_graph:main** (function) – No Why
+- **health_monitor:health_monitor** (module) – Provides comprehensive system health monitoring and alerting to ensure optimal performance, resource management, and early detection of issu…
+- **health_monitor:SystemHealthMonitor** (class) – Provide centralized, lightweight visibility into core runtime health (resources, database, evolution engine, NLP components) so issues are s…
+- **health_monitor:get_health_monitor** (function) – No Why
+- **health_monitor:__init__** (function) – No Why
+- **health_monitor:check_system_resources** (function) – Provides real-time system resource monitoring to detect performance issues, resource constraints, and potential problems before they impact …
+- **health_monitor:check_database_health** (function) – No Why
+- **health_monitor:check_nlp_components** (function) – No Why
+- **health_monitor:check_evolution_engine** (function) – No Why
+- **health_monitor:run_full_health_check** (function) – No Why
+- **health_monitor:get_health_summary** (function) – No Why
+- **introspection:introspection** (module) – Provide a real-time window into what the system is rendering, which routes are active, and the associated Why/Where/How reasoning metadata e…
+- **introspection:extract_doc_meta** (function) – Converts enforced documentation tokens into structured data for live introspection, aiding debugging and transparency.
+- **introspection:record_render** (function) – Build a rolling history of recent renders to pinpoint UI issues and confirm which template actually served a request.
+- **introspection:get_recent_renders** (function) – No Why
+- **introspection:set_last_error** (function) – No Why
+- **introspection:get_last_error** (function) – No Why
+- **introspection:build_endpoints_snapshot** (function) – Provide a routing map with reasoning context to help trace request handling and quickly identify undocumented or divergent endpoints.
+- **introspection:detect_git_version** (function) – No Why
+- **introspection:_compute_warnings** (function) – Proactively signal documentation drift (missing Why/Where/How) so the runtime overlay acts as early warning before CI enforcement or confusi…
+- **introspection:runtime_state** (function) – Central aggregation converting docstring reasoning + live telemetry (renders, errors, evolution stats) into a navigational map—the "arrows" …
+- **introspection:traced_render** (function) – Central interception point to know exactly which template produced the response for a route, enabling UI debugging tied to Why/Where/How met…
+- **introspection:register_error_handler** (function) – No Why
+- **introspection:_capture_error** (function) – No Why
+- **knowledge_base:knowledge_base** (module) – The original module accumulated legacy artifacts. This minimal, documented compatibility layer lets lingering imports keep working without r…
+- **knowledge_base:init_db** (function) – Some legacy utilities expect a tiny logging table even though the broader tracking has moved elsewhere.
+- **knowledge_base:log_interaction** (function) – Maintains backwards compatibility with older code that may still call this function with additional metadata parameters.
+- **knowledge_base:get_recent_interactions** (function) – Provides a lightweight inspection/diagnostic hook during development or tests without exposing broader database query surface area.
+- **knowledge_base_full:knowledge_base_full** (module) – The previous version mixed two different initialization flows and contained indentation errors plus partial SQL statements. Archiving prior …
+- **memory_engine:memory_engine** (module) – Creates persistent, intelligent memory system that learns from every interaction, builds context awareness, and enables predictive responses…
+- **memory_engine:MemoryContext** (class) – Structured representation of conversation context
+- **memory_engine:MemoryNode** (class) – Represents single piece of learned information with connections
+- **memory_engine:AdvancedMemoryEngine** (class) – Provide sophisticated memory capabilities for Jay's AI assistant
+- **memory_engine:get_memory_engine** (function) – Provide singleton access to memory system across application
+- **memory_engine:reset_memory_engine** (function) – Allow clean state for testing and development
+- **memory_engine:__post_init__** (function) – No Why
+- **memory_engine:__post_init__** (function) – No Why
+- **memory_engine:__init__** (function) – Set up comprehensive memory system with database persistence
+- **memory_engine:_execute_query** (function) – Provide safe database access with connection management
+- **memory_engine:_generate_session_id** (function) – Track conversation sessions for temporal context
+- **memory_engine:_initialize_memory_schema** (function) – Ensure database has all required tables for memory operations
+- **memory_engine:store_interaction** (function) – Capture and persist every interaction for learning and context building
+- **memory_engine:_store_conversation_context** (function) – Persist conversation data for future retrieval and analysis
+- **memory_engine:_extract_memory_nodes** (function) – Create persistent knowledge nodes from conversation content
+- **memory_engine:_create_memory_node** (function) – Store individual pieces of learned information
+- **memory_engine:_create_semantic_links** (function) – Build knowledge graph with meaningful connections
+- **memory_engine:_calculate_similarity** (function) – Determine relationship strength between concepts
+- **memory_engine:_create_relationship** (function) – Build knowledge graph connections
+- **memory_engine:_learn_patterns** (function) – Identify Jay's communication patterns and preferences
+- **memory_engine:_update_preferences** (function) – Build model of Jay's preferences and habits
+- **memory_engine:_update_preference** (function) – Maintain accurate model of Jay's preferences
+- **memory_engine:_load_preferences** (function) – Initialize preference model with historical data
+- **memory_engine:get_contextual_memory** (function) – Provide relevant context for response generation
+- **memory_engine:get_conversation_history** (function) – Provide conversation context for response generation
+- **memory_engine:predict_preferences** (function) – Enable proactive response customization
+- **memory_engine:get_memory_stats** (function) – Provide insights into memory system performance and learning
+- **nlp_processor:nlp_processor** (module) – Provides basic natural language processing without complex dependencies
+- **nlp_processor:_safe_lower** (function) – No Why
+- **nlp_processor:SimpleNLPProcessor** (class) – Provide text analysis without external dependencies
+- **nlp_processor:AdvancedNLPProcessor** (class) – Provide richer semantic signal for the persona engine so responses can feel analytical, insightful, and *Einstein-level* without any externa…
+- **nlp_processor:get_nlp_processor** (function) – Central place for persona or other modules to obtain NLP features without duplicating capability detection.
+- **nlp_processor:__init__** (function) – Set up basic text processing capabilities
+- **nlp_processor:process_text** (function) – Provide comprehensive text analysis for system use
+- **nlp_processor:process** (function) – Some higher-level engines (e.g., enhanced conversation engine) invoke `process`; adding an alias avoids widespread refactors while maintaini…
+- **nlp_processor:extract_keywords** (function) – Identify important concepts for contextual responses
+- **nlp_processor:_noise_metrics** (function) – Persona needs to recognize when user input is accidental (keyboard smash) or heavily typo-laden to prompt clarification.
+- **nlp_processor:analyze_sentiment** (function) – Understand emotional tone for appropriate responses
+- **nlp_processor:extract_entities** (function) – Identify important names and concepts
+- **nlp_processor:tokenize** (function) – Split text into individual words for analysis
+- **nlp_processor:__init__** (function) – No Why
+- **nlp_processor:process_text** (function) – No Why
+- **nlp_processor:_extract_entities_advanced** (function) – No Why
+- **nlp_processor:_hybrid_sentiment** (function) – Improve robustness and analyzer friendliness (avoid static type complaints about attribute access) while keeping offline operation.
+- **nlp_processor:_readability** (function) – No Why
+- **nlp_processor:_question_type** (function) – No Why
+- **nlp_processor:_concept_density** (function) – No Why
+- **nlp_processor:_topic_vector** (function) – No Why
+- **nlp_processor:_estimate_syllables** (function) – No Why
+- **nlp_processor:get_word_frequency** (function) – Understand text composition and emphasis
+- **nlp_processor:process** (function) – Some modules expect 'process' method name
+- **nlp_processor_backup:nlp_processor_backup** (module) – Provides advanced natural language processing capabilities for Clever, including entity extraction, sentiment analysis, and keyword identifi…
+- **nlp_processor_backup:_load_spacy** (function) – Provides core NLP functionality for entity recognition, tokenization, and text analysis at full potential.
+- **nlp_processor_backup:_normalize_token** (function) – No Why
+- **nlp_processor_backup:_top_tokens** (function) – No Why
+- **nlp_processor_backup:_keywords_spacy** (function) – No Why
+- **nlp_processor_backup:_keywords_fallback** (function) – No Why
+- **nlp_processor_backup:_sentiment** (function) – Provides sentiment analysis for persona response generation and evolution engine learning from user interactions.
+- **nlp_processor_backup:UnifiedNLPProcessor** (class) – Provides comprehensive natural language processing at full potential for all text analysis needs including entities, sentiment, and keywords…
+- **nlp_processor_backup:__init__** (function) – No Why
+- **nlp_processor_backup:_ensure_nlp** (function) – Provides thread-safe access to spaCy model for all NLP operations.
+- **nlp_processor_backup:_quick_cache** (function) – No Why
+- **nlp_processor_backup:process** (function) – No Why
+- **nlp_processor_backup:_process_uncached** (function) – Provides core text processing for keywords and entities using spaCy at full potential for consistent, high-quality results.
+- **nlp_processor_backup:nlp** (function) – Provides direct access to spaCy model for advanced operations like entity extraction and custom processing pipelines.
+- **nlp_processor_fixed:nlp_processor_fixed** (module) – Provides advanced natural language processing capabilities for Clever, including entity extraction, sentiment analysis, and keyword identifi…
+- **nlp_processor_fixed:_normalize_token** (function) – Ensures consistent token formatting for reliable keyword matching and deduplication across all NLP operations.
+- **nlp_processor_fixed:_top_tokens** (function) – Identifies the most significant terms for keyword extraction when entity recognition alone is insufficient.
+- **nlp_processor_fixed:_load_spacy** (function) – Provides core NLP functionality for entity recognition, tokenization, and text analysis at full potential.
+- **nlp_processor_fixed:_keywords_spacy** (function) – Identifies key concepts and entities from text for persona responses and evolution engine learning at full analytical potential.
+- **nlp_processor_fixed:_sentiment** (function) – Provides sentiment analysis for persona response generation and evolution engine learning from user interactions.
+- **nlp_processor_fixed:UnifiedNLPProcessor** (class) – Provides comprehensive natural language processing at full potential for all text analysis needs including entities, sentiment, and keywords…
+- **nlp_processor_fixed:__init__** (function) – No Why
+- **nlp_processor_fixed:_ensure_nlp** (function) – Provides thread-safe access to spaCy model for all NLP operations.
+- **nlp_processor_fixed:_quick_cache** (function) – No Why
+- **nlp_processor_fixed:process** (function) – Provides unified interface for all text analysis operations needed throughout Clever for consistent NLP processing.
+- **nlp_processor_fixed:_process_uncached** (function) – Provides core text processing for keywords and entities using spaCy at full potential for consistent, high-quality results.
+- **nlp_processor_fixed:nlp** (function) – Provides direct access to spaCy model for advanced operations like entity extraction and custom processing pipelines.
+- **offline_guard:offline_guard** (module) – Enforces strict offline operation by blocking all outbound network connections except loopback, ensuring compliance with project rules.
+- **offline_guard:_is_loopback** (function) – Ensures only local connections are allowed when offline guard is enabled
+- **offline_guard:_GuardedSocket** (class) – Enforces offline-only operation by raising errors on non-local connections
+- **offline_guard:enable** (function) – Activates strict offline mode for Clever AI
+- **offline_guard:disable** (function) – Allows temporary re-enabling of network for debugging/maintenance
+- **offline_guard:is_enabled** (function) – Provides status for system validation and debugging
+- **offline_guard:contains_network_reference** (function) – Detects user input or code that may attempt external network access
+- **offline_guard:connect** (function) – No Why
+- **offline_guard:connect_ex** (function) – No Why
+- **pdf_ingestor:pdf_ingestor** (module) – Automates ingestion and processing of PDFs, text files, and other documents for Clever's knowledge base, enabling intelligent search and lea…
+- **pdf_ingestor:EnhancedFileIngestor** (class) – Centralizes and streamlines document ingestion for knowledge base updates and search.
+- **pdf_ingestor:watch_and_ingest** (function) – No Why
+- **pdf_ingestor:__init__** (function) – Sets up ingestion scope and supported file types for processing.
+- **pdf_ingestor:ingest_all_files** (function) – No Why
+- **pdf_ingestor:ingest_file** (function) – No Why
+- **pdf_ingestor:_extract_pdf_content** (function) – No Why
+- **pdf_ingestor:_extract_text_content** (function) – No Why
+- **pdf_ingestor:_chunk_content** (function) – No Why
+- **pdf_ingestor:EnhancedSyncHandler** (class) – No Why
+- **pdf_ingestor:__init__** (function) – No Why
+- **pdf_ingestor:trigger_ingestion** (function) – No Why
+- **perf_benchmark:perf_benchmark** (module) – Provides concrete latency metrics and variation statistics for the persona response generation pipeline so regressions or performance improv…
+- **perf_benchmark:_now** (function) – Abstracts time access for potential future mocking.
+- **perf_benchmark:benchmark_persona** (function) – Establish consistent metric capture (latency & variation) to detect regressions early in CI.
+- **perf_benchmark:write_results** (function) – Artifact captured by CI for longitudinal comparison.
+- **perf_benchmark:_check_thresholds** (function) – Enforce performance & variation guardrails so regressions do not silently land in main.
+- **perf_benchmark:main** (function) – Provides standalone execution path outside CI.
+- **persona:persona** (module) – Converts raw user intent + localized analysis signals into tailored, empathetic replies across five adaptive modes (Auto, Creative, Deep Div…
+- **persona:PersonaResponse** (class) – Structured container for AI responses with metadata
+- **persona:PersonaEngine** (class) – Generates contextual responses matching Jay's preferences
+- **persona:__init__** (function) – No Why
+- **persona:__init__** (function) – Set up available response modes, personality traits, and memory integration
+- **persona:_response_signature** (function) – Need a fast, deterministic way to detect near-identical responses
+- **persona:_ensure_variation** (function) – User reported "she says the same thing" – reduce repetition probability.
+- **persona:generate** (function) – Main entry point for AI response generation with learning capabilities
+- **persona:_maybe_handle_file_search** (function) – Align capability with responses—as user may ask Clever to "find", "locate", or "list" files meeting criteria. This enables proactive, action…
+- **persona:_augment_with_reasoning_layers** (function) – Elevate responses beyond surface pattern – provide multi-step derivations, analogies, and principle-first framing for complex or exploratory…
+- **persona:_extract_keywords** (function) – Identify important concepts for contextual responses
+- **persona:_analyze_sentiment** (function) – Adapt response tone to user's emotional state
+- **persona:_extract_entities** (function) – Identify important names, places, and concepts for memory storage
+- **persona:_calculate_importance** (function) – Determine how significant this interaction is for memory storage
+- **persona:_generate_suggestions** (function) – Provide helpful next steps and conversation continuers based on memory and context
+- **persona:_auto_style** (function) – Default mode providing natural, balanced responses
+- **persona:_time_bucket** (function) – Add subtle temporal personalization to reduce template staleness.
+- **persona:_heuristic_vector_strength** (function) – Provide pseudo-analytic scalar for variety in responses.
+- **persona:_compression_ratio** (function) – Another numerical artifact to diversify surface form.
+- **persona:_creative_style** (function) – Generate creative, out-of-the-box thinking for brainstorming
+- **persona:_deep_dive_style** (function) – Provide comprehensive analysis for complex topics
+- **persona:_support_style** (function) – Provide emotional support and encouragement
+- **persona:_quick_hit_style** (function) – Provide fast, actionable answers for efficiency
+- **persona:_regen** (function) – No Why
+- **persona_simple:persona_simple** (module) – Provides basic AI personality and response generation
+- **persona_simple:PersonaResponse** (class) – Standardizes AI response format with metadata
+- **persona_simple:PersonaEngine** (class) – Generates responses with Clever's personality
+- **persona_simple:__init__** (function) – Sets up Clever's personality and user context
+- **persona_simple:generate** (function) – Main interface for AI response generation
+- **reasoning_focus:reasoning_focus** (module) – Provides contributors with a fast, actionable view of the largest remaining Why/Where/How documentation gaps so effort targets maximum cover…
+- **reasoning_focus:parse_remediation** (function) – No Why
+- **reasoning_focus:load_or_fail** (function) – No Why
+- **reasoning_focus:get_code_excerpt** (function) – No Why
+- **reasoning_focus:main** (function) – No Why
+- **run_tests:run_tests** (module) – Provides a unified entry point for running all test suites, including UI tooltip tests, to ensure system reliability and feature coverage.
+- **run_tests:run_tooltip_tests** (function) – No Why
+- **run_tests:run_main_test_suite** (function) – Provides thorough validation of Clever AI's core functionality including database, NLP, persona, and system integration tests.
+- **run_tests:run_pytest_tests** (function) – Provides unified entry for external invocation without importing pytest API.
+- **run_tests:create_test_report** (function) – No Why
+- **run_tests:main** (function) – No Why
+- **run_tests_legacy:run_tests_legacy** (module) – Originally orchestrated a bespoke sequence of assertions before the project standardized on pytest. Retained only to show historical testing…
+- **runtime_dump:runtime_dump** (module) – Provide a quick offline CLI method to visualize the same reasoning "arrows" (Why/Where/How + recent renders) available via the debug overlay…
+- **runtime_dump:ensure_initial_render** (function) – runtime_state is more useful with at least one render event present.
+- **runtime_dump:main** (function) – No Why
+- **scheduler:scheduler** (module) – No Why
+- **scheduler:_run_cycle** (function) – Performs automated synchronization and file processing to maintain up-to-date knowledge base without manual intervention.
+- **scheduler:run_scheduler** (function) – Provides automated background processing to keep Clever AI's knowledge base synchronized with external file changes.
+- **self_fix:self_fix** (module) – Envisions a future mechanism for Clever to detect and remediate minor internal inconsistencies (e.g., stale file inventory, missing indexes,…
+- **self_fix:plan_self_fixes** (function) – Gives callers a predictable contract for early experimentation and UI wiring before dynamic detection logic is implemented.
+- **simplified_integration_test:simplified_integration_test** (module) – Validates core enhanced capabilities without external dependencies
+- **simplified_integration_test:test_system_validation** (function) – No Why
+- **simplified_integration_test:test_enhanced_conversation** (function) – No Why
+- **simplified_integration_test:test_file_access** (function) – No Why
+- **simplified_integration_test:test_conversation_with_file_analysis** (function) – No Why
+- **simplified_integration_test:main** (function) – No Why
+- **summarize_repo:summarize_repo** (module) – Intended foundation for generating high-level repository summaries (file counts, key architectural components, recent change hotspots) to as…
+- **summarize_repo:summarize** (function) – Provides a stable, documented return contract so downstream experimental callers can develop against the shape before full implementation la…
+- **sync_tools:sync_tools** (module) – Provides real-time file monitoring and ingestion capabilities for Clever's knowledge base, ensuring continuous learning from new content
+- **sync_tools:run_rclone_sync** (function) – Enables synchronized file operations between local and remote storage while maintaining offline-first operation principles Provides robust c…
+- **sync_tools:sync_clever_from_remote** (function) – Downloads latest files from cloud storage to ensure local system has up-to-date information for processing and analysis.
+- **sync_tools:sync_synaptic_from_remote** (function) – Downloads synaptic data files from cloud to maintain local knowledge base consistency and enable offline processing capabilities.
+- **sync_watcher:sync_watcher** (module) – No Why
+- **sync_watcher:SyncEventHandler** (class) – Enables real-time processing of files added to sync directories, ensuring Clever AI's knowledge base stays current with external changes.
+- **sync_watcher:main** (function) – Provides continuous monitoring of sync directories to enable real-time knowledge base updates for Clever AI's offline-first architecture.
+- **sync_watcher:__init__** (function) – Prevent repeated rapid ingestion and centralize ingestion logic.
+- **sync_watcher:on_any_event** (function) – No Why
+- **sync_watcher:trigger_ingestion** (function) – No Why
+- **system_validator:system_validator** (module) – Ensures continuous adherence to all Unbreakable Rules and instructions by monitoring system state, detecting deviations, and automatically c…
+- **system_validator:ValidationResult** (class) – Standardizes structure for all validation outcomes so reporting, aggregation, and remediation logic can treat heterogeneous checks uniformly…
+- **system_validator:SystemValidator** (class) – Maintains system integrity by continuously validating against Unbreakable Rules and automatically correcting any deviations to ensure Clever…
+- **system_validator:get_system_validator** (function) – Provides singleton access to system validator for consistent validation and monitoring across all system components.
+- **system_validator:validate_system_startup** (function) – Ensures system integrity and rule compliance before operation begins
+- **system_validator:__init__** (function) – No Why
+- **system_validator:run_full_validation** (function) – Provides complete system health check against all Unbreakable Rules. To ensure perfect compliance and identify any areas requiring correctio…
+- **system_validator:_validate_offline_enforcement** (function) – No Why
+- **system_validator:_validate_single_user_config** (function) – No Why
+- **system_validator:_validate_single_database** (function) – No Why
+- **system_validator:_validate_jay_personalization** (function) – No Why
+- **system_validator:_validate_clever_persona** (function) – No Why
+- **system_validator:_validate_file_structure_compliance** (function) – No Why
+- **system_validator:_validate_nlp_capabilities** (function) – No Why
+- **system_validator:_validate_evolution_engine_access** (function) – No Why
+- **system_validator:_validate_documentation_standards** (function) – No Why
+- **system_validator:_validate_performance_optimization** (function) – No Why
+- **system_validator:_generate_recommendations** (function) – No Why
+- **test_app:test_app** (module) – No Why
+- **test_app:app_client** (function) – Provides clean test environment with temporary database to prevent test interference and data pollution in main database.
+- **test_app:test_health** (function) – Ensures system health monitoring endpoint works correctly and returns expected data structure for monitoring systems.
+- **test_app:test_index** (function) – Validates the primary user interface loads properly and contains essential Clever AI branding elements.
+- **test_app:test_chat_happy** (function) – Validates core chat functionality works correctly with proper message processing and response structure generation.
+- **test_app:test_chat_bad_request** (function) – Ensures proper error handling and validation for chat API when users submit invalid or empty message content.
+- **test_app:test_ingest_form** (function) – Validates form-based data submission works correctly for file ingestion and data processing workflows.
+- **test_file_ingestor_ingest:test_file_ingestor_ingest** (module) – Ensure single-file ingestion behaves deterministically for inserted/unchanged/updated
+- **test_file_ingestor_ingest:test_ingest_file_insert_and_unchanged** (function) – No Why
+- **test_file_ingestor_ingest:test_ingest_file_updated_on_change** (function) – No Why
+- **test_file_search_intent:test_file_search_intent** (module) – Ensure newly added capability (file location) functions correctly so persona responses remain aligned with actionable behavior.
+- **test_file_search_intent:_response_lines** (function) – No Why
+- **test_file_search_intent:test_file_search_simple_python** (function) – No Why
+- **test_file_search_intent:test_file_search_markdown_architecture** (function) – No Why
+- **test_file_search_intent:test_file_search_no_results** (function) – No Why
+- **test_introspection:test_introspection** (module) – Ensure the new /api/runtime_introspect endpoint surfaces render events and Why/Where/How route metadata so regressions are caught early.
+- **test_introspection:client** (function) – Provide isolated app context for endpoint tests.
+- **test_introspection:test_runtime_introspect_basic** (function) – Confirms render tracing captured the canonical index.html template and endpoint snapshot includes expected keys with Why/Where/How present (…
+- **test_introspection:test_runtime_introspect_reasoning_richness** (function) – Guards against accidental stripping of docstrings or parsing logic regressions that would remove the directional "arrows" between system nod…
+- **test_introspection:test_runtime_introspect_schema_keys** (function) – Ensures debug overlay (and future tooling) can rely on consistent keys to visualize the reasoning map without defensive null checks.
+- **test_introspection:test_runtime_introspect_evolution_summary** (function) – Confirms interaction counts surface in runtime JSON for overlay.
+- **test_introspection:test_runtime_introspect_includes_version** (function) – Overlay relies on presence of version key for display logic.
+- **test_mode_variation:test_mode_variation** (module) – Ensure per-mode responses show variation (not identical signatures) and debug memory metrics appear.
+- **test_mode_variation:_signature** (function) – No Why
+- **test_mode_variation:test_mode_variation_and_memory_metrics** (function) – No Why
+- **test_offline_guard_block:test_offline_guard_block** (module) – Ensures Rule #1 (Strictly Offline) is actually enforced at runtime, not just by policy documentation.
+- **test_offline_guard_block:test_offline_guard_blocks_external_connection** (function) – Runtime validation of security boundary (no external network IO allowed).
+- **test_persona_smoke:test_persona_smoke** (module) – Ensure core persona generation pipeline produces responses, includes required metadata, and exhibits variation for repeated inputs (addresse…
+- **test_persona_smoke:test_persona_basic_response** (function) – No Why
+- **test_persona_smoke:test_persona_variation** (function) – No Why
+- **test_persona_smoke:test_persona_auto_mode_smoke** (function) – Acts as a guardrail for future template changes so CI will flag breaking structural changes early.
+- **test_sentiment_consistency:test_sentiment_consistency** (module) – Ensure sentiment analysis remains stable and predictable across common polarity patterns.
+- **test_sentiment_consistency:engine** (function) – No Why
+- **test_sentiment_consistency:test_positive_sentiment** (function) – No Why
+- **test_sentiment_consistency:test_negative_sentiment** (function) – No Why
+- **test_sentiment_consistency:test_neutral_sentiment** (function) – No Why
+- **test_skills:test_skills** (module) – No Why
+- **test_skills:test_summarize_ok** (function) – Validates that the /api/summarize endpoint correctly processes text input and returns structured summary data.
+- **test_skills:test_search_empty** (function) – Ensures search functionality gracefully handles empty queries without errors and returns appropriate empty results.
+- **test_suite:test_suite** (module) – The previous monolithic test suite had unstable optional dependencies and overlapping concerns. We now default to pytest tests under tests/ …
+- **test_suite:CleverTestSuite** (class) – Keep CI green and fast while deeper tests run under pytest.
+- **test_suite:get_test_suite** (function) – No Why
+- **test_suite:run_quick_tests** (function) – No Why
+- **test_suite:__init__** (function) – No Why
+- **test_suite:run_all_tests** (function) – No Why
+- **test_suite:test_database_components** (function) – Ensure DB connectivity and basic interaction logging works.
+- **test_suite_full:test_suite_full** (module) – The previous monolithic test suite contained mixed concerns and unstable dependencies; it is archived to avoid blocking CI while preserving …
+- **test_ui_brief_acceptance:test_ui_brief_acceptance** (module) – No Why
+- **test_ui_brief_acceptance:test_index_has_core_elements** (function) – Ensures the main interface contains all required components for Clever AI's 3D holographic chamber experience.
+- **test_ui_brief_acceptance:test_assets_wired_locally** (function) – No Why
+- **test_ui_brief_acceptance:test_microcopy_placeholders** (function) – Ensures offline-first operation by confirming no external CDN dependencies and all assets use Flask's url_for routing.
+- **test_ui_brief_acceptance:test_microcopy_placeholders** (function) – Validates user experience elements align with Clever AI's ambient creativity and thought flow design philosophy.
+- **test_ui_functionality:test_ui_functionality** (module) – No Why
+- **test_ui_functionality:UITooltipTests** (class) – No Why
+- **test_ui_functionality:run_ui_tooltip_tests** (function) – No Why
+- **test_ui_functionality:__init__** (function) – No Why
+- **test_ui_functionality:run_all_tooltip_tests** (function) – No Why
+- **test_ui_functionality:get_template_files** (function) – No Why
+- **test_ui_functionality:extract_buttons_from_html** (function) – No Why
+- **test_ui_functionality:test_button_tooltips_exist** (function) – No Why
+- **test_ui_functionality:test_tooltip_consistency** (function) – No Why
+- **test_ui_functionality:test_accessibility_attributes** (function) – No Why
+- **test_ui_functionality:test_tooltip_html_structure** (function) – No Why
+- **test_ui_tooltips:test_ui_tooltips** (module) – Ensures all UI buttons have consistent, accessible tooltip implementations for better user experience and compliance.
+- **test_ui_tooltips:TestUITooltips** (class) – Validates that all UI buttons have tooltips and that tooltip patterns are consistent for accessibility and usability.
+- **test_ui_tooltips:template_files** (function) – Provides a list of HTML templates to be checked for tooltips
+- **test_ui_tooltips:parse_html_file** (function) – Enables HTML parsing for tooltip validation
+- **test_ui_tooltips:test_button_tooltips_exist** (function) – Ensures every button is accessible and provides context to users
+- **test_ui_tooltips:test_tooltip_consistency** (function) – Enforces UI consistency for better usability and maintainability
+- **test_ui_tooltips:test_accessibility_attributes** (function) – No Why
+- **test_ui_tooltips:test_tooltip_content_quality** (function) – No Why
+- **test_ui_tooltips:test_tooltip_html_structure** (function) – No Why
+- **test_util_placeholders:test_util_placeholders** (module) – Ensure placeholder utilities maintain stable return contracts so downstream experimental integrations or UI components can rely on them with…
+- **test_util_placeholders:test_summarize_min_shape** (function) – No Why
+- **test_util_placeholders:test_plan_self_fixes_shape** (function) – No Why
+- **user_config:user_config** (module) – Centralizes all user-specific configuration including identity, network settings, and preferences while maintaining offline-first architectu…
+- **utils_watcher_full:utils_watcher_full** (module) – Preserved only for historical reference after refactors consolidated multiple watcher implementations into the streamlined ``sync_watcher.py…
+- **validate_lazy_loading:validate_lazy_loading** (module) – Validates and benchmarks spaCy lazy loading and pipeline optimization patterns for offline performance in Clever AI.
+- **validate_lazy_loading:get_memory_usage** (function) – Measures memory footprint for benchmarking NLP loading strategies
+- **validate_lazy_loading:test_standard_loading** (function) – Establishes baseline for spaCy model loading time and memory usage
+- **validate_lazy_loading:LazyNLPProcessor** (class) – Shows how to defer spaCy model loading until first use for improved startup performance
+- **validate_lazy_loading:test_lazy_loading** (function) – Benchmarks lazy loading strategy for spaCy model
+- **validate_lazy_loading:test_minimal_pipeline** (function) – Measures performance and memory usage of spaCy with only essential components enabled
+- **validate_lazy_loading:cached_process** (function) – No Why
+- **validate_lazy_loading:test_caching_benefits** (function) – No Why
+- **validate_lazy_loading:main** (function) – No Why
+- **validate_lazy_loading:__init__** (function) – No Why
+- **validate_lazy_loading:nlp** (function) – No Why
+- **validate_lazy_loading:process** (function) – Enables NLP processing only after model is loaded, demonstrating lazy evaluation
+- **verify_reasoning_docs:verify_reasoning_docs** (module) – Enforce the Clever reasoning documentation contract so every new or modified Python artifact preserves the "arrows between dots" (Why → Wher…
+- **verify_reasoning_docs:_debug** (function) – No Why
+- **verify_reasoning_docs:gather_staged_python_files** (function) – Scope enforcement to changed code only for fast commits.
+- **verify_reasoning_docs:extract_docstring_nodes** (function) – Centralize traversal so enforcement uniformly evaluates objects.
+- **verify_reasoning_docs:has_all_tokens** (function) – No Why
+- **verify_reasoning_docs:analyze_file** (function) – Provide granular feedback pinpointing missing reasoning arrows.
+- **verify_reasoning_docs:main** (function) – No Why
+- **watcher:watcher** (module) – The original utils/watcher.py was corrupted with merge artifacts. This shim preserves a stable API while the real watcher lives in sync_watc…
+- **watcher:run_watch** (function) – Maintain backwards compatibility for callers expecting run_watch.
+
+## Edges (Source → Target)
+
+- ai_enhancement:ai_enhancement → database.py
+- ai_enhancement:ai_enhancement → evolution_engine.py
+- ai_enhancement:ai_enhancement → persona.py
+- app:api_runtime_introspect → introspection.py
+- app:api_runtime_introspect → templates/index.html
+- app:app → database.py
+- app:app → evolution_engine.py
+- app:app → introspection.py
+- app:app → persona.py
+- app:app → user_config.py
+- app:chat → persona.py
+- app:chat → static/js/main.js
+- app:health → debug_config.py
+- app:health → tests/
+- app:home → templates/index.html
+- app:home → user_config.py
+- app:ingest → database.py
+- app:ingest → file_ingestor.py
+- app:search → database.py
+- app:search → evolution_engine.py
+- app:summarize → nlp_processor.py
+- app:summarize → persona.py
+- automated_monitor:AutomatedMonitor → Alerting
+- automated_monitor:AutomatedMonitor → All
+- automated_monitor:AutomatedMonitor → system_validator.py
+- automated_monitor:automated_monitor → all
+- automated_monitor:automated_monitor → app.py
+- automated_monitor:automated_monitor → debug_config.py
+- automated_monitor:automated_monitor → system_validator.py
+- automated_monitor:get_automated_monitor → All
+- automated_monitor:get_automated_monitor → app.py
+- backup_system:backup_system → config.py
+- backup_system:backup_system → database.py
+- backup_system:backup_system → knowledge
+- backup_system:backup_system → logs
+- backup_system:create_full_backup → File
+- backup_system:create_full_backup → config.py
+- backup_system:create_full_backup → database.py
+- clean_ui_assets:clean_ui_assets → Makefile
+- clean_ui_assets:clean_ui_assets → static/js
+- clean_ui_assets:clean_ui_assets → templates/*.html
+- clever_conversation_engine:CleverConversationEngine → legacy/clever_conversation_engine.py
+- clever_conversation_engine:CleverConversationEngine → persona.py
+- clever_conversation_engine:clever_conversation_engine → legacy/clever_conversation_engine.py
+- clever_conversation_engine:clever_conversation_engine → persona.py
+- config:_load_dotenv → .env
+- config:_load_dotenv → os.environ
+- config:config → All
+- config:config → app.py
+- config:config → database.py
+- config:config → sync
+- config:config → user_config.py
+- conftest:conftest → persona.py,
+- core_nlp_logic:build_context → app.py
+- core_nlp_logic:build_context → knowledge_base.py
+- core_nlp_logic:build_context → persona.py
+- core_nlp_logic:classify_intent → app.py
+- core_nlp_logic:classify_intent → nlp_processor.py
+- core_nlp_logic:classify_intent → persona.py
+- core_nlp_logic:core_nlp_logic → app.py
+- core_nlp_logic:core_nlp_logic → config.py
+- core_nlp_logic:core_nlp_logic → persona.py
+- core_nlp_logic:extract_entities → classify_intent
+- core_nlp_logic:extract_entities → knowledge_base.py
+- core_nlp_logic:extract_entities → persona.py
+- core_nlp_logic:finalize_configurations → app.py
+- core_nlp_logic:finalize_configurations → config.py
+- core_nlp_logic:upgrade_configurations → app.py
+- core_nlp_logic:upgrade_configurations → config.py
+- database:database → config.py
+- database:database → evolution_engine.py
+- database:database → file_ingestor.py
+- database:database → health_monitor.py
+- database:database → persona.py
+- database:database → sync_watcher.py
+- debug_config:debug_config → app.py
+- debug_config:debug_config → system_validator.py
+- debug_config:get_debugger → All
+- debug_config:get_debugger → app.py
+- docstring_enforcer:docstring_enforcer → CI
+- docstring_enforcer:docstring_enforcer → Developer
+- docstring_enforcer:iter_python_files → docstring
+- docstring_enforcer:main → clever-ci.yml
+- docstring_enforcer:scan_file → CI
+- docstring_enforcer:scan_file → iter_python_files()
+- enhanced_conversation_engine:ConversationContext → All
+- enhanced_conversation_engine:ConversationContext → Conversation
+- enhanced_conversation_engine:ConversationContext → File
+- enhanced_conversation_engine:EnhancedConversationEngine → database
+- enhanced_conversation_engine:EnhancedConversationEngine → evolution_engine.py
+- enhanced_conversation_engine:EnhancedConversationEngine → file
+- enhanced_conversation_engine:EnhancedConversationEngine → nlp_processor.py
+- enhanced_conversation_engine:EnhancedConversationEngine → persona.py
+- enhanced_conversation_engine:enhanced_conversation_engine → database.py
+- enhanced_conversation_engine:enhanced_conversation_engine → evolution_engine.py
+- enhanced_conversation_engine:enhanced_conversation_engine → file_ingestor.py
+- enhanced_conversation_engine:enhanced_conversation_engine → nlp_processor.py
+- enhanced_conversation_engine:enhanced_conversation_engine → persona.py
+- enhanced_conversation_engine:get_conversation_engine → All
+- enhanced_conversation_engine:get_conversation_engine → app.py
+- enhanced_conversation_engine:process_conversation → All
+- enhanced_conversation_engine:process_conversation → Conversation
+- enhanced_conversation_engine:process_conversation → Response
+- error_recovery:ErrorRecoverySystem → debug_config.py
+- error_recovery:error_recovery → debug_config.py
+- error_recovery:error_recovery → legacy/error_recovery.py
+- evolution_engine:evolution_engine → app.py
+- evolution_engine:evolution_engine → database.py
+- evolution_engine:evolution_engine → introspection.py
+- evolution_engine:evolution_engine → persona.py
+- evolution_engine:get_evolution_engine → All
+- evolution_engine:get_evolution_engine → app.py
+- evolution_engine:log_interaction → app.py
+- evolution_engine:log_interaction → persona.py
+- file_ingestor:ingest_file → database.py
+- file_ingestor:ingest_file → evolution_engine.py
+- file_ingestor:ingest_file → nlp_processor
+- file_search:file_search → app.py
+- file_search:file_search → persona.py
+- file_search:search_files → persona.py
+- final_integration_test:final_integration_test → app.py
+- final_integration_test:final_integration_test → automated_monitor.py
+- final_integration_test:final_integration_test → enhanced_conversation_engine.py
+- final_integration_test:final_integration_test → system_validator.py
+- fix_line_lengths:fix_app_py → CI
+- fix_line_lengths:fix_app_py → app.py
+- fixer_legacy:fixer_legacy → fixer.py
+- fixer_legacy:fixer_legacy → tools/
+- generate_reasoning_graph:generate_reasoning_graph → docs/reasoning_graph.md
+- generate_reasoning_graph:generate_reasoning_graph → introspection.py
+- generate_reasoning_graph:generate_reasoning_graph → tools/verify_reasoning_docs.py
+- health_monitor:SystemHealthMonitor → database.py
+- health_monitor:SystemHealthMonitor → debug_config.py
+- health_monitor:SystemHealthMonitor → evolution_engine.py
+- health_monitor:SystemHealthMonitor → psutil
+- health_monitor:check_system_resources → Alerting
+- health_monitor:check_system_resources → debug_config.py
+- health_monitor:check_system_resources → psutil
+- health_monitor:health_monitor → System
+- health_monitor:health_monitor → app.py
+- health_monitor:health_monitor → database.py
+- health_monitor:health_monitor → debug_config.py
+- introspection:introspection → app.py
+- introspection:introspection → static/js/main.js
+- introspection:introspection → templates/index.html
+- introspection:runtime_state → app.py
+- introspection:runtime_state → evolution_engine.py
+- introspection:runtime_state → tools/runtime_dump.py
+- knowledge_base:init_db → config.py
+- knowledge_base:init_db → database.py
+- knowledge_base:knowledge_base → config.py
+- knowledge_base:knowledge_base → database.py
+- knowledge_base:log_interaction → database.py
+- knowledge_base_full:knowledge_base_full → evolution_engine.py
+- knowledge_base_full:knowledge_base_full → knowledge_base.py
+- memory_engine:__init__ → All
+- memory_engine:__init__ → database.py
+- memory_engine:_initialize_memory_schema → database.py
+- memory_engine:get_contextual_memory → persona.py
+- memory_engine:get_memory_engine → All
+- memory_engine:get_memory_engine → app.py
+- memory_engine:get_memory_engine → persona.py
+- memory_engine:memory_engine → app.py
+- memory_engine:memory_engine → database.py
+- memory_engine:memory_engine → evolution_engine.py
+- memory_engine:memory_engine → nlp_processor.py
+- memory_engine:memory_engine → persona.py
+- memory_engine:store_interaction → app.py
+- memory_engine:store_interaction → nlp_processor.py
+- memory_engine:store_interaction → persona.py
+- nlp_processor:AdvancedNLPProcessor → evolution_engine.py
+- nlp_processor:AdvancedNLPProcessor → memory_engine.py
+- nlp_processor:AdvancedNLPProcessor → persona.py
+- nlp_processor:nlp_processor → evolution_engine.py
+- nlp_processor:nlp_processor → persona.py
+- nlp_processor:process_text → evolution_engine.py
+- nlp_processor:process_text → persona.py
+- nlp_processor_backup:UnifiedNLPProcessor → TextBlob
+- nlp_processor_backup:UnifiedNLPProcessor → app.py
+- nlp_processor_backup:UnifiedNLPProcessor → evolution_engine.py
+- nlp_processor_backup:UnifiedNLPProcessor → persona.py
+- nlp_processor_backup:UnifiedNLPProcessor → spacy
+- nlp_processor_backup:_load_spacy → Threading
+- nlp_processor_backup:_load_spacy → spacy
+- nlp_processor_backup:_process_uncached → _keywords_spacy()
+- nlp_processor_backup:_process_uncached → _sentiment()
+- nlp_processor_backup:_process_uncached → spacy
+- nlp_processor_backup:_sentiment → TextBlob
+- nlp_processor_backup:_sentiment → evolution_engine.py
+- nlp_processor_backup:_sentiment → persona.py
+- nlp_processor_backup:nlp_processor_backup → app.py
+- nlp_processor_backup:nlp_processor_backup → config.py
+- nlp_processor_backup:nlp_processor_backup → evolution_engine.py
+- nlp_processor_backup:nlp_processor_backup → persona.py
+- nlp_processor_fixed:UnifiedNLPProcessor → TextBlob
+- nlp_processor_fixed:UnifiedNLPProcessor → app.py
+- nlp_processor_fixed:UnifiedNLPProcessor → evolution_engine.py
+- nlp_processor_fixed:UnifiedNLPProcessor → persona.py
+- nlp_processor_fixed:UnifiedNLPProcessor → spacy
+- nlp_processor_fixed:_keywords_spacy → evolution_engine.py
+- nlp_processor_fixed:_keywords_spacy → persona.py
+- nlp_processor_fixed:_keywords_spacy → spacy.Doc
+- nlp_processor_fixed:_load_spacy → Threading
+- nlp_processor_fixed:_load_spacy → spacy
+- nlp_processor_fixed:_process_uncached → _keywords_spacy()
+- nlp_processor_fixed:_process_uncached → _sentiment()
+- nlp_processor_fixed:_process_uncached → spacy
+- nlp_processor_fixed:_sentiment → TextBlob
+- nlp_processor_fixed:_sentiment → evolution_engine.py
+- nlp_processor_fixed:_sentiment → persona.py
+- nlp_processor_fixed:_top_tokens → _normalize_token()
+- nlp_processor_fixed:_top_tokens → collections.Counter
+- nlp_processor_fixed:nlp_processor_fixed → app.py
+- nlp_processor_fixed:nlp_processor_fixed → config.py
+- nlp_processor_fixed:nlp_processor_fixed → evolution_engine.py
+- nlp_processor_fixed:nlp_processor_fixed → persona.py
+- perf_benchmark:benchmark_persona → nlp_processor.AdvancedNLPProcessor
+- perf_benchmark:benchmark_persona → persona.PersonaEngine.generate
+- perf_benchmark:perf_benchmark → memory_engine.py
+- perf_benchmark:perf_benchmark → nlp_processor.py
+- perf_benchmark:perf_benchmark → persona.py
+- perf_benchmark:write_results → CI
+- persona:__init__ → memory_engine.py
+- persona:_augment_with_reasoning_layers → memory_engine.py
+- persona:_augment_with_reasoning_layers → nlp_processor.py
+- persona:_maybe_handle_file_search → utils/file_search.py
+- persona:generate → app.py
+- persona:generate → memory_engine.py
+- persona:generate → nlp_processor.py
+- persona:persona → app.py
+- persona:persona → database.py
+- persona:persona → evolution_engine.py
+- persona:persona → introspection.py
+- persona:persona → memory_engine.py
+- persona:persona → nlp_processor.py
+- reasoning_focus:reasoning_focus → docs/reasoning_remediation.md
+- reasoning_focus:reasoning_focus → tools/generate_reasoning_graph.py
+- reasoning_focus:reasoning_focus → verification
+- run_tests:run_tests → Other
+- run_tests:run_tests → tests/test_ui_functionality.py
+- run_tests_legacy:run_tests_legacy → Makefile
+- run_tests_legacy:run_tests_legacy → tests/
+- runtime_dump:runtime_dump → app.py
+- runtime_dump:runtime_dump → introspection.py
+- self_fix:plan_self_fixes → database.py
+- self_fix:plan_self_fixes → system_validator.py
+- self_fix:self_fix → debug_config.py
+- self_fix:self_fix → evolution_engine.py
+- self_fix:self_fix → system_validator.py
+- summarize_repo:summarize → This
+- summarize_repo:summarize → persona.py
+- summarize_repo:summarize_repo → evolution_engine.py
+- summarize_repo:summarize_repo → file-inventory.md
+- summarize_repo:summarize_repo → persona.py
+- sync_tools:run_rclone_sync → config.py
+- sync_tools:run_rclone_sync → sync_watcher.py
+- sync_tools:sync_tools → database.py
+- sync_tools:sync_tools → file_ingestor.py
+- sync_tools:sync_tools → pdf_ingestor.py
+- sync_tools:sync_tools → sync_watcher.py
+- system_validator:SystemValidator → All
+- system_validator:SystemValidator → config
+- system_validator:SystemValidator → database
+- system_validator:SystemValidator → offline_guard
+- system_validator:get_system_validator → All
+- system_validator:get_system_validator → Monitoring
+- system_validator:system_validator → .github/copilot-instructions.md
+- system_validator:system_validator → All
+- system_validator:system_validator → config.py
+- system_validator:system_validator → user_config.py
+- test_file_ingestor_ingest:test_file_ingestor_ingest → database.py
+- test_file_ingestor_ingest:test_file_ingestor_ingest → file_ingestor.py
+- test_file_search_intent:test_file_search_intent → persona.py
+- test_file_search_intent:test_file_search_intent → utils/file_search.py
+- test_mode_variation:test_mode_variation → nlp_processor.py
+- test_mode_variation:test_mode_variation → persona.py
+- test_offline_guard_block:test_offline_guard_block → app.py
+- test_offline_guard_block:test_offline_guard_block → utils/offline_guard.py
+- test_offline_guard_block:test_offline_guard_blocks_external_connection → test
+- test_offline_guard_block:test_offline_guard_blocks_external_connection → utils/offline_guard.py
+- test_sentiment_consistency:test_sentiment_consistency → nlp_processor.py
+- test_sentiment_consistency:test_sentiment_consistency → persona.py
+- test_util_placeholders:test_util_placeholders → tools/summarize_repo.py
+- test_util_placeholders:test_util_placeholders → utils/self_fix.py
+- utils_watcher_full:utils_watcher_full → file_ingestor.py
+- utils_watcher_full:utils_watcher_full → sync_watcher.py
+- utils_watcher_full:utils_watcher_full → tools/docstring_enforcer.py
+- verify_reasoning_docs:verify_reasoning_docs → .github/copilot-instructions.md
+- verify_reasoning_docs:verify_reasoning_docs → introspection.py
+- verify_reasoning_docs:verify_reasoning_docs → tools/runtime_dump.py
+- watcher:watcher → file_ingestor.py
+- watcher:watcher → sync_watcher.py
+
+## Orphan Nodes (no outgoing Connects)
+
+- ai_enhancement:MemoryNetwork
+- ai_enhancement:IntelligenceAmplifier
+- ai_enhancement:PatternDetector
+- ai_enhancement:ResponseOptimizer
+- ai_enhancement:__init__
+- ai_enhancement:store_interaction
+- ai_enhancement:retrieve_relevant_context
+- ai_enhancement:_extract_concepts
+- ai_enhancement:_build_concept_connections
+- ai_enhancement:_calculate_relevance
+- ai_enhancement:_update_memory_weights
+- ai_enhancement:__init__
+- ai_enhancement:enhance_response
+- ai_enhancement:_generate_proactive_suggestions
+- ai_enhancement:analyze_patterns
+- ai_enhancement:_find_frequent_topics
+- ai_enhancement:_analyze_time_patterns
+- ai_enhancement:_analyze_interaction_style
+- ai_enhancement:_analyze_technical_focus
+- ai_enhancement:optimize_response
+- ai_enhancement:_make_concise
+- ai_enhancement:_add_detail
+- ai_enhancement:_add_contextual_reference
+- app:SimpleDebugger
+- app:info
+- auto_code_cleaner:auto_code_cleaner
+- auto_code_cleaner:scan_file
+- auto_code_cleaner:main
+- auto_code_cleaner_v2:auto_code_cleaner_v2
+- auto_code_cleaner_v2:is_in_function_or_class
+- auto_code_cleaner_v2:attach_parents
+- auto_code_cleaner_v2:scan_file
+- auto_code_cleaner_v2:main
+- automated_monitor:MonitoringAlert
+- automated_monitor:start_system_monitoring
+- automated_monitor:get_system_health
+- automated_monitor:__init__
+- automated_monitor:start_monitoring
+- automated_monitor:stop_monitoring
+- automated_monitor:_monitoring_loop
+- automated_monitor:_run_comprehensive_validation
+- automated_monitor:_run_critical_checks
+- automated_monitor:_monitor_performance
+- automated_monitor:_log_alert
+- automated_monitor:_log_correction
+- automated_monitor:get_monitoring_status
+- automated_monitor:get_system_health_summary
+- automated_monitor:_generate_health_recommendations
+- backup_manager:backup_manager
+- backup_manager:BackupManager
+- backup_manager:__init__
+- backup_manager:create_backup
+- backup_manager:cleanup_old_backups
+- backup_system:CleverBackupSystem
+- backup_system:main
+- backup_system:__init__
+- backup_system:_calculate_directory_size
+- backup_system:_count_files
+- backup_system:create_database_snapshot
+- backup_system:_analyze_database
+- backup_system:list_backups
+- backup_system:cleanup_old_backups
+- clever_conversation_engine:deprecated_engine_warning
+- clever_conversation_engine:__init__
+- clever_conversation_engine:get_dynamic_greeting
+- cli:cli
+- cli:cmd_ingest
+- cli:cmd_list
+- cli:cmd_search
+- cli:cmd_show
+- cli:main
+- config:_split_paths
+- convert_inventory:convert_inventory
+- convert_inventory:load_inventory
+- convert_inventory:group_by_language
+- convert_inventory:group_by_directory
+- convert_inventory:calculate_stats
+- convert_inventory:format_number
+- convert_inventory:create_markdown
+- convert_inventory:main
+- database:Source
+- database:DatabaseManager
+- database:add_conversation
+- database:__init__
+- database:_connect
+- database:_init
+- database:set_context_note
+- database:add_utterance
+- database:list_utterances
+- database:add_or_update_source
+- database:list_interactions
+- database:add_interaction
+- database:add_conversation
+- debug_config:SimpleDebugger
+- debug_config:performance_monitor
+- debug_config:reset_debugger
+- debug_config:__init__
+- debug_config:info
+- debug_config:debug
+- debug_config:error
+- debug_config:warning
+- debug_config:track_performance
+- debug_config:get_debug_summary
+- debug_config:decorator
+- debug_config:wrapper
+- enhanced_conversation_engine:__init__
+- enhanced_conversation_engine:_discover_capabilities
+- enhanced_conversation_engine:update_from_interaction
+- enhanced_conversation_engine:__init__
+- enhanced_conversation_engine:_perform_comprehensive_analysis
+- enhanced_conversation_engine:_analyze_intent
+- enhanced_conversation_engine:_classify_request_type
+- enhanced_conversation_engine:_identify_required_capabilities
+- enhanced_conversation_engine:_build_enhanced_context
+- enhanced_conversation_engine:_route_request
+- enhanced_conversation_engine:_identify_file_operations
+- enhanced_conversation_engine:_generate_comprehensive_response
+- enhanced_conversation_engine:_process_file_requests
+- enhanced_conversation_engine:_safe_read_file
+- enhanced_conversation_engine:_analyze_file_content
+- enhanced_conversation_engine:_detect_content_type
+- enhanced_conversation_engine:_retrieve_relevant_memory
+- enhanced_conversation_engine:_generate_clever_state
+- enhanced_conversation_engine:_generate_ui_reactions
+- enhanced_conversation_engine:_determine_mood
+- enhanced_conversation_engine:_generate_insights
+- enhanced_conversation_engine:_determine_approach
+- enhanced_conversation_engine:_integrate_learning
+- enhanced_conversation_engine:_process_text_file
+- enhanced_conversation_engine:_process_code_file
+- enhanced_conversation_engine:_process_json_file
+- enhanced_conversation_engine:_process_csv_file
+- error_recovery:get_error_recovery
+- error_recovery:__init__
+- evolution_engine:SimpleEvolutionEngine
+- evolution_engine:reset_evolution_engine
+- evolution_engine:__init__
+- evolution_engine:get_interaction_summary
+- evolution_engine:get_learning_insights
+- evolution_engine:reset_session
+- file_ingestor:file_ingestor
+- file_ingestor:FileIngestor
+- file_ingestor:__init__
+- file_ingestor:ingest_all_files
+- file_ingestor:clean_pdf_text
+- file_ingestor:process_pdf
+- file_search:_iter_candidate_files
+- file_search:search_by_extension
+- final_integration_test:FinalIntegrationTester
+- final_integration_test:main
+- final_integration_test:__init__
+- final_integration_test:setup_test_environment
+- final_integration_test:test_system_validation
+- final_integration_test:test_enhanced_conversation
+- final_integration_test:test_file_access_capability
+- final_integration_test:test_automated_monitoring
+- final_integration_test:test_integration_workflow
+- final_integration_test:run_comprehensive_test
+- fix_line_lengths:fix_line_lengths
+- fixer:fixer
+- fixer:list_operations
+- fixer:apply
+- fixer:_repair_dependencies
+- fixer:_validate_config_files
+- fixer:_check_database_integrity
+- fixer:_cleanup_logs
+- fixer:_run_code_cleaner
+- fixer:_ensure_service_worker_present
+- fixer:_ensure_citations_chip
+- fixer:_enable_autoswitch_mode
+- fixer:_brighten_scene_constants
+- fixer:_boost_particle_count
+- generate_file_inventory:generate_file_inventory
+- generate_file_inventory:get_file_stats
+- generate_file_inventory:get_last_modified
+- generate_file_inventory:generate_inventory
+- generate_reasoning_graph:Node
+- generate_reasoning_graph:extract_sections
+- generate_reasoning_graph:scan_python_files
+- generate_reasoning_graph:build_nodes
+- generate_reasoning_graph:generate_markdown
+- generate_reasoning_graph:build_remediation
+- generate_reasoning_graph:generate_badge
+- generate_reasoning_graph:run
+- generate_reasoning_graph:main
+- health_monitor:get_health_monitor
+- health_monitor:__init__
+- health_monitor:check_database_health
+- health_monitor:check_nlp_components
+- health_monitor:check_evolution_engine
+- health_monitor:run_full_health_check
+- health_monitor:get_health_summary
+- introspection:extract_doc_meta
+- introspection:record_render
+- introspection:get_recent_renders
+- introspection:set_last_error
+- introspection:get_last_error
+- introspection:build_endpoints_snapshot
+- introspection:detect_git_version
+- introspection:_compute_warnings
+- introspection:traced_render
+- introspection:register_error_handler
+- introspection:_capture_error
+- knowledge_base:get_recent_interactions
+- memory_engine:MemoryContext
+- memory_engine:MemoryNode
+- memory_engine:AdvancedMemoryEngine
+- memory_engine:reset_memory_engine
+- memory_engine:__post_init__
+- memory_engine:__post_init__
+- memory_engine:_execute_query
+- memory_engine:_generate_session_id
+- memory_engine:_store_conversation_context
+- memory_engine:_extract_memory_nodes
+- memory_engine:_create_memory_node
+- memory_engine:_create_semantic_links
+- memory_engine:_calculate_similarity
+- memory_engine:_create_relationship
+- memory_engine:_learn_patterns
+- memory_engine:_update_preferences
+- memory_engine:_update_preference
+- memory_engine:_load_preferences
+- memory_engine:get_conversation_history
+- memory_engine:predict_preferences
+- memory_engine:get_memory_stats
+- nlp_processor:_safe_lower
+- nlp_processor:SimpleNLPProcessor
+- nlp_processor:get_nlp_processor
+- nlp_processor:__init__
+- nlp_processor:process
+- nlp_processor:extract_keywords
+- nlp_processor:_noise_metrics
+- nlp_processor:analyze_sentiment
+- nlp_processor:extract_entities
+- nlp_processor:tokenize
+- nlp_processor:__init__
+- nlp_processor:_extract_entities_advanced
+- nlp_processor:_hybrid_sentiment
+- nlp_processor:_readability
+- nlp_processor:_question_type
+- nlp_processor:_concept_density
+- nlp_processor:_topic_vector
+- nlp_processor:_estimate_syllables
+- nlp_processor:get_word_frequency
+- nlp_processor:process
+- nlp_processor_backup:_normalize_token
+- nlp_processor_backup:_top_tokens
+- nlp_processor_backup:_keywords_spacy
+- nlp_processor_backup:_keywords_fallback
+- nlp_processor_backup:__init__
+- nlp_processor_backup:_ensure_nlp
+- nlp_processor_backup:_quick_cache
+- nlp_processor_backup:process
+- nlp_processor_backup:nlp
+- nlp_processor_fixed:_normalize_token
+- nlp_processor_fixed:__init__
+- nlp_processor_fixed:_ensure_nlp
+- nlp_processor_fixed:_quick_cache
+- nlp_processor_fixed:process
+- nlp_processor_fixed:nlp
+- offline_guard:offline_guard
+- offline_guard:_is_loopback
+- offline_guard:_GuardedSocket
+- offline_guard:enable
+- offline_guard:disable
+- offline_guard:is_enabled
+- offline_guard:contains_network_reference
+- offline_guard:connect
+- offline_guard:connect_ex
+- pdf_ingestor:pdf_ingestor
+- pdf_ingestor:EnhancedFileIngestor
+- pdf_ingestor:watch_and_ingest
+- pdf_ingestor:__init__
+- pdf_ingestor:ingest_all_files
+- pdf_ingestor:ingest_file
+- pdf_ingestor:_extract_pdf_content
+- pdf_ingestor:_extract_text_content
+- pdf_ingestor:_chunk_content
+- pdf_ingestor:EnhancedSyncHandler
+- pdf_ingestor:__init__
+- pdf_ingestor:trigger_ingestion
+- perf_benchmark:_now
+- perf_benchmark:_check_thresholds
+- perf_benchmark:main
+- persona:PersonaResponse
+- persona:PersonaEngine
+- persona:_response_signature
+- persona:_ensure_variation
+- persona:_extract_keywords
+- persona:_analyze_sentiment
+- persona:_extract_entities
+- persona:_calculate_importance
+- persona:_generate_suggestions
+- persona:_auto_style
+- persona:_time_bucket
+- persona:_heuristic_vector_strength
+- persona:_compression_ratio
+- persona:_creative_style
+- persona:_deep_dive_style
+- persona:_support_style
+- persona:_quick_hit_style
+- persona:_regen
+- persona_simple:persona_simple
+- persona_simple:PersonaResponse
+- persona_simple:PersonaEngine
+- persona_simple:__init__
+- persona_simple:generate
+- reasoning_focus:parse_remediation
+- reasoning_focus:load_or_fail
+- reasoning_focus:get_code_excerpt
+- reasoning_focus:main
+- run_tests:run_tooltip_tests
+- run_tests:run_main_test_suite
+- run_tests:run_pytest_tests
+- run_tests:create_test_report
+- run_tests:main
+- runtime_dump:ensure_initial_render
+- runtime_dump:main
+- scheduler:scheduler
+- scheduler:_run_cycle
+- scheduler:run_scheduler
+- simplified_integration_test:simplified_integration_test
+- simplified_integration_test:test_system_validation
+- simplified_integration_test:test_enhanced_conversation
+- simplified_integration_test:test_file_access
+- simplified_integration_test:test_conversation_with_file_analysis
+- simplified_integration_test:main
+- sync_tools:sync_clever_from_remote
+- sync_tools:sync_synaptic_from_remote
+- sync_watcher:sync_watcher
+- sync_watcher:SyncEventHandler
+- sync_watcher:main
+- sync_watcher:__init__
+- sync_watcher:on_any_event
+- sync_watcher:trigger_ingestion
+- system_validator:ValidationResult
+- system_validator:validate_system_startup
+- system_validator:__init__
+- system_validator:run_full_validation
+- system_validator:_validate_offline_enforcement
+- system_validator:_validate_single_user_config
+- system_validator:_validate_single_database
+- system_validator:_validate_jay_personalization
+- system_validator:_validate_clever_persona
+- system_validator:_validate_file_structure_compliance
+- system_validator:_validate_nlp_capabilities
+- system_validator:_validate_evolution_engine_access
+- system_validator:_validate_documentation_standards
+- system_validator:_validate_performance_optimization
+- system_validator:_generate_recommendations
+- test_app:test_app
+- test_app:app_client
+- test_app:test_health
+- test_app:test_index
+- test_app:test_chat_happy
+- test_app:test_chat_bad_request
+- test_app:test_ingest_form
+- test_file_ingestor_ingest:test_ingest_file_insert_and_unchanged
+- test_file_ingestor_ingest:test_ingest_file_updated_on_change
+- test_file_search_intent:_response_lines
+- test_file_search_intent:test_file_search_simple_python
+- test_file_search_intent:test_file_search_markdown_architecture
+- test_file_search_intent:test_file_search_no_results
+- test_introspection:test_introspection
+- test_introspection:client
+- test_introspection:test_runtime_introspect_basic
+- test_introspection:test_runtime_introspect_reasoning_richness
+- test_introspection:test_runtime_introspect_schema_keys
+- test_introspection:test_runtime_introspect_evolution_summary
+- test_introspection:test_runtime_introspect_includes_version
+- test_mode_variation:_signature
+- test_mode_variation:test_mode_variation_and_memory_metrics
+- test_persona_smoke:test_persona_smoke
+- test_persona_smoke:test_persona_basic_response
+- test_persona_smoke:test_persona_variation
+- test_persona_smoke:test_persona_auto_mode_smoke
+- test_sentiment_consistency:engine
+- test_sentiment_consistency:test_positive_sentiment
+- test_sentiment_consistency:test_negative_sentiment
+- test_sentiment_consistency:test_neutral_sentiment
+- test_skills:test_skills
+- test_skills:test_summarize_ok
+- test_skills:test_search_empty
+- test_suite:test_suite
+- test_suite:CleverTestSuite
+- test_suite:get_test_suite
+- test_suite:run_quick_tests
+- test_suite:__init__
+- test_suite:run_all_tests
+- test_suite:test_database_components
+- test_suite_full:test_suite_full
+- test_ui_brief_acceptance:test_ui_brief_acceptance
+- test_ui_brief_acceptance:test_index_has_core_elements
+- test_ui_brief_acceptance:test_assets_wired_locally
+- test_ui_brief_acceptance:test_microcopy_placeholders
+- test_ui_brief_acceptance:test_microcopy_placeholders
+- test_ui_functionality:test_ui_functionality
+- test_ui_functionality:UITooltipTests
+- test_ui_functionality:run_ui_tooltip_tests
+- test_ui_functionality:__init__
+- test_ui_functionality:run_all_tooltip_tests
+- test_ui_functionality:get_template_files
+- test_ui_functionality:extract_buttons_from_html
+- test_ui_functionality:test_button_tooltips_exist
+- test_ui_functionality:test_tooltip_consistency
+- test_ui_functionality:test_accessibility_attributes
+- test_ui_functionality:test_tooltip_html_structure
+- test_ui_tooltips:test_ui_tooltips
+- test_ui_tooltips:TestUITooltips
+- test_ui_tooltips:template_files
+- test_ui_tooltips:parse_html_file
+- test_ui_tooltips:test_button_tooltips_exist
+- test_ui_tooltips:test_tooltip_consistency
+- test_ui_tooltips:test_accessibility_attributes
+- test_ui_tooltips:test_tooltip_content_quality
+- test_ui_tooltips:test_tooltip_html_structure
+- test_util_placeholders:test_summarize_min_shape
+- test_util_placeholders:test_plan_self_fixes_shape
+- user_config:user_config
+- validate_lazy_loading:validate_lazy_loading
+- validate_lazy_loading:get_memory_usage
+- validate_lazy_loading:test_standard_loading
+- validate_lazy_loading:LazyNLPProcessor
+- validate_lazy_loading:test_lazy_loading
+- validate_lazy_loading:test_minimal_pipeline
+- validate_lazy_loading:cached_process
+- validate_lazy_loading:test_caching_benefits
+- validate_lazy_loading:main
+- validate_lazy_loading:__init__
+- validate_lazy_loading:nlp
+- validate_lazy_loading:process
+- verify_reasoning_docs:_debug
+- verify_reasoning_docs:gather_staged_python_files
+- verify_reasoning_docs:extract_docstring_nodes
+- verify_reasoning_docs:has_all_tokens
+- verify_reasoning_docs:analyze_file
+- verify_reasoning_docs:main
+- watcher:run_watch
+

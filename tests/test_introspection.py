@@ -58,6 +58,10 @@ def test_runtime_introspect_basic(client):
     assert 'render_threshold_ms' in data
     assert 'warnings' in data
     assert isinstance(data['warnings'], list)
+    assert 'reasoning_coverage' in data and isinstance(data['reasoning_coverage'], dict)
+    rc = data['reasoning_coverage']
+    for k in ('endpoints_total','endpoints_complete','percent'):
+        assert k in rc
     if data['last_render']:
         assert 'slow' in data['last_render']
 
@@ -88,7 +92,7 @@ def test_runtime_introspect_schema_keys(client):
     """
     client.get('/')
     data = client.get('/api/runtime_introspect').get_json()
-    for key in ['last_render', 'recent_renders', 'endpoints', 'persona_mode', 'last_error', 'version', 'generated_ts', 'warnings', 'render_threshold_ms', 'evolution']:
+    for key in ['last_render', 'recent_renders', 'endpoints', 'persona_mode', 'last_error', 'version', 'generated_ts', 'warnings', 'render_threshold_ms', 'evolution', 'reasoning_coverage']:
         assert key in data, f"Missing key {key} in runtime introspection response"
 
 

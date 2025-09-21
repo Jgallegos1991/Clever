@@ -91,6 +91,19 @@ class SimpleNLPProcessor:
             'char_count': char_count,
             **noise_metrics
         }
+
+    def process(self, text: str) -> Dict[str, Any]:  # Backward-compatible alias
+        """Alias for process_text to support legacy callers.
+
+        Why: Some higher-level engines (e.g., enhanced conversation engine)
+        invoke `process`; adding an alias avoids widespread refactors while
+        maintaining a single implementation source of truth.
+        Where: Called by `enhanced_conversation_engine.py` during comprehensive
+        analysis stages to obtain NLP features.
+        How: Thin passthrough returning `process_text(text)` results; keeps
+        external contract stable and future-proofs naming consistency.
+        """
+        return self.process_text(text)
     
     def extract_keywords(self, text: str) -> List[str]:
         """

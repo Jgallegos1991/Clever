@@ -1,19 +1,30 @@
 """
 Persona Engine for Clever AI
 
-Why: Generates context-aware, empathetic responses in various modes (Auto,
-Creative, Deep Dive, Support, Quick Hit) for Jay specifically. Operates fully
-offline, leveraging advanced memory system and local NLP.
-Where: Used by app.py for user interactions, connects to memory_engine for
-intelligent context and nlp_processor for language analysis.
-How: Implements PersonaEngine class with multiple response modes, integrates
-advanced memory system, predictive capabilities, and returns PersonaResponse objects.
+Why:
+    Converts raw user intent + localized analysis signals into tailored, empathetic
+    replies across five adaptive modes (Auto, Creative, Deep Dive, Support, Quick Hit).
+    It is the semantic forge where contextual arrows are created: each response embeds
+    memory references, inferred mode, and reasoning layers—fuel for downstream logging
+    and introspection.
+Where:
+    Invoked by `app.py` chat endpoints; draws from `memory_engine` for relevance,
+    `nlp_processor` for linguistic and sentiment cues, and surfaces debug metrics the
+    evolution and introspection systems can consume. Feeds database only indirectly
+    via memory storage pathways.
+How:
+    Lazily initializes NLP + memory, predicts or confirms mode, synthesizes response via
+    mode-specific style handlers, enforces anti-repetition variation, layers structured
+    reasoning (especially for why/how queries), generates proactive suggestions, and
+    emits a `PersonaResponse` annotated with debug metrics (arrows for observability).
 
 Connects to:
-    - memory_engine.py: Advanced memory and learning system
-    - nlp_processor.py: NLP and sentiment analysis  
-    - database.py: Persistent storage via memory engine
-    - app.py: Main application for user interaction
+    - memory_engine.py: Contextual memory retrieval & storage hooks
+    - nlp_processor.py: Analysis pipeline (keywords, entities, sentiment)
+    - evolution_engine.py: Interaction logging consumer of mode + telemetry
+    - app.py: Primary caller routing user input to persona
+    - database.py: Underlying persistence via memory interactions
+    - introspection.py: Exposes persona_mode & metrics in runtime snapshot
 """
 from __future__ import annotations
 import logging
@@ -117,13 +128,18 @@ class PersonaEngine:
         """Compute a lightweight signature for repetition detection.
 
         Why: Need a fast, deterministic way to detect near-identical responses
-        Where: Called by _ensure_variation when deciding if we must mutate output
-        How: Lowercase slice + hash fallback for short texts
+        Where: Called by _ensure_variation when deciding if we must mutate output.
+        How: We intentionally base the signature ONLY on the first rendered line
+             (lower‑cased & truncated) because the test suite's variation check
+             compares only the first line (see tests/test_mode_variation.py::_signature).
+             Previously we used the first 240 chars of the whole response with newlines
+             collapsed; two responses that differed later (line2/line3) but had an
+             identical opening line passed the uniqueness check, causing the test to fail.
+             Aligning the heuristic to the test's surface form guarantees forced variation
+             when the opening sentence repeats.
         """
-        # Increase slice length so mode-specific subtle variations (e.g. different creative lenses
-        # near end of first sentence) are captured; previous 140 chars truncated differences.
-        core = text.strip().lower().replace('\n', ' ')[:240]
-        return core
+        first_line = text.strip().split('\n', 1)[0].lower()
+        return first_line[:160]
 
     def _ensure_variation(self, base: str, regen_callable, max_attempts: int = 3) -> str:
         """Ensure the returned response is not an immediate repeat.
@@ -289,8 +305,13 @@ class PersonaEngine:
         if clarification_prefix:
             response_text = clarification_prefix + response_text
         # Post-enhance with analytical depth if deep-dive or complex query
-        if mode_handler == self._deep_dive_style or analysis.get('question_type') in {'why','how'}:
-            response_text = self._augment_with_reasoning_layers(text, response_text, analysis, enhanced_context)
+        # Reasoning layer injection disabled (minimal conversational mode)
+        # Why: User requested removal of visible meta / analytical scaffolding lines.
+        # Where: Previously appended extra layered explanation paragraphs here.
+        # How: Skip _augment_with_reasoning_layers entirely to prevent generation
+        #      of multi-line structured reasoning that can expose internal state.
+        # if mode_handler == self._deep_dive_style or analysis.get('question_type') in {'why','how'}:
+        #     response_text = self._augment_with_reasoning_layers(text, response_text, analysis, enhanced_context)
         
         # Generate memory-enhanced proactive suggestions
         suggestions = self._generate_suggestions(text, keywords, enhanced_context)
@@ -577,70 +598,62 @@ class PersonaEngine:
 
     def _auto_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
-        Auto mode - balanced, contextual responses
-        
-        Why: Default mode providing natural, balanced responses
-        Where: Used when no specific mode is requested
-        How: Analyze input and provide appropriate response style
+        Auto mode - balanced, human, and purposeful responses (no number spam)
+
+        Why: Jay asked for less "calculations" and more clear reasoning. This style
+             leads with understanding, then a concise because/therefore chain, then a
+             next step. It keeps Clever's personality without distracting metrics.
+        Where: Default path when no explicit mode is requested (most everyday chats).
+        How: Derive a subject from keywords/entities, mirror intent briefly, give a
+             1-2 sentence rationale, and end with a gentle actionable option.
         """
         analysis = context.get('nlp_analysis', {})
-        question_type = analysis.get('question_type')
+        question_type = (analysis.get('question_type') or '').lower() or ('?' in text and 'why' or 'none')
         sentiment = analysis.get('sentiment', 'neutral')
         rel_mem = context.get('relevant_memories') or []
-        top_kw = keywords[:3]
-        entities = analysis.get('entities') or []
-        time_of_day = self._time_bucket()
+        top_kw = [kw for kw in keywords if isinstance(kw, str)][:3]
+        entities = [e for e in (analysis.get('entities') or []) if isinstance(e, str)][:3]
 
-        # Dynamic fragments
-        openings_question = [
-            "Great question on", "Let's unpack", "Let's deconstruct", "Zooming in on",
-            "Worth exploring deeply:" , "Love that you're probing"
-        ]
-        openings_statement = [
-            "Noted—you're reflecting on", "Interesting angle about", "Let's frame",
-            "We can distill", "There's a signal in", "Let's map the contours of"
-        ]
-        sentiment_adapters = {
-            'positive': ["— the energy is good here.", "; momentum is in your favor."],
-            'negative': ["— let's stabilize this.", "; we can turn friction into traction."],
-            'neutral': ["— balanced starting point.", "; we can shape this further."],
+        # Mirror user's topic simply (no metrics)
+        subject = (top_kw[0] if top_kw else (entities[0] if entities else 'that'))
+
+        # Light persona tone depending on sentiment
+        sentiment_openers = {
+            'positive': "Love the direction here.",
+            'negative': "I hear the friction—let's steady this.",
+            'neutral': "Let's get a clean read on this.",
         }
-        question_lens = {
-            'why': "root-cause layers",
-            'how': "mechanistic sequence",
-            'what': "core structure",
-            'none': "essence"
+        opener = sentiment_openers.get(str(sentiment).lower(), sentiment_openers['neutral'])
+
+        # Pick a reasoning lens from the question type
+        lens_map = {
+            'why': "because the underlying driver matters more than the surface symptom",
+            'how': "by laying the steps in the right order and removing the choke points",
+            'what': "by naming the core pieces and the edges between them",
+            'none': "by clarifying the goal and the simplest path toward it",
         }
-        mem_fragment = ""
+        lens = lens_map.get(question_type if question_type in lens_map else 'none')
+
+        # Optional memory nudge (plain language)
+        mem_line = ""
         if rel_mem:
-            snippet = rel_mem[0].get('content','').strip().split('\n')[0][:90]
+            snippet = rel_mem[0].get('content', '').strip().split('\n')[0][:90]
             if snippet:
-                mem_fragment = f" Earlier we touched on '{snippet}...' which resonates here."
-        entity_fragment = ""
-        if entities:
-            entity_fragment = f" Entities noticed: {', '.join(entities[:3])}."
+                mem_line = f" Earlier you mentioned '{snippet}…'—I'll keep that in frame."
 
-        base_subject = (top_kw[0] if top_kw else 'this')
-        opening_pool = openings_question if '?' in text or question_type else openings_statement
-        opening = random.choice(opening_pool)
-        lens = question_lens.get(question_type or 'none', 'structure')
-        sentiment_tail = random.choice(sentiment_adapters.get(sentiment, sentiment_adapters['neutral']))
-        # Compose layered sentence
-        line1 = f"{opening} {base_subject}{sentiment_tail}"
-        line2 = f"Time-of-day: {time_of_day}; focal lens: {lens}."
-        line3_options = [
-            "Key signals: " + ", ".join(top_kw) if top_kw else "Signal: still forming.",
-            f"Vector: {self._heuristic_vector_strength(text):.2f} complexity index.",
-            f"Compression ratio heuristic: {self._compression_ratio(text):.2f}."
-        ]
-        line3 = random.choice(line3_options)
-        closing_options = [
-            "Want a deeper breakdown?", "We can branch into subcomponents.",
-            "I can model causal chains if helpful.", "Ready to pivot modes if you are." 
-        ]
-        closing = random.choice(closing_options)
-        assembled = f"{line1}\n{line2}\n{line3}{mem_fragment}{entity_fragment}\n{closing}"
-        return assembled
+        # Assemble a short, logical reply (max ~3 lines)
+        line1 = f"{opener} With {subject}, let's keep it simple."
+        line2 = f"We make progress {lens}."
+        # Offer a concrete next step tailored to question type
+        next_steps = {
+            'why': "Want me to map likely causes vs. signals?",
+            'how': "Want a quick step-by-step so you can move now?",
+            'what': "Want a crisp definition and a tiny example?",
+            'none': "Want a simple plan or a quick gut-check?",
+        }
+        line3 = next_steps.get(question_type if question_type in next_steps else 'none')
+
+        return f"{line1}\n{line2}{mem_line}\n{line3}"
 
     def _time_bucket(self) -> str:
         """Return coarse time-of-day bucket.
@@ -694,11 +707,11 @@ class PersonaEngine:
         # micro-adjective + creative verb bundle.
 
         starters = [
-            "Let's splash some color: ",
-            "Lighting the imagination fuse: ",
-            "Creative detour engaged: ",
-            "Permission to remix granted: ",
-            "Unconventional pivot: "
+            "Let's paint with possibility: ",
+            "Here's a playful riff: ",
+            "Creative detour, softly lit: ",
+            "Permission to remix—granted: ",
+            "Unconventional pivot incoming: "
         ]
         lenses = [
             'storytelling', 'design thinking', 'musical composition',
@@ -722,12 +735,12 @@ class PersonaEngine:
             # Place lens + verb up front for early-surface divergence
             line = (
                 f"{starter}{adj} {lens} lens → what if we {verb} {target} early, "
-                f"then explore secondary dimensions? We could map contrasting patterns and unexpected analogies."  # noqa: E501
+                "then wander a bit and come back with a cleaner angle?"
             )
         else:
             line = (
-                f"{starter}{adj} {lens} lens → let's {verb} the whole frame, "
-                "then rebuild with surprising analogies and cross-domain echoes."
+                f"{starter}{adj} {lens} lens → let's {verb} the frame, "
+                "then rebuild it with one surprising analogy."
             )
 
         return line

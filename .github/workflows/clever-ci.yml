@@ -83,6 +83,18 @@ jobs:
           . .venv/bin/activate
           if [ -d tests ]; then pytest -q || pytest -q --maxfail=1; else echo "No tests directory"; fi
 
+      - name: Generate reasoning graph & remediation
+        run: |
+          . .venv/bin/activate
+          echo "Generating reasoning graph (non-blocking remediation)"
+          python tools/generate_reasoning_graph.py --remediation --badge || true
+
+      - name: Enforce minimum reasoning coverage
+        run: |
+          . .venv/bin/activate
+          echo "Checking reasoning coverage threshold (60% min)"
+          python tools/generate_reasoning_graph.py --fail-under 60 || (echo "Reasoning coverage below threshold" && exit 1)
+
       - name: Generate file inventory
         run: |
           . .venv/bin/activate
@@ -94,6 +106,16 @@ jobs:
         with:
           name: file-inventory-${{ matrix.python-version }}-${{ github.run_id }}
           path: file-inventory.md
+
+      - name: Upload reasoning artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reasoning-artifacts
+          path: |
+            docs/reasoning_graph.md
+            docs/reasoning_remediation.md
+            docs/reasoning_coverage_badge.svg
 
       - name: Commit updated file inventory (non-blocking)
         if: success()

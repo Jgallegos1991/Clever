@@ -21,24 +21,21 @@ class HolographicChamber {
   }
 
   init() {
-    console.log('🔧 Initializing holographic chamber...');
+    // Initialize holographic chamber (quiet mode; no on-screen debug)
     this.resize();
-    console.log(`📏 Canvas size: ${this.width}x${this.height}`);
     this.createParticles();
-    console.log(`✨ Created ${this.particles.length} particles`);
     
     // Add mouse interaction
     this.mouse = { x: this.width / 2, y: this.height / 2 };
     this.addMouseInteraction();
-    this.addAccessibilityControls();
-    this.addDebugToggle();
+    // Keep UI clean: no accessibility/debug toggle buttons by default
+    this.accessibilityEnabled = false;
+    this.debugOverlayEnabled = false;
     
   // Always start with whirlpool formation for idle
   this.morphToFormation('whirlpool');
     
-    this.animate();
-    console.log('🎬 Animation started with whirlpool formation');
-    console.log('🎯 Particles should now be EXTREMELY VISIBLE with debug text');
+  this.animate();
     
     // Listen for window resize
     window.addEventListener('resize', () => this.resize());
@@ -308,34 +305,7 @@ class HolographicChamber {
   draw() {
   // Clear canvas each frame to prevent pixel trails
   this.ctx.clearRect(0, 0, this.width, this.height);
-  // Minimal debug info for performance
-  // ...existing code...
-    
-  // Accessibility overlay
-  if (this.accessibilityEnabled) {
-    this.ctx.save();
-    this.ctx.globalAlpha = 1.0;
-    this.ctx.fillStyle = '#000';
-    this.ctx.fillRect(0, 0, this.width, 40);
-    this.ctx.font = 'bold 18px Arial';
-    this.ctx.fillStyle = '#fff';
-    this.ctx.fillText('Accessibility Mode: High Contrast', 10, 30);
-    this.ctx.restore();
-  }
-    
-  // Debug overlay
-  if (this.debugOverlayEnabled) {
-    this.ctx.save();
-    this.ctx.globalAlpha = 0.95;
-    this.ctx.fillStyle = 'rgba(0,0,0,0.7)';
-    this.ctx.fillRect(0, this.height - 80, this.width, 80);
-    this.ctx.font = 'bold 16px Arial';
-    this.ctx.fillStyle = '#39ff14';
-    this.ctx.fillText(`Particles: ${this.particles.length} | Formation: ${this.targetFormation || 'whirlpool'}`, 20, this.height - 55);
-    this.ctx.fillText(`State: ${this.state} | Canvas: ${this.width}x${this.height}`, 20, this.height - 35);
-    this.ctx.fillText(`DevicePixelRatio: ${this.dpr}`, 20, this.height - 15);
-    this.ctx.restore();
-  }
+  // No on-canvas overlays in normal mode (keep stage clean)
     
   this.particles.forEach(particle => {
   // Render as glowing particles for better visibility
@@ -481,47 +451,14 @@ class HolographicChamber {
 
   // Accessibility controls
   addAccessibilityControls() {
-    // Add a toggle button to the DOM
-    const btn = document.createElement('button');
-    btn.textContent = 'Toggle Accessibility';
-    btn.style.position = 'absolute';
-    btn.style.top = '10px';
-    btn.style.right = '10px';
-  btn.style.zIndex = "1000";
-    btn.style.background = '#222';
-    btn.style.color = '#fff';
-    btn.style.border = '2px solid #39ff14';
-    btn.style.padding = '8px 16px';
-    btn.style.fontSize = '16px';
-    btn.style.borderRadius = '6px';
-    btn.style.cursor = 'pointer';
-    btn.setAttribute('aria-label', 'Toggle high contrast accessibility mode');
-    btn.onclick = () => {
-      this.accessibilityEnabled = !this.accessibilityEnabled;
-    };
-    document.body.appendChild(btn);
+    // Intentionally no-op to avoid adding toggle UI to the stage
+    return;
   }
 
   // Debug overlay toggle
   addDebugToggle() {
-    const btn = document.createElement('button');
-    btn.textContent = 'Toggle Debug Overlay';
-    btn.style.position = 'absolute';
-    btn.style.top = '50px';
-    btn.style.right = '10px';
-  btn.style.zIndex = "1000";
-    btn.style.background = '#222';
-    btn.style.color = '#39ff14';
-    btn.style.border = '2px solid #fff';
-    btn.style.padding = '8px 16px';
-    btn.style.fontSize = '16px';
-    btn.style.borderRadius = '6px';
-    btn.style.cursor = 'pointer';
-    btn.setAttribute('aria-label', 'Toggle debug performance overlay');
-    btn.onclick = () => {
-      this.debugOverlayEnabled = !this.debugOverlayEnabled;
-    };
-    document.body.appendChild(btn);
+    // Intentionally no-op to avoid adding toggle UI to the stage
+    return;
   }
   dialogue() {
     this.setState('dialogue');
@@ -554,17 +491,4 @@ window.triggerPulse = function(intensity) {
 
 // Note: Auto-initialization removed to prevent conflicts with main.js
 // The chamber is initialized by main.js using window.startHolographicChamber()
-console.log('🔧 Holographic chamber loaded, waiting for main.js initialization...');
-
-// Debug: Check if functions are exported
-console.log('🎯 startHolographicChamber type:', typeof window.startHolographicChamber);
-console.log('🎯 HolographicChamber type:', typeof window.HolographicChamber);
-
-// Update debug display if available
-setTimeout(() => {
-  const debugDiv = document.getElementById('debug-info');
-  if (debugDiv) {
-    debugDiv.innerHTML = 'Holographic chamber JS loaded!<br/>Functions exported: ' + 
-                        (typeof window.startHolographicChamber === 'function' ? 'YES' : 'NO');
-  }
-}, 100);
+// Quiet load: no console logs or UI updates; main.js will initialize when ready.

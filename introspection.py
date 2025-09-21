@@ -377,32 +377,39 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
         from pathlib import Path  # local import to avoid overhead if stripped
         diag_path = Path(__file__).resolve().parent / 'docs' / 'copilot_diagnostics.md'
         if not diag_path.exists():
-            # adjust if running from root (introspection.py at project root)
             proj_root = Path(__file__).resolve().parent
             diag_path = proj_root / 'docs' / 'copilot_diagnostics.md'
         if diag_path.exists():
             text = diag_path.read_text(encoding='utf-8', errors='ignore').splitlines()
-            # Extract first 40 lines to keep payload small
             diagnostics_excerpt = text[:40]
     except Exception:
         diagnostics_excerpt = None
 
     reasoning_graph = _build_reasoning_graph(endpoints, app)
     concept_graph = _build_concept_graph()
-    
+
+    # Coverage stats: count endpoints with all tokens vs total (documentation health metric)
+    complete = 0
+    for ep in endpoints:
+        if all((ep.get(k) or '').strip() for k in ('why','where','how')):
+            complete += 1
+    reasoning_coverage = {
+        'endpoints_total': len(endpoints),
+        'endpoints_complete': complete,
+        'percent': (complete / len(endpoints) * 100.0) if endpoints else 100.0,
+    }
+
     # Enhanced: Add intelligent analysis if requested
     intelligent_analysis = None
     if include_intelligent_analysis:
         try:
-            from intelligent_analyzer import get_intelligent_analysis
+            from intelligent_analyzer import get_intelligent_analysis  # type: ignore
             intelligent_analysis = get_intelligent_analysis()
-        except Exception as e:
-            # Gracefully degrade if intelligent analysis fails
+        except Exception as e:  # noqa: BLE001 broad purposely
             intelligent_analysis = {
                 'error': f'Intelligent analysis unavailable: {str(e)}',
                 'generated_at': time.time()
             }
-    
     return {
         "last_render": last_render,
         "recent_renders": renders,
@@ -413,6 +420,7 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
         "version": {"git": _GIT_HASH},
         "render_threshold_ms": RENDER_SLOW_THRESHOLD_MS,
         "warnings": warnings,
+        "reasoning_coverage": reasoning_coverage,
         "generated_ts": time.time(),
         "diagnostics_excerpt": diagnostics_excerpt,
         "reasoning_graph": reasoning_graph,
