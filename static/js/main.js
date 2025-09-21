@@ -52,10 +52,17 @@ document.addEventListener('DOMContentLoaded', () => {
       startFunction: typeof window['startHolographicChamber']
     });
     debugDiv.innerHTML += '<br/>❌ Missing function or canvas';
-  // Initialize particle canvas if present
-  const canvasElem = document.getElementById('particles');
-  if (canvasElem instanceof HTMLCanvasElement && typeof window.startParticles === 'function') {
-    window.startParticles(canvasElem, { count: 4000 });
+    // Why: Provide a graceful degradation path so the rest of the chat UI still works
+    // Where: Fallback lives inside main.js init; connects to legacy particle starter if present
+    // How: Attempt to start legacy particles() engine instead of holographic chamber
+    try {
+      if (canvasElem instanceof HTMLCanvasElement && typeof window.startParticles === 'function') {
+        window.startParticles(canvasElem, { count: 4000 });
+        console.log('✨ Fallback particle engine started');
+      }
+    } catch (e) {
+      console.warn('Fallback particle init failed (non-fatal)', e);
+    }
   }
 
   // Send on click or Enter
@@ -206,13 +213,26 @@ async function sendMessage() {
   inputElem.value = '';
   showStatus('Ideas crystallizing...');
   try {
-    const res = await fetch('/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text })
-    });
-    const data = await res.json();
-    const reply = data.response || '...';
+    // Why: Provide resilience if one route alias fails (proxy/cache issue) and surface diagnostics
+    // Where: sendMessage flow inside main.js; connects to Flask /chat and /api/chat endpoints
+    // How: Attempt /chat first; on network or JSON failure, retry /api/chat, log details
+    const attemptFetch = async (url) => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      let data; let parseOk = true;
+      try { data = await res.json(); } catch (e) { parseOk = false; }
+      return { res, data, parseOk };
+    };
+    let { res, data, parseOk } = await attemptFetch('/chat');
+    if (!res.ok || !parseOk || !data || typeof data !== 'object') {
+      console.warn('Primary /chat failed or invalid JSON. Fallback to /api/chat', { status: res && res.status, parseOk, data });
+      ({ res, data, parseOk } = await attemptFetch('/api/chat'));
+    }
+    if (!res.ok || !parseOk || !data) throw new Error('Chat endpoint failure');
+    const reply = data.response || '(no response text)';
   const aiEl = appendMessage('ai', reply);
   
     // Switch to dialogue state when receiving response
@@ -277,8 +297,8 @@ async function sendMessage() {
   if (typeof dissolve === 'function') dissolve();
     }, 2000);
   } catch (err) {
-    appendMessage('ai', 'Error.');
-    console.error(err);
+    console.error('[chat] fetch error', err);
+    appendMessage('ai', 'Error. (open console)');
   setSelfcheckState('error', 'Error');
   showStatus('Error occurred');
   }
@@ -288,6 +308,11 @@ function appendMessage(who, text) {
   const log = document.getElementById('chat-log');
   const wrap = document.createElement('div');
   wrap.classList.add('message', who, 'manifesting');
+  // Why: Need ephemeral chat bubbles that fade away after a period to keep stage focused on holographic chamber (per UI vision)
+  // Where: appendMessage is the single construction path for every chat bubble; adding logic here guarantees uniform lifecycle handling
+  // How: Add timed fade + removal sequence using CSS classes (fade-out) and a timeout schedule; expose constants for adjustability
+  const AUTO_HIDE_MS = 14000;        // total time before starting fade-out
+  const FADE_DURATION_MS = 1200;     // should match / be <= CSS animation duration
   // Optional role chip like screenshot (User / Clever)
   const chip = document.createElement('div');
   chip.className = 'chip';
@@ -306,6 +331,20 @@ function appendMessage(who, text) {
     if (live) {
       live.textContent = 'Clever: ' + String(text).slice(0, 160);
     }
+  }
+
+  // Ephemeral lifecycle: schedule fade + DOM removal
+  // Skip auto-hide for extremely short control/system messages
+  if (text && text.length > 0) {
+    setTimeout(() => {
+      // Guard: already removed or user scrolled back (optional future enhancement)
+      if (!wrap.isConnected) return;
+      wrap.classList.add('fading'); // CSS should define .message.fading { opacity:0; transform:translateY(-2px); pointer-events:none; }
+      // Remove after fade completes
+      setTimeout(() => {
+        if (wrap.isConnected) wrap.remove();
+      }, FADE_DURATION_MS);
+    }, AUTO_HIDE_MS);
   }
   return wrap;
 }
