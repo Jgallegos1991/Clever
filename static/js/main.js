@@ -10,8 +10,8 @@ const FRONTEND_TELEMETRY = {
 
 // Fade & lifecycle configuration (single source of truth)
 const MESSAGE_LIFECYCLE = {
-  AUTO_HIDE_MS: 14000,   // Time before fade starts
-  FADE_DURATION_MS: 1200 // Must match CSS .message.fading transition
+  AUTO_HIDE_MS: 12000,   // Time before fade starts - shorter to keep stage clear
+  FADE_DURATION_MS: 1800 // Must match CSS .message.fading transition - longer graceful fade
 };
 
 // Utility: show ephemeral toast notifications (errors, status)
@@ -265,6 +265,13 @@ async function sendMessage() {
       ({ res, data, parseOk } = await attemptFetch('/api/chat'));
     }
     if (!res.ok || !parseOk || !data) throw new Error('Chat endpoint failure');
+    // Debug schema validation (temporary instrumentation)
+    const requiredKeys = ['response','analysis'];
+    const missing = requiredKeys.filter(k => !(k in data));
+    if (missing.length) {
+      console.warn('[chat] Missing expected keys', { missing, got:Object.keys(data) });
+      showToast('Schema mismatch ('+missing.join(',')+')', 'warning', 4500);
+    }
     const reply = data.response || '(no response text)';
   const aiEl = appendMessage('ai', reply);
   

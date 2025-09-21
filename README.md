@@ -26,6 +26,17 @@ Clever runs locally (Python 3.12 + Flask), using spaCy, VADER, and TextBlob for 
 
 ---
 
+## 🤖 For AI Agents & Copilots
+
+**Before working on Clever, ALL agents must read:**
+- **[`.github/AGENT_ONBOARDING.md`](./.github/AGENT_ONBOARDING.md)** - Required reading checklist and unbreakable rules
+- **[`docs/config/device_specifications.md`](./docs/config/device_specifications.md)** - Hardware constraints and environment
+- **[`docs/architecture.md`](./docs/architecture.md)** - System architecture and connections
+
+This ensures code changes are safe, performant, and architecturally sound.
+
+---
+
 ## GitHub Copilot & API Usage
 
 To maximize productivity and avoid hitting GitHub API rate limits, please review the [COPILOT_USAGE_GUIDE.md](./COPILOT_USAGE_GUIDE.md).

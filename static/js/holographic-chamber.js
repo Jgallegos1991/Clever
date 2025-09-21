@@ -196,15 +196,16 @@ class HolographicChamber {
           break;
           
         case 'whirlpool':
-          // Bottom-centered lively whirlpool effect
+          // Dynamic center-stage whirlpool effect
           const whirlCenterX = centerX;
-          const whirlCenterY = this.height * 0.75; // Bottom center
-          const whirlAngle = (i / this.particles.length) * Math.PI * 6 + Date.now() * 0.001; // Rotating
-          const whirlRadius = radius * (0.3 + Math.sin(whirlAngle * 0.5) * 0.4);
-          const whirlHeight = Math.sin(whirlAngle * 2) * 50; // Vertical motion
+          const whirlCenterY = centerY; // True center for stage focus
+          const whirlAngle = (i / this.particles.length) * Math.PI * 8 + Date.now() * 0.0015; // Faster rotation
+          const whirlRadius = radius * (0.4 + Math.sin(whirlAngle * 0.3) * 0.3);
+          const whirlHeight = Math.sin(whirlAngle * 1.5) * 40; // Gentle vertical motion
+          const whirlSpiral = (i / this.particles.length) * radius * 0.2; // Spiral inward/outward
           
-          particle.targetX = whirlCenterX + Math.cos(whirlAngle) * whirlRadius + randomOffset();
-          particle.targetY = whirlCenterY + Math.sin(whirlAngle) * whirlRadius * 0.5 + whirlHeight;
+          particle.targetX = whirlCenterX + Math.cos(whirlAngle) * (whirlRadius + whirlSpiral) + randomOffset();
+          particle.targetY = whirlCenterY + Math.sin(whirlAngle) * (whirlRadius + whirlSpiral) * 0.6 + whirlHeight;
           break;
           
         case 'scatter':
@@ -287,14 +288,16 @@ class HolographicChamber {
   particle.x += particle.vx;
   particle.y += particle.vy;
       
-  // Update phase for pulsing (minimum)
-  particle.phase += 0.0015 + particle.energy * 0.002;
+      // Update phase for pulsing with breathing effect
+      particle.phase += 0.002 + particle.energy * 0.003;
       
-  // Update hue slightly for color shifting (slower)
-  particle.hue += 0.04;
-  if (particle.hue > 220) particle.hue = 160;
+      // Add subtle size pulsing for breathing effect
+      const breathingPhase = Date.now() * 0.0008 + particle.phase;
+      particle.size = particle.size * 0.99 + (2 + Math.sin(breathingPhase) * 0.5) * 0.01;
       
-      // Wrap around screen edges
+      // Update hue slightly for color shifting (slower)
+      particle.hue += 0.05;
+      if (particle.hue > 220) particle.hue = 160;      // Wrap around screen edges
       if (particle.x < 0) particle.x = this.width;
       if (particle.x > this.width) particle.x = 0;
       if (particle.y < 0) particle.y = this.height;
@@ -335,11 +338,28 @@ class HolographicChamber {
   }
     
   this.particles.forEach(particle => {
-  // Render as simple pixel for performance
+  // Render as glowing particles for better visibility
   this.ctx.save();
+  this.ctx.globalAlpha = particle.alpha * (0.8 + Math.sin(particle.phase) * 0.2);
+  
+  // Create gradient for glow effect
+  const gradient = this.ctx.createRadialGradient(
+    particle.x, particle.y, 0,
+    particle.x, particle.y, particle.size * 3
+  );
+  gradient.addColorStop(0, `hsla(${particle.hue}, 85%, 70%, 1)`);
+  gradient.addColorStop(0.5, `hsla(${particle.hue}, 85%, 70%, 0.5)`);
+  gradient.addColorStop(1, `hsla(${particle.hue}, 85%, 70%, 0)`);
+  
+  this.ctx.fillStyle = gradient;
+  this.ctx.beginPath();
+  this.ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
+  this.ctx.fill();
+  
+  // Add bright center dot
   this.ctx.globalAlpha = 1.0;
-  this.ctx.fillStyle = '#69EACB'; // Neon teal pixel
-  this.ctx.fillRect(Math.round(particle.x), Math.round(particle.y), 2, 2);
+  this.ctx.fillStyle = '#69EACB';
+  this.ctx.fillRect(Math.round(particle.x - 1), Math.round(particle.y - 1), 2, 2);
   this.ctx.restore();
   });
     
@@ -348,15 +368,16 @@ class HolographicChamber {
   }
 
   drawConnections() {
-    const maxDistance = 100;
+    const maxDistance = 120;
+    const maxConnections = 150; // Limit connections for performance
+    let connectionCount = 0;
     
     this.ctx.save();
-    this.ctx.strokeStyle = 'rgba(105, 234, 203, 0.8)'; // Much brighter connections
-    this.ctx.lineWidth = 3; // Even thicker lines
-    this.ctx.globalAlpha = 1.0;
+    this.ctx.strokeStyle = 'rgba(105, 234, 203, 0.6)';
+    this.ctx.lineWidth = 1.5;
     
-    for (let i = 0; i < this.particles.length; i++) {
-      for (let j = i + 1; j < this.particles.length; j++) {
+    for (let i = 0; i < this.particles.length && connectionCount < maxConnections; i++) {
+      for (let j = i + 1; j < this.particles.length && connectionCount < maxConnections; j++) {
         const p1 = this.particles[i];
         const p2 = this.particles[j];
         
@@ -365,13 +386,14 @@ class HolographicChamber {
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         if (distance < maxDistance) {
-          const alpha = (1 - distance / maxDistance) * 0.9; // Maximum visibility
+          const alpha = (1 - distance / maxDistance) * 0.7;
           
-          this.ctx.globalAlpha = alpha;
+          this.ctx.globalAlpha = alpha * (0.8 + Math.sin(Date.now() * 0.001 + i) * 0.2);
           this.ctx.beginPath();
           this.ctx.moveTo(p1.x, p1.y);
           this.ctx.lineTo(p2.x, p2.y);
           this.ctx.stroke();
+          connectionCount++;
         }
       }
     }

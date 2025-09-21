@@ -94,12 +94,16 @@ def test_chat_happy(app_client):
     r = app_client.post('/chat', json={'message': 'hey clever?'})
     assert r.status_code == 200
     data = r.get_json()
-    # Current schema returns 'response' and 'analysis' dict
+    # Schema returns 'response' and 'analysis' dict plus optional extended fields
     assert 'response' in data and isinstance(data['response'], str)
-    assert 'analysis' in data and isinstance(data['analysis'], (dict,))
-    # Intent key is optional; when present, it should be a string
-    if 'intent' in data['analysis']:
-        assert isinstance(data['analysis']['intent'], str)
+    assert 'analysis' in data and isinstance(data['analysis'], dict)
+    # Extended fields (non-fatal if missing in legacy mode)
+    for k in ['approach', 'mood', 'particle_intensity']:
+        if k in data:
+            assert data[k] is not None
+     # Intent key is optional; when present, it should be a string
+     if 'intent' in data['analysis'] and data['analysis']['intent'] is not None:
+          assert isinstance(data['analysis']['intent'], str)
 
 
 def test_chat_bad_request(app_client):
@@ -115,6 +119,9 @@ def test_chat_bad_request(app_client):
     """
     r = app_client.post('/chat', json={'message': ''})
     assert r.status_code == 400
+    data = r.get_json()
+    assert data.get('status') == 'error'
+    assert 'error' in data
 
 
 def test_ingest_form(app_client):

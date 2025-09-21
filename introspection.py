@@ -333,23 +333,24 @@ def _build_concept_graph() -> Optional[Dict[str, Any]]:
         return None
 
 
-def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
-    """Assemble full runtime introspection state.
+def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -> Dict[str, Any]:
+    """Assemble full runtime introspection state with enhanced intelligent analysis.
 
     Why: Central aggregation converting docstring reasoning + live telemetry
-    (renders, errors, evolution stats) into a navigational map—the "arrows"
-    that show what connected to what, why, and how at the moment of inspection.
+    (renders, errors, evolution stats) + AI-powered analysis into a comprehensive
+    navigational map that not only shows "what connects to what" but also
+    identifies problems, suggests fixes, and provides actionable insights.
     Where: Returned by `/api/runtime_introspect` endpoint in `app.py`, consumed
-    by optional frontend debug overlay and CLI snapshot tool.
-    How: Gathers recent renders (with slow flag), endpoint reasoning metadata,
-    persona mode, evolution interaction summary (best-effort), last error,
-    version hash, computed drift warnings, and the render slow threshold for
-    client display.
+    by enhanced frontend debug overlay and CLI analysis tools.
+    How: Gathers traditional metrics plus intelligent analysis results, problem
+    detection, architectural insights, and performance recommendations to create
+    a complete system health and improvement dashboard.
 
     Connects to:
         - evolution_engine.py: Interaction summary (if available)
         - app.py: Persona engine reference & endpoint registration
         - tools/runtime_dump.py: CLI dump utility
+        - intelligent_analyzer.py: AI-powered problem detection and insights
     """
     renders = get_recent_renders()
     last_render = renders[-1] if renders else None
@@ -388,6 +389,20 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
 
     reasoning_graph = _build_reasoning_graph(endpoints, app)
     concept_graph = _build_concept_graph()
+    
+    # Enhanced: Add intelligent analysis if requested
+    intelligent_analysis = None
+    if include_intelligent_analysis:
+        try:
+            from intelligent_analyzer import get_intelligent_analysis
+            intelligent_analysis = get_intelligent_analysis()
+        except Exception as e:
+            # Gracefully degrade if intelligent analysis fails
+            intelligent_analysis = {
+                'error': f'Intelligent analysis unavailable: {str(e)}',
+                'generated_at': time.time()
+            }
+    
     return {
         "last_render": last_render,
         "recent_renders": renders,
@@ -402,6 +417,7 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
         "diagnostics_excerpt": diagnostics_excerpt,
         "reasoning_graph": reasoning_graph,
         "concept_graph": concept_graph,
+        "intelligent_analysis": intelligent_analysis,
     }
 
 

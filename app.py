@@ -114,8 +114,9 @@ def chat():
     """
     t0 = time.time()
     try:
-        data = request.get_json() or {}
-        user_message = data.get('message', '').strip()
+        data = request.get_json(silent=True) or {}
+        # Accept multiple legacy/alias keys: message, text, prompt
+        user_message = (data.get('message') or data.get('text') or data.get('prompt') or '').strip()
         
         if not user_message:
             return jsonify({
@@ -126,13 +127,17 @@ def chat():
         # Generate response using persona engine if available
         if clever_persona:
             persona_response = clever_persona.generate(user_message, mode="Auto")
-            # Legacy compatible schema expected by tests: response + analysis dict
+            # Unified schema consumed by frontend (main.js) plus future fields
             response = {
                 'response': persona_response.text,
                 'analysis': {
                     'mode': persona_response.mode,
                     'sentiment': persona_response.sentiment,
+                    'intent': None,  # placeholder (could derive from persona)
                 },
+                'approach': persona_response.mode,  # alias for shaping logic
+                'mood': (persona_response.sentiment or 'neutral'),
+                'particle_intensity': 0.6,  # heuristic baseline (future: derive from sentiment)
                 'status': 'success'
             }
             
@@ -154,8 +159,12 @@ def chat():
                 'response': f"Hello! You said: {user_message}",
                 'analysis': {
                     'mode': 'Auto',
-                    'sentiment': 'neutral'
+                    'sentiment': 'neutral',
+                    'intent': None,
                 },
+                'approach': 'Auto',
+                'mood': 'neutral',
+                'particle_intensity': 0.4,
                 'status': 'success'
             }
         
@@ -180,7 +189,9 @@ def chat():
         debugger.info("chat", f"Error processing message: {str(e)}")
         return jsonify({
             'error': 'Failed to process message',
-            'status': 'error'
+            'status': 'error',
+            'detail': str(e),
+            'received': (request.get_json(silent=True) or {}),
         }), 500
 
 
