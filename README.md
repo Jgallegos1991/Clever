@@ -77,6 +77,12 @@ Visit `http://127.0.0.1:5000` to experience Clever's magical interface.
 
 All legacy and unused files have been removed. Only the following files are active and loaded:
 
+
+Additional utility commands:
+
+- make diagnostics   # Architectural drift (offline guard, single DB, diagnostics doc)
+- make audit-why     # Why/Where/How docstring coverage audit (advisory)
+
 ### Active Frontend Files
 - `/templates/index.html` (main UI)
 - `/templates/test_basic.html` (diagnostic)
@@ -310,6 +316,8 @@ make setup-min    # Minimal Flask-only setup
 make setup-full   # Full setup + spaCy model (internet required)
 make run          # Start Clever
 make test         # Run test suite
+make diagnostics   # Architectural drift checks
+make audit-why     # Why/Where/How docstring audit
 make clean-ui     # Remove unreferenced legacy UI assets
 ```
 
@@ -321,6 +329,19 @@ Comprehensive documentation is available in the `docs/` directory:
 - **API Documentation** - Endpoint specifications and usage
 - **UI Patterns** - Magical interface implementation details
 - **Deployment Guide** - Production setup and configuration
+ - **Diagnostics & Drift** - See `docs/copilot_diagnostics.md` for current alignment snapshot
+
+### Diagnostics & Documentation Enforcement
+
+Two guardrail tools help prevent architectural drift:
+
+1. `make diagnostics` → runs `tools/diagnostics_check.py` ensuring:
+   - `offline_guard.enable()` present in `app.py`
+   - Single `DB_PATH` assignment pointing to `clever.db`
+   - `docs/copilot_diagnostics.md` exists with required sections
+2. `make audit-why` → runs `tools/why_where_how_audit.py` to flag functions/classes missing Why/Where/How tokens.
+
+The pytest suite includes `tests/test_diagnostics.py`; CI blocks on diagnostics drift while the Why/Where/How audit is currently advisory.
 
 ## 🎯 For Jay
 

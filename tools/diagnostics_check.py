@@ -44,17 +44,30 @@ def check_offline_guard():
 
 
 def check_single_db():
-    config_py = (ROOT / 'config.py').read_text(encoding='utf-8', errors='ignore')
-    # crude check: ensure DB_PATH defined once and only clever.db
-    m = re.findall(r'DB_PATH\s*=\s*(["\'])(.+?)\1', config_py)
-    if not m:
+    """Validate a single DB_PATH assignment referencing clever.db.
+
+    Why: Original regex assumed a simple quoted literal assignment which broke
+    when the project moved to an environment override pattern using
+    os.environ.get("CLEVER_DB_PATH", str(ROOT_DIR / "clever.db")). We loosen
+    detection to still enforce single definition and correct filename without
+    over-parsing Python semantics.
+    Where: Called inside diagnostics pre-flight to prevent unnoticed drift in
+    storage location (single DB rule).
+    How: Scans config.py for lines starting with 'DB_PATH' (ignoring leading
+    whitespace) and counts them; validates 'clever.db' substring is present on
+    that line. Avoids executing code or AST parsing to remain trivial & offline.
+    """
+    config_text = (ROOT / 'config.py').read_text(encoding='utf-8', errors='ignore').splitlines()
+    db_lines = [ln for ln in config_text if re.match(r'^\s*DB_PATH\s*=', ln)]
+    if not db_lines:
         fail('DB_PATH not defined in config.py')
         return
-    if len(m) > 1:
+    if len(db_lines) > 1:
         fail('Multiple DB_PATH assignments detected')
-    if 'clever.db' not in m[0][1]:
+    line = db_lines[0]
+    if 'clever.db' not in line:
         fail('DB_PATH does not reference clever.db')
-    else:
+    if not FAIL:
         print('[OK] single DB_PATH referencing clever.db')
 
 

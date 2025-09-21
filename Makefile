@@ -57,6 +57,8 @@ fmt:
 lint:
 	$(ACTIVATE) && flake8 .
 test:
+	# Run diagnostics drift check before executing full test suite
+	$(ACTIVATE) && $(PY) tools/diagnostics_check.py
 	$(ACTIVATE) && pytest
 
 # Enforce Why/Where/How docstring presence across codebase

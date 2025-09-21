@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install minimal deps
+        run: |
+          python -m pip install --upgrade pip wheel
+          if [ -f requirements-base.txt ]; then pip install -r requirements-base.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run diagnostics check
+        run: python tools/diagnostics_check.py
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Why/Where/How audit (non-blocking)
+        run: |
+          python tools/why_where_how_audit.py || echo "Skipping failure (advisory only)"
+
+      - name: Upload diagnostics artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics-report
+          path: |
+            docs/copilot_diagnostics.md
+            perf_history.jsonl
+            perf_results.txt
+          if-no-files-found: ignore
