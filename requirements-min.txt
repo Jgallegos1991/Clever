@@ -1,1 +1,3 @@
 Flask==3.1.1
+# Add pytest so minimal environment can still execute test suite
+pytest==8.3.2

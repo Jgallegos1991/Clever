@@ -24,7 +24,7 @@ import re
 import threading
 import time
 from collections import deque
-from typing import Any, Callable, Deque, Dict, List, Optional
+from typing import Any, Callable, Deque, Dict, List, Optional, Set
 
 # Regular expression to extract Why/Where/How sections from docstrings (case-insensitive)
 _SECTION_RE = re.compile(r"^(why|where|how)\s*:\s*(.*)$", re.IGNORECASE)
@@ -185,6 +185,149 @@ def _compute_warnings(endpoints: List[Dict[str, Any]]) -> List[str]:
     return warnings
 
 
+def _extract_connects_to(obj: Any) -> List[str]:
+    """Parse 'Connects to:' lines from a docstring to derive graph edges.
+
+    Why: Convert human-readable connection annotations into machine-readable
+    edges that can power a live reasoning/architecture graph overlay.
+    Where: Called when assembling reasoning_graph inside runtime_state; ties
+    directly into enforced documentation contract without extra author burden.
+    How: Scans the docstring for a 'Connects to:' line, then collects the
+    following indented or hyphen-prefixed lines until a blank or new section.
+    Extracts probable module/file tokens (*.py) or bare identifiers.
+    """
+    doc = inspect.getdoc(obj) or ""
+    lines = doc.splitlines()
+    captures: List[str] = []
+    in_block = False
+    for raw in lines:
+        line = raw.rstrip()
+        if not in_block:
+            if line.lower().startswith('connects to'):  # start block
+                in_block = True
+            continue
+        # inside block: terminate on blank or section style line
+        if not line.strip():
+            break
+        if re.match(r'^(why|where|how)\s*:', line, re.IGNORECASE):  # new section
+            break
+        # Normalize bullet styles
+        line_clean = re.sub(r'^[-*]\s*', '', line).strip()
+        if not line_clean:
+            continue
+        # Heuristic: capture first token that looks like module or file
+        token = line_clean.split()[0]
+        # Strip trailing commas / punctuation
+        token = token.rstrip(':,;')
+        captures.append(token)
+    # Deduplicate while preserving order
+    seen: Set[str] = set()
+    ordered = []
+    for c in captures:
+        if c not in seen:
+            seen.add(c)
+            ordered.append(c)
+    return ordered
+
+
+def _build_reasoning_graph(endpoints: List[Dict[str, Any]], app) -> Dict[str, Any]:
+    """Build a lightweight reasoning graph from endpoint docstrings.
+
+    Why: Provide the frontend with a navigable set of nodes/edges describing
+    declared architectural intent (the "arrows" between components).
+    Where: Embedded in runtime_state payload; consumed by optional graph
+    debug overlay (graph-debug.js) when ?graph=1 is present.
+    How: Creates nodes for each endpoint function + unique referenced targets
+    from their Connects to blocks. Edges are directed endpoint -> target.
+    Truncates counts to remain payload-friendly; includes a 'truncated' flag.
+    """
+    nodes: Dict[str, Dict[str, Any]] = {}
+    edges: List[Dict[str, str]] = []
+    MAX_NODES = 300
+    MAX_EDGES = 600
+    # First add endpoint nodes
+    for ep in endpoints:
+        ident = f"{ep['module']}.{ep['func']}"
+        nodes[ident] = {
+            'id': ident,
+            'label': ep['func'],
+            'type': 'endpoint',
+            'why': ep.get('why',''),
+            'where': ep.get('where',''),
+            'how': ep.get('how',''),
+            'rule': ep.get('rule'),
+        }
+    # Extract edges by re-inspecting actual view functions (for raw docstring)
+    for rule in app.url_map.iter_rules():
+        fn = app.view_functions.get(rule.endpoint)
+        if not fn:
+            continue
+        src = f"{getattr(fn,'__module__','<unknown>')}.{getattr(fn,'__name__','<unknown>')}"
+        targets = _extract_connects_to(fn)
+        for tgt in targets:
+            # Normalize target id heuristic: if endswith .py remove extension
+            norm = tgt[:-3] if tgt.endswith('.py') else tgt
+            # Create node placeholder if missing
+            if norm not in nodes:
+                nodes[norm] = {'id': norm, 'label': norm, 'type': 'target'}
+            edges.append({'source': src, 'target': norm, 'type': 'connects_to'})
+    truncated = False
+    if len(nodes) > MAX_NODES:
+        truncated = True
+        # Keep endpoints preferentially
+        ep_nodes = [n for n in nodes.values() if n.get('type')=='endpoint']
+        extra = MAX_NODES - len(ep_nodes)
+        keep_ids = set(n['id'] for n in ep_nodes)
+        if extra > 0:
+            for n in nodes.values():
+                if n['id'] not in keep_ids and n.get('type')=='target' and extra>0:
+                    keep_ids.add(n['id']); extra -=1
+        nodes = {nid: nodes[nid] for nid in keep_ids}
+        edges = [e for e in edges if e['source'] in nodes and e['target'] in nodes][:MAX_EDGES]
+    if len(edges) > MAX_EDGES:
+        truncated = True
+        edges = edges[:MAX_EDGES]
+    return {
+        'nodes': list(nodes.values()),
+        'edges': edges,
+        'truncated': truncated,
+        'generated_ts': time.time(),
+    }
+
+
+def _build_concept_graph() -> Optional[Dict[str, Any]]:
+    """Attempt to build an evolution concept graph (best-effort).
+
+    Why: Provide optional second layer (concept network) requested for rich
+    graph view (option C). Keeps failure silent if evolution engine not ready
+    or data would be too large.
+    Where: runtime_state attaches as concept_graph when available.
+    How: Queries evolution_engine for a lightweight list of concepts and their
+    connections if such attributes exist. Applies size caps similar to
+    reasoning graph.
+    """
+    try:
+        from evolution_engine import get_evolution_engine  # type: ignore
+        evo = get_evolution_engine()
+        concepts = getattr(evo, 'concepts', None)
+        links = getattr(evo, 'concept_links', None)
+        if not concepts or not links:
+            return None
+        MAX_CONCEPTS = 250
+        MAX_LINKS = 600
+        c_items = list(concepts.items()) if isinstance(concepts, dict) else []
+        c_items = c_items[:MAX_CONCEPTS]
+        nodes = [{'id': k, 'label': k, 'type': 'concept', 'weight': v} for k, v in c_items]
+        # Filter links to those whose endpoints present in truncated node set
+        node_ids = {n['id'] for n in nodes}
+        filtered = [l for l in links if l[0] in node_ids and l[1] in node_ids]
+        filtered = filtered[:MAX_LINKS]
+        edges = [{'source': a, 'target': b, 'type': 'concept_link', 'weight': w} for a,b,w in filtered]
+        return {'nodes': nodes, 'edges': edges, 'truncated': len(concepts)>MAX_CONCEPTS or len(links)>MAX_LINKS}
+    except Exception:
+        return None
+
+
 def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
     """Assemble full runtime introspection state.
 
@@ -238,6 +381,8 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
     except Exception:
         diagnostics_excerpt = None
 
+    reasoning_graph = _build_reasoning_graph(endpoints, app)
+    concept_graph = _build_concept_graph()
     return {
         "last_render": last_render,
         "recent_renders": renders,
@@ -250,6 +395,8 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
         "warnings": warnings,
         "generated_ts": time.time(),
         "diagnostics_excerpt": diagnostics_excerpt,
+        "reasoning_graph": reasoning_graph,
+        "concept_graph": concept_graph,
     }
 
 

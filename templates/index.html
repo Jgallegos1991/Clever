@@ -175,6 +175,8 @@ How:
     <script src="{{ url_for('static', filename='js/holographic-chamber.js') }}?v={{ cache_buster }}"></script>
     <script src="{{ url_for('static', filename='js/core/app.js') }}?v={{ cache_buster }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
+    <!-- Graph debug overlay (loads only if ?graph=1 or ?debug=graph) -->
+    <script src="{{ url_for('static', filename='js/graph-debug.js') }}?v={{ cache_buster }}" defer></script>
     <!-- Toast stack placeholder: populated by main.js showToast() -->
     <div id="toast-stack" aria-live="polite" aria-atomic="true" style="position:fixed;bottom:1rem;right:1rem;display:flex;flex-direction:column;gap:.5rem;z-index:9999;pointer-events:none;"></div>
 </body>

@@ -1,3 +1,5 @@
 Flask==3.1.1
 watchdog==6.0.0
 pypdf>=3.9.0
+# Testing framework (Why: ensure pytest available inside venv so tests don't rely on global site-packages; Where: consumed by Makefile install target before running pytest; How: pinned to stable recent version for Python 3.12 compatibility)
+pytest==8.3.2
