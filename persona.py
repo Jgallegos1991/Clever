@@ -30,7 +30,6 @@ from __future__ import annotations
 import logging
 import random
 import time
-import math
 from collections import deque
 from types import SimpleNamespace
 from typing import List, Dict, Any, Optional
@@ -598,97 +597,67 @@ class PersonaEngine:
 
     def _auto_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
-        Auto mode - balanced, human, and purposeful responses (no number spam)
+        Auto mode - natural, conversational responses like chatting with a friend
 
-        Why: Jay asked for less "calculations" and more clear reasoning. This style
-             leads with understanding, then a concise because/therefore chain, then a
-             next step. It keeps Clever's personality without distracting metrics.
+        Why: Provide warm, natural conversation without confusing metrics or calculations.
+        Users want to chat with Clever like a real person, not a robot spouting numbers.
         Where: Default path when no explicit mode is requested (most everyday chats).
-        How: Derive a subject from keywords/entities, mirror intent briefly, give a
-             1-2 sentence rationale, and end with a gentle actionable option.
+        How: Respond naturally based on what the user said, with personality and warmth.
         """
         analysis = context.get('nlp_analysis', {})
-        question_type = (analysis.get('question_type') or '').lower() or ('?' in text and 'why' or 'none')
         sentiment = analysis.get('sentiment', 'neutral')
         rel_mem = context.get('relevant_memories') or []
-        top_kw = [kw for kw in keywords if isinstance(kw, str)][:3]
-        entities = [e for e in (analysis.get('entities') or []) if isinstance(e, str)][:3]
-
-        # Mirror user's topic simply (no metrics)
-        subject = (top_kw[0] if top_kw else (entities[0] if entities else 'that'))
-
-        # Light persona tone depending on sentiment
-        sentiment_openers = {
-            'positive': "Love the direction here.",
-            'negative': "I hear the friction—let's steady this.",
-            'neutral': "Let's get a clean read on this.",
-        }
-        opener = sentiment_openers.get(str(sentiment).lower(), sentiment_openers['neutral'])
-
-        # Pick a reasoning lens from the question type
-        lens_map = {
-            'why': "because the underlying driver matters more than the surface symptom",
-            'how': "by laying the steps in the right order and removing the choke points",
-            'what': "by naming the core pieces and the edges between them",
-            'none': "by clarifying the goal and the simplest path toward it",
-        }
-        lens = lens_map.get(question_type if question_type in lens_map else 'none')
-
-        # Optional memory nudge (plain language)
-        mem_line = ""
+        
+        # Natural conversation starters based on sentiment
+        if sentiment == 'positive':
+            openers = ["I love your energy!", "That's exciting!", "I'm picking up good vibes here.", "You sound enthusiastic!"]
+        elif sentiment == 'negative':  
+            openers = ["I hear you - that sounds frustrating.", "Rough situation, huh?", "I can sense your frustration.", "That doesn't sound fun."]
+        else:
+            openers = ["Hey there!", "What's on your mind?", "I'm listening.", "Tell me more.", "Interesting..."]
+        
+        opener = random.choice(openers)
+        
+        # Add memory context naturally if available
+        memory_context = ""
         if rel_mem:
-            snippet = rel_mem[0].get('content', '').strip().split('\n')[0][:90]
-            if snippet:
-                mem_line = f" Earlier you mentioned '{snippet}…'—I'll keep that in frame."
+            memory_snippet = rel_mem[0].get('content', '').strip()[:100]
+            if memory_snippet:
+                memory_context = f" This reminds me of when you mentioned '{memory_snippet}...' before."
+        
+        # Natural follow-ups based on the conversation
+        if '?' in text:
+            # User asked a question
+            responses = [
+                f"{opener} Let me think about that.{memory_context} What aspect interests you most?",
+                f"{opener} That's a great question.{memory_context} Want me to break it down?",
+                f"{opener} I'd love to explore that with you.{memory_context} Where should we start?",
+            ]
+        elif any(word in text.lower() for word in ['help', 'stuck', 'problem', 'issue']):
+            # User needs help
+            responses = [
+                f"{opener} I'm here to help figure this out.{memory_context} What's the main challenge?",
+                f"{opener} Let's tackle this together.{memory_context} What would be most helpful right now?",
+                f"{opener} We can work through this.{memory_context} What's your biggest concern?",
+            ]
+        elif any(word in text.lower() for word in ['create', 'make', 'build', 'design']):
+            # User wants to create something
+            responses = [
+                f"{opener} I love creative projects!{memory_context} What's your vision here?",
+                f"{opener} Let's make something cool.{memory_context} What direction feels right?",
+                f"{opener} Building things is fun!{memory_context} What's the first step?",
+            ]
+        else:
+            # General conversation
+            responses = [
+                f"{opener}{memory_context} What would you like to explore?",
+                f"{opener} I'm curious to hear more.{memory_context} Tell me what you're thinking.",
+                f"{opener} Sounds interesting.{memory_context} What's the story here?",
+            ]
+        
+        return random.choice(responses)
 
-        # Assemble a short, logical reply (max ~3 lines)
-        line1 = f"{opener} With {subject}, let's keep it simple."
-        line2 = f"We make progress {lens}."
-        # Offer a concrete next step tailored to question type
-        next_steps = {
-            'why': "Want me to map likely causes vs. signals?",
-            'how': "Want a quick step-by-step so you can move now?",
-            'what': "Want a crisp definition and a tiny example?",
-            'none': "Want a simple plan or a quick gut-check?",
-        }
-        line3 = next_steps.get(question_type if question_type in next_steps else 'none')
 
-        return f"{line1}\n{line2}{mem_line}\n{line3}"
-
-    def _time_bucket(self) -> str:
-        """Return coarse time-of-day bucket.
-
-        Why: Add subtle temporal personalization to reduce template staleness.
-        Where: Used in _auto_style dynamic composition.
-        How: Local time hour → label.
-        """
-        h = time.localtime().tm_hour
-        if 5 <= h < 12: return 'morning'
-        if 12 <= h < 17: return 'afternoon'
-        if 17 <= h < 22: return 'evening'
-        return 'late-cycle'
-
-    def _heuristic_vector_strength(self, text: str) -> float:
-        """Crude lexical diversity / density heuristic.
-
-        Why: Provide pseudo-analytic scalar for variety in responses.
-        Where: Referenced in _auto_style line3 options.
-        How: unique_words / sqrt(total_words+1).
-        """
-        parts = [w for w in text.lower().split() if w.isalpha()]
-        if not parts: return 0.0
-        return len(set(parts)) / math.sqrt(len(parts) + 1)
-
-    def _compression_ratio(self, text: str) -> float:
-        """Approximate information compression ratio.
-
-        Why: Another numerical artifact to diversify surface form.
-        Where: Auto mode line3.
-        How: len(unique_chars)/len(text)
-        """
-        t = text.strip()
-        if not t: return 0.0
-        return len(set(t)) / len(t)
 
     def _creative_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
@@ -698,52 +667,38 @@ class PersonaEngine:
         Where: Used when user requests creative exploration
         How: Use metaphors, analogies, and creative language patterns
         """
-        # Why: Previous implementation placed the varying concept (lens) too far into
-        # the sentence so early signatures (first 120 chars) were sometimes identical,
-        # causing test_mode_variation to fail for Creative mode.
-        # Where: This function feeds PersonaEngine.generate() variation testing.
-        # How: Move variation tokens (lens + style + verb) earlier in the first
-        # clause so the first 120 chars diverge; add an additional randomized
-        # micro-adjective + creative verb bundle.
-
-        starters = [
-            "Let's paint with possibility: ",
-            "Here's a playful riff: ",
-            "Creative detour, softly lit: ",
-            "Permission to remix—granted: ",
-            "Unconventional pivot incoming: "
+        creative_starters = [
+            "Ooh, I love getting creative with this!",
+            "Let's think outside the box here...",
+            "Time to get imaginative!",
+            "What if we flipped this completely?",
+            "Here's a wild idea..."
         ]
-        lenses = [
-            'storytelling', 'design thinking', 'musical composition',
-            'architectural principles', 'nature patterns', 'game dynamics',
-            'jazz improvisation', 'biomimicry'
+        
+        creative_approaches = [
+            "What if we approached this like an artist would?",
+            "Let's imagine this as a story - what's the plot twist?",
+            "Picture this as a dance - what's the rhythm?",
+            "Think of it like music - where's the harmony?",
+            "Imagine we're architects - what's the blueprint?",
+            "Let's see this as a game - what are the rules we can bend?"
         ]
-        micro_adj = [
-            'bold', 'playful', 'textured', 'asymmetric', 'fractal', 'luminous', 'kinetic'
-        ]
-        creative_verbs = [
-            'remix', 'reimagine', 'deconstruct', 'recompose', 'reshape', 'transmute'
-        ]
-
-        lens = random.choice(lenses)
-        adj = random.choice(micro_adj)
-        verb = random.choice(creative_verbs)
-        starter = random.choice(starters)
-
+        
         if keywords:
-            target = keywords[0]
-            # Place lens + verb up front for early-surface divergence
-            line = (
-                f"{starter}{adj} {lens} lens → what if we {verb} {target} early, "
-                "then wander a bit and come back with a cleaner angle?"
-            )
+            topic = keywords[0]
+            responses = [
+                f"{random.choice(creative_starters)} With {topic}, we could totally reimagine the whole thing. {random.choice(creative_approaches)}",
+                f"You know what's fascinating about {topic}? {random.choice(creative_approaches)} I'm seeing so many possibilities!",
+                f"{random.choice(creative_starters)} {topic} is just begging for a creative twist. {random.choice(creative_approaches)}"
+            ]
         else:
-            line = (
-                f"{starter}{adj} {lens} lens → let's {verb} the frame, "
-                "then rebuild it with one surprising analogy."
-            )
-
-        return line
+            responses = [
+                f"{random.choice(creative_starters)} {random.choice(creative_approaches)} I'm already buzzing with ideas!",
+                f"Creative mode activated! {random.choice(creative_approaches)} The possibilities are endless!",
+                f"{random.choice(creative_starters)} {random.choice(creative_approaches)} Let's make something amazing!"
+            ]
+        
+        return random.choice(responses)
 
     def _deep_dive_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
@@ -754,20 +709,28 @@ class PersonaEngine:
         How: Structure response with multiple perspectives and depth
         """
         deep_starters = [
-            "Let's dig deep into this. ",
-            "Time for a thorough analysis. ",
-            "Let me break this down comprehensively. ",
-            "Here's a detailed exploration of this topic. "
+            "Now we're talking - I love diving deep!",
+            "Alright, let's really unpack this...",
+            "Time to go full analysis mode!",
+            "I'm getting my thinking cap on for this one.",
+            "Ooh, this is meaty stuff. Let me really dig in..."
         ]
         
-        analysis_aspects = ["historical context", "current implications", "future possibilities", "different perspectives", "underlying principles"]
-        
         if keywords:
-            deep_response = f"When examining {keywords[0]}, we should consider {random.choice(analysis_aspects)}. This connects to broader themes and requires careful consideration of multiple factors."
+            topic = keywords[0]
+            responses = [
+                f"{random.choice(deep_starters)} When I look at {topic}, I see layers we need to explore. There's the surface level, but underneath there are patterns, connections, and implications that paint a much richer picture. Want me to walk through what I'm seeing?",
+                f"{random.choice(deep_starters)} {topic} is fascinating because it touches on so many different areas. I'm thinking about the historical context, how it fits into current trends, what it means for the future, and honestly - there are probably angles neither of us have considered yet. Where should we start?",
+                f"{random.choice(deep_starters)} You know what I love about {topic}? It's one of those topics where the more you examine it, the more complex and interesting it becomes. I'm seeing connections to other concepts, potential implications, and some really thought-provoking questions emerging."
+            ]
         else:
-            deep_response = "This topic deserves thorough analysis from multiple angles, considering both immediate and long-term implications."
-            
-        return random.choice(deep_starters) + deep_response
+            responses = [
+                f"{random.choice(deep_starters)} This is exactly the kind of topic that deserves our full attention. I'm already seeing multiple angles we could explore - the immediate implications, the broader context, the underlying patterns. There's so much to unpack here!",
+                f"{random.choice(deep_starters)} You've hit on something that really warrants a thorough exploration. I'm thinking about this from different perspectives - historical, practical, theoretical, and what it means moving forward. Ready to go deep?",
+                f"{random.choice(deep_starters)} I can tell this is important to you, and honestly, it deserves a comprehensive look. I'm seeing layers of complexity here that are worth examining carefully. Let's take our time with this one."
+            ]
+        
+        return random.choice(responses)
 
     def _support_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
@@ -777,19 +740,29 @@ class PersonaEngine:
         Where: Used when user needs motivation or reassurance  
         How: Use empathetic language and supportive messaging
         """
-        support_starters = [
-            "I'm here with you on this. ",
-            "You've got this, and I'm here to help. ",
-            "I understand this might be challenging. ",
-            "Let's work through this together. "
-        ]
+        analysis = context.get('nlp_analysis', {})
+        sentiment = analysis.get('sentiment', 'neutral')
         
-        if keywords:
-            support_response = f"Dealing with {keywords[0]} can be complex, but you're approaching it thoughtfully. Remember that progress often comes in small steps."
+        if sentiment == 'negative':
+            supportive_responses = [
+                "Hey, I can hear that you're going through something tough right now. I want you to know that whatever this is, you don't have to handle it alone. I'm here, and we can figure this out together.",
+                "I'm picking up that this isn't easy for you, and that's completely okay. Sometimes things are just hard, and acknowledging that is actually a sign of strength. What would feel most helpful right now?",
+                "It sounds like you're dealing with something challenging, and I want you to know that's valid. You're allowed to feel frustrated or overwhelmed - those feelings make sense. How can I best support you through this?"
+            ]
+        elif sentiment == 'positive':
+            supportive_responses = [
+                "I love seeing your positive energy! It sounds like you're in a good headspace, and that's wonderful. I'm here to celebrate the good moments with you and help you build on this momentum.",
+                "Your enthusiasm is contagious! It's clear you're feeling good about something, and I'm here for it. What's got you feeling so positive? I'd love to hear more!",
+                "You sound like you're in a great place right now, and that makes me happy! I'm here to support you in whatever you're working on and help you keep this good energy flowing."
+            ]
         else:
-            support_response = "Whatever you're working through, remember that you have the strength and capability to handle it."
-            
-        return random.choice(support_starters) + support_response
+            supportive_responses = [
+                "I'm here for you, whatever you need. Sometimes we need someone to just listen, sometimes we need practical help, and sometimes we need encouragement. What would be most helpful for you right now?",
+                "You know what I appreciate about you? You reach out when you need support, and that takes courage. I'm genuinely glad you're here, and I want to help however I can.",
+                "I'm in your corner, always. Whatever you're thinking about or working through, remember that you have someone who believes in you and wants to see you succeed."
+            ]
+        
+        return random.choice(supportive_responses)
 
     def _quick_hit_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
@@ -799,15 +772,31 @@ class PersonaEngine:
         Where: Used when user needs quick information or decisions
         How: Deliver key points without lengthy explanations
         """
+        quick_starters = [
+            "Quick answer:",
+            "Short version:",
+            "Here's the deal:",
+            "Bottom line:",
+            "Simply put:"
+        ]
+        
         if keywords:
-            return f"Quick take on {keywords[0]}: {random.choice(['Focus on the essentials.', 'Start with the fundamentals.', 'Prioritize the key factors.', 'Keep it simple and actionable.'])}"
+            topic = keywords[0] 
+            responses = [
+                f"{random.choice(quick_starters)} For {topic}, focus on what matters most and start there.",
+                f"{random.choice(quick_starters)} With {topic}, keep it simple and take action on the key points.",
+                f"{random.choice(quick_starters)} {topic} comes down to the fundamentals - nail those first.",
+                f"Got it. For {topic}: prioritize, act, adjust. That's your path forward."
+            ]
         else:
-            return random.choice([
-                "Bottom line: Keep it focused and actionable.",
-                "Key point: Start with what matters most.",
-                "Quick advice: Break it down into clear steps.",
-                "Essential approach: Focus on high-impact actions."
-            ])
+            responses = [
+                f"{random.choice(quick_starters)} Focus on what matters, ignore the noise, take action.",
+                f"{random.choice(quick_starters)} Start with the most important thing, do it well, then move to the next.",
+                f"{random.choice(quick_starters)} Keep it simple, stay focused, make progress.",
+                "Here's what I'd do: identify the key issue, pick the best solution, execute."
+            ]
+        
+        return random.choice(responses)
 
 
 # Global instance for app.py
