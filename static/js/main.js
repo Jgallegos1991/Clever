@@ -1,5 +1,38 @@
 // Track last AI bubble globally for positioning the analysis card
 let lastAiEl = null;
+// In-memory telemetry (frontend perspective)
+const FRONTEND_TELEMETRY = {
+  chatCount: 0,
+  avgLatencyMs: 0,
+  lastLatencyMs: 0,
+  lastError: null,
+};
+
+// Fade & lifecycle configuration (single source of truth)
+const MESSAGE_LIFECYCLE = {
+  AUTO_HIDE_MS: 14000,   // Time before fade starts
+  FADE_DURATION_MS: 1200 // Must match CSS .message.fading transition
+};
+
+// Utility: show ephemeral toast notifications (errors, status)
+function showToast(msg, type = 'info', ttl = 4000) {
+  /**
+   * Why: Provide lightweight, non-blocking user feedback (errors, connectivity, mode hints)
+   * Where: Invoked by sendMessage error handling, ping health check, and future proactive system notices
+   * How: Creates a div in #toast-stack with fade-in/out CSS classes; removed after TTL
+   */
+  const stack = document.getElementById('toast-stack');
+  if (!stack) return; // graceful no-op
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.textContent = msg;
+  stack.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('visible'));
+  setTimeout(()=> {
+    el.classList.remove('visible');
+    setTimeout(()=> el.remove(), 600);
+  }, ttl);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- Runtime module registration (introspection) -------------------------
@@ -311,8 +344,7 @@ function appendMessage(who, text) {
   // Why: Need ephemeral chat bubbles that fade away after a period to keep stage focused on holographic chamber (per UI vision)
   // Where: appendMessage is the single construction path for every chat bubble; adding logic here guarantees uniform lifecycle handling
   // How: Add timed fade + removal sequence using CSS classes (fade-out) and a timeout schedule; expose constants for adjustability
-  const AUTO_HIDE_MS = 14000;        // total time before starting fade-out
-  const FADE_DURATION_MS = 1200;     // should match / be <= CSS animation duration
+  // (Moved constants to MESSAGE_LIFECYCLE for centralized control)
   // Optional role chip like screenshot (User / Clever)
   const chip = document.createElement('div');
   chip.className = 'chip';
@@ -320,6 +352,14 @@ function appendMessage(who, text) {
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
   bubble.textContent = text;
+  // Add pin button (only for AI messages for now)
+  const pinBtn = document.createElement('button');
+  pinBtn.type = 'button';
+  pinBtn.className = 'pin-btn';
+  pinBtn.title = 'Pin message (prevent auto-hide)';
+  pinBtn.textContent = '📌';
+  pinBtn.setAttribute('aria-label', 'Pin message');
+  if (who === 'ai') bubble.appendChild(pinBtn);
   wrap.append(chip, bubble);
   log.append(wrap);
   // animate in
@@ -336,18 +376,68 @@ function appendMessage(who, text) {
   // Ephemeral lifecycle: schedule fade + DOM removal
   // Skip auto-hide for extremely short control/system messages
   if (text && text.length > 0) {
-    setTimeout(() => {
-      // Guard: already removed or user scrolled back (optional future enhancement)
-      if (!wrap.isConnected) return;
-      wrap.classList.add('fading'); // CSS should define .message.fading { opacity:0; transform:translateY(-2px); pointer-events:none; }
-      // Remove after fade completes
-      setTimeout(() => {
-        if (wrap.isConnected) wrap.remove();
-      }, FADE_DURATION_MS);
-    }, AUTO_HIDE_MS);
+    scheduleMessageAutoHide(wrap);
   }
+
+  // Pause on hover & pin logic
+  let pinned = false;
+  const pause = () => wrap.classList.add('paused');
+  const resume = () => { if (!pinned) wrap.classList.remove('paused'); };
+  wrap.addEventListener('mouseenter', pause);
+  wrap.addEventListener('mouseleave', resume);
+  pinBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    pinned = !pinned;
+    if (pinned) {
+      wrap.classList.add('pinned');
+      wrap.classList.remove('fading');
+      wrap.dataset.pinned = '1';
+      pinBtn.textContent = '❌';
+      pinBtn.title = 'Unpin message';
+      showToast('Message pinned', 'info', 1800);
+    } else {
+      wrap.classList.remove('pinned');
+      delete wrap.dataset.pinned;
+      pinBtn.textContent = '📌';
+      pinBtn.title = 'Pin message';
+      // Reschedule fade from now
+      scheduleMessageAutoHide(wrap, 3000); // shorter delay after unpin
+    }
+  });
   return wrap;
 }
+
+function scheduleMessageAutoHide(wrap, overrideDelay) {
+  /**
+   * Why: Centralized function to manage message auto-hide respecting pause/pin state
+   * Where: Called from appendMessage and when unpinning an existing bubble
+   * How: Uses timeouts referencing shared MESSAGE_LIFECYCLE constants; checks data-pinned and .paused
+   */
+  const delay = typeof overrideDelay === 'number' ? overrideDelay : MESSAGE_LIFECYCLE.AUTO_HIDE_MS;
+  setTimeout(() => {
+    if (!wrap.isConnected) return;
+    if (wrap.dataset.pinned === '1' || wrap.classList.contains('paused')) return; // skip
+    wrap.classList.add('fading');
+    setTimeout(() => { if (wrap.isConnected && wrap.dataset.pinned !== '1') wrap.remove(); }, MESSAGE_LIFECYCLE.FADE_DURATION_MS);
+  }, delay);
+}
+
+// Ping server for latency & health once DOM is ready (defer minimal)
+window.addEventListener('load', async () => {
+  try {
+    const t0 = performance.now();
+    const res = await fetch('/api/ping');
+    if (!res.ok) throw new Error('ping status ' + res.status);
+    await res.json();
+    const dt = performance.now() - t0;
+    FRONTEND_TELEMETRY.lastLatencyMs = dt;
+    FRONTEND_TELEMETRY.avgLatencyMs = FRONTEND_TELEMETRY.avgLatencyMs ? (FRONTEND_TELEMETRY.avgLatencyMs * 0.8 + dt * 0.2) : dt;
+    showToast('Connected (' + Math.round(dt) + ' ms)', 'info', 2500);
+  } catch (e) {
+    FRONTEND_TELEMETRY.lastError = String(e.message||e);
+    showToast('Connection issue (ping failed)', 'error', 5000);
+  }
+});
 
 function mapApproachToIntent(approach, fallbackIntent){
   const a = String(approach||'').toLowerCase();

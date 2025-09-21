@@ -160,6 +160,54 @@ body {
   transition: opacity 1.0s ease, transform 1.0s ease;
 }
 
+/* Why: Keep pinned messages visible; Where: toggled by main.js pin logic; How: disable fading visuals */
+.message.pinned { box-shadow: 0 0 0 1px rgba(105,234,203,0.35), 0 0 18px -4px rgba(105,234,203,0.45); }
+
+/* Pause state (hover) prevents removal; subtle lift */
+.message.paused:not(.pinned):not(.fading) { transform: translateY(-2px) scale(1.005); }
+
+/* Pin button inside bubble */
+.pin-btn {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: rgba(11,15,20,0.55);
+  border: 1px solid rgba(105,234,203,0.25);
+  color: var(--neon-teal);
+  font-size: 11px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .25s ease, background .25s ease;
+}
+.message:hover .pin-btn { opacity: 1; }
+.pin-btn:hover { background: rgba(105,234,203,0.15); }
+
+/* Chat stream layout (moved from inline injection) */
+.chat-stream { position:fixed; bottom:6.5rem; left:50%; transform:translateX(-50%); width:min(840px,92vw); display:flex; flex-direction:column; gap:.5rem; padding:0 1rem; max-height:60vh; overflow-y:auto; scrollbar-width:none; z-index:20; }
+.chat-stream::-webkit-scrollbar { display:none; }
+
+/* Toast notifications */
+#toast-stack .toast { 
+  background: rgba(18,24,33,0.9); 
+  border:1px solid rgba(105,234,203,0.25); 
+  color: var(--fg); 
+  font: 12px/1.3 system-ui,-apple-system,Segoe UI,Roboto; 
+  padding:8px 12px; 
+  border-radius:10px; 
+  box-shadow:0 6px 22px -8px #000; 
+  opacity:0; 
+  transform: translateY(8px) scale(.98); 
+  transition: opacity .35s ease, transform .45s cubic-bezier(.4,.16,.2,1);
+  pointer-events:auto;
+}
+#toast-stack .toast.visible { opacity:1; transform:translateY(0) scale(1); }
+#toast-stack .toast.toast-error { border-color:#ff6b6b; color:#ffb3b3; }
+#toast-stack .toast.toast-info { border-color:rgba(105,234,203,0.4); }
+
+
 .message.manifesting {
     opacity: 0;
     transform: translateY(30px) scale(0.95);

@@ -1,3 +1,7 @@
+## NOTE (TODO): Dependabot flagged a moderate vulnerability (see alert #2). Pending audit.
+## Why: Track remediation scope without immediate unpinned mass upgrades (maintain reproducibility)
+## Where: Security workflow references this header; future patch should bump only affected package(s)
+## How: After identifying CVE and impacted version, add minimal version bump + CHANGELOG entry.
 annotated-types==0.7.0
 blinker==1.9.0
 blis==1.3.0
