@@ -225,6 +225,14 @@ evolution-learn:
 	@echo "  trigger-evolution Force evolution cascade"
 	@echo "  evolution-learn  Learn from all sync folder content"
 
+# Diagnostics alignment (Why/Where/How + offline + single DB)
+.PHONY: diagnostics audit-why
+diagnostics:
+	$(ACTIVATE) && $(PY) tools/diagnostics_check.py
+
+audit-why:
+	$(ACTIVATE) && $(PY) tools/why_where_how_audit.py
+
 # Remove unreferenced legacy UI assets and templates
 .PHONY: clean-ui
 clean-ui:

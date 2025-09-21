@@ -222,6 +222,22 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
     except Exception:
         evolution_summary = None
     warnings = _compute_warnings(endpoints)
+    # Attempt to read a short excerpt of diagnostics document (non-fatal)
+    diagnostics_excerpt = None
+    try:
+        from pathlib import Path  # local import to avoid overhead if stripped
+        diag_path = Path(__file__).resolve().parent / 'docs' / 'copilot_diagnostics.md'
+        if not diag_path.exists():
+            # adjust if running from root (introspection.py at project root)
+            proj_root = Path(__file__).resolve().parent
+            diag_path = proj_root / 'docs' / 'copilot_diagnostics.md'
+        if diag_path.exists():
+            text = diag_path.read_text(encoding='utf-8', errors='ignore').splitlines()
+            # Extract first 40 lines to keep payload small
+            diagnostics_excerpt = text[:40]
+    except Exception:
+        diagnostics_excerpt = None
+
     return {
         "last_render": last_render,
         "recent_renders": renders,
@@ -233,6 +249,7 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
         "render_threshold_ms": RENDER_SLOW_THRESHOLD_MS,
         "warnings": warnings,
         "generated_ts": time.time(),
+        "diagnostics_excerpt": diagnostics_excerpt,
     }
 
 

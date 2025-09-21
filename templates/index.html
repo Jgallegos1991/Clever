@@ -41,10 +41,12 @@ How:
         }
 
         /* Hide demo/status elements but keep particles */
-        .status, #legacy-debug-status, #magical-status, #selfcheck,
-        .hud, .chat-panel, #chat-log, .conversation-stream,
-        .analysis-panel, .panel, .grid-overlay,
-        .microcopy, .fallback-panel {
+        /* Hidden legacy/demo elements (keep chat + grid + panels visible now) */
+        /* Why: Previously an overly broad selector also hid #chat-log causing "cannot conversate" issue. */
+        /* Where: This inline style sits in canonical index.html; main.js depends on #chat-log visibility. */
+        /* How: Narrow the hidden list to only actual legacy/demo IDs/classes; leave chat stream and overlay visible. */
+        .status, #legacy-debug-status, #magical-status,
+        .hud, .chat-panel, .fallback-panel {
             display: none !important;
         }
 
@@ -128,6 +130,9 @@ How:
 
     <!-- Hidden particle canvas for subtle background effect -->
     <canvas id="particles" aria-hidden="true"></canvas>
+
+    <!-- Status chip (selfcheck) now present so main.js showStatus() has a target -->
+    <div id="selfcheck" class="chip" style="position:fixed;top:1rem;right:1rem;z-index:50;font:12px system-ui,'-apple-system','Segoe UI',Roboto;background:rgba(18,24,33,0.75);padding:4px 10px;border:1px solid rgba(105,234,203,0.4);border-radius:16px;letter-spacing:.5px;">Ready</div>
 
     <!-- Debug info container (hidden) -->
     <div id="debug-info" style="display:none;position:fixed;top:0;left:0;font:11px monospace;color:#69EACB;z-index:9999;"></div>
