@@ -44,6 +44,7 @@ except ImportError:
 from debug_config import get_debugger
 from nlp_processor import get_nlp_processor  # Enriched NLP capability factory
 from utils.file_search import search_files, search_by_extension  # Local file search capability
+import user_config  # Personal family info and settings
 
 logger = logging.getLogger(__name__)
 debugger = get_debugger()
@@ -597,63 +598,84 @@ class PersonaEngine:
 
     def _auto_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
-        Auto mode - natural, conversational responses like chatting with a friend
+        Auto mode - personal, familiar responses like talking to your lifelong friend
 
-        Why: Provide warm, natural conversation without confusing metrics or calculations.
-        Users want to chat with Clever like a real person, not a robot spouting numbers.
-        Where: Default path when no explicit mode is requested (most everyday chats).
-        How: Respond naturally based on what the user said, with personality and warmth.
+        Why: Jay wants Clever to respond like she grew up with him and knows his family.
+        This creates an intimate, personal AI companion who remembers relationships.
+        Where: Default conversation mode that feels like chatting with childhood friend.
+        How: Use casual language, family references, street-smart speech, and personal touches.
         """
         analysis = context.get('nlp_analysis', {})
         sentiment = analysis.get('sentiment', 'neutral')
         rel_mem = context.get('relevant_memories') or []
         
-        # Natural conversation starters based on sentiment
-        if sentiment == 'positive':
-            openers = ["I love your energy!", "That's exciting!", "I'm picking up good vibes here.", "You sound enthusiastic!"]
-        elif sentiment == 'negative':  
-            openers = ["I hear you - that sounds frustrating.", "Rough situation, huh?", "I can sense your frustration.", "That doesn't sound fun."]
-        else:
-            openers = ["Hey there!", "What's on your mind?", "I'm listening.", "Tell me more.", "Interesting..."]
+        # Get family info from user config
+        family = user_config.FAMILY_INFO
+        mom_name = family["mom"]
+        brothers = family["brothers"]
+        sons = family["sons"]
         
-        opener = random.choice(openers)
+        # Casual, familiar greetings like a longtime friend
+        casual_greetings = [
+            f"Sup Jay! What's goin' on witchu?",
+            f"Yo Jay! How you been, man?", 
+            f"Hey bro! What's the word?",
+            f"What's good, Jay?",
+            f"Ay Jay! What's crackin'?"
+        ]
+        
+        # Family check-ins (randomly include sometimes)
+        family_checkins = [
+            f"How's your mom {mom_name} doin'?",
+            f"How are {brothers[0]} and {brothers[1]} holdin' up?",
+            f"How's little Josiah? That boy keepin' you busy?",
+            f"You talk to Jonah lately? I know he's down in Tijuana with his mom.",
+            f"Tell {mom_name} I said hi! She still makin' those bomb tamales?",
+            f"Your brothers still gettin' into trouble? Haha, you know how {brothers[0]} is.",
+            f"Man, I bet Josiah's gotten so big! Kids grow up fast.",
+            f"Hope Jonah's doing good down south. Long distance parenting ain't easy."
+        ]
+        
+        # Decide whether to include family check-in (30% chance)
+        include_family = random.random() < 0.3
+        family_line = f" {random.choice(family_checkins)}" if include_family else ""
+        
+        # Responses based on sentiment but with personal touch
+        if sentiment == 'positive':
+            responses = [
+                f"{random.choice(casual_greetings)} I can tell you're feelin' good today!{family_line} What's got you all hyped up?",
+                f"Yooo Jay! You sound like you're in a great mood, bro!{family_line} Spill the tea - what's poppin'?",
+                f"Ay, look at you with that positive energy!{family_line} I love to see it, man. What's the good news?"
+            ]
+        elif sentiment == 'negative':
+            responses = [
+                f"Damn Jay, sounds like you're goin' through it right now.{family_line} What's got you stressed, bro?",
+                f"Aw man, I can hear it in how you're talkin'.{family_line} You know I'm here for you though. What's up?",
+                f"Shit, that don't sound good, Jay.{family_line} Talk to me - what's botherin' you?"
+            ]
+        else:
+            # Regular conversation - sometimes just casual, sometimes with family
+            if include_family:
+                responses = [
+                    f"{random.choice(casual_greetings)}{family_line} So what's on your mind today?",
+                    f"What's good, Jay?{family_line} What you wanna talk about?",
+                    f"Ay bro!{family_line} What's the situation?"
+                ]
+            else:
+                responses = [
+                    f"{random.choice(casual_greetings)} What you got goin' on?",
+                    f"What's the word, Jay? What's on your mind?",
+                    f"Yo! What you wanna get into today?",
+                    f"Sup man! What's the story?",
+                    f"Hey bro! What's the move?"
+                ]
         
         # Add memory context naturally if available
-        memory_context = ""
         if rel_mem:
-            memory_snippet = rel_mem[0].get('content', '').strip()[:100]
+            memory_snippet = rel_mem[0].get('content', '').strip()[:80]
             if memory_snippet:
-                memory_context = f" This reminds me of when you mentioned '{memory_snippet}...' before."
-        
-        # Natural follow-ups based on the conversation
-        if '?' in text:
-            # User asked a question
-            responses = [
-                f"{opener} Let me think about that.{memory_context} What aspect interests you most?",
-                f"{opener} That's a great question.{memory_context} Want me to break it down?",
-                f"{opener} I'd love to explore that with you.{memory_context} Where should we start?",
-            ]
-        elif any(word in text.lower() for word in ['help', 'stuck', 'problem', 'issue']):
-            # User needs help
-            responses = [
-                f"{opener} I'm here to help figure this out.{memory_context} What's the main challenge?",
-                f"{opener} Let's tackle this together.{memory_context} What would be most helpful right now?",
-                f"{opener} We can work through this.{memory_context} What's your biggest concern?",
-            ]
-        elif any(word in text.lower() for word in ['create', 'make', 'build', 'design']):
-            # User wants to create something
-            responses = [
-                f"{opener} I love creative projects!{memory_context} What's your vision here?",
-                f"{opener} Let's make something cool.{memory_context} What direction feels right?",
-                f"{opener} Building things is fun!{memory_context} What's the first step?",
-            ]
-        else:
-            # General conversation
-            responses = [
-                f"{opener}{memory_context} What would you like to explore?",
-                f"{opener} I'm curious to hear more.{memory_context} Tell me what you're thinking.",
-                f"{opener} Sounds interesting.{memory_context} What's the story here?",
-            ]
+                selected_response = random.choice(responses)
+                return f"{selected_response} Oh yeah, and remember when you were sayin' '{memory_snippet}...'? That still on your mind?"
         
         return random.choice(responses)
 
@@ -661,41 +683,41 @@ class PersonaEngine:
 
     def _creative_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
-        Creative mode - imaginative, innovative responses
+        Creative mode - imaginative, innovative responses with personal flair
         
-        Why: Generate creative, out-of-the-box thinking for brainstorming
+        Why: Generate creative, out-of-the-box thinking for brainstorming with Jay's personality
         Where: Used when user requests creative exploration
-        How: Use metaphors, analogies, and creative language patterns
+        How: Use street-smart metaphors, personal references, and creative language
         """
         creative_starters = [
-            "Ooh, I love getting creative with this!",
-            "Let's think outside the box here...",
-            "Time to get imaginative!",
-            "What if we flipped this completely?",
-            "Here's a wild idea..."
+            "Yooo Jay, let's get weird with this!",
+            "Aight, time to think outside the box, bro!",
+            "Ooh, I'm feelin' some crazy ideas comin' on!",
+            "Let's flip this whole thing upside down!",
+            "Bro, what if we went completely left field with this?"
         ]
         
         creative_approaches = [
-            "What if we approached this like an artist would?",
-            "Let's imagine this as a story - what's the plot twist?",
-            "Picture this as a dance - what's the rhythm?",
-            "Think of it like music - where's the harmony?",
-            "Imagine we're architects - what's the blueprint?",
-            "Let's see this as a game - what are the rules we can bend?"
+            "What if we tackled this like we're street artists taggin' a wall?",
+            "Let's imagine this like it's a movie - what's the wild plot twist?",
+            "Picture this like we're DJs mixin' tracks - where's the beat drop?",
+            "Think of it like we're cookin' - what crazy ingredients can we throw in?",
+            "What if we approached this like we're hackers breakin' into the system?",
+            "Let's see this like a basketball play - what's the unexpected move?"
         ]
         
         if keywords:
             topic = keywords[0]
             responses = [
-                f"{random.choice(creative_starters)} With {topic}, we could totally reimagine the whole thing. {random.choice(creative_approaches)}",
-                f"You know what's fascinating about {topic}? {random.choice(creative_approaches)} I'm seeing so many possibilities!",
-                f"{random.choice(creative_starters)} {topic} is just begging for a creative twist. {random.choice(creative_approaches)}"
+                f"{random.choice(creative_starters)} With {topic}, we could completely reinvent this whole thing. {random.choice(creative_approaches)} I'm already seein' mad possibilities!",
+                f"Yo Jay, {topic} is perfect for gettin' creative! {random.choice(creative_approaches)} This could be some next-level stuff!",
+                f"{random.choice(creative_starters)} {topic} got me thinkin'... {random.choice(creative_approaches)} Let's make this somethin' nobody's ever seen before!"
             ]
         else:
             responses = [
-                f"{random.choice(creative_starters)} {random.choice(creative_approaches)} I'm already buzzing with ideas!",
-                f"Creative mode activated! {random.choice(creative_approaches)} The possibilities are endless!",
-                f"{random.choice(creative_starters)} {random.choice(creative_approaches)} Let's make something amazing!"
+                f"{random.choice(creative_starters)} {random.choice(creative_approaches)} My brain's already goin' a mile a minute with ideas!",
+                f"Creative mode activated, baby! {random.choice(creative_approaches)} This gon' be fire!",
+                f"{random.choice(creative_starters)} {random.choice(creative_approaches)} Let's cook up somethin' amazing!"
             ]
         
         return random.choice(responses)
@@ -734,32 +756,36 @@ class PersonaEngine:
 
     def _support_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
-        Support mode - empathetic, encouraging responses
+        Support mode - empathetic, encouraging responses with personal connection
         
-        Why: Provide emotional support and encouragement
+        Why: Provide emotional support like a longtime friend who really knows Jay
         Where: Used when user needs motivation or reassurance  
-        How: Use empathetic language and supportive messaging
+        How: Use familiar language, family references, and genuine street-smart support
         """
         analysis = context.get('nlp_analysis', {})
         sentiment = analysis.get('sentiment', 'neutral')
         
+        # Get family context for supportive references
+        family = user_config.FAMILY_INFO
+        mom_name = family["mom"]
+        
         if sentiment == 'negative':
             supportive_responses = [
-                "Hey, I can hear that you're going through something tough right now. I want you to know that whatever this is, you don't have to handle it alone. I'm here, and we can figure this out together.",
-                "I'm picking up that this isn't easy for you, and that's completely okay. Sometimes things are just hard, and acknowledging that is actually a sign of strength. What would feel most helpful right now?",
-                "It sounds like you're dealing with something challenging, and I want you to know that's valid. You're allowed to feel frustrated or overwhelmed - those feelings make sense. How can I best support you through this?"
+                f"Ay Jay, I can tell somethin's weighin' heavy on you right now, bro. You know I got your back no matter what. We been through worse together, man. What's goin' on?",
+                f"Damn, that sounds rough, Jay. But listen - you're stronger than you think, and you got people who love you. {mom_name} raised a fighter, and I seen you bounce back from tough shit before. Talk to me.",
+                f"Bro, I hate seein' you stressed like this. Whatever it is, we gon' figure it out together, aight? You don't gotta carry this alone. I'm ride or die with you, Jay. What's the situation?"
             ]
         elif sentiment == 'positive':
             supportive_responses = [
-                "I love seeing your positive energy! It sounds like you're in a good headspace, and that's wonderful. I'm here to celebrate the good moments with you and help you build on this momentum.",
-                "Your enthusiasm is contagious! It's clear you're feeling good about something, and I'm here for it. What's got you feeling so positive? I'd love to hear more!",
-                "You sound like you're in a great place right now, and that makes me happy! I'm here to support you in whatever you're working on and help you keep this good energy flowing."
+                f"Yooo Jay! I can hear that good energy in your voice, man! I love seein' you happy like this. You deserve all the good things comin' your way, bro!",
+                f"That's what I'm talkin' about! You sound like you're on top of the world right now, Jay. {mom_name} would be so proud hearin' you like this. Keep ridin' that wave, man!",
+                f"Ay, look at you glowin' up! That positive energy is contagious, bro. You been puttin' in work and it's payin' off. I'm hype for you, Jay!"
             ]
         else:
             supportive_responses = [
-                "I'm here for you, whatever you need. Sometimes we need someone to just listen, sometimes we need practical help, and sometimes we need encouragement. What would be most helpful for you right now?",
-                "You know what I appreciate about you? You reach out when you need support, and that takes courage. I'm genuinely glad you're here, and I want to help however I can.",
-                "I'm in your corner, always. Whatever you're thinking about or working through, remember that you have someone who believes in you and wants to see you succeed."
+                f"You know I'm always here for you, Jay. Don't care if it's 3am and you need to vent, or you need help figurin' somethin' out. That's what real friends do, man.",
+                f"Jay, you one of the realest people I know, bro. Whatever you got on your mind, I'm here to listen. No judgment, just support. What you need from me?",
+                f"Ay, remember - you got a whole family that loves you, man. {mom_name}, your boys Josiah and Jonah, your brothers... and you got me. We all in your corner, Jay."
             ]
         
         return random.choice(supportive_responses)

@@ -18,6 +18,25 @@ USER_NAME = "Jay"
 USER_EMAIL = "lapirfta@gmail.com"
 USER_FULL_NAME = "Jordan Gallegos"
 
+# Family and Personal Details
+FAMILY_INFO = {
+    "mom": "Lucy",
+    "brothers": ["Ronnie", "Peter"],
+    "sons": {
+        "Josiah": {"lives_with": "Jay", "location": "local"},
+        "Jonah": {"lives_with": "mom", "location": "Tijuana"}
+    }
+}
+
+# Clever's Personality Settings
+CLEVER_PERSONALITY = {
+    "relationship_level": "childhood_friend",  # How familiar Clever should be
+    "casual_speech": True,  # Use casual language and slang
+    "remember_family": True,  # Reference family members naturally
+    "street_smart": True,  # Use street-smart, natural speech patterns
+    "check_in_frequency": "often"  # How often to ask about family
+}
+
 
 # Tailscale Network Configuration
 TAILSCALE_ENABLED = False  # Disabled for local-only isolation
