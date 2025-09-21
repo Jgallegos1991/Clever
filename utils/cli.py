@@ -103,7 +103,7 @@ def main():
     sp_ingest = sp.add_parser("ingest")
     sp_ingest.add_argument("path", nargs="?")
 
-    sp_list = sp.add_parser("list")
+    sp.add_parser("list")  # List command needs no additional arguments
 
     sp_search = sp.add_parser("search")
     sp_search.add_argument("query")

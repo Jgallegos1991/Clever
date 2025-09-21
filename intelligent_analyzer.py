@@ -26,7 +26,6 @@ Connects to:
 """
 from __future__ import annotations
 import ast
-import inspect
 import re
 import threading
 import time
@@ -34,7 +33,7 @@ import statistics
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 # Enhanced problem detection categories
 PROBLEM_CATEGORIES = {
