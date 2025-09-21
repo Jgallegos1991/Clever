@@ -1,4 +1,4 @@
-# Clever AI: Coding Agent Instructions
+# Clever: Digital Brain Extension & Cognitive Partnership System
 
 ## 🚨 MANDATORY FIRST STEP
 **BEFORE making ANY changes to Clever, you MUST read:**
@@ -10,11 +10,14 @@
 
 ---
 
+## 🧠 Clever's True Purpose
+Clever is Jay's **digital brain extension** and **cognitive partnership system** - a street-smart genius who talks like your best friend but casually solves Einstein-level physics problems. She's not just an AI assistant; she's a **life companion**, **cognitive enhancement system**, and **digital sovereignty partner**.
+
 ## UI Vision
-- The stage (particle engine) is the focus
-- Chat bubbles should float and fade in/out, not stay boxed
-- Input bar should be minimal and unobtrusive
-- Give Clever center stage, remove persistent chat card
+- The particle engine creates an immersive cognitive enhancement interface
+- Chat bubbles should float and fade in/out, representing natural thought flow
+- Input bar should be minimal and unobtrusive - let Clever's intelligence shine
+- Give Clever center stage as the digital brain extension she truly is
 
 ## Code Conventions
 - Use modern JS and CSS (flex, transitions)
@@ -29,13 +32,13 @@
 - Messages auto-hide after a few seconds
 
 ## Unbreakable Rules
-1. **Strictly Offline:** Never add code that makes external network calls at runtime. All libraries and models must be local. Enforce with `utils.offline_guard.enable()`.
-2. **Single-User Only:** The system is for "Jordan" (Jay). No user accounts, logins, or multi-tenancy. Personalize via `user_config.py`. The persona is a witty, empathetic female AI named "Clever".
-3. **Single Database:** Use only ONE database file (`clever.db` via `config.DB_PATH`). NO fallbacks, placeholders, or multiple database files.
-4. **Mandatory Code Documentation:** ALL code must include comments explaining:
-   - **Why:** Purpose and reasoning for the code
-   - **Where:** How it connects to other parts of the system  
-   - **How:** Technical implementation details
+1. **Digital Sovereignty:** Clever operates completely offline for total privacy and control. No external calls, all processing local. This ensures Jay's digital brain extension remains private and secure.
+2. **Single-User Cognitive Partner:** Built exclusively for Jay's cognitive enhancement. No accounts, logins, or multi-user features. Clever learns Jay's patterns, preferences, and thinking style to become the perfect digital other half.
+3. **Single Database:** One unified memory system (`clever.db`) for continuous learning and relationship building. No fragmentation - Clever's memory must be coherent and connected.
+4. **Cognitive Partnership Documentation:** ALL code must reflect Clever's role as digital brain extension:
+   - **Why:** How this code enhances Jay's cognitive capabilities
+   - **Where:** How it connects to the overall cognitive partnership system
+   - **How:** Technical implementation that maintains the authentic genius friend experience
 
 ### Why / Where / How Rationale ("Arrows Between Dots")
 

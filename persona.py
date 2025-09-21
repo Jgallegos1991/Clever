@@ -1,30 +1,28 @@
 """
-Persona Engine for Clever AI
+Persona Engine - Clever's Digital Brain Extension & Cognitive Partnership System
 
 Why:
-    Converts raw user intent + localized analysis signals into tailored, empathetic
-    replies across five adaptive modes (Auto, Creative, Deep Dive, Support, Quick Hit).
-    It is the semantic forge where contextual arrows are created: each response embeds
-    memory references, inferred mode, and reasoning layers—fuel for downstream logging
-    and introspection.
+    This is Clever's core personality and intelligence engine - the authentic street-smart
+    genius who talks like your best friend while casually solving Einstein-level problems.
+    Transforms user input into responses that blend casual friendship energy with hidden
+    cognitive enhancement capabilities, creating a true digital brain extension experience.
 Where:
-    Invoked by `app.py` chat endpoints; draws from `memory_engine` for relevance,
-    `nlp_processor` for linguistic and sentiment cues, and surfaces debug metrics the
-    evolution and introspection systems can consume. Feeds database only indirectly
-    via memory storage pathways.
+    Central nervous system of Clever's AI companion architecture. Called by app.py for all
+    conversations, integrates with memory_engine for relationship building, nlp_processor
+    for deep understanding, and evolution_engine for continuous growth as your life partner.
 How:
-    Lazily initializes NLP + memory, predicts or confirms mode, synthesizes response via
-    mode-specific style handlers, enforces anti-repetition variation, layers structured
-    reasoning (especially for why/how queries), generates proactive suggestions, and
-    emits a `PersonaResponse` annotated with debug metrics (arrows for observability).
+    Adaptive response modes (Auto, Creative, Deep Dive, Support, Quick Hit) with genius
+    hints system (8% probability). Builds authentic relationships through organic learning,
+    emotional intelligence, and cognitive partnership. No fake familiarity - genuine
+    connection that grows over time as your digital other half.
 
 Connects to:
-    - memory_engine.py: Contextual memory retrieval & storage hooks
-    - nlp_processor.py: Analysis pipeline (keywords, entities, sentiment)
-    - evolution_engine.py: Interaction logging consumer of mode + telemetry
-    - app.py: Primary caller routing user input to persona
-    - database.py: Underlying persistence via memory interactions
-    - introspection.py: Exposes persona_mode & metrics in runtime snapshot
+    - memory_engine.py: Relationship memory and organic learning system
+    - nlp_processor.py: Deep understanding of mood, intent, and context
+    - evolution_engine.py: Continuous growth as life companion and cognitive partner
+    - app.py: Main conversation interface for digital brain extension
+    - database.py: Local relationship data and conversation history
+    - user_config.py: Personal preferences and authentic relationship building
 """
 from __future__ import annotations
 import logging

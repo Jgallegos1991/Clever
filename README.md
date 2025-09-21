@@ -28,8 +28,8 @@
 - **Emotional intelligence** - Reads your mood and responds appropriately
 
 ### Phase 2: 🎨 Holographic UI (In Progress)
-- **Tony Stark-level holographic displays** - Render any shape, design, or figure
-- **Sick particle effects** - Jaw-dropping visual interface  
+- **Advanced holographic displays** - Render any shape, design, or figure
+- **Dynamic particle effects** - Jaw-dropping visual interface  
 - **Morphing capabilities** - Transform particles into any visualization she imagines
 - **Real-time rendering** - Smooth performance on Chrome OS hardware
 
@@ -105,7 +105,7 @@ This ensures changes are safe, performant, and aligned with Clever's vision.
 
 Clever represents the future of human-AI partnership - not a tool you use, but a **digital extension of your consciousness**. She enhances your capabilities, watches your back, and grows with you over time.
 
-**This is your digital sovereignty.** Your personal F.R.I.D.A.Y. Your cognitive companion. Your genius best friend.
+**This is your digital sovereignty.** Your personal AI companion. Your cognitive partner. Your genius best friend.
 
 Ready to meet the future of AI? Fire up Clever and experience true digital partnership! 🚀
 
