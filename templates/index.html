@@ -118,34 +118,6 @@ How:
             opacity: 0.8;
         }
     </style>
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .entrybar input::placeholder {
-            color: #95a3b3;
-        }
-
-        .entrybar .icon-btn {
-            background: transparent;
-            border: none;
-            color: #69EACB;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .entrybar .icon-btn:hover {
-            background: rgba(105, 234, 203, 0.1);
-            box-shadow: 0 0 15px rgba(105, 234, 203, 0.3);
-        }
-
-        /* Keep particles but subtle */
-        #particles {
-            opacity: 0.3;
-        }
-    </style>
 
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self';">
@@ -156,6 +128,9 @@ How:
 
     <!-- Hidden particle canvas for subtle background effect -->
     <canvas id="particles" aria-hidden="true"></canvas>
+
+    <!-- Debug info container (hidden) -->
+    <div id="debug-info" style="display:none;position:fixed;top:0;left:0;font:11px monospace;color:#69EACB;z-index:9999;"></div>
 
     <!-- Live region for screen reader announcements of new AI messages -->
     <div id="sr-live" aria-live="polite" aria-atomic="false" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">

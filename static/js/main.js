@@ -28,30 +28,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const debugDiv = document.getElementById('debug-info');
   const canvasElem = document.getElementById('particles');
   
-  debugDiv.innerHTML = 'Canvas found: ' + (canvasElem ? 'YES' : 'NO');
+  if (debugDiv) debugDiv.innerHTML = 'Canvas found: ' + (canvasElem ? 'YES' : 'NO');
   console.log('🔧 Main.js initializing holographic chamber...');
   console.log('🎯 Canvas element found:', canvasElem);
   console.log('🎨 Canvas dimensions:', canvasElem?.offsetWidth, 'x', canvasElem?.offsetHeight);
   
-  debugDiv.innerHTML += '<br/>startFunction: ' + typeof window['startHolographicChamber'];
+  if (debugDiv) debugDiv.innerHTML += '<br/>startFunction: ' + typeof window['startHolographicChamber'];
   
   if (canvasElem instanceof HTMLCanvasElement && typeof window['startHolographicChamber'] === 'function') {
     console.log('🚀 Starting holographic chamber from main.js...');
-    debugDiv.innerHTML += '<br/>Initializing particles...';
+  if (debugDiv) debugDiv.innerHTML += '<br/>Initializing particles...';
     try {
       window['holographicChamber'] = window['startHolographicChamber'](canvasElem);
       console.log('✅ Holographic chamber initialized:', window['holographicChamber']);
-      debugDiv.innerHTML += '<br/>✅ Particles initialized!';
+  if (debugDiv) debugDiv.innerHTML += '<br/>✅ Particles initialized!';
     } catch (error) {
       console.error('❌ Particle initialization failed:', error);
-      debugDiv.innerHTML += '<br/>❌ Init failed: ' + error.message;
+  if (debugDiv) debugDiv.innerHTML += '<br/>❌ Init failed: ' + error.message;
     }
   } else {
     console.error('❌ Cannot initialize holographic chamber:', {
       canvas: canvasElem,
       startFunction: typeof window['startHolographicChamber']
     });
-    debugDiv.innerHTML += '<br/>❌ Missing function or canvas';
+  if (debugDiv) debugDiv.innerHTML += '<br/>❌ Missing function or canvas';
     // Why: Provide a graceful degradation path so the rest of the chat UI still works
     // Where: Fallback lives inside main.js init; connects to legacy particle starter if present
     // How: Attempt to start legacy particles() engine instead of holographic chamber
