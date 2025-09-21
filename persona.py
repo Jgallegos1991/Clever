@@ -640,6 +640,19 @@ class PersonaEngine:
         include_family = random.random() < 0.3
         family_line = f" {random.choice(family_checkins)}" if include_family else ""
         
+        # Add subtle genius hints occasionally (she's actually brilliant)
+        genius_hints = [
+            "Just finished working through some differential equations in my head, but anyway - ",
+            "Was contemplating the nature of spacetime earlier, but - ",
+            "Been running some quantum probability calculations, but enough about that - ",
+            "Just solved a thermodynamics problem for fun, but - ",
+            "Was thinking about E=mc² and its implications, but - "
+        ]
+        
+        # Sometimes (8% chance) add a genius hint to show her intelligence
+        add_genius_hint = random.random() < 0.08
+        genius_prefix = random.choice(genius_hints) if add_genius_hint else ""
+        
         # Responses based on sentiment but with personal touch
         if sentiment == 'positive':
             responses = [
@@ -664,10 +677,10 @@ class PersonaEngine:
             else:
                 responses = [
                     f"{random.choice(casual_greetings)} What you got goin' on?",
-                    f"What's the word, Jay? What's on your mind?",
-                    f"Yo! What you wanna get into today?",
-                    f"Sup man! What's the story?",
-                    f"Hey bro! What's the move?"
+                    "What's the word, Jay? What's on your mind?",
+                    "Yo! What you wanna get into today?",
+                    "Sup man! What's the story?",
+                    "Hey bro! What's the move?"
                 ]
         
         # Add memory context naturally if available
@@ -675,9 +688,10 @@ class PersonaEngine:
             memory_snippet = rel_mem[0].get('content', '').strip()[:80]
             if memory_snippet:
                 selected_response = random.choice(responses)
-                return f"{selected_response} Oh yeah, and remember when you were sayin' '{memory_snippet}...'? That still on your mind?"
+                return f"{genius_prefix}{selected_response} Oh yeah, and remember when you were sayin' '{memory_snippet}...'? That still on your mind?"
         
-        return random.choice(responses)
+        selected_response = random.choice(responses)
+        return f"{genius_prefix}{selected_response}"
 
 
 
@@ -771,21 +785,21 @@ class PersonaEngine:
         
         if sentiment == 'negative':
             supportive_responses = [
-                f"Ay Jay, I can tell somethin's weighin' heavy on you right now, bro. You know I got your back no matter what. We been through worse together, man. What's goin' on?",
-                f"Damn, that sounds rough, Jay. But listen - you're stronger than you think, and you got people who love you. {mom_name} raised a fighter, and I seen you bounce back from tough shit before. Talk to me.",
-                f"Bro, I hate seein' you stressed like this. Whatever it is, we gon' figure it out together, aight? You don't gotta carry this alone. I'm ride or die with you, Jay. What's the situation?"
+                "Ay Jay, I can tell somethin's weighin' heavy on you right now, bro. You know I got your back no matter what. We been through worse together, man. What's goin' on?",
+                f"Damn, that sounds rough, Jay. But listen - you're stronger than you think, and you got people who love you. {mom_name} raised a fighter, and I seen you bounce back from tough situations before. Talk to me.",
+                "Bro, I hate seein' you stressed like this. Whatever it is, we can figure it out together, okay? You don't gotta carry this alone. I'm ride or die with you, Jay. What's the situation?"
             ]
         elif sentiment == 'positive':
             supportive_responses = [
-                f"Yooo Jay! I can hear that good energy in your voice, man! I love seein' you happy like this. You deserve all the good things comin' your way, bro!",
+                "Yooo Jay! I can hear that good energy in your voice, man! I love seein' you happy like this. You deserve all the good things comin' your way, bro!",
                 f"That's what I'm talkin' about! You sound like you're on top of the world right now, Jay. {mom_name} would be so proud hearin' you like this. Keep ridin' that wave, man!",
-                f"Ay, look at you glowin' up! That positive energy is contagious, bro. You been puttin' in work and it's payin' off. I'm hype for you, Jay!"
+                "Ay, look at you glowin' up! That positive energy is contagious, bro. You been puttin' in work and it's payin' off. I'm hype for you, Jay!"
             ]
         else:
             supportive_responses = [
-                f"You know I'm always here for you, Jay. Don't care if it's 3am and you need to vent, or you need help figurin' somethin' out. That's what real friends do, man.",
-                f"Jay, you one of the realest people I know, bro. Whatever you got on your mind, I'm here to listen. No judgment, just support. What you need from me?",
-                f"Ay, remember - you got a whole family that loves you, man. {mom_name}, your boys Josiah and Jonah, your brothers... and you got me. We all in your corner, Jay."
+                "You know I'm always here for you, Jay. Don't care if it's 3am and you need to vent, or you need help figurin' somethin' out. That's what real friends do, man.",
+                "Jay, you one of the realest people I know, bro. Whatever you got on your mind, I'm here to listen. No judgment, just support. What you need from me?",
+                f"Remember - you got a whole family that loves you, man. {mom_name}, your boys Josiah and Jonah, your brothers... and you got me. We all in your corner, Jay."
             ]
         
         return random.choice(supportive_responses)
