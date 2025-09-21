@@ -53,8 +53,7 @@ How:
     <!-- Hidden particle canvas for subtle background effect -->
     <canvas id="particles" aria-hidden="true"></canvas>
 
-    <!-- Removed debug-info element (quiet mode) -->
-
+    <!-- Removed debug-info & status elements (quiet mode) -->
 
     <!-- Live region for screen reader announcements of new AI messages -->
     <div id="sr-live" aria-live="polite" aria-atomic="false" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
@@ -95,5 +94,8 @@ How:
     <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
     <!-- Externalized fade logic to satisfy CSP (no inline scripts) -->
     <script src="{{ url_for('static', filename='js/chat-fade.js') }}?v={{ cache_buster }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
+    <script src="{{ url_for('static', filename='js/chat-fade.js') }}?v={{ cache_buster }}"></script>
+    <div id="toast-stack" aria-live="polite" aria-atomic="true" style="position:fixed;bottom:1rem;right:1rem;display:flex;flex-direction:column;gap:.5rem;z-index:9999;pointer-events:none;"></div>
 </body>
 </html>

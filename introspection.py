@@ -24,7 +24,7 @@ import re
 import threading
 import time
 from collections import deque
-from typing import Any, Callable, Deque, Dict, List, Optional
+from typing import Any, Callable, Deque, Dict, List, Optional, Set
 
 # Regular expression to extract Why/Where/How sections from docstrings (case-insensitive)
 _SECTION_RE = re.compile(r"^(why|where|how)\s*:\s*(.*)$", re.IGNORECASE)
@@ -185,23 +185,172 @@ def _compute_warnings(endpoints: List[Dict[str, Any]]) -> List[str]:
     return warnings
 
 
-def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
-    """Assemble full runtime introspection state.
+def _extract_connects_to(obj: Any) -> List[str]:
+    """Parse 'Connects to:' lines from a docstring to derive graph edges.
+
+    Why: Convert human-readable connection annotations into machine-readable
+    edges that can power a live reasoning/architecture graph overlay.
+    Where: Called when assembling reasoning_graph inside runtime_state; ties
+    directly into enforced documentation contract without extra author burden.
+    How: Scans the docstring for a 'Connects to:' line, then collects the
+    following indented or hyphen-prefixed lines until a blank or new section.
+    Extracts probable module/file tokens (*.py) or bare identifiers.
+    """
+    doc = inspect.getdoc(obj) or ""
+    lines = doc.splitlines()
+    captures: List[str] = []
+    in_block = False
+    for raw in lines:
+        line = raw.rstrip()
+        if not in_block:
+            if line.lower().startswith('connects to'):  # start block
+                in_block = True
+            continue
+        # inside block: terminate on blank or section style line
+        if not line.strip():
+            break
+        if re.match(r'^(why|where|how)\s*:', line, re.IGNORECASE):  # new section
+            break
+        # Normalize bullet styles
+        line_clean = re.sub(r'^[-*]\s*', '', line).strip()
+        if not line_clean:
+            continue
+        # Heuristic: capture first token that looks like module or file
+        token = line_clean.split()[0]
+        # Strip trailing commas / punctuation
+        token = token.rstrip(':,;')
+        captures.append(token)
+    # Deduplicate while preserving order
+    seen: Set[str] = set()
+    ordered = []
+    for c in captures:
+        if c not in seen:
+            seen.add(c)
+            ordered.append(c)
+    return ordered
+
+
+def _build_reasoning_graph(endpoints: List[Dict[str, Any]], app) -> Dict[str, Any]:
+    """Build a lightweight reasoning graph from endpoint docstrings.
+
+    Why: Provide the frontend with a navigable set of nodes/edges describing
+    declared architectural intent (the "arrows" between components).
+    Where: Embedded in runtime_state payload; consumed by optional graph
+    debug overlay (graph-debug.js) when ?graph=1 is present.
+    How: Creates nodes for each endpoint function + unique referenced targets
+    from their Connects to blocks. Edges are directed endpoint -> target.
+    Truncates counts to remain payload-friendly; includes a 'truncated' flag.
+    """
+    nodes: Dict[str, Dict[str, Any]] = {}
+    edges: List[Dict[str, str]] = []
+    MAX_NODES = 300
+    MAX_EDGES = 600
+    # First add endpoint nodes
+    for ep in endpoints:
+        ident = f"{ep['module']}.{ep['func']}"
+        nodes[ident] = {
+            'id': ident,
+            'label': ep['func'],
+            'type': 'endpoint',
+            'why': ep.get('why',''),
+            'where': ep.get('where',''),
+            'how': ep.get('how',''),
+            'rule': ep.get('rule'),
+        }
+    # Extract edges by re-inspecting actual view functions (for raw docstring)
+    for rule in app.url_map.iter_rules():
+        fn = app.view_functions.get(rule.endpoint)
+        if not fn:
+            continue
+        src = f"{getattr(fn,'__module__','<unknown>')}.{getattr(fn,'__name__','<unknown>')}"
+        targets = _extract_connects_to(fn)
+        for tgt in targets:
+            # Normalize target id heuristic: if endswith .py remove extension
+            norm = tgt[:-3] if tgt.endswith('.py') else tgt
+            # Create node placeholder if missing
+            if norm not in nodes:
+                nodes[norm] = {'id': norm, 'label': norm, 'type': 'target'}
+            edges.append({'source': src, 'target': norm, 'type': 'connects_to'})
+    truncated = False
+    if len(nodes) > MAX_NODES:
+        truncated = True
+        # Keep endpoints preferentially
+        ep_nodes = [n for n in nodes.values() if n.get('type')=='endpoint']
+        extra = MAX_NODES - len(ep_nodes)
+        keep_ids = set(n['id'] for n in ep_nodes)
+        if extra > 0:
+            for n in nodes.values():
+                if n['id'] not in keep_ids and n.get('type')=='target' and extra>0:
+                    keep_ids.add(n['id']); extra -=1
+        nodes = {nid: nodes[nid] for nid in keep_ids}
+        edges = [e for e in edges if e['source'] in nodes and e['target'] in nodes][:MAX_EDGES]
+    if len(edges) > MAX_EDGES:
+        truncated = True
+        edges = edges[:MAX_EDGES]
+    return {
+        'nodes': list(nodes.values()),
+        'edges': edges,
+        'truncated': truncated,
+        'generated_at': time.time(),  # Why: unify timestamp key naming for frontend consumption; Where: referenced by graph legend overlay; How: epoch seconds float
+    }
+
+
+def _build_concept_graph() -> Optional[Dict[str, Any]]:
+    """Attempt to build an evolution concept graph (best-effort).
+
+    Why: Provide optional second layer (concept network) requested for rich
+    graph view (option C). Keeps failure silent if evolution engine not ready
+    or data would be too large.
+    Where: runtime_state attaches as concept_graph when available.
+    How: Queries evolution_engine for a lightweight list of concepts and their
+    connections if such attributes exist. Applies size caps similar to
+    reasoning graph.
+    """
+    try:
+        from evolution_engine import get_evolution_engine  # type: ignore
+        evo = get_evolution_engine()
+        concepts = getattr(evo, 'concepts', None)
+        links = getattr(evo, 'concept_links', None)
+        if not concepts or not links:
+            return None
+        MAX_CONCEPTS = 250
+        MAX_LINKS = 600
+        c_items = list(concepts.items()) if isinstance(concepts, dict) else []
+        c_items = c_items[:MAX_CONCEPTS]
+        nodes = [{'id': k, 'label': k, 'type': 'concept', 'weight': v} for k, v in c_items]
+        # Filter links to those whose endpoints present in truncated node set
+        node_ids = {n['id'] for n in nodes}
+        filtered = [l for l in links if l[0] in node_ids and l[1] in node_ids]
+        filtered = filtered[:MAX_LINKS]
+        edges = [{'source': a, 'target': b, 'type': 'concept_link', 'weight': w} for a,b,w in filtered]
+        return {
+            'nodes': nodes,
+            'edges': edges,
+            'truncated': len(concepts)>MAX_CONCEPTS or len(links)>MAX_LINKS,
+            'generated_ts': time.time(),  # Why: allow frontend to detect refresh cycles; Where: consumed by graph-debug.js legend; How: epoch seconds
+        }
+    except Exception:
+        return None
+
+
+def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -> Dict[str, Any]:
+    """Assemble full runtime introspection state with enhanced intelligent analysis.
 
     Why: Central aggregation converting docstring reasoning + live telemetry
-    (renders, errors, evolution stats) into a navigational map—the "arrows"
-    that show what connected to what, why, and how at the moment of inspection.
+    (renders, errors, evolution stats) + AI-powered analysis into a comprehensive
+    navigational map that not only shows "what connects to what" but also
+    identifies problems, suggests fixes, and provides actionable insights.
     Where: Returned by `/api/runtime_introspect` endpoint in `app.py`, consumed
-    by optional frontend debug overlay and CLI snapshot tool.
-    How: Gathers recent renders (with slow flag), endpoint reasoning metadata,
-    persona mode, evolution interaction summary (best-effort), last error,
-    version hash, computed drift warnings, and the render slow threshold for
-    client display.
+    by enhanced frontend debug overlay and CLI analysis tools.
+    How: Gathers traditional metrics plus intelligent analysis results, problem
+    detection, architectural insights, and performance recommendations to create
+    a complete system health and improvement dashboard.
 
     Connects to:
         - evolution_engine.py: Interaction summary (if available)
         - app.py: Persona engine reference & endpoint registration
         - tools/runtime_dump.py: CLI dump utility
+        - intelligent_analyzer.py: AI-powered problem detection and insights
     """
     renders = get_recent_renders()
     last_render = renders[-1] if renders else None
@@ -222,7 +371,24 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
     except Exception:
         evolution_summary = None
     warnings = _compute_warnings(endpoints)
-    # Coverage stats: count endpoints with all tokens vs total
+    # Attempt to read a short excerpt of diagnostics document (non-fatal)
+    diagnostics_excerpt = None
+    try:
+        from pathlib import Path  # local import to avoid overhead if stripped
+        diag_path = Path(__file__).resolve().parent / 'docs' / 'copilot_diagnostics.md'
+        if not diag_path.exists():
+            proj_root = Path(__file__).resolve().parent
+            diag_path = proj_root / 'docs' / 'copilot_diagnostics.md'
+        if diag_path.exists():
+            text = diag_path.read_text(encoding='utf-8', errors='ignore').splitlines()
+            diagnostics_excerpt = text[:40]
+    except Exception:
+        diagnostics_excerpt = None
+
+    reasoning_graph = _build_reasoning_graph(endpoints, app)
+    concept_graph = _build_concept_graph()
+
+    # Coverage stats: count endpoints with all tokens vs total (documentation health metric)
     complete = 0
     for ep in endpoints:
         if all((ep.get(k) or '').strip() for k in ('why','where','how')):
@@ -232,6 +398,18 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
         'endpoints_complete': complete,
         'percent': (complete / len(endpoints) * 100.0) if endpoints else 100.0,
     }
+
+    # Enhanced: Add intelligent analysis if requested
+    intelligent_analysis = None
+    if include_intelligent_analysis:
+        try:
+            from intelligent_analyzer import get_intelligent_analysis  # type: ignore
+            intelligent_analysis = get_intelligent_analysis()
+        except Exception as e:  # noqa: BLE001 broad purposely
+            intelligent_analysis = {
+                'error': f'Intelligent analysis unavailable: {str(e)}',
+                'generated_at': time.time()
+            }
     return {
         "last_render": last_render,
         "recent_renders": renders,
@@ -244,6 +422,10 @@ def runtime_state(app, persona_engine=None) -> Dict[str, Any]:
         "warnings": warnings,
         "reasoning_coverage": reasoning_coverage,
         "generated_ts": time.time(),
+        "diagnostics_excerpt": diagnostics_excerpt,
+        "reasoning_graph": reasoning_graph,
+        "concept_graph": concept_graph,
+        "intelligent_analysis": intelligent_analysis,
     }
 
 

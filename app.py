@@ -114,6 +114,16 @@ class SimpleDebugger:
     
 debugger = SimpleDebugger()
 
+# In-memory telemetry (server-side)
+TELEMETRY = {
+    "total_chats": 0,
+    "avg_latency_ms": 0.0,
+    "last_latency_ms": 0.0,
+    "last_chat_ts": None,
+    "last_error": None,
+    "start_ts": time.time(),
+}
+
 # Initialize persona engine
 try:
     from persona import PersonaEngine
@@ -171,9 +181,11 @@ def chat():
         - persona.py: AI response generation
         - static/js/main.js: Frontend chat interface
     """
+    t0 = time.time()
     try:
-        data = request.get_json() or {}
-        user_message = data.get('message', '').strip()
+        data = request.get_json(silent=True) or {}
+        # Accept multiple legacy/alias keys: message, text, prompt
+        user_message = (data.get('message') or data.get('text') or data.get('prompt') or '').strip()
         
         if not user_message:
             return jsonify({
@@ -184,18 +196,27 @@ def chat():
         # Generate response using persona engine if available
         if clever_persona:
             persona_response = clever_persona.generate(user_message, mode="Auto")
+            # Apply server-side scrub to remove any internal reasoning/meta tokens
+            # Why: Ensure only human-like natural text reaches client regardless of upstream persona layers
+            # Where: Chat endpoint directly before JSON serialization; complements client-side final scrub
+            # How: _sanitize_persona_text uses regex + sentence removal heuristics; logs pre/post for traceability
             pre_raw = persona_response.text
             persona_response.text = _sanitize_persona_text(persona_response.text)
-            # Debug trace (trim to 140 chars each) to verify sanitizer effect
-            debugger.info("sanitizer", f"pre={{ {pre_raw[:140].replace('\n',' ')} }}")
-            debugger.info("sanitizer", f"post={{ {persona_response.text[:140].replace('\n',' ')} }}")
-            # Legacy compatible schema expected by tests: response + analysis dict
+            pre_preview = pre_raw[:140].replace("\n", " ")
+            post_preview = persona_response.text[:140].replace("\n", " ")
+            debugger.info("sanitizer", f"pre={{ {pre_preview} }}")
+            debugger.info("sanitizer", f"post={{ {post_preview} }}")
+            # Unified schema consumed by frontend (main.js) plus future fields
             response = {
                 'response': persona_response.text,
                 'analysis': {
                     'mode': persona_response.mode,
                     'sentiment': persona_response.sentiment,
+                    'intent': None,  # placeholder (could derive from persona)
                 },
+                'approach': persona_response.mode,  # alias for shaping logic
+                'mood': (persona_response.sentiment or 'neutral'),
+                'particle_intensity': 0.6,  # heuristic baseline (future: derive from sentiment)
                 'status': 'success'
             }
             
@@ -217,20 +238,86 @@ def chat():
                 'response': f"Hello! You said: {user_message}",
                 'analysis': {
                     'mode': 'Auto',
-                    'sentiment': 'neutral'
+                    'sentiment': 'neutral',
+                    'intent': None,
                 },
+                'approach': 'Auto',
+                'mood': 'neutral',
+                'particle_intensity': 0.4,
                 'status': 'success'
             }
         
+        # Telemetry update (Why/Where/How documented inline)
+        try:
+            latency_ms = (time.time() - t0) * 1000.0
+            TELEMETRY["last_latency_ms"] = latency_ms
+            TELEMETRY["last_chat_ts"] = time.time()
+            # Exponential moving average for stability
+            if TELEMETRY["avg_latency_ms"] == 0:
+                TELEMETRY["avg_latency_ms"] = latency_ms
+            else:
+                TELEMETRY["avg_latency_ms"] = TELEMETRY["avg_latency_ms"] * 0.85 + latency_ms * 0.15
+            TELEMETRY["total_chats"] += 1
+        except Exception:
+            pass
         debugger.info("chat", f"Processed message: {user_message[:50]}...")
         return jsonify(response)
         
     except Exception as e:
+        TELEMETRY["last_error"] = str(e)
         debugger.info("chat", f"Error processing message: {str(e)}")
         return jsonify({
             'error': 'Failed to process message',
-            'status': 'error'
+            'status': 'error',
+            'detail': str(e),
+            'received': (request.get_json(silent=True) or {}),
         }), 500
+
+
+@app.route('/api/ping', methods=['GET'])
+def api_ping():
+    """Lightweight ping for latency measurement and frontend readiness
+    
+    Why: Frontend needs a tiny, fast endpoint to confirm connectivity and measure baseline latency
+    Where: Called once on page load by main.js (window load listener -> fetch('/api/ping'))
+    How: Returns JSON with server time, uptime, persona mode if available, and minimal telemetry snapshot (no heavy processing)
+    
+    Connects to:
+        - static/js/main.js: showToast connection success + latency metrics
+        - persona.py: (optional) exposes current persona mode if engine exists
+    """
+    persona_mode = None
+    try:
+        persona_mode = getattr(clever_persona, 'default_mode', 'Auto') if clever_persona else 'N/A'
+    except Exception:
+        persona_mode = 'unknown'
+    uptime_s = time.time() - TELEMETRY.get("start_ts", time.time())
+    return jsonify({
+        'status': 'ok',
+        'ts': time.time(),
+        'uptime_s': round(uptime_s, 2),
+        'persona_mode': persona_mode,
+        'avg_latency_ms': round(TELEMETRY.get('avg_latency_ms', 0.0), 2),
+        'total_chats': TELEMETRY.get('total_chats', 0)
+    })
+
+
+@app.route('/api/telemetry', methods=['GET'])
+def api_telemetry():
+    """Expose lightweight in-memory telemetry (debug use only)
+    
+    Why: Provide quick operational insight (chat volume, latency) without external monitoring stack
+    Where: Queried manually via curl or future debug overlay; NOT for production analytics persistence
+    How: Returns a shallow copy of TELEMETRY with computed uptime
+    
+    Connects to:
+        - static/js/main.js (potential future polling)
+        - debug tooling (runtime introspection augment)
+    """
+    uptime_s = time.time() - TELEMETRY.get("start_ts", time.time())
+    out = dict(TELEMETRY)
+    out["uptime_s"] = round(uptime_s, 2)
+    return jsonify(out)
 
 
 @app.route('/health', methods=['GET'])

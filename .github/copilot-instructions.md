@@ -1,5 +1,15 @@
 # Clever AI: Coding Agent Instructions
 
+## 🚨 MANDATORY FIRST STEP
+**BEFORE making ANY changes to Clever, you MUST read:**
+- **`.github/AGENT_ONBOARDING.md`** - Complete onboarding checklist and required documentation
+- **`docs/config/device_specifications.md`** - Hardware environment and performance constraints  
+- **`docs/architecture.md`** - System architecture and component relationships
+
+**Failure to read these documents first will result in broken functionality.**
+
+---
+
 ## UI Vision
 - The stage (particle engine) is the focus
 - Chat bubbles should float and fade in/out, not stay boxed

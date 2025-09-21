@@ -1,8 +1,29 @@
 // Track last AI bubble globally for positioning the analysis card (scoped)
 let lastAiElMain = null;
-// Ephemeral preview bubble and idle timer must be module-scoped (used in sendMessage/scheduleAutoHideBar)
+// Ephemeral preview bubble + hide timer
 let typingGhostEl = null;
 let hideBarTimer = null;
+// In-memory telemetry (frontend perspective)
+const FRONTEND_TELEMETRY = { chatCount:0, avgLatencyMs:0, lastLatencyMs:0, lastError:null };
+// Fade & lifecycle configuration
+const MESSAGE_LIFECYCLE = { AUTO_HIDE_MS: 12000, FADE_DURATION_MS: 1800 };
+function showToast(msg, type='info', ttl=4000){
+  const id='toast-stack';
+  let stack=document.getElementById(id);
+  if(!stack){
+    stack=document.createElement('div');
+    stack.id=id;
+    stack.style.cssText='position:fixed;bottom:1rem;right:1rem;display:flex;flex-direction:column;gap:.5rem;z-index:9999;pointer-events:none;';
+    document.body.appendChild(stack);
+  }
+  const el=document.createElement('div');
+  el.className=`toast toast-${type}`;
+  el.textContent=msg;
+  el.style.cssText='background:rgba(20,30,38,0.85);color:#cde;padding:6px 10px;font:12px system-ui,monospace;border:1px solid #2d5; border-radius:6px;opacity:0;transition:opacity .35s';
+  stack.appendChild(el);
+  requestAnimationFrame(()=> el.style.opacity='1');
+  setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=> el.remove(),600); }, ttl);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- Defensive microcopy scrub -------------------------------------------------
@@ -77,13 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize holographic chamber (quiet mode)
   const canvasElem = document.getElementById('particles');
-  // Why: Remove runtime debug text injection to keep stage visually clean
-  // Where: Replaces prior debugDiv population of #debug-info element
-  // How: Silently start holographic chamber if available; no DOM or console spam unless debug flag present
+  // Quiet initialization (no console spam)
   if (canvasElem instanceof HTMLCanvasElement && typeof window['startHolographicChamber'] === 'function') {
-    try { window['holographicChamber'] = window['startHolographicChamber'](canvasElem); } catch (_) { /* silent */ }
+    try { window['holographicChamber'] = window['startHolographicChamber'](canvasElem); } catch (_) {}
   } else if (canvasElem instanceof HTMLCanvasElement && typeof window.startParticles === 'function') {
-    try { window.startParticles(canvasElem, { count: 800 }); } catch (_) { /* silent */ }
+    try { window.startParticles(canvasElem, { count: 800 }); } catch (_) {}
   }
 
   // Send on click or Enter
@@ -268,13 +287,33 @@ async function sendMessage() {
   scheduleAutoHideBar();
   showStatus('Ideas crystallizing...');
   try {
-    const res = await fetch('/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text })
-    });
-    const data = await res.json();
-    const reply = data.response || '...';
+    // Why: Provide resilience if one route alias fails (proxy/cache issue) and surface diagnostics
+    // Where: sendMessage flow inside main.js; connects to Flask /chat and /api/chat endpoints
+    // How: Attempt /chat first; on network or JSON failure, retry /api/chat, log details
+    const attemptFetch = async (url) => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      let data; let parseOk = true;
+      try { data = await res.json(); } catch (e) { parseOk = false; }
+      return { res, data, parseOk };
+    };
+    let { res, data, parseOk } = await attemptFetch('/chat');
+    if (!res.ok || !parseOk || !data || typeof data !== 'object') {
+      console.warn('Primary /chat failed or invalid JSON. Fallback to /api/chat', { status: res && res.status, parseOk, data });
+      ({ res, data, parseOk } = await attemptFetch('/api/chat'));
+    }
+    if (!res.ok || !parseOk || !data) throw new Error('Chat endpoint failure');
+    // Debug schema validation (temporary instrumentation)
+    const requiredKeys = ['response','analysis'];
+    const missing = requiredKeys.filter(k => !(k in data));
+    if (missing.length) {
+      console.warn('[chat] Missing expected keys', { missing, got:Object.keys(data) });
+      showToast('Schema mismatch ('+missing.join(',')+')', 'warning', 4500);
+    }
+    const reply = data.response || '(no response text)';
   const aiEl = appendMessage('ai', reply);
   
     // Switch to dialogue state when receiving response
@@ -339,10 +378,22 @@ async function sendMessage() {
       if (typeof dissolve === 'function') dissolve();
     }, 2000);
   } catch (err) {
-    appendMessage('ai', 'Error.');
-    console.error(err);
-  setSelfcheckState('error', 'Error');
-  showStatus('Error occurred');
+    // Why: Provide structured, user-visible diagnostics for transient chat failures without forcing console inspection
+    // Where: Error path of sendMessage, connected to toast + optional inline last-error overlay
+    // How: Capture message, stack (if any), timestamp; update FRONTEND_TELEMETRY and surface toast + inline panel
+    const info = {
+      message: err && err.message || String(err),
+      stack: err && err.stack || null,
+      ts: Date.now(),
+      phase: 'fetch/chat'
+    };
+    FRONTEND_TELEMETRY.lastError = info;
+    console.error('[chat] fetch error', info);
+    appendMessage('ai', 'Error contacting Clever.');
+    setSelfcheckState('error', 'Error');
+    showStatus('Error occurred');
+    showToast('Chat error: ' + info.message, 'error', 6000);
+    injectLastErrorOverlay(info);
   }
 }
 
@@ -350,9 +401,30 @@ function scheduleAutoHideBar() {
   const bar = document.getElementById('floating-input');
   if (!bar) return;
   if (hideBarTimer) clearTimeout(hideBarTimer);
-  hideBarTimer = setTimeout(() => {
-    bar.classList.remove('active');
-  }, 3500);
+  hideBarTimer = setTimeout(() => { bar.classList.remove('active'); }, 3500);
+}
+
+function injectLastErrorOverlay(errInfo){
+  /**
+   * Why: Surface the most recent operational error inline for rapid debugging (no console required)
+   * Where: Called from sendMessage error catch block; attaches small fixed panel lower-right
+   * How: Creates or updates #last-error-overlay with sanitized message + relative age, auto-fades after inactivity
+   */
+  let panel = document.getElementById('last-error-overlay');
+  if(!panel){
+    panel = document.createElement('div');
+    panel.id = 'last-error-overlay';
+    Object.assign(panel.style, {
+      position:'fixed', bottom:'10px', right:'10px', zIndex:9999,
+      background:'rgba(40,0,0,0.85)', color:'#fdd', padding:'8px 10px', border:'1px solid #a33',
+      font:'11px system-ui,monospace', borderRadius:'6px', maxWidth:'260px', lineHeight:'1.35'
+    });
+    document.body.appendChild(panel);
+  }
+  panel.dataset.ts = String(errInfo.ts);
+  panel.textContent = `[chat error] ${errInfo.message}`;
+  panel.style.opacity = '1';
+  setTimeout(()=>{ const ts = Number(panel.dataset.ts||0); if(Date.now()-ts>9500){ panel.style.transition='opacity 600ms'; panel.style.opacity='0'; } }, 10000);
 }
 
 function appendMessage(who, text) {
@@ -380,6 +452,7 @@ function appendMessage(who, text) {
   bubble.className = 'bubble';
   bubble.textContent = text;
   wrap.append(bubble);
+  // Minimal bubble only (chips removed for clean stage)
   log.append(wrap);
   // animate in
   requestAnimationFrame(() => wrap.classList.add('manifested'));
@@ -391,8 +464,46 @@ function appendMessage(who, text) {
       live.textContent = 'Clever: ' + String(text).slice(0, 160);
     }
   }
+
+  // Ephemeral lifecycle: schedule fade + DOM removal
+  // Skip auto-hide for extremely short control/system messages
+  if (text && text.length > 0) {
+    scheduleMessageAutoHide(wrap);
+  }
   return wrap;
 }
+
+function scheduleMessageAutoHide(wrap, overrideDelay) {
+  /**
+   * Why: Centralized function to manage message auto-hide respecting pause/pin state
+   * Where: Called from appendMessage and when unpinning an existing bubble
+   * How: Uses timeouts referencing shared MESSAGE_LIFECYCLE constants; checks data-pinned and .paused
+   */
+  const delay = typeof overrideDelay === 'number' ? overrideDelay : MESSAGE_LIFECYCLE.AUTO_HIDE_MS;
+  setTimeout(() => {
+    if (!wrap.isConnected) return;
+    if (wrap.dataset.pinned === '1' || wrap.classList.contains('paused')) return; // skip
+    wrap.classList.add('fading');
+    setTimeout(() => { if (wrap.isConnected && wrap.dataset.pinned !== '1') wrap.remove(); }, MESSAGE_LIFECYCLE.FADE_DURATION_MS);
+  }, delay);
+}
+
+// Ping server for latency & health once DOM is ready (defer minimal)
+window.addEventListener('load', async () => {
+  try {
+    const t0 = performance.now();
+    const res = await fetch('/api/ping');
+    if (!res.ok) throw new Error('ping status ' + res.status);
+    await res.json();
+    const dt = performance.now() - t0;
+    FRONTEND_TELEMETRY.lastLatencyMs = dt;
+    FRONTEND_TELEMETRY.avgLatencyMs = FRONTEND_TELEMETRY.avgLatencyMs ? (FRONTEND_TELEMETRY.avgLatencyMs * 0.8 + dt * 0.2) : dt;
+    showToast('Connected (' + Math.round(dt) + ' ms)', 'info', 2500);
+  } catch (e) {
+    FRONTEND_TELEMETRY.lastError = String(e.message||e);
+    showToast('Connection issue (ping failed)', 'error', 5000);
+  }
+});
 
 function mapApproachToIntent(approach, fallbackIntent){
   const a = String(approach||'').toLowerCase();
