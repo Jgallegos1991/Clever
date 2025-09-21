@@ -19,6 +19,7 @@ def test_runtime_introspection_reasoning_graph():
     rg = data['reasoning_graph']
     assert isinstance(rg, dict)
     assert 'nodes' in rg and 'edges' in rg
+    assert 'generated_at' in rg or 'generated_ts' in rg, 'Timestamp missing from reasoning_graph'
     assert isinstance(rg['nodes'], list) and isinstance(rg['edges'], list)
     # minimal structural expectations
     if rg['nodes']:

@@ -291,7 +291,7 @@ def _build_reasoning_graph(endpoints: List[Dict[str, Any]], app) -> Dict[str, An
         'nodes': list(nodes.values()),
         'edges': edges,
         'truncated': truncated,
-        'generated_ts': time.time(),
+        'generated_at': time.time(),  # Why: unify timestamp key naming for frontend consumption; Where: referenced by graph legend overlay; How: epoch seconds float
     }
 
 
@@ -323,7 +323,12 @@ def _build_concept_graph() -> Optional[Dict[str, Any]]:
         filtered = [l for l in links if l[0] in node_ids and l[1] in node_ids]
         filtered = filtered[:MAX_LINKS]
         edges = [{'source': a, 'target': b, 'type': 'concept_link', 'weight': w} for a,b,w in filtered]
-        return {'nodes': nodes, 'edges': edges, 'truncated': len(concepts)>MAX_CONCEPTS or len(links)>MAX_LINKS}
+        return {
+            'nodes': nodes,
+            'edges': edges,
+            'truncated': len(concepts)>MAX_CONCEPTS or len(links)>MAX_LINKS,
+            'generated_ts': time.time(),  # Why: allow frontend to detect refresh cycles; Where: consumed by graph-debug.js legend; How: epoch seconds
+        }
     except Exception:
         return None
 

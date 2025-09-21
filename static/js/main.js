@@ -330,11 +330,50 @@ async function sendMessage() {
   if (typeof dissolve === 'function') dissolve();
     }, 2000);
   } catch (err) {
-    console.error('[chat] fetch error', err);
-    appendMessage('ai', 'Error. (open console)');
-  setSelfcheckState('error', 'Error');
-  showStatus('Error occurred');
+    // Why: Provide structured, user-visible diagnostics for transient chat failures without forcing console inspection
+    // Where: Error path of sendMessage, connected to toast + optional inline last-error overlay
+    // How: Capture message, stack (if any), timestamp; update FRONTEND_TELEMETRY and surface toast + inline panel
+    const info = {
+      message: err && err.message || String(err),
+      stack: err && err.stack || null,
+      ts: Date.now(),
+      phase: 'fetch/chat'
+    };
+    FRONTEND_TELEMETRY.lastError = info;
+    console.error('[chat] fetch error', info);
+    appendMessage('ai', 'Error contacting Clever.');
+    setSelfcheckState('error', 'Error');
+    showStatus('Error occurred');
+    showToast('Chat error: ' + info.message, 'error', 6000);
+    injectLastErrorOverlay(info);
   }
+}
+
+function injectLastErrorOverlay(errInfo){
+  /**
+   * Why: Surface the most recent operational error inline for rapid debugging (no console required)
+   * Where: Called from sendMessage error catch block; attaches small fixed panel lower-right
+   * How: Creates or updates #last-error-overlay with sanitized message + relative age, auto-fades after inactivity
+   */
+  let panel = document.getElementById('last-error-overlay');
+  if(!panel){
+    panel = document.createElement('div');
+    panel.id = 'last-error-overlay';
+    Object.assign(panel.style, {
+      position:'fixed', bottom:'10px', right:'10px', zIndex:9999,
+      background:'rgba(40,0,0,0.85)', color:'#fdd', padding:'8px 10px', border:'1px solid #a33',
+      font:'11px system-ui,monospace', borderRadius:'6px', maxWidth:'260px', lineHeight:'1.35'
+    });
+    document.body.appendChild(panel);
+  }
+  panel.dataset.ts = String(errInfo.ts);
+  panel.textContent = `[chat error] ${errInfo.message}`;
+  panel.style.opacity = '1';
+  // Auto fade after 10s if no newer error
+  setTimeout(()=>{
+    const ts = Number(panel.dataset.ts||0);
+    if(Date.now() - ts > 9500){ panel.style.transition='opacity 600ms'; panel.style.opacity='0'; }
+  }, 10000);
 }
 
 function appendMessage(who, text) {

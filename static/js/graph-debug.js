@@ -33,12 +33,30 @@ No external dependencies for offline compliance.
   resize(); window.addEventListener('resize', resize);
 
   const state = {
-    nodes: {}, // id -> {id,label,type,x,y,vx,vy}
+    nodes: {}, // id -> {id,label,type,x,y,vx,vy,deg}
     edges: [],
     lastFetch: 0,
     focus: null,
     warning: null,
+    filter: 'all', // all|endpoint|target|concept
+    meta: { rg_ts: null, cg_ts: null }
   };
+
+  // Legend / controls overlay
+  const legend = document.createElement('div');
+  Object.assign(legend.style, {
+    position:'fixed', top:'6px', left:'430px', padding:'8px 10px', background:'rgba(15,20,30,0.85)',
+    color:'#cfe', font:'12px system-ui, sans-serif', zIndex:9999, border:'1px solid #124', borderRadius:'6px',
+    lineHeight:'1.35', maxWidth:'220px'
+  });
+  legend.innerHTML = `<strong style="color:#9cf">Graph Debug</strong><br>
+    <em style="color:#6ff">Keys:</em> [0]=All [1]=Endpoints [2]=Targets [3]=Concepts<br>
+    <em>Click node</em> to focus (highlight edges).<br>
+    <span id="gd-counts"></span><br>
+    <span id="gd-timestamps"></span>`;
+  document.body.appendChild(legend);
+  const countsEl = legend.querySelector('#gd-counts');
+  const tsEl = legend.querySelector('#gd-timestamps');
 
   async function fetchGraph(){
     try {
@@ -48,6 +66,8 @@ No external dependencies for offline compliance.
       const rg = data.reasoning_graph || {nodes:[],edges:[]};
       const cg = data.concept_graph || null;
       state.warning = rg.truncated ? 'reasoning truncated' : null;
+      state.meta.rg_ts = rg.generated_at || rg.generated_ts || null;
+      state.meta.cg_ts = cg && (cg.generated_at || cg.generated_ts) || null;
       // Merge nodes (concept nodes get suffix to avoid id collision if any)
       const combinedNodes = [...rg.nodes];
       if(cg && cg.nodes){ combinedNodes.push(...cg.nodes.map(n=>({...n, type:n.type||'concept'}))); }
@@ -70,7 +90,11 @@ No external dependencies for offline compliance.
         if(!combinedNodes.find(n=>n.id === id)) delete state.nodes[id];
       });
       state.edges = combinedEdges.filter(e=>state.nodes[e.source] && state.nodes[e.target]);
+      // Compute degrees
+      Object.values(state.nodes).forEach(n=>{ n.deg = 0; });
+      state.edges.forEach(e=>{ const a=state.nodes[e.source]; const b=state.nodes[e.target]; if(a) a.deg++; if(b) b.deg++; });
       state.lastFetch = performance.now();
+      updateLegend();
     } catch(e){ /* silent */ }
   }
 
@@ -110,6 +134,15 @@ No external dependencies for offline compliance.
     });
   }
 
+  function updateLegend(){
+    const nodes = Object.values(state.nodes);
+    const counts = {endpoint:0,target:0,concept:0};
+    nodes.forEach(n=>{ counts[n.type] = (counts[n.type]||0)+1; });
+    countsEl.textContent = `Endpoints: ${counts.endpoint||0} | Targets: ${counts.target||0} | Concepts: ${counts.concept||0}`;
+    const fmt = ts=> ts? new Date(ts*1000).toLocaleTimeString() : '—';
+    tsEl.textContent = `RG: ${fmt(state.meta.rg_ts)}  CG: ${fmt(state.meta.cg_ts)}`;
+  }
+
   function draw(){
     const rectW = canvas.width; const rectH = canvas.height;
     ctx.clearRect(0,0,rectW,rectH);
@@ -119,13 +152,16 @@ No external dependencies for offline compliance.
     ctx.lineWidth = 1;
     state.edges.forEach(e=>{
       const a = state.nodes[e.source]; const b = state.nodes[e.target]; if(!a||!b) return;
+      if(state.filter !== 'all' && a.type !== state.filter && b.type !== state.filter) return;
       ctx.strokeStyle = (state.focus && (e.source===state.focus || e.target===state.focus)) ? '#6ff' : 'rgba(180,220,255,0.25)';
       ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
     });
     // Nodes
     const nodes = Object.values(state.nodes);
     nodes.forEach(n=>{
-      const r = n.type === 'endpoint' ? 8 : (n.type==='concept'?5:6);
+      if(state.filter !== 'all' && n.type !== state.filter) return;
+      const base = n.type === 'endpoint' ? 8 : (n.type==='concept'?5:6);
+      const r = base + Math.min(6, (n.deg||0)*0.6); // degree scaling
       ctx.beginPath();
       ctx.fillStyle = n.id===state.focus ? '#6ff' : (n.type==='concept' ? '#5fa' : '#9cf');
       ctx.arc(n.x, n.y, r, 0, Math.PI*2);
@@ -135,6 +171,7 @@ No external dependencies for offline compliance.
     ctx.font = '11px system-ui,sans-serif';
     ctx.fillStyle = '#cfe';
     nodes.slice(0,120).forEach(n=>{
+      if(state.filter !== 'all' && n.type !== state.filter) return;
       ctx.fillText(n.label.slice(0,18), n.x+10, n.y+4);
     });
     if(state.warning){
@@ -160,4 +197,12 @@ No external dependencies for offline compliance.
     step(); draw(); requestAnimationFrame(loop);
   }
   fetchGraph(); loop();
+
+  // Keyboard filters
+  window.addEventListener('keydown', (e)=>{
+    if(e.key==='0'){ state.filter='all'; }
+    else if(e.key==='1'){ state.filter='endpoint'; }
+    else if(e.key==='2'){ state.filter='target'; }
+    else if(e.key==='3'){ state.filter='concept'; }
+  });
 })();
