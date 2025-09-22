@@ -41,7 +41,7 @@ def test_assets_wired_locally():
      """
      html = INDEX.read_text(encoding='utf-8')
      assert "url_for('static', filename='style.css')" in html
-     assert "url_for('static', filename='js/holographic-chamber.js')" in html
+     assert "url_for('static', filename='js/engines/holographic-chamber.js')" in html
      # core/app.js intentionally excluded after UI minimization
 
 
@@ -58,7 +58,7 @@ def test_microcopy_placeholders():
     """
     html = INDEX.read_text(encoding='utf-8')
     assert "url_for('static', filename='style.css')" in html
-    assert "url_for('static', filename='js/particles.js')" in html
+    assert "url_for('static', filename='js/components/chat-fade.js')" in html
     assert "url_for('static', filename='js/main.js')" in html
 
 

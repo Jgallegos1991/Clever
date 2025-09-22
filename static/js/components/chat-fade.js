@@ -3,11 +3,11 @@
 // Where: Loaded by templates/index.html after main.js so MutationObserver sees appended messages
 // How: Observe #chat-log for new .message nodes, schedule fade-out + removal.
 (function(){
-  const AUTO_HIDE_MS = 9000;
+  const AUTO_HIDE_MS = 18000; // Slowed down from 9000ms to 18000ms for more comfortable reading
   function scheduleFade(node){
     setTimeout(()=>{
       node.classList.add('fade-out');
-      setTimeout(()=> node.remove(), 1400);
+      setTimeout(()=> node.remove(), 2800); // Slowed down fade duration from 1400ms to 2800ms
     }, AUTO_HIDE_MS);
   }
   const log = document.getElementById('chat-log');

@@ -69,7 +69,7 @@ Treat the pattern as the metabolic wiring of Clever—keep the arrows unbroken s
   - `evolution_engine.py`: Self-learning, memory, growth metrics
   - `nlp_processor.py`: Local NLP (spaCy, VADER, TextBlob)
   - `debug_config.py`: Debugging, monitoring
-- **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), `static/js/holographic-chamber.js` (particle engine)
+- **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), `static/js/engines/holographic-chamber.js` (particle engine)
 
 ## Code Documentation Standards
 Every function, class, and significant code block MUST include:
@@ -113,7 +113,7 @@ def example_function(param1: str, param2: int) -> str:
 - **Testing:**
   - `make test` (pytest, see `pytest.ini`)
   - `test-offline.sh` (validates offline operation and single DB)
-- **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), engines under `static/js/`, performance modules
+- **Frontend:** `templates/index.html` (dark, particle UI), `static/css/style.css`, `static/js/main.js` (entry), engines under `static/js/engines/`, performance modules under `static/js/performance/`, components under `static/js/components/`
 
 ## Developer Workflows
 - **Setup:**
@@ -269,5 +269,4 @@ def test_persona_auto_mode_smoke():
 ```
 
 ### Frontend pattern (particles + core app)
-- Main UI at `templates/index.html`; JS entry `static/js/main.js` loads `static/js/holographic-chamber.js` particle engine. Performance modules under `static/js/performance/` loaded only in debug mode.
-- Main UI at `templates/index.html`; JS entry `static/js/core/app.js` controls particle engines under `static/js/engines/` and performance modules under `static/js/performance/`.
+- Main UI at `templates/index.html`; JS entry `static/js/main.js` loads particle engine from `static/js/engines/holographic-chamber.js`. Performance modules under `static/js/performance/` loaded only in debug mode, UI components under `static/js/components/`, core modules under `static/js/core/`.

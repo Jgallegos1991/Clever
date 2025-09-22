@@ -50,6 +50,9 @@ class HolographicChamber {
     
   // Always start with whirlpool formation for idle
   this.morphToFormation('whirlpool');
+  
+  // Start Clever's thinking pattern - she forms shapes based on what she's pondering
+  this.startThoughtFormations();
     
   this.animate();
     
@@ -64,6 +67,36 @@ class HolographicChamber {
       this.mouse.y = e.clientY - rect.top;
     });
     // Removed random formation trigger on canvas click to keep whirlpool idle state
+  }
+
+  startThoughtFormations() {
+    // Clever's thinking patterns - she forms shapes based on what she's pondering
+    const thoughtPatterns = [
+      { shape: 'cube', thought: 'quantum mechanics', duration: 8000 },
+      { shape: 'torus', thought: 'creative solutions', duration: 6000 },
+      { shape: 'helix', thought: 'DNA structures', duration: 7000 },
+      { shape: 'sphere', thought: 'planetary motion', duration: 5000 },
+      { shape: 'wave', thought: 'electromagnetic waves', duration: 6000 },
+      { shape: 'spiral', thought: 'fibonacci sequences', duration: 7000 },
+      { shape: 'whirlpool', thought: 'fluid dynamics', duration: 4000 }
+    ];
+    
+    let currentIndex = 0;
+    
+    // Start thinking cycle - Clever forms shapes based on her thoughts
+    const thinkingCycle = () => {
+      const pattern = thoughtPatterns[currentIndex];
+      this.morphToFormation(pattern.shape);
+      this.currentThought = pattern.thought;
+      
+      // Move to next thought pattern
+      currentIndex = (currentIndex + 1) % thoughtPatterns.length;
+      
+      setTimeout(thinkingCycle, pattern.duration);
+    };
+    
+    // Start first thought after a brief moment
+    setTimeout(thinkingCycle, 2000);
   }
 
   startFormationCycle() {
@@ -103,16 +136,16 @@ class HolographicChamber {
       this.particles.push({
         x: Math.random() * this.width,
         y: Math.random() * this.height,
-    vx: (Math.random() - 0.5) * 0.2,
-    vy: (Math.random() - 0.5) * 0.2,
+    vx: (Math.random() - 0.5) * 0.05, // Much slower initial velocity (reduced from 0.2 to 0.05)
+    vy: (Math.random() - 0.5) * 0.05, // Much slower initial velocity (reduced from 0.2 to 0.05)
     targetX: Math.random() * this.width,
     targetY: Math.random() * this.height,
     size: Math.random() * 2 + 1,
     alpha: Math.random() * 0.4 + 0.6,
     hue: Math.random() * 60 + 160,
     phase: Math.random() * Math.PI * 2,
-    speed: 0.005 + Math.random() * 0.004, // Minimum movement
-    energy: Math.random() * 0.08 + 0.08 // Minimum pulsing
+    speed: 0.0025 + Math.random() * 0.001, // More consistent speed range: 0.0025-0.0035 (tighter range, slightly faster minimum)
+    energy: Math.random() * 0.04 + 0.04 // Slowed down pulsing from 0.08-0.16 to 0.04-0.08
       });
     }
   }
@@ -289,8 +322,8 @@ class HolographicChamber {
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance > 1) {
-        particle.vx += dx * (particle.speed * 0.08);
-        particle.vy += dy * (particle.speed * 0.08);
+        particle.vx += dx * (particle.speed * 0.02); // Better movement speed (increased from 0.01 to 0.02)
+        particle.vy += dy * (particle.speed * 0.02); // Better movement speed (increased from 0.01 to 0.02)
       }
 
       // Apply magnetic field effects
@@ -315,8 +348,8 @@ class HolographicChamber {
         if (Math.abs(waveDistance - wave.radius) < 20) {
           const waveForce = wave.intensity * 0.1;
           const angle = Math.atan2(-waveDy, -waveDx);
-          particle.vx += Math.cos(angle) * waveForce;
-          particle.vy += Math.sin(angle) * waveForce;
+          particle.vx += Math.cos(angle) * waveForce * 0.3; // Much gentler wave force (reduced by 70%)
+          particle.vy += Math.sin(angle) * waveForce * 0.3;
           particle.energy = Math.min(1, particle.energy + wave.intensity * 0.1);
           particle.hue = wave.hue;
         }
@@ -356,16 +389,16 @@ class HolographicChamber {
             avgVy /= groupSize;
 
             // Cohesion: move toward group center
-            particle.vx += (avgX - particle.x) * group.cohesion * 0.001;
-            particle.vy += (avgY - particle.y) * group.cohesion * 0.001;
+            particle.vx += (avgX - particle.x) * group.cohesion * 0.0003; // Slower cohesion (reduced from 0.001 to 0.0003)
+            particle.vy += (avgY - particle.y) * group.cohesion * 0.0003;
 
             // Alignment: match group velocity
-            particle.vx += (avgVx - particle.vx) * group.alignment * 0.1;
-            particle.vy += (avgVy - particle.vy) * group.alignment * 0.1;
+            particle.vx += (avgVx - particle.vx) * group.alignment * 0.03; // Slower alignment (reduced from 0.1 to 0.03)
+            particle.vy += (avgVy - particle.vy) * group.alignment * 0.03;
 
             // Separation: avoid crowding
-            particle.vx += separationVx * group.separation * 0.01;
-            particle.vy += separationVy * group.separation * 0.01;
+            particle.vx += separationVx * group.separation * 0.008; // Increased separation to prevent clumping (0.003 to 0.008)
+            particle.vy += separationVy * group.separation * 0.008;
           }
         }
       });
@@ -377,40 +410,48 @@ class HolographicChamber {
         const mouseDistance = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
         
         if (mouseDistance < 200) {
-          const attraction = (200 - mouseDistance) / 200 * 0.0005;
+          const attraction = (200 - mouseDistance) / 200 * 0.0001; // Much gentler mouse attraction (reduced from 0.0005 to 0.0001)
           particle.vx += mouseDx * attraction;
           particle.vy += mouseDy * attraction;
           
-          // Increase energy when near mouse
-          particle.energy = Math.min(1, particle.energy + 0.002);
+          // Increase energy when near mouse (much slower)
+          particle.energy = Math.min(1, particle.energy + 0.0005); // Much slower energy increase (reduced from 0.002 to 0.0005)
           
           // Create mini magnetic field at mouse position
           if (Math.random() < 0.1) {
             this.addMagneticField(this.mouse.x, this.mouse.y, 0.1, 50, 1);
           }
         } else {
-          // Decrease energy when away from mouse
-          particle.energy = Math.max(0.08, particle.energy - 0.001);
+          // Decrease energy when away from mouse (much slower)
+          particle.energy = Math.max(0.08, particle.energy - 0.0003); // Much slower energy decrease (reduced from 0.001 to 0.0003)
         }
       }
       
-      // Apply velocity with damping
-      particle.vx *= 0.992; // Slightly less damping for more fluid movement
-      particle.vy *= 0.992;
+      // Apply velocity with stronger damping for slower, calmer movement
+      particle.vx *= 0.98; // Stronger damping to slow down particles (reduced from 0.992 to 0.98)
+      particle.vy *= 0.98;
+      
+      // Cap maximum velocity to slow down the fastest moving particles specifically
+      const maxSpeed = 1.5; // Increased speed limit (was 0.8, now 1.5 for better movement)
+      const currentSpeed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+      if (currentSpeed > maxSpeed) {
+        particle.vx = (particle.vx / currentSpeed) * maxSpeed;
+        particle.vy = (particle.vy / currentSpeed) * maxSpeed;
+      }
       
       particle.x += particle.vx;
       particle.y += particle.vy;
       
-      // Update phase for pulsing with breathing effect
-      particle.phase += 0.003 + particle.energy * 0.005;
+      // Update phase for pulsing with breathing effect (MUCH more chill and slower)
+      particle.phase += 0.0003 + particle.energy * 0.0005; // Much slower phase updates (reduced from 0.001 + 0.002 to 0.0003 + 0.0005)
       
-      // Enhanced size pulsing based on energy
-      const breathingPhase = Date.now() * 0.001 + particle.phase;
-      const energyPulse = Math.sin(particle.phase * 2) * particle.energy * 0.5;
-      particle.size = particle.size * 0.98 + (1.5 + Math.sin(breathingPhase) * 0.5 + energyPulse) * 0.02;
+      // Gentle size pulsing based on energy (way less seizure-inducing and much slower!)
+      const breathingPhase = Date.now() * 0.0001 + particle.phase; // Much slower breathing (reduced from 0.0003 to 0.0001)
+      const energyPulse = Math.sin(particle.phase * 0.5) * particle.energy * 0.2;
+      particle.size = particle.size * 0.99 + (1.5 + Math.sin(breathingPhase) * 0.3 + energyPulse) * 0.01;
       
-      // Dynamic color shifting based on energy and connections
-      const colorShift = particle.energy * 0.2 + Math.sin(particle.phase) * 0.1;
+      // Smooth color shifting (even slower and more subtle!)
+      const colorShift = particle.energy * 0.01 + Math.sin(particle.phase) * 0.005; // Much slower color shifting (reduced from 0.05 + 0.03 to 0.01 + 0.005)
       particle.hue += colorShift;
       if (particle.hue > 220) particle.hue = 160;
       if (particle.hue < 160) particle.hue = 220;
@@ -463,18 +504,18 @@ class HolographicChamber {
     this.particles.forEach((particle, i) => {
       this.ctx.save();
       
-      // Dynamic alpha based on energy and phase
-      const dynamicAlpha = particle.alpha * (0.7 + Math.sin(particle.phase) * 0.3) * (0.8 + particle.energy * 0.2);
+      // Gentle alpha variation (no more seizure strobing!)
+      const dynamicAlpha = particle.alpha * (0.8 + Math.sin(particle.phase) * 0.15) * (0.9 + particle.energy * 0.1);
       this.ctx.globalAlpha = dynamicAlpha;
       
-      // Energy-based size multiplier
-      const energySize = particle.size * (1 + particle.energy * 0.5);
+      // Subtle energy-based size multiplier
+      const energySize = particle.size * (1 + particle.energy * 0.3);
       
-      // Create multi-layer glow effect
+      // Toned down multi-layer glow effect
       const layers = [
-        { radius: energySize * 4, alpha: 0.2, hueShift: 0 },
-        { radius: energySize * 2.5, alpha: 0.4, hueShift: 20 },
-        { radius: energySize * 1.5, alpha: 0.6, hueShift: 10 }
+        { radius: energySize * 3, alpha: 0.15, hueShift: 0 },
+        { radius: energySize * 2, alpha: 0.3, hueShift: 15 },
+        { radius: energySize * 1.2, alpha: 0.5, hueShift: 8 }
       ];
       
       layers.forEach(layer => {
@@ -495,17 +536,17 @@ class HolographicChamber {
         this.ctx.fill();
       });
       
-      // Bright center core with energy pulsing
-      this.ctx.globalAlpha = 1.0;
-      const coreSize = 1 + particle.energy * 2;
-      const coreHue = (particle.hue + 40) % 360;
-      this.ctx.fillStyle = `hsl(${coreHue}, 100%, 85%)`;
+      // Gentle center core (less eye-searing!)
+      this.ctx.globalAlpha = 0.9;
+      const coreSize = 1 + particle.energy * 1;
+      const coreHue = (particle.hue + 20) % 360;
+      this.ctx.fillStyle = `hsl(${coreHue}, 90%, 70%)`;
       this.ctx.beginPath();
       this.ctx.arc(particle.x, particle.y, coreSize, 0, Math.PI * 2);
       this.ctx.fill();
       
-      // Super bright pixel center
-      this.ctx.fillStyle = '#FFFFFF';
+      // Subtle pixel center (not blinding white)
+      this.ctx.fillStyle = '#69EACB';
       this.ctx.fillRect(Math.round(particle.x - 0.5), Math.round(particle.y - 0.5), 1, 1);
       
       this.ctx.restore();
@@ -516,20 +557,20 @@ class HolographicChamber {
     this.ctx.save();
     this.energyWaves.forEach(wave => {
       if (wave.active) {
-        const alpha = wave.intensity * (1 - wave.radius / wave.maxRadius);
-        this.ctx.strokeStyle = `hsla(${wave.hue}, 80%, 60%, ${alpha * 0.3})`;
-        this.ctx.lineWidth = 2;
+        const alpha = wave.intensity * (1 - wave.radius / wave.maxRadius) * 0.5; // Much more subtle
+        this.ctx.strokeStyle = `hsla(${wave.hue}, 70%, 50%, ${alpha * 0.2})`;
+        this.ctx.lineWidth = 1.5;
         this.ctx.globalAlpha = alpha;
         
         this.ctx.beginPath();
         this.ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2);
         this.ctx.stroke();
         
-        // Inner ripple
-        this.ctx.strokeStyle = `hsla(${wave.hue + 30}, 90%, 80%, ${alpha * 0.6})`;
+        // Gentle inner ripple
+        this.ctx.strokeStyle = `hsla(${wave.hue + 15}, 80%, 60%, ${alpha * 0.4})`;
         this.ctx.lineWidth = 1;
         this.ctx.beginPath();
-        this.ctx.arc(wave.x, wave.y, wave.radius * 0.7, 0, Math.PI * 2);
+        this.ctx.arc(wave.x, wave.y, wave.radius * 0.8, 0, Math.PI * 2);
         this.ctx.stroke();
       }
     });
@@ -614,16 +655,16 @@ class HolographicChamber {
         
         if (distance < maxDistance) {
           const connectionStrength = (1 - distance / maxDistance);
-          const alpha = connectionStrength * 0.8;
+          const alpha = connectionStrength * 0.6; // Less intense
           
-          // Dynamic color based on connection strength and time
-          const hue = 160 + connectionStrength * 60 + Math.sin(time + i * 0.1) * 20;
-          const saturation = 85 + connectionStrength * 15;
-          const lightness = 60 + connectionStrength * 30;
+          // Much slower color changes for calmer connections
+          const hue = 160 + connectionStrength * 40 + Math.sin(time * 0.1 + i * 0.01) * 10; // Slowed from 0.5 + 0.05 to 0.1 + 0.01
+          const saturation = 85 + connectionStrength * 10;
+          const lightness = 60 + connectionStrength * 20;
           
-          // Pulsing effect based on particle energy
-          const pulseIntensity = (p1.energy + p2.energy) * 0.5;
-          const pulseFactor = 0.7 + Math.sin(time * 3 + distance * 0.05) * 0.3 * pulseIntensity;
+          // Much gentler pulsing effect (super chill)
+          const pulseIntensity = (p1.energy + p2.energy) * 0.1; // Reduced intensity from 0.3 to 0.1
+          const pulseFactor = 0.8 + Math.sin(time * 0.3 + distance * 0.005) * 0.1 * pulseIntensity; // Much slower pulse (1.5->0.3, 0.02->0.005, 0.2->0.1)
           
           // Variable line width based on connection strength
           this.ctx.lineWidth = 0.5 + connectionStrength * 2.5;
@@ -643,17 +684,17 @@ class HolographicChamber {
           this.ctx.lineTo(p2.x, p2.y);
           this.ctx.stroke();
           
-          // Add energy particles flowing along connections for strong links
-          if (connectionStrength > 0.7 && Math.random() < 0.1) {
-            const flowProgress = (time * 2 + i + j) % 1;
+          // Subtle energy particles flowing along connections (much less frequent)
+          if (connectionStrength > 0.8 && Math.random() < 0.03) {
+            const flowProgress = (time * 0.8 + i + j) % 1;
             const flowX = p1.x + (p2.x - p1.x) * flowProgress;
             const flowY = p1.y + (p2.y - p1.y) * flowProgress;
             
             this.ctx.save();
-            this.ctx.globalAlpha = alpha * 2;
-            this.ctx.fillStyle = `hsl(${hue + 40}, 100%, 80%)`;
+            this.ctx.globalAlpha = alpha * 1.5;
+            this.ctx.fillStyle = `hsl(${hue + 20}, 90%, 70%)`;
             this.ctx.beginPath();
-            this.ctx.arc(flowX, flowY, 1.5, 0, Math.PI * 2);
+            this.ctx.arc(flowX, flowY, 1, 0, Math.PI * 2);
             this.ctx.fill();
             this.ctx.restore();
           }
@@ -666,8 +707,15 @@ class HolographicChamber {
   }
 
   animate() {
-    // Standard animation loop: update simulation, render frame, schedule next frame
-    this.update();
+    // Slower, more consistent animation loop
+    this.frameCount = (this.frameCount || 0) + 1;
+    
+    // Update every 2nd frame for slower motion, but ensure consistent speed
+    if (this.frameCount % 2 === 0) {
+      this.update();
+    }
+    
+    // Always draw to maintain smooth visuals
     this.draw();
     requestAnimationFrame(() => this.animate());
   }
@@ -735,7 +783,7 @@ class HolographicChamber {
   }
 
   // Create energy wave that ripples through particles
-  createEnergyWave(x, y, maxRadius = 300, speed = 5, intensity = 1) {
+  createEnergyWave(x, y, maxRadius = 300, speed = 2.5, intensity = 1) { // Slowed down energy wave speed from 5 to 2.5
     this.energyWaves.push({
       x, y, radius: 0, maxRadius, speed, intensity,
       hue: 160 + Math.random() * 60,
@@ -816,7 +864,7 @@ class HolographicChamber {
     for (let i = 0; i < 5; i++) {
       stream.particles.push({
         progress: i / 5,
-        speed: 0.02 + Math.random() * 0.01,
+        speed: 0.01 + Math.random() * 0.005, // Slowed down stream particle speed from 0.02-0.03 to 0.01-0.015
         size: 2 + Math.random() * 2,
         alpha: 0.8
       });
@@ -1003,15 +1051,15 @@ class HolographicChamber {
         return;
       }
       
-      // Make particles dance
+      // Make particles dance (way more chill!)
       this.particles.forEach((particle, i) => {
-        const dancePhase = elapsed * 0.005 + i * 0.2;
-        const danceIntensity = 0.5 + Math.sin(elapsed * 0.003) * 0.3;
+        const dancePhase = elapsed * 0.002 + i * 0.1;
+        const danceIntensity = 0.3 + Math.sin(elapsed * 0.001) * 0.2;
         
-        particle.vx += Math.sin(dancePhase) * danceIntensity * 0.01;
-        particle.vy += Math.cos(dancePhase * 1.3) * danceIntensity * 0.01;
-        particle.energy = 0.5 + Math.sin(dancePhase * 2) * 0.3;
-        particle.hue = (160 + Math.sin(dancePhase) * 60) % 360;
+        particle.vx += Math.sin(dancePhase) * danceIntensity * 0.005;
+        particle.vy += Math.cos(dancePhase * 1.1) * danceIntensity * 0.005;
+        particle.energy = 0.3 + Math.sin(dancePhase * 0.5) * 0.2;
+        particle.hue = (160 + Math.sin(dancePhase * 0.3) * 30) % 360;
       });
       
       requestAnimationFrame(dance);
@@ -1049,8 +1097,19 @@ class HolographicChamber {
 window.HolographicChamber = HolographicChamber;
 
 window.startHolographicChamber = function(canvas) {
+  if (!canvas || !canvas.getContext) {
+    console.error('❌ HolographicChamber: Invalid canvas element provided');
+    return null;
+  }
+  
   if (!window.holographicChamber) {
-    window.holographicChamber = new HolographicChamber(canvas);
+    try {
+      window.holographicChamber = new HolographicChamber(canvas);
+      console.log('✨ HolographicChamber: Initialized successfully');
+    } catch (error) {
+      console.error('❌ HolographicChamber: Initialization failed:', error);
+      return null;
+    }
   }
   return window.holographicChamber;
 };
@@ -1117,6 +1176,32 @@ window.createEnergyWave = function(x, y, intensity = 1) {
   if (window.holographicChamber) {
     window.holographicChamber.createEnergyWave(x || window.innerWidth/2, y || window.innerHeight/2, 300, 5, intensity);
   }
+};
+
+// Intent-based morphing function that main.js is looking for
+window.morphForIntent = function(intent) {
+  if (!window.holographicChamber) return;
+  
+  const intentMap = {
+    'creative': 'torus',
+    'deep': 'cube', 
+    'analysis': 'cube',
+    'casual_chat': 'sphere',
+    'galaxy': 'spiral',
+    'support': 'wave',
+    'shape_request': 'cube',
+    'cube': 'cube',
+    'sphere': 'sphere',
+    'torus': 'torus',
+    'spiral': 'spiral',
+    'helix': 'helix',
+    'wave': 'wave',
+    'scatter': 'scatter',
+    'whirlpool': 'whirlpool'
+  };
+  
+  const formation = intentMap[intent.toLowerCase()] || 'whirlpool';
+  window.holographicChamber.morphToFormation(formation);
 };
 
 // Note: Auto-initialization removed to prevent conflicts with main.js

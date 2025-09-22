@@ -510,7 +510,7 @@ class IntelligentAnalyzer:
                 file for file, deps in dependencies.items() 
                 if len(deps) > avg_dependencies * 1.5
             ],
-            'dependency_graph': dict(dependencies)
+            'dependency_graph': {k: list(v) for k, v in dependencies.items()}
         }
     
     def _analyze_performance_patterns(self) -> List[AnalysisResult]:

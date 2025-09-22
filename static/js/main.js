@@ -5,9 +5,9 @@ let typingGhostEl = null;
 let hideBarTimer = null;
 // In-memory telemetry (frontend perspective)
 const FRONTEND_TELEMETRY = { chatCount:0, avgLatencyMs:0, lastLatencyMs:0, lastError:null };
-// Fade & lifecycle configuration
-const MESSAGE_LIFECYCLE = { AUTO_HIDE_MS: 12000, FADE_DURATION_MS: 1800 };
-function showToast(msg, type='info', ttl=4000){
+// Fade & lifecycle configuration - slowed down for more comfortable reading
+const MESSAGE_LIFECYCLE = { AUTO_HIDE_MS: 20000, FADE_DURATION_MS: 3000 };
+function showToast(msg, type='info', ttl=7000){ // Slowed down default toast duration from 4000ms to 7000ms
   const id='toast-stack';
   let stack=document.getElementById(id);
   if(!stack){
@@ -19,10 +19,10 @@ function showToast(msg, type='info', ttl=4000){
   const el=document.createElement('div');
   el.className=`toast toast-${type}`;
   el.textContent=msg;
-  el.style.cssText='background:rgba(20,30,38,0.85);color:#cde;padding:6px 10px;font:12px system-ui,monospace;border:1px solid #2d5; border-radius:6px;opacity:0;transition:opacity .35s';
+  el.style.cssText='background:rgba(20,30,38,0.85);color:#cde;padding:6px 10px;font:12px system-ui,monospace;border:1px solid #2d5; border-radius:6px;opacity:0;transition:opacity .8s'; // Slowed down opacity transition from .35s to .8s
   stack.appendChild(el);
   requestAnimationFrame(()=> el.style.opacity='1');
-  setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=> el.remove(),600); }, ttl);
+  setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=> el.remove(),1200); }, ttl); // Slowed down removal delay from 600ms to 1200ms
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -96,13 +96,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const analysisPanel = document.querySelector('.analysis-panel');
   const modeBtn = document.getElementById('mode-btn');
 
-  // Initialize holographic chamber (quiet mode)
+  // Initialize unified holographic chamber system (no fallbacks)
   const canvasElem = document.getElementById('particles');
-  // Quiet initialization (no console spam)
   if (canvasElem instanceof HTMLCanvasElement && typeof window['startHolographicChamber'] === 'function') {
-    try { window['holographicChamber'] = window['startHolographicChamber'](canvasElem); } catch (_) {}
-  } else if (canvasElem instanceof HTMLCanvasElement && typeof window.startParticles === 'function') {
-    try { window.startParticles(canvasElem, { count: 800 }); } catch (_) {}
+    const chamber = window['startHolographicChamber'](canvasElem);
+    if (chamber) {
+      window['holographicChamber'] = chamber;
+      console.log('🌌 Clever\'s holographic chamber is active');
+    } else {
+      console.error('❌ Failed to initialize holographic chamber');
+    }
+  } else {
+    console.error('❌ Canvas element or HolographicChamber not available');
+  }
+
+  // Initialize UI Foundation System
+  if (typeof window.CleverUIFoundation === 'function') {
+    try { 
+      window.uiFoundation = new window.CleverUIFoundation(); 
+      console.log('🧠 UI Foundation System initialized');
+    } catch (e) { 
+      console.warn('UI Foundation initialization failed:', e.message); 
+    }
   }
 
   // Send on click or Enter
@@ -152,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid-overlay');
     if (grid) {
       grid.classList.add('ripple');
-      setTimeout(() => grid.classList.remove('ripple'), 600);
+      setTimeout(() => grid.classList.remove('ripple'), 1200); // Slowed down ripple effect from 600ms to 1200ms
     }
     if (typeof window.triggerPulse === 'function') window.triggerPulse(0.5);
   });
@@ -174,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const grid = document.querySelector('.grid-overlay');
       if (grid) {
         grid.classList.add('ripple');
-        setTimeout(() => grid.classList.remove('ripple'), 600);
+        setTimeout(() => grid.classList.remove('ripple'), 1200); // Slowed down ripple effect from 600ms to 1200ms
       }
       if (typeof window.triggerPulse === 'function') window.triggerPulse(0.3);
     }
@@ -220,15 +235,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Particle effects with Ctrl + key combinations
     if (e.ctrlKey && !e.altKey && !e.metaKey) {
       switch (e.key.toLowerCase()) {
-        case 'e': // Explode particles
+        case 'e': // Explode particles (gentler)
           e.preventDefault();
-          window.explodeParticles?.(1.5);
-          showToast('💥 Particle Explosion!', 'info', 2000);
+          window.explodeParticles?.(0.8);
+          showToast('💥 Gentle Explosion!', 'info', 2000);
           break;
-        case 'i': // Implode particles  
+        case 'i': // Implode particles (smoother)
           e.preventDefault();
-          window.implodeParticles?.(1.2);
-          showToast('🌀 Particle Implosion!', 'info', 2000);
+          window.implodeParticles?.(0.6);
+          showToast('🌀 Smooth Implosion!', 'info', 2000);
           break;
         case 'v': // Create vortex
           e.preventDefault();
@@ -245,10 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
           window.createLightning?.();
           showToast('⚡ Lightning Strike!', 'info', 2000);
           break;
-        case 'd': // Dance party mode
+        case 'd': // Dance party mode (chill vibes)
           e.preventDefault();
           window.startDanceParty?.(8000);
-          showToast('🕺 Dance Party Mode!', 'info', 3000);
+          showToast('🕺 Chill Dance Mode!', 'info', 3000);
           break;
         case 't': // Toggle trail mode
           e.preventDefault();
@@ -260,10 +275,10 @@ document.addEventListener('DOMContentLoaded', () => {
           window.addMagneticField?.();
           showToast('🧲 Magnetic Field Added!', 'info', 2000);
           break;
-        case 'p': // Pulse effect
+        case 'p': // Pulse effect (much gentler)
           e.preventDefault();
-          window.triggerPulse?.(2);
-          showToast('💫 Particle Pulse!', 'info', 2000);
+          window.triggerPulse?.(0.5);
+          showToast('💫 Gentle Pulse!', 'info', 2000);
           break;
       }
     }
@@ -325,8 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Show keyboard shortcuts on startup
   setTimeout(() => {
-    showToast('🎮 Particle Controls Loaded! Try Ctrl+E for explosion, Shift+C for cube!', 'info', 5000);
-  }, 2000);
+    showToast('🎮 Particle Controls Loaded! Try Ctrl+E for explosion, Shift+C for cube!', 'info', 8000);
+  }, 3000); // Slowed down from 2000ms to 3000ms, and toast duration from 5000 to 8000
 
   // Maintain snap on resize and when user scrolls chat
   window.addEventListener('resize', () => {
@@ -395,8 +410,9 @@ async function sendMessage() {
   }
   // Try to morph shape immediately from user request (e.g., "form a cube")
   const preShape = inferShapeFromTextAndAnalysis(text, null);
-  if (preShape && typeof window.morphForIntent === 'function') {
-    window.morphForIntent(preShape);
+  if (preShape && window.holographicChamber && typeof window.holographicChamber.morphToFormation === 'function') {
+    window.holographicChamber.morphToFormation(preShape);
+    console.log(`🌌 User requested shape: ${preShape}`);
   }
   // Visual ripple: show grid thinking effect
   const grid = document.querySelector('.grid-overlay');
@@ -449,10 +465,11 @@ async function sendMessage() {
       // Morph holographic chamber based on shape intent
       
       // Show/hide glass panels based on conversation state
-      // Morph field based on detected shape intent
+      // Morph particles based on detected shape intent
       const shape = inferShapeFromTextAndAnalysis(null, data.analysis || {});
-      if (shape && typeof window.morphForIntent === 'function') {
-        window.morphForIntent(shape);
+      if (shape && window.holographicChamber && typeof window.holographicChamber.morphToFormation === 'function') {
+        window.holographicChamber.morphToFormation(shape);
+        console.log(`🌌 Morphing particles to: ${shape}`);
       }
       // Snap analysis panel under the latest AI message and animate highlight
       if (aiEl) {
@@ -461,7 +478,7 @@ async function sendMessage() {
         const panel = document.querySelector('.analysis-panel');
         if (panel) {
           panel.classList.add('updated');
-          setTimeout(() => panel.classList.remove('updated'), 800);
+          setTimeout(() => panel.classList.remove('updated'), 1600); // Slowed down from 800ms to 1600ms
         }
       }
     }
@@ -472,14 +489,17 @@ async function sendMessage() {
     if (typeof window.triggerPulse === 'function') {
       window.triggerPulse(data.particle_intensity || 0.5);
     }
-    if (typeof window.morphForIntent === 'function') {
+    if (window.holographicChamber && typeof window.holographicChamber.morphToFormation === 'function') {
       // Map approach/intent to explicit morph shape for clearer storytelling
       const intent = mapApproachToIntent(data.approach, data?.analysis?.intent);
-      window.morphForIntent(intent);
+      window.holographicChamber.morphToFormation(intent);
+      console.log(`🌌 AI response triggered shape: ${intent}`);
     }
     // AI response complete: visual and status update
     if (/money|dollar|finance/i.test(reply)) {
-      window.morphForIntent('-'); // text morph to $ or text morph to '💰'
+      if (window.holographicChamber && typeof window.holographicChamber.morphToFormation === 'function') {
+        window.holographicChamber.morphToFormation('spiral'); // Money/finance gets spiral formation
+      }
       if (window.triggerPulse) window.triggerPulse(1.0);
     }
   // Mark done and show copy
@@ -490,14 +510,14 @@ async function sendMessage() {
       if (window.holographicChamber) {
         window.holographicChamber.idle();
       }
-    }, 3000);
+    }, 6000); // Slowed down from 3000ms to 6000ms
   showStatus('Energy takes shape.');
     // After a delay, return to idle microcopy
     setTimeout(() => {
       // Removed ambient microcopy reinsertion
       const dissolve = window['dissolveToSwarm'];
       if (typeof dissolve === 'function') dissolve();
-    }, 2000);
+    }, 4000); // Slowed down from 2000ms to 4000ms
   } catch (err) {
     // Why: Provide structured, user-visible diagnostics for transient chat failures without forcing console inspection
     // Where: Error path of sendMessage, connected to toast + optional inline last-error overlay
@@ -522,7 +542,7 @@ function scheduleAutoHideBar() {
   const bar = document.getElementById('floating-input');
   if (!bar) return;
   if (hideBarTimer) clearTimeout(hideBarTimer);
-  hideBarTimer = setTimeout(() => { bar.classList.remove('active'); }, 3500);
+  hideBarTimer = setTimeout(() => { bar.classList.remove('active'); }, 8000); // Slowed down from 3500ms to 8000ms
 }
 
 function injectLastErrorOverlay(errInfo){
@@ -706,14 +726,49 @@ function inferModeFromAnalysis(analysis, replyText) {
 }
 
 function inferShapeFromTextAndAnalysis(userText, analysis) {
+  // Check for explicit shape request from Clever first
+  if (analysis && analysis.requested_shape) {
+    console.log(`🔍 Found requested shape in analysis: ${analysis.requested_shape}`);
+    return analysis.requested_shape;
+  }
+  
   const t = String(userText || (analysis && analysis.user_input) || '').toLowerCase();
+  console.log(`🔍 Analyzing text for shapes: "${t}"`);
+  
   // Direct shape mentions take precedence
-  if (/cube|box|square/.test(t)) return 'cube';
-  if (/torus|donut|ring/.test(t)) return 'torus';
-  if (/sphere|ball|circle/.test(t)) return 'sphere';
-  if (/galaxy|spiral|swirl/.test(t)) return 'galaxy';
-  if (/grid|plane/.test(t)) return 'grid';
-  if (/wave|ripple/.test(t)) return 'wave';
+  if (/cube|box|square/.test(t)) {
+    console.log('🎯 Detected shape: cube');
+    return 'cube';
+  }
+  if (/torus|donut|ring/.test(t)) {
+    console.log('🎯 Detected shape: torus');
+    return 'torus';
+  }
+  if (/sphere|ball|circle/.test(t)) {
+    console.log('🎯 Detected shape: sphere');
+    return 'sphere';
+  }
+  if (/galaxy|spiral|swirl/.test(t)) {
+    console.log('🎯 Detected shape: galaxy');
+    return 'galaxy';
+  }
+  if (/grid|plane/.test(t)) {
+    console.log('🎯 Detected shape: grid');
+    return 'grid';
+  }
+  if (/wave|ripple/.test(t)) {
+    console.log('🎯 Detected shape: wave');
+    return 'wave';
+  }
+  if (/helix|dna/.test(t)) {
+    console.log('🎯 Detected shape: helix');
+    return 'helix';
+  }
+  if (/scatter|spread/.test(t)) {
+    console.log('🎯 Detected shape: scatter');
+    return 'scatter';
+  }
+  
   // Infer from analysis intent if available
   const intent = String(analysis && analysis.intent || '').toLowerCase();
   if (intent.includes('shape')) return 'cube';
@@ -721,6 +776,8 @@ function inferShapeFromTextAndAnalysis(userText, analysis) {
   if (intent.includes('deep')) return 'cube';
   if (intent.includes('casual') || intent.includes('chat')) return 'sphere';
   if (intent.includes('explore')) return 'galaxy';
+  
+  console.log('🔍 No shape detected');
   return '';
 }
 
@@ -732,4 +789,99 @@ function setSelfcheckState(state, text) {
   if (state === 'ok') el.classList.add('ok');
   if (state === 'error') el.classList.add('error');
   if (typeof text === 'string' && text) el.textContent = text;
+}
+
+// --- UI Component Helper Functions ---
+// These demonstrate the holographic UI components from the screenshots
+
+function toggleAnalysisDisplay() {
+  if (!window.uiFoundation) return;
+  
+  const existing = window.uiFoundation.getComponent('main-analysis');
+  if (existing) {
+    window.uiFoundation.removeComponent('main-analysis');
+    showToast('📊 Analysis Display Hidden', 'info', 2000);
+  } else {
+    const analysis = window.uiFoundation.createComponent('AnalysisDisplay', 'main-analysis', {
+      title: 'Cognitive Analysis',
+      position: { x: 'auto', y: 'auto' }
+    });
+    
+    // Demo data similar to screenshots
+    analysis.updateAnalysis({
+      intent: 'Holographic Interface Design',
+      mood: 'creative_focused',
+      keywords: ['UI', 'holographic', 'particles', 'brain'],
+      formation: 'cube'
+    });
+    
+    showToast('📊 Analysis Display Shown', 'info', 2000);
+  }
+}
+
+function showStatus(text, type = 'info') {
+  if (!window.uiFoundation) return;
+  
+  const status = window.uiFoundation.createComponent('StatusIndicator', `status-${Date.now()}`, {
+    text: text,
+    type: type,
+    position: 'top-center'
+  });
+  
+  // Auto-remove after delay
+  setTimeout(() => {
+    if (status) {
+      window.uiFoundation.removeComponent(status.id);
+    }
+  }, 3000);
+}
+
+function showFloatingPanel(title, content) {
+  if (!window.uiFoundation) return;
+  
+  const panel = window.uiFoundation.createComponent('FloatingPanel', `panel-${Date.now()}`, {
+    title: title,
+    content: content,
+    width: 320,
+    style: 'holographic',
+    position: { x: 'auto', y: 'auto' }
+  });
+  
+  // Auto-remove after 8 seconds
+  setTimeout(() => {
+    if (panel) {
+      window.uiFoundation.removeComponent(panel.id);
+    }
+  }, 8000);
+  
+  return panel;
+}
+
+function createChatBubble(message, role = 'ai') {
+  if (!window.uiFoundation) return;
+  
+  const bubble = window.uiFoundation.createComponent('ChatBubble', `bubble-${Date.now()}`, {
+    message: message,
+    role: role,
+    autoHide: true,
+    hideDelay: 6000
+  });
+  
+  return bubble;
+}
+
+function getSystemInfo() {
+  const particleCount = window.holographicChamber ? 
+    (window.holographicChamber.particles ? window.holographicChamber.particles.length : '?') : '?';
+  
+  return `
+    <div style="font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.6;">
+      <div style="color: #69EACB; margin-bottom: 8px;">CLEVER DIGITAL BRAIN v2.0</div>
+      <div>Particles: ${particleCount}</div>
+      <div>Formation: ${window.holographicChamber?.currentFormation || 'whirlpool'}</div>
+      <div>Performance: ${Math.round(performance.now() / 1000)}s uptime</div>
+      <div>UI Components: ${window.uiFoundation ? window.uiFoundation.componentCount : 0}</div>
+      <div style="margin-top: 8px; color: #69EACB;">Neural Link: ●○○ ACTIVE</div>
+    </div>
+  `;
 }

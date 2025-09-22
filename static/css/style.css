@@ -63,7 +63,7 @@ body {
   z-index: 9999; 
   border: 1px solid rgba(105, 234, 203, 0.08);
   backdrop-filter: blur(8px);
-  transition: all 0.4s ease;
+  transition: all 0.8s ease; /* Slowed down from 0.4s to 0.8s for more comfortable selfcheck transitions */
   font-weight: 500;
 }
 
@@ -97,7 +97,7 @@ body {
 }
 .selfcheck.thinking::after {
   content: ' …';
-  animation: dots 1.2s steps(4, end) infinite;
+  animation: dots 2.0s steps(4, end) infinite; /* Slowed down thinking dots from 1.2s to 2.0s */
 }
 @keyframes dots { 0%, 20% { opacity: 0 } 50% { opacity: 1 } 100% { opacity: 0 } }
 
@@ -106,7 +106,7 @@ body {
 .manifesting {
     opacity: 0;
     transform: scale(0.8) translateY(20px);
-    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Slowed down from 0.8s to 1.2s for smoother manifesting animation */
 }
 
 .manifested {
@@ -129,14 +129,14 @@ body {
     font-size: 14px;
     font-weight: 500;
     opacity: 0;
-    transition: opacity 0.5s ease;
+    transition: opacity 1.0s ease; /* Slowed down from 0.5s to 1.0s for gentler fade transitions */
     pointer-events: none;
     z-index: 1000;
 }
 
 #magical-status.active {
     opacity: 1;
-    animation: statusPulse 0.5s ease-out;
+    animation: statusPulse 1.0s ease-out; /* Slowed down from 0.5s to 1.0s for gentler pulse animation */
 }
 
 @keyframes statusPulse {
@@ -147,7 +147,7 @@ body {
 
 /* Enhanced message animations */
 .message {
-    transition: all 0.3s ease;
+    transition: all 0.6s ease; /* Slowed down from 0.3s to 0.6s for gentler message transitions */
 }
 
 /* Why: Support ephemeral chat bubbles that gracefully disappear to keep visual focus on the holographic chamber
@@ -266,7 +266,7 @@ body {
     pointer-events: auto;
     z-index: 1;
     opacity: 0.9;
-    transition: opacity 0.5s ease;
+    transition: opacity 1.0s ease; /* Slowed down from 0.5s to 1.0s for gentler opacity transitions */
 }
 
 #manifestation-canvas:hover {
@@ -291,7 +291,7 @@ body {
 #user-input:focus {
     border-color: #69EACB;
     box-shadow: 0 0 15px rgba(105, 234, 203, 0.3);
-    animation: inputSummon 0.5s ease-out;
+    animation: inputSummon 1.0s ease-out; /* Slowed down from 0.5s to 1.0s for gentler input summoning */
 }
 
 @keyframes inputSummon {
@@ -319,8 +319,8 @@ body {
     font-size: 12px;
     margin: 2px;
     display: inline-block;
-    transition: all 0.3s ease;
-    animation: entityManifest 0.5s ease-out;
+    transition: all 0.6s ease; /* Slowed down from 0.3s to 0.6s for gentler chip transitions */
+    animation: entityManifest 1.0s ease-out; /* Slowed down from 0.5s to 1.0s for gentler chip manifestation */
 }
 
 @keyframes entityManifest {
@@ -409,7 +409,7 @@ body {
 }
 
 #send-button:active {
-    animation: buttonManifest 0.2s ease-out;
+    animation: buttonManifest 0.5s ease-out; /* Slowed down from 0.2s to 0.5s for gentler button manifestation */
 }
 
 @keyframes buttonManifest {
@@ -529,7 +529,7 @@ body {
   max-width: 700px;
   margin-bottom: 80px;
   pointer-events: auto;
-  animation: fadeInUp 0.6s ease-out;
+      animation: fadeInUp 1.2s ease-out; /* Slowed down from 0.6s to 1.2s for gentler fade-in animation */
 }
 
 .chat {
@@ -554,7 +554,7 @@ body {
   margin-bottom: 6px;
   display: flex;
   flex-direction: column;
-  animation: messageSlideIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation: messageSlideIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Slowed down from 0.6s to 1.2s for gentler message slide-in */
   pointer-events: auto; /* Allow interactions on messages */
   backdrop-filter: blur(12px);
   border-radius: 16px;
@@ -631,7 +631,7 @@ body {
   backdrop-filter: blur(20px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   z-index: 3;
-  transition: all 0.2s ease;
+  transition: all 0.5s ease; /* Slowed down from 0.2s to 0.5s for gentler entrybar transitions */
 }
 
 .entrybar:focus-within {
@@ -665,7 +665,7 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.5s ease; /* Slowed down from 0.2s to 0.5s for gentler icon button transitions */
   font-size: 16px;
 }
 

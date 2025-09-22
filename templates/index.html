@@ -88,14 +88,14 @@ How:
 
     <!-- Microcopy removed to keep stage fully empty unless user interacts -->
 
-    <!-- Scripts (keeping minimal functionality) -->
-    <script src="{{ url_for('static', filename='js/particles.js') }}?v={{ cache_buster }}"></script>
-    <script src="{{ url_for('static', filename='js/holographic-chamber.js') }}?v={{ cache_buster }}"></script>
+    <!-- Scripts (unified holographic chamber + UI foundation system) -->
+    <script src="{{ url_for('static', filename='js/engines/holographic-chamber.js') }}?v={{ cache_buster }}"></script>
+    <!-- UI Foundation System (loads before main.js) -->
+    <script src="{{ url_for('static', filename='js/components/clever-ui-foundation.js') }}?v={{ cache_buster }}"></script>
+    <script src="{{ url_for('static', filename='js/components/clever-ui-components.js') }}?v={{ cache_buster }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
     <!-- Externalized fade logic to satisfy CSP (no inline scripts) -->
-    <script src="{{ url_for('static', filename='js/chat-fade.js') }}?v={{ cache_buster }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
-    <script src="{{ url_for('static', filename='js/chat-fade.js') }}?v={{ cache_buster }}"></script>
+    <script src="{{ url_for('static', filename='js/components/chat-fade.js') }}?v={{ cache_buster }}"></script>
     <div id="toast-stack" aria-live="polite" aria-atomic="true" style="position:fixed;bottom:1rem;right:1rem;display:flex;flex-direction:column;gap:.5rem;z-index:9999;pointer-events:none;"></div>
 </body>
 </html>

@@ -1,7 +1,4 @@
-import os
-import json
 import tempfile
-import types
 import pytest
 
 import importlib.util
@@ -101,9 +98,9 @@ def test_chat_happy(app_client):
     for k in ['approach', 'mood', 'particle_intensity']:
         if k in data:
             assert data[k] is not None
-     # Intent key is optional; when present, it should be a string
-     if 'intent' in data['analysis'] and data['analysis']['intent'] is not None:
-          assert isinstance(data['analysis']['intent'], str)
+    # Intent key is optional; when present, it should be a string
+    if 'intent' in data['analysis'] and data['analysis']['intent'] is not None:
+        assert isinstance(data['analysis']['intent'], str)
 
 
 def test_chat_bad_request(app_client):
