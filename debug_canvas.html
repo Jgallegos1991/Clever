@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas Debug Test</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #000; color: #fff; }
+        canvas { border: 1px solid #fff; }
+        #info { margin-top: 10px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Canvas Debug Test</h1>
+    <canvas id="test-canvas" width="400" height="300"></canvas>
+    <div id="info"></div>
+    
+    <script>
+        const canvas = document.getElementById('test-canvas');
+        const ctx = canvas.getContext('2d');
+        const info = document.getElementById('info');
+        
+        if (ctx) {
+            // Draw a simple test
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(10, 10, 50, 50);
+            
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.arc(100, 100, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            info.innerHTML = '✅ Canvas working! Context available.';
+            
+            // Test if our holographic chamber script loads
+            const script = document.createElement('script');
+            script.src = '/static/js/engines/holographic-chamber.js';
+            script.onload = () => {
+                info.innerHTML += '<br>✅ Holographic chamber script loaded!';
+                if (typeof HolographicChamber !== 'undefined') {
+                    info.innerHTML += '<br>✅ HolographicChamber class available!';
+                    const chamber = new HolographicChamber(canvas);
+                    chamber.init();
+                    info.innerHTML += '<br>✅ HolographicChamber initialized!';
+                } else {
+                    info.innerHTML += '<br>❌ HolographicChamber class not found';
+                }
+            };
+            script.onerror = () => {
+                info.innerHTML += '<br>❌ Failed to load holographic chamber script';
+            };
+            document.head.appendChild(script);
+        } else {
+            info.innerHTML = '❌ Canvas context not available';
+        }
+    </script>
+</body>
+</html>

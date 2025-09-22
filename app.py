@@ -216,6 +216,7 @@ def chat():
                 'approach': persona_response.mode,  # alias for shaping logic
                 'mood': (persona_response.sentiment or 'neutral'),
                 'particle_intensity': 0.6,  # heuristic baseline (future: derive from sentiment)
+                'particle_command': getattr(persona_response, 'particle_command', None),  # Shape formation command
                 'status': 'success'
             }
             

@@ -120,17 +120,17 @@ class HolographicChamber {
   }
 
   resize() {
-  // Use window innerWidth/innerHeight for full viewport coverage
-  this.width = window.innerWidth;
-  this.height = window.innerHeight;
-  this.canvas.width = this.width;
-  this.canvas.height = this.height;
+  // Use canvas dimensions instead of window dimensions for proper particle placement
+  this.width = this.canvas.width || 1366;
+  this.height = this.canvas.height || 768;
+  
+  console.log(`🔧 HolographicChamber resize: ${this.width}x${this.height}, particles: ${this.particles.length}`);
+  
   this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any scaling
-  this.canvas.style.width = this.width + 'px';
-  this.canvas.style.height = this.height + 'px';
   }
 
   createParticles() {
+    console.log(`🚀 Creating ${this.maxParticles} particles in ${this.width}x${this.height} canvas`);
     this.particles = [];
     for (let i = 0; i < this.maxParticles; i++) {
       this.particles.push({
@@ -144,16 +144,28 @@ class HolographicChamber {
     alpha: Math.random() * 0.4 + 0.6,
     hue: Math.random() * 60 + 160,
     phase: Math.random() * Math.PI * 2,
-    speed: 0.0025 + Math.random() * 0.001, // More consistent speed range: 0.0025-0.0035 (tighter range, slightly faster minimum)
+    speed: 0.05 + Math.random() * 0.03, // Increased speed range: 0.05-0.08 for visible movement
     energy: Math.random() * 0.04 + 0.04 // Slowed down pulsing from 0.08-0.16 to 0.04-0.08
       });
     }
+    console.log(`✅ Created ${this.particles.length} particles successfully`);
   }
 
   morphToFormation(formation) {
+    console.log(`🔄 HolographicChamber.morphToFormation called with: ${formation}`);
+    console.log(`📊 Particle count: ${this.particles.length}, Canvas size: ${this.width}x${this.height}`);
+    
     const centerX = this.width / 2;
     const centerY = this.height / 2;
     const radius = Math.min(this.width, this.height) * 0.35;
+    
+    console.log(`🎯 Formation center: ${centerX}, ${centerY}, radius: ${radius}`);
+    
+    // Add visual feedback: temporarily increase energy and change color
+    this.particles.forEach(particle => {
+      particle.energy = Math.min(1, particle.energy + 0.3); // Boost energy for visibility
+      particle.formationHue = 180 + Math.random() * 40; // Bright cyan-green for formations
+    });
 
     this.particles.forEach((particle, i) => {
       // Add some randomness for organic feel
@@ -261,6 +273,13 @@ class HolographicChamber {
           break;
       }
     });
+    
+    // Debug: Show first few particle targets after morphing
+    console.log(`🎯 First 3 particle targets after ${formation}:`);
+    for (let i = 0; i < Math.min(3, this.particles.length); i++) {
+      const p = this.particles[i];
+      console.log(`  Particle ${i}: (${p.x.toFixed(1)}, ${p.y.toFixed(1)}) → (${p.targetX.toFixed(1)}, ${p.targetY.toFixed(1)})`);
+    }
   }
 
   setState(newState) {
@@ -322,8 +341,8 @@ class HolographicChamber {
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance > 1) {
-        particle.vx += dx * (particle.speed * 0.02); // Better movement speed (increased from 0.01 to 0.02)
-        particle.vy += dy * (particle.speed * 0.02); // Better movement speed (increased from 0.01 to 0.02)
+        particle.vx += dx * (particle.speed * 0.1); // Increased movement speed for visible shape morphing
+        particle.vy += dy * (particle.speed * 0.1); // Increased movement speed for visible shape morphing
       }
 
       // Apply magnetic field effects
@@ -480,6 +499,15 @@ class HolographicChamber {
   }
 
   draw() {
+    // Debug particle count every 60 frames
+    if ((this.frameCount || 0) % 60 === 0) {
+      console.log(`🎨 Drawing ${this.particles.length} particles`);
+      if (this.particles.length > 0) {
+        const sample = this.particles[0];
+        console.log(`📍 Sample particle: x=${sample.x.toFixed(1)}, y=${sample.y.toFixed(1)}, size=${sample.size.toFixed(1)}, alpha=${sample.alpha.toFixed(2)}`);
+      }
+    }
+    
     // Clear canvas (or create trail effect if enabled)
     if (this.trailMode) {
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
@@ -523,7 +551,9 @@ class HolographicChamber {
           particle.x, particle.y, 0,
           particle.x, particle.y, layer.radius
         );
-        const hue = (particle.hue + layer.hueShift) % 360;
+        // Use formation color if available, otherwise use particle hue
+        const baseHue = particle.formationHue || particle.hue;
+        const hue = (baseHue + layer.hueShift) % 360;
         const lightness = 60 + particle.energy * 20;
         
         gradient.addColorStop(0, `hsla(${hue}, 85%, ${lightness}%, ${layer.alpha})`);

@@ -1,35 +1,77 @@
 """
-Simple NLP Processor for Clever AI
+NLP Processor for Clever AI
 
-Why: Provides basic natural language processing without complex dependencies
-Where: Used by persona.py and other modules for text analysis
-How: Simple rule-based processing following offline requirements
+Why: Provides natural language processing for Clever's genius-level text understanding
+Where: Used by persona.py and other modules for advanced text analysis
+How: Rule-based processing with optional advanced capabilities when available
+
+Core Purpose:
+    - Text analysis and feature extraction without external APIs
+    - Sentiment detection and keyword extraction for context understanding
+    - Entity recognition and noise detection for intelligent responses
+    - Provides foundation for all text understanding in Clever
 
 Connects to:
     - persona.py: Text analysis for response generation
+        * Sentiment for tone matching
+        * Keywords for context building
+        * Noise detection for clarification needs
     - evolution_engine.py: Text processing for learning
+        * Entity extraction for knowledge updates
+        * Concept density for complexity assessment
+    - enhanced_conversation_engine.py: Rich conversation analysis
+        * Question type detection for appropriate responses
+        * Readability metrics for adaptive communication
+    - memory_engine.py: Semantic feature storage
+        * Keywords for memory indexing
+        * Entities for context retrieval
+    - holographic_particle_engine.py: Pattern recognition
+        * Topic vectors for particle state influence
+        * Sentiment for energy field modulation
+
+Processing Flow:
+    1. Text input → tokenization → stopword removal
+    2. Feature extraction (keywords, entities, sentiment)
+    3. Noise/gibberish detection for quality control
+    4. Advanced features (when available): NER, readability, topic vectors
+    5. Aggregated analysis dict returned to calling module
+
+Key Methods:
+    - process_text(): Main entry point returning comprehensive analysis
+    - extract_keywords(): Critical concepts for context
+    - analyze_sentiment(): Emotional tone detection
+    - extract_entities(): Names, numbers, and proper nouns
+    - _noise_metrics(): Typo/gibberish detection for clarification
+
+Design Principles:
+    - Confident-first (Clever always responds intelligently)
+    - Offline-first (no external dependencies required)
+    - Extensible (new features enhance existing capabilities)
+    - Performance-conscious (lightweight operations)
 """
+
 import re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from collections import Counter
-import math
 
 try:  # Optional heavy libs – never required
     import spacy  # type: ignore
     _SPACY_AVAILABLE = True
-except Exception:  # pragma: no cover - environment dependent
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - environment dependent
     _SPACY_AVAILABLE = False
 
 try:  # TextBlob sentiment (polarity / subjectivity)
     from textblob import TextBlob  # type: ignore
     _TEXTBLOB_AVAILABLE = True
-except Exception:  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     _TEXTBLOB_AVAILABLE = False
 
 try:  # NLTK VADER (already in requirements)
     from nltk.sentiment import SentimentIntensityAnalyzer  # type: ignore
+    # Test if VADER lexicon is available
+    _ = SentimentIntensityAnalyzer()
     _VADER_AVAILABLE = True
-except Exception:  # pragma: no cover
+except (ImportError, ModuleNotFoundError, LookupError):  # pragma: no cover
     _VADER_AVAILABLE = False
 
 
@@ -46,6 +88,12 @@ class SimpleNLPProcessor:
     Where: Core component for all text processing needs
     How: Rule-based analysis with basic pattern matching
     """
+    
+    # Noise detection thresholds - configurable for easier tuning
+    NOISE_TYPO_THRESHOLD = 0.8
+    NOISE_SMASH_THRESHOLD = 0.6
+    NOISE_REPEAT_THRESHOLD = 3
+    NOISE_ENTROPY_THRESHOLD = 0.15
     
     def __init__(self):
         """
@@ -140,8 +188,15 @@ class SimpleNLPProcessor:
         tokens = re.findall(r"[a-zA-Z]+", lowered)
         if not tokens:
             return {"typo_ratio": 0.0, "smash_score": 0.0, "needs_clarification": False}
-        # Simple english core set (small to stay offline/light)
-        core_vocab = {"the","and","that","this","you","for","with","have","are","but","not","can","your","from","what","about","just","like","time","need","want","make","code","test","file","data","project"}
+        # Simple english core set (small to stay offline/light) + technical terms
+        core_vocab = {
+            # Common English words  
+            "the","and","that","this","you","for","with","have","are","but","not","can","your","from","what","about","just","like","time","need","want","make",
+            # Clever-specific terms to prevent false typo detection
+            "code","test","file","data","project","shape","shifting","capabilities","particles","clever","working","right","message","understand","trying","system","interface","holographic","particle","engine",
+            # Additional common tech terms
+            "python","javascript","html","css","json","api","server","client","function","method","class","object","array","variable","debug","error","syntax","config","settings","import","export","async","await","callback","event","handler","component","element","property","value","input","output","database","memory","storage","network","http","https","url","request","response","header","status","query","auth","login","session","cache","load","save","create","read","write","update","delete","search","filter","sort","map","validation","format","template","style","theme","color","background","text","font","button","menu","modal","notification","loading","progress","image","video","audio","upload","download","browser","window","document","element","attribute","content","layout","design","framework","library","module","package","version","dependency","installation","configuration","deployment","production","development","testing","optimization","performance","security","encryption","authentication","authorization","permission","access","control","user","admin","guest","public","private","local","remote","cloud","backup","restore","sync","migration","integration","automation","workflow","pipeline","monitoring","logging","analytics","metrics","reporting","dashboard","visualization","chart","graph","table","list","grid","form","field","label","placeholder","tooltip","dropdown","checkbox","radio","slider","toggle","tab","panel","section","header","footer","sidebar","navbar","breadcrumb","pagination","search","filter","sort","group","category","tag","priority","status","state","active","inactive","enabled","disabled","visible","hidden","selected","focused","hover","click","touch","drag","drop","resize","scroll","zoom","rotate","scale","transition","animation","mobile","tablet","desktop","responsive","adaptive","accessibility","usability","cross-browser","compatibility","progressive","enhancement","graceful","degradation"
+        }
         misspelled = 0
         consonant_runs = 0
         long_repeats = 0
@@ -162,7 +217,8 @@ class SimpleNLPProcessor:
         unique_chars = len(set(lowered))
         entropy_proxy = unique_chars / max(1, len(lowered))
         smash_score = min(1.0, 0.4*typo_ratio + 0.3*(consonant_runs/ max(1,total_chars)) + 0.3*(long_repeats / max(1,len(tokens))))
-        needs = (typo_ratio > 0.55 and smash_score > 0.4) or (long_repeats >= 2) or (entropy_proxy < 0.28)
+        # Relaxed thresholds - only flag truly garbled text, not technical terms or minor typos
+        needs = (typo_ratio > self.NOISE_TYPO_THRESHOLD and smash_score > self.NOISE_SMASH_THRESHOLD) or (long_repeats >= self.NOISE_REPEAT_THRESHOLD) or (entropy_proxy < self.NOISE_ENTROPY_THRESHOLD)
         return {
             "typo_ratio": round(typo_ratio, 3),
             "smash_score": round(smash_score, 3),
@@ -230,6 +286,17 @@ class SimpleNLPProcessor:
         How: Simple regex-based word extraction
         """
         return re.findall(r'\b\w+\b', text.lower())
+    
+    def get_word_frequency(self, text: str) -> Dict[str, int]:
+        """
+        Get word frequency distribution
+        
+        Why: Understand text composition and emphasis
+        Where: Used for content analysis and keyword weighting
+        How: Count occurrences of each word
+        """
+        words = self.tokenize(text)
+        return dict(Counter(words))
 
 
 class AdvancedNLPProcessor(SimpleNLPProcessor):
@@ -256,12 +323,17 @@ class AdvancedNLPProcessor(SimpleNLPProcessor):
         if _SPACY_AVAILABLE:
             try:  # Load small English model if present; never downloads
                 self._nlp = spacy.load("en_core_web_sm")  # pragma: no cover (env)
-            except Exception:
+            except (OSError, IOError, ImportError):  # More specific exceptions for model loading
                 self._nlp = None
-        self._vader = SentimentIntensityAnalyzer() if _VADER_AVAILABLE else None
+        self._vader = None
+        if _VADER_AVAILABLE:
+            try:
+                self._vader = SentimentIntensityAnalyzer()
+            except (LookupError, OSError):  # Catch missing VADER lexicon data
+                self._vader = None
 
     # ---------- Public API ----------
-    def process_text(self, text: str) -> Dict[str, Any]:  # type: ignore[override]
+    def process_text(self, text: str) -> Dict[str, Any]:
         """Enhance base processing with deeper semantic layers.
 
         Returns extended dict while preserving base keys so existing code
@@ -282,7 +354,7 @@ class AdvancedNLPProcessor(SimpleNLPProcessor):
         return enriched
 
     # ---------- Enriched Feature Methods ----------
-    def _extract_entities_advanced(self, text: str, doc) -> List[str]:
+    def _extract_entities_advanced(self, text: str, doc: Optional[Any]) -> List[str]:
         if doc is not None:
             ents = {e.text for e in doc.ents if len(e.text) < 60}
         else:
@@ -326,7 +398,7 @@ class AdvancedNLPProcessor(SimpleNLPProcessor):
                     if polarity < -0.2:
                         return "negative"
                     return "neutral"
-            except Exception:
+            except (AttributeError, TypeError, ValueError):  # More specific TextBlob exceptions
                 pass
 
         # Fallback to rule-based sentiment
@@ -381,13 +453,12 @@ class AdvancedNLPProcessor(SimpleNLPProcessor):
         count = 0
         prev_vowel = False
         for ch in word:
-            if ch in vowels:
-                if not prev_vowel:
-                    count += 1
-                prev_vowel = True
-            else:
-                prev_vowel = False
-        if word.endswith("e") and count > 1:
+            is_vowel = ch in vowels
+            if is_vowel and not prev_vowel:
+                count += 1
+            prev_vowel = is_vowel
+        # Adjust for silent e
+        if word.endswith('e') and count > 1:
             count -= 1
         return max(1, count)
 
@@ -402,30 +473,13 @@ def get_nlp_processor() -> SimpleNLPProcessor:
     """
     try:
         return AdvancedNLPProcessor()
-    except Exception:  # Safety net – never break core flow
+    except (ImportError, ModuleNotFoundError, OSError):  # Safety net – never break core flow
         return SimpleNLPProcessor()
-    
-    def get_word_frequency(self, text: str) -> Dict[str, int]:
-        """
-        Get word frequency distribution
-        
-        Why: Understand text composition and emphasis
-        Where: Used for content analysis and keyword weighting
-        How: Count occurrences of each word
-        """
-        words = self.tokenize(text)
-        return dict(Counter(words))
-    
-    def process(self, text: str) -> Dict[str, Any]:
-        """
-        Alias for process_text for backward compatibility
-        
-        Why: Some modules expect 'process' method name
-        Where: Used by enhanced_conversation_engine and other modules
-        How: Delegates to process_text method
-        """
-        return self.process_text(text)
 
 
-# Global processor instance
-nlp_processor = SimpleNLPProcessor()
+# Global processor instance - wrapped in try-except to ensure module always loads
+try:
+    nlp_processor = get_nlp_processor()
+except (ImportError, ModuleNotFoundError, OSError):
+    # Fallback to simple processor if any error occurs during initialization
+    nlp_processor = SimpleNLPProcessor()

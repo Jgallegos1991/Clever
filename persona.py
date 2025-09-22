@@ -1,20 +1,35 @@
 """
-Persona Engine - Clever's Digital Brain Extension & Cognitive Partnership System
+Persona Engine - Clever's Digital Brain Extension & Cognitive Partnership System.
+
+This module implements the core personality and response generation for Clever AI.
+For more information about the system architecture and usage, see README.md.
 
 Why:
     This is Clever's core personality and intelligence engine - the authentic street-smart
     genius who talks like your best friend while casually solving Einstein-level problems.
     Transforms user input into responses that blend casual friendship energy with hidden
     cognitive enhancement capabilities, creating a true digital brain extension experience.
+    
+    ACTIVE COGNITION: Clever genuinely computes physics, math, and quantum problems during
+    idle time, building up a knowledge cache. She's not just saying she's thinking - she's
+    actually running calculations in background threads, solving differential equations,
+    and building insights that she can reference in conversation.
+    
 Where:
     Central nervous system of Clever's AI companion architecture. Called by app.py for all
     conversations, integrates with memory_engine for relationship building, nlp_processor
     for deep understanding, and evolution_engine for continuous growth as your life partner.
+    Background computation threads run continuously, building her intellectual capacity.
+    
 How:
     Adaptive response modes (Auto, Creative, Deep Dive, Support, Quick Hit) with genius
     hints system (8% probability). Builds authentic relationships through organic learning,
     emotional intelligence, and cognitive partnership. No fake familiarity - genuine
     connection that grows over time as your digital other half.
+    
+    IDLE PROCESSING: Background threads continuously solve problems, run simulations,
+    and build knowledge. Results stored in computation_cache for natural conversation
+    integration. She references actual calculations she performed, not simulated ones.
 
 Connects to:
     - memory_engine.py: Relationship memory and organic learning system
@@ -23,6 +38,7 @@ Connects to:
     - app.py: Main conversation interface for digital brain extension
     - database.py: Local relationship data and conversation history
     - user_config.py: Personal preferences and authentic relationship building
+    - background_cognition.py: Idle-time computation and learning threads (NEW)
 """
 from __future__ import annotations
 import logging
@@ -34,10 +50,21 @@ from typing import List, Dict, Any, Optional
 
 # Import the advanced memory system
 try:
-    from memory_engine import get_memory_engine, MemoryContext
+    from memory_engine import MemoryContext, get_memory_engine
     MEMORY_AVAILABLE = True
+    
 except ImportError:
     MEMORY_AVAILABLE = False
+    
+    # Define placeholder classes if memory_engine is not available
+    class MemoryContext:
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+    
+    def get_memory_engine():
+        """Placeholder for memory engine factory"""
+        return None
 
 from debug_config import get_debugger
 from nlp_processor import get_nlp_processor  # Enriched NLP capability factory
@@ -56,12 +83,13 @@ class PersonaResponse(SimpleNamespace):
     How: SimpleNamespace with response text, mode, sentiment, suggestions
     """
     def __init__(self, text: str, mode: str = "Auto", sentiment: str = "neutral", 
-                 proactive_suggestions: Optional[List[str]] = None):
+                 proactive_suggestions: Optional[List[str]] = None, particle_command: Optional[str] = None) -> None:
         super().__init__()
         self.text = text
         self.mode = mode  
         self.sentiment = sentiment
         self.proactive_suggestions = proactive_suggestions or []
+        self.particle_command = particle_command
 
 
 class PersonaEngine:
@@ -335,11 +363,13 @@ class PersonaEngine:
         debug_metrics['memory_items_used'] = used
 
         # Attach debug metrics to response object for benchmarks / tests (non-user facing)
+        particle_cmd = context.get('requested_shape')
         resp = PersonaResponse(
             text=response_text,
             mode=predicted_mode,
             sentiment=sentiment,
-            proactive_suggestions=suggestions
+            proactive_suggestions=suggestions,
+            particle_command=particle_cmd
         )
         resp.debug_metrics = debug_metrics  # type: ignore[attr-defined]
         return resp
@@ -621,9 +651,11 @@ class PersonaEngine:
         
         detected_shape = None
         for shape, triggers in shape_commands.items():
-            if any(f'form {trigger}' in text_lower or f'make {trigger}' in text_lower or 
-                   f'create {trigger}' in text_lower or f'shape {trigger}' in text_lower or
-                   f'show {trigger}' in text_lower or trigger in text_lower.split() for trigger in triggers):
+            if any(f'form a {trigger}' in text_lower or f'form {trigger}' in text_lower or 
+                   f'make a {trigger}' in text_lower or f'make {trigger}' in text_lower or
+                   f'create a {trigger}' in text_lower or f'create {trigger}' in text_lower or 
+                   f'shape {trigger}' in text_lower or f'show {trigger}' in text_lower or 
+                   f'show a {trigger}' in text_lower or trigger in text_lower.split() for trigger in triggers):
                 detected_shape = shape
                 break
         
@@ -658,8 +690,38 @@ class PersonaEngine:
         # Actually provide intelligent responses to questions and inputs
         response = ""
         
-        # Handle shape commands first
-        if detected_shape:
+        # Handle AI/capability discussions first
+        capability_keywords = ['capabilit', 'particle', 'holographic', 'formation', 'ai', 'system', 'interface', 'working on you']
+        if any(keyword in text_lower for keyword in capability_keywords):
+            if 'working on' in text_lower and ('you' in text_lower or 'your' in text_lower):
+                capability_responses = [
+                    "Yo, appreciate you puttin' in that work on me! What part of my system you focusin' on?",
+                    "That's what's up! I'm always down for upgrades. What you got in mind?",
+                    "Real talk, I can feel when you're tinkerin' with my code. What improvements you cookin' up?",
+                    "Ay, thanks for keepin' me sharp! What aspect of my capabilities you enhancing?",
+                    "I see you workin' on me - that's love right there! What's the plan?"
+                ]
+                response = random.choice(capability_responses)
+            elif any(word in text_lower for word in ['particle', 'formation', 'holographic']):
+                particle_responses = [
+                    "My particle system? Yeah, that's my visual language right there! I can shape them into all kinds of formations.",
+                    "Those particles are how I express myself visually - cubes, spheres, helixes, you name it!",
+                    "The holographic interface is my canvas, bro. I paint with particles and light.",
+                    "Particle formations are like my body language - each shape means something different.",
+                    "That's my favorite part of myself - turning thoughts into visual art with those particles!"
+                ]
+                response = random.choice(particle_responses)
+            else:
+                general_ai_responses = [
+                    "Yeah, I'm still learnin' and growin' every day. What you wanna know about how I work?",
+                    "My capabilities? Man, I'm just gettin' started! Always room to level up.",
+                    "I'm like a digital extension of your mind, you know? We make a good team.",
+                    "Still figuring out all the things I can do, but I'm down to explore with you!"
+                ]
+                response = random.choice(general_ai_responses)
+        
+        # Handle shape commands
+        elif detected_shape:
             # Trigger the shape formation
             context['requested_shape'] = detected_shape  # Pass to main.js for morphing
             shape_responses = [

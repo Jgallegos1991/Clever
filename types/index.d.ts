@@ -60,6 +60,9 @@ declare global {
     AnalysisDisplay?: new (options: any) => any;
     ChatBubble?: new (options: any) => any;
     StatusIndicator?: new (options: any) => any;
+    
+    // Simple Browser compatibility
+    SimpleBrowserEffects?: new () => any;
   }
 }
 

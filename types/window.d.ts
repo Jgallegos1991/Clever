@@ -48,6 +48,15 @@ declare global {
       burstParticles?: (color: string, intensity: number) => void;
     };
 
+    // Shape testing and debug functions
+    testShape?: (shape: string) => void;
+    debugShapeFormation?: {
+      testShape: (shape: string) => void;
+      autoTest: () => void;
+      logStatus: () => void;
+    };
+    SimpleBrowserEffects?: any;
+
     // Clever personality enhancer instances
     cleverPersonalityEnhancer?: any;
     cleverInvisiblePersonality?: any;
