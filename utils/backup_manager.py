@@ -13,7 +13,6 @@ How: Implements ZIP-based backup creation with timestamp naming, automatic
 """
 import os
 from pathlib import Path
-import shutil
 import time
 import zipfile
 

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clever Codebase Investigation</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #000; color: #0f0; font-family: monospace; }
+        .test-section { border: 1px solid #333; margin: 10px 0; padding: 10px; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warning { color: #ff0; }
+        canvas { border: 1px solid #666; }
+        #console-output { background: #111; padding: 10px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Clever Codebase Investigation</h1>
+    
+    <div class="test-section">
+        <h2>1. Basic Browser Capabilities</h2>
+        <div id="browser-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Canvas Testing</h2>
+        <canvas id="test-canvas" width="300" height="200"></canvas>
+        <div id="canvas-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Script Loading Test</h2>
+        <div id="script-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Holographic Chamber Investigation</h2>
+        <canvas id="holo-canvas" width="400" height="300"></canvas>
+        <div id="holo-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Console Output</h2>
+        <div id="console-output"></div>
+    </div>
+
+    <script>
+        // Capture console output
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function logToPage(level, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' ');
+            consoleOutput.textContent += `[${timestamp}] ${level.toUpperCase()}: ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = (...args) => { originalLog.apply(console, args); logToPage('log', ...args); };
+        console.error = (...args) => { originalError.apply(console, args); logToPage('error', ...args); };
+        console.warn = (...args) => { originalWarn.apply(console, args); logToPage('warn', ...args); };
+        
+        // 1. Browser Capability Tests
+        function testBrowserCapabilities() {
+            const results = [];
+            
+            results.push(`User Agent: ${navigator.userAgent}`);
+            results.push(`Canvas support: ${typeof HTMLCanvasElement !== 'undefined' ? '✅' : '❌'}`);
+            results.push(`2D Context: ${document.createElement('canvas').getContext ? '✅' : '❌'}`);
+            results.push(`WebGL: ${document.createElement('canvas').getContext('webgl') ? '✅' : '❌'}`);
+            results.push(`Local Storage: ${typeof localStorage !== 'undefined' ? '✅' : '❌'}`);
+            results.push(`Fetch API: ${typeof fetch !== 'undefined' ? '✅' : '❌'}`);
+            results.push(`ES6 Classes: ${typeof class {} === 'function' ? '✅' : '❌'}`);
+            
+            document.getElementById('browser-tests').innerHTML = results.join('<br>');
+        }
+        
+        // 2. Canvas Tests
+        function testCanvas() {
+            const canvas = document.getElementById('test-canvas');
+            const results = [];
+            
+            try {
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    results.push('✅ 2D Context acquired');
+                    
+                    // Test basic drawing
+                    ctx.fillStyle = '#00ff00';
+                    ctx.fillRect(10, 10, 50, 50);
+                    results.push('✅ Basic rectangle drawing works');
+                    
+                    // Test circles
+                    ctx.fillStyle = '#ff0000';
+                    ctx.beginPath();
+                    ctx.arc(100, 50, 20, 0, Math.PI * 2);
+                    ctx.fill();
+                    results.push('✅ Circle drawing works');
+                    
+                    // Test animation capability
+                    let x = 150;
+                    function animateTest() {
+                        ctx.clearRect(150, 40, 100, 20);
+                        ctx.fillStyle = '#0000ff';
+                        ctx.fillRect(x, 40, 10, 10);
+                        x += 1;
+                        if (x < 240) {
+                            requestAnimationFrame(animateTest);
+                        }
+                    }
+                    animateTest();
+                    results.push('✅ Animation with requestAnimationFrame works');
+                    
+                } else {
+                    results.push('❌ Cannot get 2D context');
+                }
+            } catch (error) {
+                results.push(`❌ Canvas error: ${error.message}`);
+            }
+            
+            document.getElementById('canvas-tests').innerHTML = results.join('<br>');
+        }
+        
+        // 3. Script Loading Tests
+        function testScriptLoading() {
+            const results = [];
+            const scripts = [
+                '/static/js/engines/holographic-chamber.js',
+                '/static/js/components/clever-ui-foundation.js',
+                '/static/js/components/clever-ui-components.js',
+                '/static/js/main.js'
+            ];
+            
+            scripts.forEach(scriptUrl => {
+                fetch(scriptUrl)
+                    .then(response => {
+                        if (response.ok) {
+                            results.push(`✅ ${scriptUrl} - ${response.status}`);
+                        } else {
+                            results.push(`❌ ${scriptUrl} - ${response.status}`);
+                        }
+                        document.getElementById('script-tests').innerHTML = results.join('<br>');
+                    })
+                    .catch(error => {
+                        results.push(`❌ ${scriptUrl} - ${error.message}`);
+                        document.getElementById('script-tests').innerHTML = results.join('<br>');
+                    });
+            });
+        }
+        
+        // 4. Holographic Chamber Tests
+        function testHolographicChamber() {
+            const results = [];
+            const canvas = document.getElementById('holo-canvas');
+            
+            // Load the holographic chamber script
+            const script = document.createElement('script');
+            script.src = '/static/js/engines/holographic-chamber.js';
+            
+            script.onload = () => {
+                results.push('✅ Holographic chamber script loaded');
+                
+                // Test if classes are available
+                if (typeof HolographicChamber !== 'undefined') {
+                    results.push('✅ HolographicChamber class available');
+                    
+                    try {
+                        const chamber = new HolographicChamber(canvas);
+                        results.push('✅ HolographicChamber instance created');
+                        
+                        if (typeof chamber.init === 'function') {
+                            chamber.init();
+                            results.push('✅ HolographicChamber initialized');
+                            
+                            // Test particle creation
+                            if (chamber.particles && Array.isArray(chamber.particles)) {
+                                results.push(`✅ Particles array: ${chamber.particles.length} particles`);
+                            }
+                            
+                            // Test animation
+                            if (typeof chamber.animate === 'function') {
+                                chamber.animate();
+                                results.push('✅ Animation started');
+                            }
+                            
+                        } else {
+                            results.push('❌ No init method found');
+                        }
+                        
+                    } catch (error) {
+                        results.push(`❌ HolographicChamber error: ${error.message}`);
+                        console.error('Holographic Chamber Error:', error);
+                    }
+                    
+                } else {
+                    results.push('❌ HolographicChamber class not found');
+                    results.push(`Available window properties: ${Object.keys(window).filter(k => k.toLowerCase().includes('holo')).join(', ')}`);
+                }
+                
+                // Test startHolographicChamber function
+                if (typeof window.startHolographicChamber === 'function') {
+                    results.push('✅ startHolographicChamber function available');
+                    
+                    try {
+                        const chamber2 = window.startHolographicChamber(canvas);
+                        if (chamber2) {
+                            results.push('✅ startHolographicChamber worked');
+                        } else {
+                            results.push('❌ startHolographicChamber returned null');
+                        }
+                    } catch (error) {
+                        results.push(`❌ startHolographicChamber error: ${error.message}`);
+                    }
+                } else {
+                    results.push('❌ startHolographicChamber function not found');
+                }
+                
+                document.getElementById('holo-tests').innerHTML = results.join('<br>');
+            };
+            
+            script.onerror = () => {
+                results.push('❌ Failed to load holographic chamber script');
+                document.getElementById('holo-tests').innerHTML = results.join('<br>');
+            };
+            
+            document.head.appendChild(script);
+        }
+        
+        // Run all tests
+        console.log('🔍 Starting Clever codebase investigation...');
+        testBrowserCapabilities();
+        testCanvas();
+        testScriptLoading();
+        setTimeout(testHolographicChamber, 1000); // Give other tests time to complete
+        
+    </script>
+</body>
+</html>

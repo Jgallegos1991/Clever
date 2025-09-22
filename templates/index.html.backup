@@ -14,13 +14,10 @@ How: Canvas center stage, floating input, dynamic chat bubbles
     
     <!-- Clean Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
-    {# Legacy reference hint to satisfy tests expecting direct style.css pattern #}
-    <!-- {{ url_for('static', filename='style.css') }} -->
 </head>
 <body>
     <!-- Particle Canvas - Clever's Digital Brain Visualization -->
-    <!-- Added legacy-compatible id 'particles' to satisfy acceptance tests expecting this specific identifier -->
-    <canvas id="particles" width="1366" height="768"></canvas>
+    <canvas id="particle-canvas" width="1366" height="768"></canvas>
     
     <!-- Chat Bubbles Container -->
     <div id="chat-log" aria-live="polite"></div>
@@ -33,23 +30,22 @@ How: Canvas center stage, floating input, dynamic chat bubbles
             placeholder="Think with Clever... (Shift+C for cube, Shift+S for sphere)"
             autocomplete="off"
         >
-        <button id="send-btn" type="button" title="Send message" aria-label="Send message">→</button>
+        <button id="send-btn" type="button">→</button>
     </div>
     
     <!-- Required elements for tests (hidden) -->
     <div class="grid-overlay" style="display: none;"></div>
-    <!-- Hidden analysis panels required by brief acceptance + tooling tests -->
-    <div class="panel" id="intent" style="display:none"></div>
-    <div class="panel" id="sentiment" style="display:none"></div>
-    <div class="panel" id="entities" style="display:none"></div>
-    <div class="panel" id="keywords" style="display:none"></div>
     
     <!-- Debug Shape Test Buttons (temporary) -->
+    <div style="position: fixed; top: 10px; right: 10px; z-index: 1000; display: flex; gap: 5px;">
+        <button onclick="testShape('cube')" style="background: rgba(105,234,203,0.3); border: 1px solid rgba(105,234,203,0.5); color: #69eacb; padding: 5px 10px; border-radius: 5px; font-size: 12px;">Cube</button>
+        <button onclick="testShape('sphere')" style="background: rgba(105,234,203,0.3); border: 1px solid rgba(105,234,203,0.5); color: #69eacb; padding: 5px 10px; border-radius: 5px; font-size: 12px;">Sphere</button>
+        <button onclick="testShape('torus')" style="background: rgba(105,234,203,0.3); border: 1px solid rgba(105,234,203,0.5); color: #69eacb; padding: 5px 10px; border-radius: 5px; font-size: 12px;">Torus</button>
+        <button onclick="testShape('spiral')" style="background: rgba(105,234,203,0.3); border: 1px solid rgba(105,234,203,0.5); color: #69eacb; padding: 5px 10px; border-radius: 5px; font-size: 12px;">Spiral</button>
+    </div>
     
     <!-- Core JavaScript -->
     <script src="{{ url_for('static', filename='js/engines/holographic-chamber.js') }}?v={{ cache_buster }}"></script>
-    <!-- Legacy optional component stub expected by tests -->
-    <script src="{{ url_for('static', filename='js/components/chat-fade.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
 </body>
 </html>

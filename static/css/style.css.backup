@@ -1,0 +1,1503 @@
+/*:root {
+
+Clever Digital Brain Extension - Core Styles  /* UI Brief core colors */
+
+  --bg-cosmic: #0B0F14;
+
+Why: Minimal, performance-optimized styling for immersive cognitive enhancement  --bg-cosmic-2: #121821;
+
+Where: Main stylesheet loaded by templates/index.html   --fg: #e9f1fb;
+
+How: Clean CSS with particle system focus and floating UI elements  --muted: #95a3b3;
+
+  --neon-teal: #69EACB;
+
+Connects to:  --neon-magenta: #FF6BFF;
+
+    - templates/index.html: Main UI structure  --soft-cyan: #33ccff;
+
+    - static/js/engines/holographic-chamber.js: Particle system styling hooks  --chip: #0f1b24;
+
+    - static/js/main.js: Dynamic chat bubble classes  --bubble: #101821;
+
+*/  --glow-teal: rgba(105, 234, 203, 0.35);
+
+  --glow-magenta: rgba(255, 107, 255, 0.35);
+
+/* CSS Reset - Minimal and Modern */  --glass-bg: rgba(11, 15, 20, 0.7);
+
+*, *::before, *::after {}
+
+  box-sizing: border-box;
+
+  margin: 0;* { box-sizing: border-box; }
+
+  padding: 0;html, body { height: 100%; }
+
+}
+
+body {
+
+html {  margin: 0; 
+
+  font-size: 16px;  color: var(--fg);
+
+  scroll-behavior: smooth;  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+
+}  /* Dark cosmic background as per UI Brief */
+
+  background: 
+
+body {    radial-gradient(1200px 800px at 15% -20%, rgba(105, 234, 203, 0.08), transparent 70%),
+
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;    radial-gradient(1000px 600px at 85% 120%, rgba(255, 107, 255, 0.06), transparent 70%),
+
+  font-weight: 400;    linear-gradient(180deg, var(--bg-cosmic) 0%, var(--bg-cosmic-2) 100%);
+
+  line-height: 1.6;  /* Magical space ambient */
+
+  color: #e6edf3;  min-height: 100vh;
+
+  background: #0a0a0a;  overflow: hidden;
+
+  overflow: hidden;}
+
+  height: 100vh;
+
+  -webkit-font-smoothing: antialiased;/* Particle Canvas - legacy Clever UI */
+
+  -moz-osx-font-smoothing: grayscale;#particles {
+
+}  position: fixed;
+
+  top: 0;
+
+/* Particle Canvas - Clever's Digital Brain Visualization */  left: 0;
+
+#particle-canvas {  width: 100%;
+
+  position: fixed;  height: 100%;
+
+  top: 0;  pointer-events: none;
+
+  left: 0;  z-index: 5;
+
+  width: 100vw;  opacity: 1;
+
+  height: 100vh;  background: transparent;
+
+  z-index: 1;}
+
+  background: radial-gradient(ellipse at center, #0d1117 0%, #000000 100%);
+
+  pointer-events: none;#particles.active {
+
+}  opacity: 1;
+
+  filter: none;
+
+/* Chat Bubbles - Floating Thought Flow */}
+
+#chat-log {
+
+  position: fixed;/* Status indicator - cosmic status */
+
+  top: 0;.selfcheck { 
+
+  left: 0;  position: fixed; 
+
+  width: 100vw;  top: 8px; 
+
+  height: 100vh;  right: 12px; 
+
+  z-index: 100;  font-size: 12px; 
+
+  pointer-events: none;  padding: 8px 16px; 
+
+  overflow: hidden;  border-radius: 999px; 
+
+}  background: rgba(11, 15, 20, 0.8); 
+
+  color: var(--muted); 
+
+.chat-bubble {  opacity: 0.9; 
+
+  position: absolute;  z-index: 9999; 
+
+  max-width: 350px;  border: 1px solid rgba(105, 234, 203, 0.08);
+
+  padding: 1rem 1.5rem;  backdrop-filter: blur(8px);
+
+  background: rgba(13, 17, 23, 0.9);  transition: all 0.8s ease; /* Slowed down from 0.4s to 0.8s for more comfortable selfcheck transitions */
+
+  border: 1px solid rgba(105, 234, 203, 0.3);  font-weight: 500;
+
+  border-radius: 20px;}
+
+  color: #e6edf3;
+
+  font-size: 14px;.selfcheck.ok { 
+
+  line-height: 1.4;  background: rgba(19, 52, 30, 0.8); 
+
+  backdrop-filter: blur(15px);  color: #bff0c6; 
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);  border-color: var(--neon-teal);
+
+  opacity: 0;  box-shadow: 0 0 16px rgba(105, 234, 203, 0.15);
+
+  transform: translateY(20px);}
+
+  animation: bubbleFloat 0.6s ease-out forwards, bubbleFade 20s ease-in-out;
+
+  pointer-events: auto;.selfcheck.error {
+
+  word-wrap: break-word;  background: rgba(52, 19, 19, 0.8);
+
+  will-change: transform, opacity;  color: #ffb3b3;
+
+}  border-color: #ff6b6b;
+
+  box-shadow: 0 0 16px rgba(255, 107, 107, 0.15);
+
+.chat-bubble.user {}
+
+  background: rgba(105, 234, 203, 0.1);
+
+  border-color: rgba(105, 234, 203, 0.5);.selfcheck.warning {
+
+  color: #69eacb;  background: rgba(52, 45, 19, 0.8);
+
+}  color: #ffe0b3;
+
+  border-color: #ffb366;
+
+.chat-bubble.ai {  box-shadow: 0 0 16px rgba(255, 179, 102, 0.15);
+
+  background: rgba(79, 172, 254, 0.1);}
+
+  border-color: rgba(79, 172, 254, 0.4);
+
+  color: #4facfe;/* Thinking state: subtle animated dots */
+
+}.selfcheck.thinking {
+
+  background: rgba(18, 24, 33, 0.85);
+
+/* Floating Input - Minimal and Unobtrusive */  color: var(--soft-cyan);
+
+.floating-input {  border-color: rgba(105, 234, 203, 0.35);
+
+  position: fixed;  box-shadow: 0 0 16px rgba(105, 234, 203, 0.15);
+
+  bottom: 2rem;}
+
+  left: 50%;.selfcheck.thinking::after {
+
+  transform: translateX(-50%);  content: ' …';
+
+  z-index: 1000;  animation: dots 2.0s steps(4, end) infinite; /* Slowed down thinking dots from 1.2s to 2.0s */
+
+  opacity: 0;}
+
+  animation: inputGlow 2s ease-out 1s forwards;@keyframes dots { 0%, 20% { opacity: 0 } 50% { opacity: 1 } 100% { opacity: 0 } }
+
+}
+
+/* Manifestation Canvas */
+
+.input-container {/* MAGICAL MANIFESTATION ANIMATIONS */
+
+  display: flex;.manifesting {
+
+  align-items: center;    opacity: 0;
+
+  background: rgba(13, 17, 23, 0.8);    transform: scale(0.8) translateY(20px);
+
+  border: 1px solid rgba(105, 234, 203, 0.3);    transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Slowed down from 0.8s to 1.2s for smoother manifesting animation */
+
+  border-radius: 25px;}
+
+  padding: 0.5rem 1rem;
+
+  backdrop-filter: blur(10px);.manifested {
+
+  box-shadow: 0 4px 20px rgba(105, 234, 203, 0.1);    opacity: 1;
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);    transform: scale(1) translateY(0);
+
+  min-width: 400px;}
+
+  max-width: 80vw;
+
+}/* Magical status overlay */
+
+#magical-status {
+
+.input-container:focus-within {    position: fixed;
+
+  border-color: rgba(105, 234, 203, 0.6);    top: 20px;
+
+  box-shadow: 0 4px 30px rgba(105, 234, 203, 0.2);    left: 50%;
+
+  background: rgba(13, 17, 23, 0.95);    transform: translateX(-50%);
+
+}    background: rgba(18, 24, 33, 0.9);
+
+    backdrop-filter: blur(10px);
+
+#chat-input {    border: 1px solid rgba(105, 234, 203, 0.3);
+
+  flex: 1;    padding: 8px 16px;
+
+  background: transparent;    border-radius: 20px;
+
+  border: none;    color: #69EACB;
+
+  outline: none;    font-size: 14px;
+
+  color: #e6edf3;    font-weight: 500;
+
+  font-size: 16px;    opacity: 0;
+
+  font-weight: 400;    transition: opacity 1.0s ease; /* Slowed down from 0.5s to 1.0s for gentler fade transitions */
+
+  padding: 0.5rem;    pointer-events: none;
+
+  letter-spacing: 0.01em;    z-index: 1000;
+
+}}
+
+
+
+#chat-input::placeholder {#magical-status.active {
+
+  color: rgba(230, 237, 243, 0.5);    opacity: 1;
+
+  font-weight: 300;    animation: statusPulse 1.0s ease-out; /* Slowed down from 0.5s to 1.0s for gentler pulse animation */
+
+}}
+
+
+
+#send-btn {@keyframes statusPulse {
+
+  background: transparent;    0% { transform: translateX(-50%) scale(0.9); }
+
+  border: none;    50% { transform: translateX(-50%) scale(1.05); }
+
+  color: rgba(105, 234, 203, 0.7);    100% { transform: translateX(-50%) scale(1); }
+
+  cursor: pointer;}
+
+  padding: 0.5rem;
+
+  margin-left: 0.5rem;/* Enhanced message animations */
+
+  border-radius: 50%;.message {
+
+  transition: all 0.3s ease;    transition: all 0.6s ease; /* Slowed down from 0.3s to 0.6s for gentler message transitions */
+
+  display: flex;}
+
+  align-items: center;
+
+  justify-content: center;/* Why: Support ephemeral chat bubbles that gracefully disappear to keep visual focus on the holographic chamber
+
+}   Where: Consumed by JS (appendMessage in static/js/main.js) which adds 'fading' before removing node
+
+   How: Apply opacity + slight upward drift + pointer-events removal for smooth fade-out */
+
+#send-btn:hover {.message.fading {
+
+  color: #69eacb;  opacity: 0 !important;
+
+  background: rgba(105, 234, 203, 0.1);  transform: translateY(-12px) scale(0.95) !important;
+
+}  pointer-events: none;
+
+  transition: opacity 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+/* Animations - Smooth and Natural */  filter: blur(2px);
+
+@keyframes bubbleFloat {}
+
+  from {
+
+    opacity: 0;/* Why: Keep pinned messages visible; Where: toggled by main.js pin logic; How: disable fading visuals */
+
+    transform: translateY(30px) scale(0.95);.message.pinned { box-shadow: 0 0 0 1px rgba(105,234,203,0.35), 0 0 18px -4px rgba(105,234,203,0.45); }
+
+  }
+
+  to {/* Pause state (hover) prevents removal; subtle lift */
+
+    opacity: 1;.message.paused:not(.pinned):not(.fading) { transform: translateY(-2px) scale(1.005); }
+
+    transform: translateY(0) scale(1);
+
+  }/* Pin button inside bubble */
+
+}.pin-btn {
+
+  position: absolute;
+
+@keyframes bubbleFade {  top: 4px;
+
+  0%, 70% {  right: 6px;
+
+    opacity: 1;  background: rgba(11,15,20,0.55);
+
+  }  border: 1px solid rgba(105,234,203,0.25);
+
+  100% {  color: var(--neon-teal);
+
+    opacity: 0;  font-size: 11px;
+
+    transform: translateY(-10px);  line-height: 1;
+
+  }  padding: 2px 4px;
+
+}  border-radius: 6px;
+
+  cursor: pointer;
+
+@keyframes inputGlow {  opacity: 0;
+
+  from {  transition: opacity .25s ease, background .25s ease;
+
+    opacity: 0;}
+
+    transform: translateX(-50%) translateY(20px);.message:hover .pin-btn { opacity: 1; }
+
+  }.pin-btn:hover { background: rgba(105,234,203,0.15); }
+
+  to {
+
+    opacity: 1;/* Chat stream layout - floating ephemeral bubbles that give particle stage center focus */
+
+    transform: translateX(-50%) translateY(0);.chat-stream { 
+
+  }  position: fixed; 
+
+}  bottom: 7rem; 
+
+  left: 50%; 
+
+/* Accessibility - Respect User Preferences */  transform: translateX(-50%); 
+
+@media (prefers-reduced-motion: reduce) {  width: min(720px, 88vw); 
+
+  * {  display: flex; 
+
+    animation-duration: 0.01ms !important;  flex-direction: column; 
+
+    animation-iteration-count: 1 !important;  gap: 0.8rem; 
+
+    transition-duration: 0.01ms !important;  padding: 0 1rem; 
+
+  }  max-height: 50vh; 
+
+}  overflow-y: auto; 
+
+  scrollbar-width: none; 
+
+/* Mobile Responsiveness */  z-index: 15; /* Lower z-index to de-emphasize vs particles */
+
+@media (max-width: 768px) {  pointer-events: none; /* Messages opt-in for interactions */
+
+  .input-container {}
+
+    min-width: 300px;.chat-stream::-webkit-scrollbar { display: none; }
+
+    max-width: 90vw;
+
+    padding: 0.6rem 1rem;/* Toast notifications */
+
+  }#toast-stack .toast { 
+
+    background: rgba(18,24,33,0.9); 
+
+  #chat-input {  border:1px solid rgba(105,234,203,0.25); 
+
+    font-size: 16px; /* Prevent zoom on iOS */  color: var(--fg); 
+
+  }  font: 12px/1.3 system-ui,-apple-system,Segoe UI,Roboto; 
+
+    padding:8px 12px; 
+
+  .chat-bubble {  border-radius:10px; 
+
+    max-width: 280px;  box-shadow:0 6px 22px -8px #000; 
+
+    font-size: 13px;  opacity:0; 
+
+    padding: 0.8rem 1.2rem;  transform: translateY(8px) scale(.98); 
+
+  }  transition: opacity .35s ease, transform .45s cubic-bezier(.4,.16,.2,1);
+
+    pointer-events:auto;
+
+  .floating-input {}
+
+    bottom: 1.5rem;#toast-stack .toast.visible { opacity:1; transform:translateY(0) scale(1); }
+
+  }#toast-stack .toast.toast-error { border-color:#ff6b6b; color:#ffb3b3; }
+
+}#toast-stack .toast.toast-info { border-color:rgba(105,234,203,0.4); }
+
+
+
+/* Performance Optimizations */
+
+#particle-canvas {.message.manifesting {
+
+  contain: strict;    opacity: 0;
+
+}    transform: translateY(30px) scale(0.95);
+}
+
+.message.manifested {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Magical analysis panel updates */
+.analysis-panel.updated {
+    border-color: #69EACB;
+    box-shadow: 0 0 20px rgba(105, 234, 203, 0.3);
+    animation: analysisGlow 1s ease-out;
+}
+
+@keyframes analysisGlow {
+    0% { 
+        background: rgba(18, 24, 33, 0.9);
+        transform: scale(1);
+    }
+    50% { 
+        background: rgba(105, 234, 203, 0.1);
+        transform: scale(1.02);
+    }
+    100% { 
+        background: rgba(18, 24, 33, 0.9);
+        transform: scale(1);
+    }
+}
+
+/* Enhanced particle canvas effects */
+#manifestation-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+    z-index: 1;
+    opacity: 0.9;
+    transition: opacity 1.0s ease; /* Slowed down from 0.5s to 1.0s for gentler opacity transitions */
+}
+
+#manifestation-canvas:hover {
+    opacity: 1;
+}
+
+/* Frosted glass manifestation effect */
+.glass-manifesting {
+    background: rgba(18, 24, 33, 0.1);
+    backdrop-filter: blur(2px);
+    border: 1px solid rgba(105, 234, 203, 0.1);
+    transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.glass-manifested {
+    background: rgba(18, 24, 33, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(105, 234, 203, 0.3);
+}
+
+/* Magical input field enhancements */
+#user-input:focus {
+    border-color: #69EACB;
+    box-shadow: 0 0 15px rgba(105, 234, 203, 0.3);
+    animation: inputSummon 1.0s ease-out; /* Slowed down from 0.5s to 1.0s for gentler input summoning */
+}
+
+@keyframes inputSummon {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(105, 234, 203, 0);
+    }
+    50% { 
+        transform: scale(1.02);
+        box-shadow: 0 0 20px rgba(105, 234, 203, 0.4);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(105, 234, 203, 0.3);
+    }
+}
+
+/* Enhanced entity tags */
+.entity-tag {
+    background: rgba(105, 234, 203, 0.2);
+    border: 1px solid rgba(105, 234, 203, 0.3);
+    color: #69EACB;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin: 2px;
+    display: inline-block;
+    transition: all 0.6s ease; /* Slowed down from 0.3s to 0.6s for gentler chip transitions */
+    animation: entityManifest 1.0s ease-out; /* Slowed down from 0.5s to 1.0s for gentler chip manifestation */
+}
+
+@keyframes entityManifest {
+    0% { 
+        opacity: 0;
+        transform: scale(0.8) translateY(10px);
+    }
+    100% { 
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.entity-tag:hover {
+    background: rgba(105, 234, 203, 0.3);
+    transform: scale(1.05);
+}
+
+/* Holographic Grid Stage - Reactive Energy Field */
+.grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.06;
+    background-image: 
+        linear-gradient(rgba(105, 234, 203, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(105, 234, 203, 0.12) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridPulse 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2; /* Behind particles but visible */
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+@keyframes gridPulse {
+    0%, 100% { 
+        opacity: 0.06; 
+        transform: perspective(1000px) rotateX(0deg);
+    }
+    50% { 
+        opacity: 0.12; 
+        transform: perspective(1000px) rotateX(1deg);
+    }
+}
+
+/* Grid ripple effect when Clever is active */
+.grid-overlay.ripple {
+    animation: gridRipple 1.5s ease-out;
+}
+
+@keyframes gridRipple {
+    0% { 
+        transform: perspective(1000px) rotateX(0deg) scale(1);
+        opacity: 0.06;
+    }
+    30% { 
+        transform: perspective(1000px) rotateX(2deg) scale(1.02);
+        opacity: 0.25;
+        filter: brightness(1.5) saturate(1.3);
+    }
+    70% {
+        transform: perspective(1000px) rotateX(-1deg) scale(0.98);
+        opacity: 0.15;
+    }
+    100% { 
+        transform: perspective(1000px) rotateX(0deg) scale(1);
+        opacity: 0.06;
+    }
+}
+
+/* Enhanced button with magical effects */
+#send-button {
+    background: linear-gradient(135deg, rgba(105, 234, 203, 0.2), rgba(255, 107, 255, 0.2));
+    border: 1px solid rgba(105, 234, 203, 0.4);
+    transition: all 0.3s ease;
+}
+
+#send-button:hover {
+    background: linear-gradient(135deg, rgba(105, 234, 203, 0.3), rgba(255, 107, 255, 0.3));
+    border-color: #69EACB;
+    box-shadow: 0 0 15px rgba(105, 234, 203, 0.4);
+    transform: scale(1.05);
+}
+
+#send-button:active {
+    animation: buttonManifest 0.5s ease-out; /* Slowed down from 0.2s to 0.5s for gentler button manifestation */
+}
+
+@keyframes buttonManifest {
+    0% { transform: scale(1.05); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1.05); }
+}
+
+/* Magical scrollbar for chat */
+#chat-log::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chat-log::-webkit-scrollbar-track {
+    background: rgba(18, 24, 33, 0.5);
+    border-radius: 4px;
+}
+
+#chat-log::-webkit-scrollbar-thumb {
+    background: rgba(105, 234, 203, 0.3);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+#chat-log::-webkit-scrollbar-thumb:hover {
+    background: rgba(105, 234, 203, 0.5);
+}
+
+/* Magical loading states */
+.thinking::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(105, 234, 203, 0.3);
+    border-top: 2px solid #69EACB;
+    border-radius: 50%;
+    animation: magicalSpin 1s linear infinite;
+    margin-left: 8px;
+}
+
+@keyframes magicalSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}/* Holographic grid plane - canvas of possibility */
+.grid-full::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    linear-gradient(rgba(105, 234, 203, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(105, 234, 203, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px; 
+  transform: perspective(800px) rotateX(70deg) translateY(40%);
+  filter: blur(0.3px);
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+/* Ripple effect when Clever thinks - alive canvas */
+.grid-full.thinking::before {
+  animation: magical-ripple 3s ease-in-out infinite;
+  background-size: 68px 68px, 68px 68px;
+  filter: blur(0.1px);
+  opacity: 0.9;
+}
+
+@keyframes magical-ripple {
+  0% { 
+    background-size: 60px 60px, 60px 60px;
+    opacity: 0.6;
+    background-image: 
+      linear-gradient(rgba(105, 234, 203, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(105, 234, 203, 0.04) 1px, transparent 1px);
+  }
+  33% { 
+    background-size: 72px 72px, 72px 72px;
+    opacity: 0.8;
+    background-image: 
+      linear-gradient(rgba(105, 234, 203, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(105, 234, 203, 0.08) 1px, transparent 1px);
+  }
+  66% { 
+    background-size: 76px 76px, 76px 76px;
+    opacity: 0.9;
+    background-image: 
+      linear-gradient(rgba(255, 107, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 107, 255, 0.06) 1px, transparent 1px);
+  }
+  100% { 
+    background-size: 60px 60px, 60px 60px;
+    opacity: 0.6;
+    background-image: 
+      linear-gradient(rgba(105, 234, 203, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(105, 234, 203, 0.04) 1px, transparent 1px);
+  }
+}
+
+/* Clean modern layout - centered conversation */
+/* HUD overlay - interface emerges from the void */
+.hud {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.chat-panel {
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 80px;
+  pointer-events: auto;
+      animation: fadeInUp 1.2s ease-out; /* Slowed down from 0.6s to 1.2s for gentler fade-in animation */
+}
+
+.chat {
+  max-height: 60vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+  /* Clean scrolling */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.chat::-webkit-scrollbar {
+  display: none;
+}
+
+/* Clean modern message bubbles - float gracefully in/out */
+.message { 
+  max-width: 75%;
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  animation: messageSlideIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Slowed down from 0.6s to 1.2s for gentler message slide-in */
+  pointer-events: auto; /* Allow interactions on messages */
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  position: relative;
+}
+
+.chat-text {
+  display: block;
+  font-size: 1.18rem;
+  color: var(--fg);
+  margin: 12px 0 0 0;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.25,0.46,0.45,0.94), filter 1.2s;
+  filter: drop-shadow(0 2px 8px rgba(105,234,203,0.12));
+}
+.chat-text.manifesting {
+  opacity: 0;
+}
+.chat-text.manifested {
+  opacity: 1;
+  filter: drop-shadow(0 2px 16px rgba(105,234,203,0.18));
+}
+.chat-text.fading {
+  opacity: 0;
+  transition: opacity 4s linear;
+}
+.message.user { 
+  align-self: flex-end;
+}
+
+.message.user .chip {
+  text-align: right;
+  color: rgba(105, 234, 203, 0.8);
+}
+
+.message.user .bubble {
+  background: linear-gradient(135deg, rgba(105, 234, 203, 0.2), rgba(105, 234, 203, 0.1));
+  border: 1px solid rgba(105, 234, 203, 0.3);
+  backdrop-filter: blur(20px);
+}
+
+.message.ai { 
+  align-self: flex-start;
+}
+
+.message.ai .chip {
+  color: rgba(255, 107, 255, 0.8);
+}
+
+.message.ai .bubble {
+  background: rgba(16, 24, 33, 0.4);
+  border: 1px solid rgba(255, 107, 255, 0.2);
+  backdrop-filter: blur(20px);
+}
+
+/* Clean modern input bar */
+.entrybar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  width: min(700px, 90vw);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px;
+  background: rgba(11, 15, 20, 0.8);
+  border: 1px solid rgba(105, 234, 203, 0.2);
+  border-radius: 25px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 3;
+  transition: all 0.5s ease; /* Slowed down from 0.2s to 0.5s for gentler entrybar transitions */
+}
+
+.entrybar:focus-within {
+  border-color: rgba(105, 234, 203, 0.4);
+  box-shadow: 0 4px 30px rgba(105, 234, 203, 0.15);
+}
+
+.entrybar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 16px 20px;
+  color: var(--fg);
+  font-size: 15px;
+  outline: none;
+}
+
+.entrybar input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.entrybar .icon-btn {
+  height: 38px;
+  width: 38px;
+  border-radius: 50%;
+  background: rgba(105, 234, 203, 0.1);
+  border: 1px solid rgba(105, 234, 203, 0.3);
+  color: var(--neon-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.5s ease; /* Slowed down from 0.2s to 0.5s for gentler icon button transitions */
+  font-size: 16px;
+}
+
+.entrybar .icon-btn:hover {
+  background: rgba(105, 234, 203, 0.2);
+  transform: scale(1.05);
+}
+
+/* Subtle analysis panel */
+.analysis-panel {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(11, 15, 20, 0.6);
+  border: 1px solid rgba(105, 234, 203, 0.1);
+  backdrop-filter: blur(15px);
+  z-index: 2;
+  max-width: 280px;
+  font-size: 12px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.analysis-panel:hover {
+  opacity: 1;
+  justify-content: flex-end;
+  padding: 24px;
+  z-index: 2;
+}
+
+.chat-panel {
+  align-self: flex-end;
+  max-width: 560px;
+  width: 100%;
+  margin-bottom: 16px;
+  animation: panel-emerge 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.chat {
+  max-height: 45vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px;
+}
+
+/* Ethereal chat bubbles that don't dominate the particle stage */
+.message { 
+  max-width: 80%;
+  padding: 10px 12px; 
+  border-radius: 14px; 
+  background: rgba(16, 24, 33, 0.3); /* More transparent */
+  border: 1px solid rgba(105, 234, 203, 0.12);
+  box-shadow: 0 0 12px rgba(105, 234, 203, 0.08);
+  backdrop-filter: blur(12px);
+  opacity: 0.9; /* Slightly transparent by default */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.message .chip {
+  display: inline-block;
+  font-size: 12px;
+  color: #69EACB;
+  border: 1px solid rgba(105, 234, 203, 0.35);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  background: rgba(16, 24, 33, 0.6);
+}
+.message .bubble {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--fg);
+}
+.message.user { 
+  align-self: flex-end; 
+  border-color: rgba(105, 234, 203, 0.25);
+  box-shadow: 0 0 15px rgba(105, 234, 203, 0.15);
+}
+.message.ai { 
+  align-self: flex-start; 
+  border-color: rgba(255, 107, 255, 0.25);
+  box-shadow: 0 0 15px rgba(255, 107, 255, 0.15);
+}
+
+.message:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(105, 234, 203, 0.2);
+}
+
+/* Frosted bottom entry bar */
+.entrybar {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  width: min(860px, 92vw);
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(16, 24, 33, 0.6);
+  border: 1px solid rgba(105, 234, 203, 0.25);
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 28px rgba(105, 234, 203, 0.15);
+  z-index: 3;
+}
+.entrybar input {
+  width: 100%;
+  background: rgba(10, 14, 20, 0.5);
+  border: 1px solid rgba(105, 234, 203, 0.25);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--fg);
+  outline: none;
+}
+.entrybar .icon-btn {
+  height: 44px;
+  width: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(105, 234, 203, 0.16), rgba(255, 107, 255, 0.12));
+  border: 1px solid rgba(105, 234, 203, 0.35);
+  color: var(--fg);
+}
+.entrybar .icon-btn:hover {
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.25);
+}
+
+/* Analysis card floating under chat */
+.analysis-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 108px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(16, 24, 33, 0.65);
+  border: 1px solid rgba(105, 234, 203, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 2;
+  max-width: 420px;
+}
+.analysis-panel h3 { margin: 0 0 8px 0; font-size: 14px; color: var(--muted); }
+
+/* Chat container layout */
+.hud .chat { 
+  background: transparent;
+  padding: 8px;
+}
+.hud .chat-panel .chat { 
+  display: flex; 
+  flex-direction: column; 
+}
+
+/* Modern smooth animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes messageSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(1.02);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+@keyframes panel-emerge {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Frosted glass messages - crystallized thoughts */
+.msg {
+  max-width: 78%;
+  padding: 16px 18px;
+  border-radius: 16px;
+  line-height: 1.5;
+  backdrop-filter: blur(12px);
+  position: relative;
+  animation: msg-condense 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* User messages - electric teal glow */
+.msg.you {
+  margin-left: auto;
+  background: var(--glass-bg);
+  border: 1px solid var(--neon-teal);
+  box-shadow: 
+    0 0 32px var(--glow-teal),
+    inset 0 1px 0 rgba(105, 234, 203, 0.2);
+}
+
+/* Assistant messages - soft cyan with frosted glass */
+.msg.clever {
+  margin-right: auto;
+  background: rgba(18, 24, 33, 0.4);
+  border: 1px solid rgba(105, 234, 203, 0.12);
+  box-shadow: 
+    0 0 24px rgba(105, 234, 203, 0.08),
+    inset 0 1px 0 rgba(105, 234, 203, 0.08);
+}
+
+/* System messages */
+.msg.system {
+  margin: 0 auto;
+  background: rgba(52, 45, 19, 0.3);
+  border: 1px solid rgba(255, 179, 102, 0.2);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Thinking message - special magical style */
+.msg.thinking {
+  background: rgba(255, 107, 255, 0.1);
+  border: 1px solid rgba(255, 107, 255, 0.3);
+  animation: thinking-pulse 2s ease-in-out infinite;
+}
+
+@keyframes thinking-pulse {
+  0% { 
+    opacity: 0.7;
+    border-color: rgba(255, 107, 255, 0.3);
+  }
+  50% { 
+    opacity: 1;
+    border-color: rgba(255, 107, 255, 0.6);
+    box-shadow: 0 0 20px rgba(255, 107, 255, 0.2);
+  }
+  100% { 
+    opacity: 0.7;
+    border-color: rgba(255, 107, 255, 0.3);
+  }
+}
+
+.thinking-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-style: italic;
+  color: rgba(255, 107, 255, 0.9);
+}
+
+.thinking-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.thinking-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 107, 255, 0.7);
+  animation: thinking-dot 1.4s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(1) { animation-delay: 0s; }
+.thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes thinking-dot {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Magical manifestation animation */
+@keyframes msg-condense {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    filter: blur(8px);
+    background: rgba(105, 234, 203, 0.02);
+  }
+  40% {
+    opacity: 0.6;
+    transform: scale(0.95) translateY(8px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Entry bar - condensed from particle field */
+.entrybar {
+  display: flex;
+  justify-content: center;
+  animation: entry-materialize 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  width: min(720px, 92vw);
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(11, 15, 20, 0.7);
+  border: 1px solid var(--neon-teal);
+  border-radius: 18px;
+  backdrop-filter: blur(16px);
+  box-shadow: 
+    0 0 40px var(--glow-teal),
+    inset 0 1px 0 rgba(105, 234, 203, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.entry:focus-within {
+  border-color: var(--neon-magenta);
+  box-shadow: 
+    0 0 48px var(--glow-magenta),
+    inset 0 1px 0 rgba(255, 107, 255, 0.2);
+}
+
+@keyframes entry-materialize {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.85);
+    filter: blur(8px);
+    background: rgba(105, 234, 203, 0.05);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-5px) scale(1.02);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.entry input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.entry input::placeholder {
+  color: rgba(149, 163, 179, 0.7);
+  transition: color 0.3s ease;
+}
+
+.entry:focus-within input::placeholder {
+  color: rgba(255, 107, 255, 0.6);
+}
+
+.entry select {
+  background: rgba(11, 15, 20, 0.8);
+  color: var(--fg);
+  border: 1px solid rgba(105, 234, 203, 0.3);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  backdrop-filter: blur(8px);
+}
+
+.entry .icon {
+  background: rgba(11, 15, 20, 0.6);
+  border: 1px solid rgba(105, 234, 203, 0.4);
+  color: var(--fg);
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.entry .icon:hover {
+  border-color: var(--neon-teal);
+  box-shadow: 0 0 20px var(--glow-teal);
+  background: rgba(11, 15, 20, 0.8);
+}
+
+.entry .icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Microphone - magical voice activation */
+.mic-btn {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mic-btn.listening {
+  background: rgba(255, 107, 255, 0.2) !important;
+  border-color: var(--neon-magenta) !important;
+  box-shadow: 0 0 32px var(--glow-magenta) !important;
+  animation: pulse-magical 2s infinite;
+}
+
+@keyframes pulse-magical {
+  0% { 
+    transform: scale(1); 
+    box-shadow: 0 0 24px var(--glow-magenta);
+  }
+  50% { 
+    transform: scale(1.08); 
+    box-shadow: 0 0 40px rgba(255, 107, 255, 0.8);
+  }
+  100% { 
+    transform: scale(1);
+    box-shadow: 0 0 24px var(--glow-magenta);
+  }
+}
+
+/* Magical scrollbars - cosmic energy flows */
+.chat::-webkit-scrollbar {
+  width: 12px;
+}
+
+.chat::-webkit-scrollbar-track {
+  background: rgba(11, 15, 20, 0.3);
+  border-radius: 6px;
+}
+
+.chat::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, 
+    rgba(105, 234, 203, 0.15) 0%, 
+    rgba(105, 234, 203, 0.25) 50%,
+    rgba(255, 107, 255, 0.15) 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(105, 234, 203, 0.1);
+  transition: all 0.3s ease;
+}
+
+.chat::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, 
+    rgba(105, 234, 203, 0.3) 0%, 
+    rgba(105, 234, 203, 0.4) 50%,
+    rgba(255, 107, 255, 0.25) 100%);
+  box-shadow: 0 0 8px rgba(105, 234, 203, 0.2);
+}
+
+/* Clean mode — minimal magical focus */
+body.clean .entry select { display: none; }
+body.clean #files-btn,
+body.clean #ingest-btn { display: none; }
+body.clean .entry {
+  box-shadow: 0 0 20px rgba(105, 234, 203, 0.1); 
+  border-color: rgba(105, 234, 203, 0.15);
+}
+body.clean .msg.you {
+  box-shadow: 0 0 16px rgba(105, 234, 203, 0.08);
+}
+body.clean .msg {
+  border-color: rgba(105, 234, 203, 0.08);
+}
+body.clean .grid-full::before {
+  opacity: 0.3;
+  background-image: 
+    linear-gradient(rgba(105, 234, 203, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(105, 234, 203, 0.02) 1px, transparent 1px);
+}
+
+/* Responsive design */
+/* Responsive design */
+@media (max-width: 768px) {
+  .hud {
+    padding: 12px;
+@media (max-width: 768px) {
+  .hud {
+    padding: 16px;
+  }
+  
+  .chat-panel {
+    max-width: 100%;
+    margin-bottom: 100px;
+  }
+  
+  .entrybar {
+    width: calc(100vw - 24px);
+    bottom: 12px;
+  }
+  
+  .entrybar input {
+    padding: 14px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .message .bubble {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  
+  .analysis-panel {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+    font-size: 11px;
+  }
+  
+  .selfcheck {
+    top: 8px;
+    right: 8px;
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+  
+  .entry {
+    width: 100%;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  
+  .entry input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .msg {
+    max-width: 85%;
+    padding: 14px 16px;
+  }
+  
+  .selfcheck {
+    top: 4px;
+    right: 4px;
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .message {
+    max-width: 90%;
+  }
+  
+  .message .bubble {
+    padding: 12px 14px;
+    border-radius: 16px;
+  }
+  
+  .entrybar {
+    padding: 4px;
+  }
+  
+  .entrybar .icon-btn {
+    height: 34px;
+    width: 34px;
+    font-size: 14px;
+  }
+}
+
+@media (max-height: 600px) {
+  .chat {
+    max-height: 50vh;
+  }
+  
+  .chat-panel {
+    margin-bottom: 60px;
+  }
+}
+
+  .entry .icon {
+    padding: 8px 10px;
+  }
+  
+  .entry select {
+    display: none; /* Hide voice select on small screens */
+  }
+  
+  .msg {
+    max-width: 90%;
+    padding: 12px 14px;
+  }
+}

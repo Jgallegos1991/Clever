@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Canvas Test</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; padding: 20px; }
+        canvas { border: 1px solid #0f0; }
+        .result { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Canvas Test</h1>
+    <canvas id="test" width="200" height="200"></canvas>
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        const canvas = document.getElementById('test');
+        
+        function addResult(message) {
+            const div = document.createElement('div');
+            div.className = 'result';
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        addResult('Canvas element: ' + (canvas ? 'Found' : 'Not found'));
+        
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            addResult('2D Context: ' + (ctx ? 'Available' : 'Not available'));
+            
+            if (ctx) {
+                // Draw a simple test
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(10, 10, 50, 50);
+                addResult('Drawing test: Rectangle drawn');
+                
+                // Test animation
+                let x = 70;
+                function animate() {
+                    ctx.clearRect(70, 10, 120, 50);
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(x, 10, 10, 10);
+                    x += 2;
+                    if (x < 180) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        addResult('Animation test: Completed');
+                    }
+                }
+                animate();
+                
+            } else {
+                addResult('ERROR: Canvas 2D context not supported');
+            }
+        } else {
+            addResult('ERROR: Canvas element not found');
+        }
+        
+        addResult('Browser: ' + navigator.userAgent);
+        addResult('Test completed at: ' + new Date().toLocaleTimeString());
+    </script>
+</body>
+</html>

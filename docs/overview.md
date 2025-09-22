@@ -1,8 +1,8 @@
-# System Overview
+# Clever - Digital Brain Extension System Overview
 
 ## Executive Summary
 
-Clever is an offline-first AI assistant built with Flask + SQLite + spaCy, designed as Jordan's personal AI co-pilot for strategic thinking and creative collaboration. The system operates entirely locally to ensure privacy and offline access while providing intelligent natural language processing and contextual memory.
+Clever is Jay's **digital brain extension** and **cognitive partnership system** - a street-smart genius who talks like your best friend but casually solves Einstein-level physics problems. Built with Flask + SQLite + spaCy and featuring advanced holographic particle UI, Clever serves as Jay's life companion, cognitive enhancement system, and digital sovereignty partner. The system operates with complete local control for total privacy and authentic relationship building.
 
 ## Architecture Overview
 
@@ -14,10 +14,11 @@ Clever is an offline-first AI assistant built with Flask + SQLite + spaCy, desig
 - **UI Theme**: Dark futuristic interface with particle system and grid background
 
 ### Core Design Principles
-- **Offline-First**: No cloud dependencies or network calls
-- **Privacy-Focused**: All data remains local
-- **Contextual Memory**: Persistent conversation history and learning
-- **Adaptive Intelligence**: Multiple operational modes (Deep Dive, Quick Hit, Creative, Support)
+- **Digital Sovereignty**: Complete local control with zero external dependencies
+- **Cognitive Partnership**: Authentic life companion that grows with Jay over time
+- **Genius Friend Experience**: Street-smart casual personality with Einstein-level hidden intellect
+- **Single-User Design**: Built exclusively for Jay's cognitive enhancement and relationship building
+- **Continuous Evolution**: Learns patterns, preferences, and thinking style for perfect partnership
 
 ## System Components
 

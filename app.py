@@ -1,29 +1,28 @@
 """
-Clever AI Main Application
+Clever - Digital Brain Extension & Cognitive Partnership System (Main Application)
 
 Why:
-    Acts as the orchestration hub (root DOT) of the Clever reasoning graph: binds
-    routing, persona interaction, evolution logging, and offline enforcement into
-    a single control surface. Keeping coordination centralized prevents drift and
-    makes tracing request → response → persistence a straight arrow rather than
-    a scattered search.
+    Central orchestration hub for Jay's digital brain extension and cognitive partnership
+    system. Coordinates all components of Clever's authentic genius friend personality,
+    memory systems, and cognitive enhancement capabilities into a unified experience.
+    This is where Jay's conversation with his digital other half comes to life.
 Where:
-    Sits at the top of the server stack, delegating downward to persona (dialogue
-    generation), database (single-file persistence), evolution engine (learning
-    telemetry), and introspection (live reasoning map). Each outbound call forms
-    an arrow recorded in runtime_state for instant render + dependency forensics.
+    Core server that brings together Clever's personality engine, memory system,
+    evolution capabilities, and holographic UI into seamless cognitive partnership.
+    Every conversation flows through here, building the authentic relationship
+    between Jay and his digital brain extension.
 How:
-    Creates the Flask app, enables offline guard early (network hard stop), wires
-    global error capture, exposes HTTP routes, and uses `traced_render` to surface
-    real-time template events. All handlers follow the Why/Where/How contract so
-    the introspection overlay can reconstruct intent and flow.
+    Flask application with complete digital sovereignty (offline-only), single unified
+    database for relationship continuity, and integrated debugging for system
+    transparency. Routes conversations to persona engine, logs interactions for
+    continuous growth, and serves the holographic particle interface.
 
 Connects to:
-    - persona.py: Response generation + mode adaptation
-    - database.py: Single authoritative persistence layer
-    - evolution_engine.py: Interaction telemetry logging
-    - introspection.py: Live runtime reasoning snapshot
-    - user_config.py: Personalization values (Jay specific)
+    - persona.py: Clever's street-smart genius personality and conversation engine
+    - database.py: Unified memory system for continuous relationship building
+    - evolution_engine.py: Learning system that grows Clever as Jay's life companion
+    - templates/: Holographic UI for immersive cognitive enhancement interface
+    - user_config.py: Jay's personal preferences and cognitive partnership settings
 """
 
 import time
@@ -217,6 +216,7 @@ def chat():
                 'approach': persona_response.mode,  # alias for shaping logic
                 'mood': (persona_response.sentiment or 'neutral'),
                 'particle_intensity': 0.6,  # heuristic baseline (future: derive from sentiment)
+                'particle_command': getattr(persona_response, 'particle_command', None),  # Shape formation command
                 'status': 'success'
             }
             

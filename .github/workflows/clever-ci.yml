@@ -104,7 +104,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: file-inventory
+          name: file-inventory-${{ matrix.python-version }}-${{ github.run_id }}
           path: file-inventory.md
 
       - name: Upload reasoning artifacts
@@ -164,11 +164,11 @@ jobs:
       - name: Upload performance results
         uses: actions/upload-artifact@v4
         with:
-          name: perf-results
+          name: perf-results-${{ github.run_id }}
           path: perf_results.txt
       - name: Upload performance history
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: perf-history
+          name: perf-history-${{ github.run_id }}
           path: perf_history.jsonl

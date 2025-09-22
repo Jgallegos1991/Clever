@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clever UI Foundation Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #d9e7ef;
+            font-family: Inter, system-ui;
+            overflow: hidden;
+        }
+        
+        #particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .demo-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(11, 15, 20, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(105, 234, 203, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            max-width: 300px;
+        }
+        
+        .demo-controls h3 {
+            margin: 0 0 12px 0;
+            color: #69EACB;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .demo-controls button {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: rgba(105, 234, 203, 0.1);
+            border: 1px solid rgba(105, 234, 203, 0.3);
+            border-radius: 6px;
+            color: #69EACB;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-controls button:hover {
+            background: rgba(105, 234, 203, 0.2);
+            border-color: rgba(105, 234, 203, 0.5);
+        }
+        
+        .demo-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(11, 15, 20, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(105, 234, 203, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            max-width: 400px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .demo-info h4 {
+            margin: 0 0 8px 0;
+            color: #69EACB;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    
+    <div class="demo-controls">
+        <h3>🧠 UI Foundation Demo</h3>
+        <button onclick="showAnalysisDisplay()">📊 Analysis Display</button>
+        <button onclick="showFloatingPanel()">🪟 Floating Panel</button>
+        <button onclick="showChatBubbleAI()">💬 AI Chat Bubble</button>
+        <button onclick="showChatBubbleUser()">👤 User Chat Bubble</button>
+        <button onclick="showStatusInfo()">ℹ️ Status Info</button>
+        <button onclick="showStatusSuccess()">✅ Status Success</button>
+        <button onclick="showStatusFormation()">🔮 Formation Status</button>
+        <button onclick="showSystemInfo()">🖥️ System Info Panel</button>
+        <button onclick="clearAll()">🧹 Clear All</button>
+    </div>
+    
+    <div class="demo-info">
+        <h4>Foundation System</h4>
+        <p>This demonstrates the stable UI foundation that can recreate the holographic interfaces from your screenshots.</p>
+        <p><strong>Performance:</strong> Chrome OS optimized with 60fps targeting</p>
+        <p><strong>Modular:</strong> Component-based system prevents "UI hell"</p>
+        <p><strong>Stable:</strong> Proper lifecycle management and cleanup</p>
+    </div>
+
+    <!-- UI Foundation Scripts -->
+    <script>
+        // Mock holographic chamber for demo
+        window.holographicChamber = {
+            particles: Array(800).fill(null),
+            currentFormation: 'whirlpool'
+        };
+    </script>
+    <script src="/static/js/clever-ui-foundation.js"></script>
+    <script src="/static/js/clever-ui-components.js"></script>
+    
+    <script>
+        // Initialize foundation
+        let uiFoundation;
+        let componentCounter = 0;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof CleverUIFoundation === 'function') {
+                uiFoundation = new CleverUIFoundation();
+                console.log('🧠 UI Foundation initialized for demo');
+            }
+        });
+        
+        // Demo functions
+        function showAnalysisDisplay() {
+            if (!uiFoundation) return;
+            
+            const id = `analysis-${++componentCounter}`;
+            const analysis = uiFoundation.createComponent('AnalysisDisplay', id, {
+                title: 'Cognitive Analysis',
+                position: { x: 'auto', y: 'auto' }
+            });
+            
+            if (analysis) {
+                analysis.updateAnalysis({
+                    intent: 'UI Foundation Testing',
+                    mood: 'focused_creative',
+                    keywords: ['holographic', 'stable', 'modular', 'brain'],
+                    formation: 'cube'
+                });
+            }
+        }
+        
+        function showFloatingPanel() {
+            if (!uiFoundation) return;
+            
+            const id = `panel-${++componentCounter}`;
+            uiFoundation.createComponent('FloatingPanel', id, {
+                title: 'Holographic Interface',
+                content: `
+                    <div style="line-height: 1.5;">
+                        <p>This floating panel demonstrates the stable foundation system.</p>
+                        <p><strong>Features:</strong></p>
+                        <ul style="margin: 8px 0; padding-left: 16px;">
+                            <li>Auto-positioning</li>
+                            <li>Performance monitoring</li>
+                            <li>Proper lifecycle</li>
+                            <li>Chrome OS optimized</li>
+                        </ul>
+                    </div>
+                `,
+                width: 280,
+                style: 'holographic'
+            });
+        }
+        
+        function showChatBubbleAI() {
+            if (!uiFoundation) return;
+            
+            const messages = [
+                "Neural pathways crystallizing...",
+                "I can see the holographic patterns forming!",
+                "This foundation system is working beautifully.",
+                "Your digital brain extension is coming online."
+            ];
+            
+            const message = messages[Math.floor(Math.random() * messages.length)];
+            uiFoundation.createComponent('ChatBubble', `bubble-ai-${++componentCounter}`, {
+                message: message,
+                role: 'ai',
+                autoHide: true,
+                hideDelay: 8000
+            });
+        }
+        
+        function showChatBubbleUser() {
+            if (!uiFoundation) return;
+            
+            const messages = [
+                "Show me the analysis",
+                "This looks incredible!",
+                "Form a cube",
+                "The particles are beautiful"
+            ];
+            
+            const message = messages[Math.floor(Math.random() * messages.length)];
+            uiFoundation.createComponent('ChatBubble', `bubble-user-${++componentCounter}`, {
+                message: message,
+                role: 'user',
+                autoHide: true,
+                hideDelay: 6000
+            });
+        }
+        
+        function showStatusInfo() {
+            if (!uiFoundation) return;
+            
+            const status = uiFoundation.createComponent('StatusIndicator', `status-${++componentCounter}`, {
+                text: 'Neural Link Active',
+                type: 'info',
+                position: 'top-right'
+            });
+            
+            setTimeout(() => {
+                if (status) uiFoundation.removeComponent(status.id);
+            }, 4000);
+        }
+        
+        function showStatusSuccess() {
+            if (!uiFoundation) return;
+            
+            const status = uiFoundation.createComponent('StatusIndicator', `status-${++componentCounter}`, {
+                text: 'Foundation Stable',
+                type: 'success',
+                position: 'top-center'
+            });
+            
+            setTimeout(() => {
+                if (status) uiFoundation.removeComponent(status.id);
+            }, 4000);
+        }
+        
+        function showStatusFormation() {
+            if (!uiFoundation) return;
+            
+            const formations = ['cube', 'sphere', 'helix', 'torus', 'galaxy'];
+            const formation = formations[Math.floor(Math.random() * formations.length)];
+            
+            const status = uiFoundation.createComponent('StatusIndicator', `status-${++componentCounter}`, {
+                text: `Formation: ${formation}`,
+                type: 'formation',
+                position: 'bottom-center'
+            });
+            
+            setTimeout(() => {
+                if (status) uiFoundation.removeComponent(status.id);
+            }, 5000);
+        }
+        
+        function showSystemInfo() {
+            if (!uiFoundation) return;
+            
+            const systemData = `
+                <div style="font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.6;">
+                    <div style="color: #69EACB; margin-bottom: 8px;">CLEVER DIGITAL BRAIN v2.0</div>
+                    <div>Components: ${uiFoundation.componentCount}</div>
+                    <div>Performance: 60fps target</div>
+                    <div>Memory: Optimized</div>
+                    <div>Formation: Active</div>
+                    <div style="margin-top: 12px;">
+                        <div style="color: #69EACB;">Foundation Status:</div>
+                        <div>✓ Lifecycle Management</div>
+                        <div>✓ Performance Monitoring</div>
+                        <div>✓ Chrome OS Optimized</div>
+                        <div>✓ Modular Architecture</div>
+                    </div>
+                    <div style="margin-top: 8px; color: #69EACB;">
+                        Neural Link: ●●● STABLE
+                    </div>
+                </div>
+            `;
+            
+            uiFoundation.createComponent('FloatingPanel', `system-${++componentCounter}`, {
+                title: 'System Status',
+                content: systemData,
+                width: 300,
+                style: 'analysis'
+            });
+        }
+        
+        function clearAll() {
+            if (!uiFoundation) {
+                console.log('No foundation to clear');
+                return;
+            }
+            
+            const count = uiFoundation.componentCount;
+            uiFoundation.cleanup();
+            console.log(`Cleared ${count} components`);
+        }
+        
+        // Performance monitoring
+        setInterval(() => {
+            if (uiFoundation && uiFoundation.performanceMonitor) {
+                const stats = uiFoundation.performanceMonitor.getStats();
+                if (stats.fps < 50) {
+                    console.warn('Performance warning: FPS dropped to', stats.fps);
+                }
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

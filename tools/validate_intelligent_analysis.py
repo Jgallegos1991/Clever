@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
+
 """
 Intelligent Analysis System Validation Test
 
@@ -17,23 +18,19 @@ Connects to:
     - introspection.py: Enhanced runtime state integration
     - debug_config.py: Performance monitoring integration
 """
-import os
 import sys
 import tempfile
 import time
 from pathlib import Path
-from typing import Dict, List
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
     from intelligent_analyzer import (
-        IntelligentAnalyzer, 
         get_intelligent_analysis,
         analyze_single_component,
-        get_fix_recommendations,
-        AnalysisResult
+        get_fix_recommendations
     )
     from debug_config import get_debugger, performance_monitor
     ANALYSIS_AVAILABLE = True

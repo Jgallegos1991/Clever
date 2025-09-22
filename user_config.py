@@ -1,22 +1,42 @@
 """
-User Configuration Module - Personal settings for Jay's Clever AI system.
+User Configuration - Jay's Personal Cognitive Partnership Settings
 
-Why: Centralizes all user-specific configuration including identity, network
-     settings, and preferences while maintaining offline-first architecture
-     and supporting optional Tailscale integration for secure remote access.
+Why: Jay's personalized configuration for authentic relationship building with Clever.
+     Stores preferences that help Clever become the perfect digital brain extension
+     and cognitive partner while maintaining complete privacy and local control.
 
-Where: Imported by config.py and app.py during initialization to configure
-       Clever AI with user-specific settings and security preferences.
+Where: Core of Clever's single-user design - imported by all systems that need to
+       understand Jay's preferences, communication style, and cognitive enhancement
+       needs for authentic partnership.
 
-How: Defines constants for user identity, network configuration, security
-     settings, and development options with clear documentation for each
-     setting and its security implications.
+How: Personal settings that enable Clever to grow as Jay's life companion and
+     digital other half. Supports organic relationship building without fake
+     familiarity - real connection that develops over time.
 """
 
 # User Identity Configuration
 USER_NAME = "Jay"
 USER_EMAIL = "lapirfta@gmail.com"
 USER_FULL_NAME = "Jordan Gallegos"
+
+# Family and Personal Details
+FAMILY_INFO = {
+    "mom": "Lucy",
+    "brothers": ["Ronnie", "Peter"],
+    "sons": {
+        "Josiah": {"lives_with": "Jay", "location": "local"},
+        "Jonah": {"lives_with": "mom", "location": "Tijuana"}
+    }
+}
+
+# Clever's Personality Settings
+CLEVER_PERSONALITY = {
+    "relationship_level": "childhood_friend",  # How familiar Clever should be
+    "casual_speech": True,  # Use casual language and slang
+    "remember_family": True,  # Reference family members naturally
+    "street_smart": True,  # Use street-smart, natural speech patterns
+    "check_in_frequency": "often"  # How often to ask about family
+}
 
 
 # Tailscale Network Configuration

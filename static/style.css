@@ -298,12 +298,13 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.08;
+    opacity: 0.25; /* Increased from 0.08 to 0.25 for much better visibility */
     background-image: 
-        linear-gradient(rgba(105, 234, 203, 0.15) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(105, 234, 203, 0.15) 1px, transparent 1px);
+        linear-gradient(rgba(105, 234, 203, 0.35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(105, 234, 203, 0.35) 1px, transparent 1px);
     background-size: 40px 40px;
-    animation: gridPulse 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 2px rgba(105, 234, 203, 0.3)); /* Add subtle glow */
+    animation: gridPulse 3s ease-in-out infinite; /* Faster pulse: 3s instead of 6s for more frequent visibility */
     pointer-events: none;
     z-index: 0;
     transform-style: preserve-3d;
@@ -312,12 +313,12 @@ body {
 
 @keyframes gridPulse {
     0%, 100% { 
-        opacity: 0.06; 
+        opacity: 0.20; /* Increased from 0.06 to 0.20 for better base visibility */
         transform: perspective(800px) rotateX(0deg);
     }
     50% { 
-        opacity: 0.12; 
-        transform: perspective(800px) rotateX(1deg);
+        opacity: 0.40; /* Increased from 0.12 to 0.40 for stronger pulse effect */
+        transform: perspective(800px) rotateX(2deg); /* Increased rotation for more drama */
     }
 }
 
@@ -329,20 +330,20 @@ body {
 @keyframes gridRipple {
     0% { 
         transform: perspective(800px) rotateX(0deg) scale(1);
-        opacity: 0.08;
+        opacity: 0.25; /* Increased from 0.08 to match new base visibility */
     }
     30% { 
-        transform: perspective(800px) rotateX(2deg) scale(1.02);
-        opacity: 0.25;
-        filter: brightness(1.5) saturate(1.3);
+        transform: perspective(800px) rotateX(4deg) scale(1.05); /* More dramatic effect */
+        opacity: 0.70; /* Much more visible peak */
+        filter: brightness(2.0) saturate(1.8); /* Brighter, more saturated */
     }
     70% {
-        transform: perspective(800px) rotateX(-1deg) scale(0.98);
-        opacity: 0.15;
+        transform: perspective(800px) rotateX(-2deg) scale(0.95); /* Stronger reverse effect */
+        opacity: 0.45; /* Better visibility throughout */
     }
     100% { 
         transform: perspective(800px) rotateX(0deg) scale(1);
-        opacity: 0.08;
+        opacity: 0.25; /* Return to enhanced base */
     }
 }
 

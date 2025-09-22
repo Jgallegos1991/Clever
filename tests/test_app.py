@@ -1,7 +1,4 @@
-import os
-import json
 import tempfile
-import types
 import pytest
 
 import importlib.util

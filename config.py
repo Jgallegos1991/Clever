@@ -1,20 +1,22 @@
 """
-Central configuration for Clever AI
+Central Configuration for Clever - Digital Brain Extension & Cognitive Partnership System
 
-Why: Provides centralized configuration management with environment variable
-support, user-specific settings, and default values to enable consistent
-configuration across all components while supporting customization.
-Where: Imported by all modules requiring configuration settings including
-database paths, server settings, sync directories, and operational parameters.
-How: Implements configuration hierarchy with environment variables, user config
-overrides, and sensible defaults with .env file support for development.
+Why: Core configuration hub that enables Clever's digital sovereignty and cognitive
+partnership capabilities. Ensures all components work together as a unified brain
+extension system with complete local control and privacy.
+Where: Foundation layer imported by all Clever modules - from conversation engine
+to memory system to particle UI. Creates the consistent environment needed for 
+authentic cognitive partnership.
+How: Hierarchical configuration with environment variables, user personalization,
+and secure defaults. Single database design ensures coherent memory system for
+continuous relationship building with Jay.
 
 Connects to:
-    - user_config.py: User-specific configuration overrides and personalization
-    - database.py: Uses DB_PATH for centralized database configuration
-    - sync modules: Uses SYNC_DIR and SYNAPTIC_HUB_DIR for file operations
-    - app.py: Server configuration including host, port, and debug settings
-    - All modules: Centralized configuration source for system-wide settings
+    - user_config.py: Jay's personal preferences and cognitive enhancement settings
+    - database.py: Single unified memory system (clever.db) for relationship continuity
+    - persona.py: Personality settings for authentic genius friend experience
+    - app.py: Local server configuration for complete digital sovereignty
+    - All cognitive systems: Unified configuration for seamless brain extension
 """
 
 import os
