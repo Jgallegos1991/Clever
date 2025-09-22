@@ -25,8 +25,13 @@ import threading
 import time
 from collections import deque
 from typing import Any, Callable, Deque, Dict, List, Optional, Set
+ backup/local-pre-pull-2025-09-22
+from pathlib import Path
+import ast
+
 from pathlib import Path  # Reintroduced for code health scanning
 import ast  # Reintroduced for static analysis of functions
+ main
 
 # Regular expression to extract Why/Where/How sections from docstrings (case-insensitive)
 _SECTION_RE = re.compile(r"^(why|where|how)\s*:\s*(.*)$", re.IGNORECASE)
@@ -390,7 +395,11 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
     reasoning_graph = _build_reasoning_graph(endpoints, app)
     concept_graph = _build_concept_graph()
 
+ backup/local-pre-pull-2025-09-22
+    # Code health + component graph (best-effort, never raise)
+
     # Code health + dependency graph (best-effort; never raise to caller)
+ main
     try:
         code_health = _scan_code_health()
     except Exception as e:  # noqa: BLE001
@@ -400,8 +409,15 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
     except Exception as e:  # noqa: BLE001
         component_graph = {"error": f"component graph failed: {e}"}
 
+ backup/local-pre-pull-2025-09-22
+    # Ensure JSON serializability: convert any sets (or nested sets) to lists.
+    def _json_safe(obj):  # Why: Prevent Flask jsonify from failing on set types
+        # Where: Applied just before assembling final runtime_state dict
+        # How: Recursively walk basic containers and convert set -> sorted list
+
     # JSON safety pass (convert sets recursively)
     def _json_safe(obj):  # Why: Prevent jsonify errors on set output
+ main
         if isinstance(obj, set):
             try:
                 return sorted(list(obj))
@@ -410,7 +426,11 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
         if isinstance(obj, dict):
             return {k: _json_safe(v) for k, v in obj.items()}
         if isinstance(obj, (list, tuple)):
+ backup/local-pre-pull-2025-09-22
+            return [ _json_safe(v) for v in obj ]
+
             return [_json_safe(v) for v in obj]
+ main
         return obj
     code_health = _json_safe(code_health)
     component_graph = _json_safe(component_graph)
@@ -491,17 +511,36 @@ def register_error_handler(app):
 
     return app
 
+ backup/local-pre-pull-2025-09-22
+
+# ---------------------------------------------------------------------------
+# Code Health & Dependency Graph Enhancements
+
 # ---------------------------------------------------------------------------
 # Code Health & Dependency Graph Enhancements (restored)
+ main
 # ---------------------------------------------------------------------------
 
 def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
     """Perform lightweight repository code health scan.
 
+ backup/local-pre-pull-2025-09-22
+    Why: Provide instant, in-memory insight for debugging / drift detection without
+         requiring an external audit phase (fast feedback loop for contributors).
+    Where: Data returned inside `runtime_state` under `code_health`; can be surfaced
+            by debug overlay or CLI tooling to highlight documentation / conflict issues.
+    How: Walks project root (bounded), parses Python files with `ast` to measure
+         function-level Why/Where/How docstring presence, detects merge conflict
+         markers, and scans for prohibited meta token leakage patterns.
+
+    Returns:
+        Dictionary containing counts, percentages, and limited samples of gaps.
+
     Why: Provide instant in-memory insight for drift detection (docstring coverage,
          merge conflicts, meta token leakage) without external tooling.
     Where: Returned via runtime_state -> used by debug overlay / tests.
     How: Walk project tree (bounded), parse AST for functions and inspect docstrings.
+ main
     """
     root = Path(__file__).resolve().parent
     py_files: List[Path] = []
@@ -512,6 +551,10 @@ def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
         py_files.append(p)
         if len(py_files) >= max_files:
             break
+ backup/local-pre-pull-2025-09-22
+
+
+ main
     conflict_markers = 0
     meta_token_hits = 0
     functions_total = 0
@@ -525,9 +568,16 @@ def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
             text = file_path.read_text(encoding="utf-8", errors="ignore")
         except Exception:
             continue
+ backup/local-pre-pull-2025-09-22
+        if "<<<<<<<" in text or ">>>>>>>" in text:
+            conflict_markers += 1
+        if meta_pattern.search(text):
+            # Count each file once for meta leakage to avoid overweighting
+
         if "<<<<<<" in text or ">>>>>>>" in text:
             conflict_markers += 1
         if meta_pattern.search(text):
+ main
             meta_token_hits += 1
         try:
             tree = ast.parse(text)
@@ -540,6 +590,19 @@ def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
                 has_why = bool(re.search(r"\bwhy\s*:", doc, re.IGNORECASE))
                 has_where = bool(re.search(r"\bwhere\s*:", doc, re.IGNORECASE))
                 has_how = bool(re.search(r"\bhow\s*:", doc, re.IGNORECASE))
+ backup/local-pre-pull-2025-09-22
+                if has_why:
+                    functions_with_why += 1
+                if has_where:
+                    functions_with_where += 1
+                if has_how:
+                    functions_with_how += 1
+                if not (has_why and has_where and has_how) and len(missing_samples) < 12:
+                    rel = file_path.relative_to(root)
+                    missing_samples.append(f"{rel}:{getattr(node, 'name','<anon>')}")
+    coverage_percent = (functions_with_why / functions_total * 100.0) if functions_total else 100.0
+    # Conservative combined coverage: functions with all tokens / total
+
                 if has_why: functions_with_why += 1
                 if has_where: functions_with_where += 1
                 if has_how: functions_with_how += 1
@@ -547,6 +610,7 @@ def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
                     rel = file_path.relative_to(root)
                     missing_samples.append(f"{rel}:{getattr(node,'name','<anon>')}")
     coverage_percent = (functions_with_why / functions_total * 100.0) if functions_total else 100.0
+ main
     combined_with_all = min(functions_with_why, functions_with_where, functions_with_how)
     combined_percent = (combined_with_all / functions_total * 100.0) if functions_total else 100.0
     return {
@@ -562,6 +626,40 @@ def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
         "missing_samples": missing_samples,
         "generated_ts": time.time(),
     }
+
+ backup/local-pre-pull-2025-09-22
+
+def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[str, Any]:
+    """Build a lightweight component import graph (intra-project only).
+
+    Why: Enable quick visual tracing of module-level dependencies to spot
+         unintended couplings or circular risks during development.
+    Where: Returned in `runtime_state` under `component_graph`; can power the
+            same frontend graph visualization layer as reasoning graph.
+    How: Parses Python files with `ast` and records edges for imports that
+         reference modules present inside the project root. Applies size caps
+         to remain payload-friendly.
+    """
+    root = Path(__file__).resolve().parent
+    py_files: List[Path] = [p for p in root.glob("*.py")]
+    # Include select subdirs but keep shallow to reduce cost
+    for sub in ("utils", "tools", "tests"):
+        sub_path = root / sub
+        if sub_path.exists():
+            for p in (sub_path).rglob("*.py"):
+                py_files.append(p)
+    modules: Dict[str, Dict[str, Any]] = {}
+    edges: List[Dict[str, str]] = []
+    # Helper to normalize module id
+    def norm(p: Path) -> str:
+        rel = p.relative_to(root).as_posix()
+        return rel[:-3] if rel.endswith('.py') else rel
+    local_module_roots = set()
+    for p in py_files:
+        local_module_roots.add(norm(p))
+    for p in py_files:
+        if len(modules) >= max_nodes:
+            break
 
 def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[str, Any]:
     """Build import dependency graph across local modules.
@@ -585,17 +683,36 @@ def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[s
     local = {norm(p) for p in py_files}
     for p in py_files:
         if len(modules) >= max_nodes: break
+ main
         try:
             text = p.read_text(encoding='utf-8', errors='ignore')
             tree = ast.parse(text)
         except Exception:
             continue
         src_id = norm(p)
+ backup/local-pre-pull-2025-09-22
+        if src_id not in modules:
+            modules[src_id] = {"id": src_id, "label": src_id, "type": "module"}
+
         modules.setdefault(src_id, {"id": src_id, "label": src_id, "type": "module"})
+ main
         for node in ast.iter_child_nodes(tree):
             if isinstance(node, ast.Import):
                 for alias in node.names:
                     tgt = alias.name.split('.')[0]
+ backup/local-pre-pull-2025-09-22
+                    # Attempt to map to local module root variations
+                    for candidate in (tgt, f"{tgt}"):
+                        if candidate in local_module_roots:
+                            edges.append({"source": src_id, "target": candidate, "type": "import"})
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    tgt = node.module.split('.')[0]
+                    if tgt in local_module_roots:
+                        edges.append({"source": src_id, "target": tgt, "type": "import"})
+        if len(edges) >= max_edges:
+            break
+
                     if tgt in local:
                         edges.append({"source": src_id, "target": tgt, "type": "import"})
             elif isinstance(node, ast.ImportFrom):
@@ -604,6 +721,7 @@ def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[s
                     if tgt in local:
                         edges.append({"source": src_id, "target": tgt, "type": "import"})
         if len(edges) >= max_edges: break
+ main
     truncated = len(modules) > max_nodes or len(edges) > max_edges
     return {
         "nodes": list(modules.values())[:max_nodes],
@@ -611,3 +729,27 @@ def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[s
         "truncated": truncated,
         "generated_ts": time.time(),
     }
+ backup/local-pre-pull-2025-09-22
+
+
+def _scan_code_health() -> Dict[str, Any]:  # type: ignore[no-redef]
+    """Wrapper to satisfy potential re-import reload ordering.
+
+    Why: Allow safe monkey-patch or reload layering if future tooling wants to
+         override scanning behavior without modifying callers.
+    Where: Called once per `/api/runtime_introspect` invocation.
+    How: Delegates to internal implementation defined above.
+    """
+    # Simplified: call the internal implementation directly (no wrapper indirection)
+    return _scan_code_health_internal()
+
+
+# Preserve the original implementation under a stable internal name
+def _scan_code_health_internal():  # type: ignore
+    return _scan_code_health.__impl__()  # type: ignore[attr-defined]
+
+# Attach implementation reference for potential monkey patching
+_scan_code_health.__impl__ = globals().get('_scan_code_health')  # type: ignore
+
+
+ main
