@@ -12,22 +12,14 @@ Core Purpose:
     - Provides foundation for all text understanding in Clever
 
 Connects to:
-    - persona.py: Text analysis for response generation
-        * Sentiment for tone matching
-        * Keywords for context building
-        * Noise detection for clarification needs
-    - evolution_engine.py: Text processing for learning
-        * Entity extraction for knowledge updates
-        * Concept density for complexity assessment
-    - enhanced_conversation_engine.py: Rich conversation analysis
-        * Question type detection for appropriate responses
-        * Readability metrics for adaptive communication
-    - memory_engine.py: Semantic feature storage
-        * Keywords for memory indexing
-        * Entities for context retrieval
-    - holographic_particle_engine.py: Pattern recognition
-        * Topic vectors for particle state influence
-        * Sentiment for energy field modulation
+    - persona.py:
+        - `generate()` -> `get_nlp_processor()`: Lazily initializes the NLP processor.
+        - `generate()` -> `process_text()`: The core method called to analyze user input for keywords, sentiment, entities, and other metrics, which then drives the entire response generation logic.
+    - memory_engine.py: (Indirectly) The `MemoryContext` object, which is created in `persona.py` using the output from `process_text()`, is passed to `memory_engine.store_interaction()`. This is how NLP analysis results are persisted.
+    - file_ingestor.py:
+        - `ingest_file()` -> `nlp_processor.process_text()`: Used to extract keywords and entities from ingested text files to enrich the knowledge base.
+    - system_validator.py:
+        - `_validate_nlp_capabilities()` -> `nlp_processor.process()`: The validator calls the processor to ensure it is functional and returning the expected analysis structure.
 
 Processing Flow:
     1. Text input → tokenization → stopword removal
@@ -82,7 +74,7 @@ def _safe_lower(text: str) -> str:
 
 class SimpleNLPProcessor:
     """
-    Simple NLP processor for offline operation
+    Simple NLP processor for offline operation.
     
     Why: Provide text analysis without external dependencies
     Where: Core component for all text processing needs
@@ -95,34 +87,47 @@ class SimpleNLPProcessor:
     NOISE_REPEAT_THRESHOLD = 3
     NOISE_ENTROPY_THRESHOLD = 0.15
     
+    # Common English stopwords
+    STOPWORDS = {
+        'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+        'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+        'should', 'may', 'might', 'must', 'can', 'shall', 'to', 'of', 'in',
+        'for', 'on', 'with', 'at', 'by', 'from', 'about', 'into', 'through',
+        'during', 'before', 'after', 'above', 'below', 'up', 'down', 'out',
+        'off', 'over', 'under', 'again', 'further', 'then', 'once', 'and',
+        'but', 'or', 'nor', 'not', 'only', 'own', 'same', 'so', 'than',
+        'too', 'very', 'just', 'now', 'i', 'you', 'he', 'she', 'it', 'we',
+        'they', 'me', 'him', 'her', 'us', 'them',
+    }
+    
     def __init__(self):
         """
-        Initialize simple NLP processor
+        Initialize basic text processing capabilities.
         
         Why: Set up basic text processing capabilities
         Where: Called once during system initialization
         How: Define stopwords and basic processing rules
-        """
-        self.stopwords = {
-            'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 
-            'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 
-            'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 
-            'will', 'would', 'could', 'should', 'may', 'might', 'must', 
-            'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 
-            'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them'
-        }
-        
-    def process_text(self, text: str) -> Dict[str, Any]:
-        """
-        Process text and extract basic information
-        
-        Why: Provide comprehensive text analysis for system use
-        Where: Main entry point for all text processing
-        How: Combine multiple analysis methods into single result
         
         Connects to:
             - persona.py: Response generation analysis
             - evolution_engine.py: Learning and context extraction
+        """
+        self.stopwords = self.STOPWORDS
+    
+    def process_text(self, text: str) -> Dict[str, Any]:
+        """
+        Process text and extract features.
+        
+        Why: Main entry point for text analysis
+        Where: Called by persona.py, evolution_engine.py, memory_engine.py, enhanced_conversation_engine.py
+        How: Extracts keywords, sentiment, entities and metrics
+        
+        Args:
+            text: The text string to process
+            
+        Returns:
+            Dictionary containing extracted features including keywords,
+            sentiment, entities, word count, character count, and noise metrics
         """
         # Compute base extraction
         keywords = self.extract_keywords(text)

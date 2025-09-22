@@ -2,6 +2,14 @@
 // CONFIG NOTE: For best performance, render particles as simple pixels (fillRect) instead of blurred/glowing circles. This eliminates lag and ensures smooth animation even with high particle counts.
 // Quantum swarm with morphing behaviors: idle → summon → dialogue → dissolve
 
+// Initialize window properties if they don't exist
+if (typeof window.cleverIntent === 'undefined') {
+  window.cleverIntent = '';
+}
+if (typeof window.holographicChamber === 'undefined') {
+  window.holographicChamber = null;
+}
+
 class HolographicChamber {
   constructor(canvas) {
     this.canvas = canvas;

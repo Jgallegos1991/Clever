@@ -44,10 +44,17 @@ class SystemHealthMonitor:
         through the central debugger for structured logging.
 
     Connects to:
-        - debug_config.py: Structured logging & performance tracing
-        - database.py: Single database status & table stats
-        - evolution_engine.py: Learning/evolution progress signals
-        - psutil: System resource statistics
+        - debug_config.py:
+            - `get_debugger()`: Used to get the logger instance for logging health status.
+            - `performance_monitor()`: Decorator used to time the execution of health check functions.
+        - database.py:
+            - `check_database_health()` -> `DatabaseManager`: Connects to the database to check its size, and table statistics.
+        - evolution_engine.py:
+            - `check_evolution_engine()` -> `get_evolution_engine()`: Gets the engine instance to check its status and learning progress.
+        - config.py:
+            - `check_database_health()`: Reads `config.DB_PATH` to locate the database file.
+        - psutil: (Optional) Used to gather system resource metrics like CPU, memory, and disk usage.
+        - spacy, textblob, vaderSentiment: (Optional) The `check_nlp_components` function attempts to import and test these libraries to verify NLP capabilities.
     """
 
     def __init__(self):

@@ -8,11 +8,18 @@ How: Multi-layered memory architecture with semantic understanding, temporal con
 and relationship mapping for continuous learning and adaptation.
 
 Connects to:
-    - database.py: Persistent memory storage in clever.db
-    - persona.py: Context-aware response generation
-    - nlp_processor.py: Semantic analysis and understanding
-    - evolution_engine.py: Learning metrics and growth tracking
-    - app.py: Main interaction processing and memory updates
+    - database.py:
+        - `__init__(db_manager)`: Takes a `DatabaseManager` instance for all database operations.
+        - `_initialize_memory_schema()`: Creates all memory-related tables (`memory_nodes`, `conversation_context`, etc.).
+        - All methods with database interactions use `self.db._execute_query()` which relies on the `DatabaseManager`.
+    - persona.py:
+        - `generate()` -> `get_contextual_memory()`: The persona engine calls this to fetch relevant memories for generating a response.
+        - `generate()` -> `get_conversation_history()`: Called to get recent conversation turns for context.
+        - `generate()` -> `predict_preferences()`: Called to suggest the best response mode.
+        - `generate()` -> `store_interaction()`: The persona engine calls this after a response is generated to log the full interaction.
+    - nlp_processor.py: (Indirectly) The `MemoryContext` object processed by `store_interaction` is created in `persona.py` using the analysis (keywords, entities, sentiment) from the `nlp_processor`.
+    - config.py: The `get_memory_engine()` factory function uses `config.DB_PATH` to initialize the `DatabaseManager`.
+    - debug_config.py: `get_debugger()` is used for logging throughout the module.
 """
 import time
 import json

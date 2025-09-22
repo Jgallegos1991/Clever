@@ -14,9 +14,20 @@ metadata derived from Flask routes, parsed Why/Where/How sections, last error
 captured by a global error handler, and lightweight git version discovery.
 
 Connects to:
-    - app.py: Provides decorators and helper functions used in route handlers
-    - templates/index.html: Source of main render events tracked
-    - static/js/main.js: Frontend can poll runtime introspection for overlay
+    - app.py:
+        - `traced_render` is called by `app.py`'s `home()` route to render templates.
+        - `register_error_handler` is called in `app.py` to set up global error catching.
+        - `runtime_state` is called by the `/api/runtime_introspect` route in `app.py`.
+    - evolution_engine.py:
+        - `get_evolution_engine` is called by `_build_concept_graph` and `runtime_state` to fetch concept data and interaction statistics.
+    - intelligent_analyzer.py:
+        - `get_intelligent_analysis` is called by `runtime_state` to include AI-powered analysis in the introspection payload.
+    - tools/runtime_dump.py:
+        - This utility script consumes the JSON output from the `/api/runtime_introspect` endpoint.
+    - templates/index.html:
+        - The main HTML file whose rendering is tracked by `record_render`.
+    - static/js/main.js:
+        - The frontend JavaScript can poll the `/api/runtime_introspect` endpoint to display debug data.
 """
 from __future__ import annotations
 import inspect

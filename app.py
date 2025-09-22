@@ -18,11 +18,25 @@ How:
     continuous growth, and serves the holographic particle interface.
 
 Connects to:
-    - persona.py: Clever's street-smart genius personality and conversation engine
-    - database.py: Unified memory system for continuous relationship building
-    - evolution_engine.py: Learning system that grows Clever as Jay's life companion
-    - templates/: Holographic UI for immersive cognitive enhancement interface
-    - user_config.py: Jay's personal preferences and cognitive partnership settings
+    - persona.py:
+        - `clever_persona = PersonaEngine()`: Initializes the core personality engine.
+        - `chat()` -> `clever_persona.generate()`: Generates AI responses for user messages.
+        - `api_ping()` -> `clever_persona`: Checks the status of the persona engine.
+        - `api_runtime_introspect()` -> `runtime_state(persona_engine=...)`: Passes the persona engine for state inspection.
+    - database.py: (Indirectly) All persistence layers like `evolution_engine` and `persona`'s memory use the `db_manager` from `database.py` to interact with the single `clever.db` file.
+    - evolution_engine.py:
+        - `chat()` -> `get_evolution_engine().log_interaction()`: Logs every user interaction to enable system learning and growth.
+    - introspection.py:
+        - `register_error_handler(app)`: Installs a global error handler for runtime introspection.
+        - `home()` -> `traced_render()`: Wraps template rendering to record performance and context.
+        - `api_runtime_introspect()` -> `runtime_state()`: Gathers and returns a snapshot of the entire application's runtime state.
+    - utils/offline_guard.py:
+        - `offline_guard.enable()`: Called at startup to enforce the "offline-only" digital sovereignty rule by blocking non-local network connections.
+    - user_config.py:
+        - `home()`: Uses `USER_NAME` and `USER_EMAIL` to personalize the UI.
+    - templates/index.html:
+        - `home()` -> `traced_render('index.html', ...)`: Serves the main holographic user interface.
+    - static/js/main.js: The frontend JavaScript makes calls to the `/api/chat` and `/api/ping` endpoints defined in this file.
 """
 
 import time

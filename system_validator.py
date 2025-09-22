@@ -12,10 +12,21 @@ How: Implements comprehensive validation checks, automated corrections,
 and real-time monitoring to ensure Clever operates at maximum capability.
 
 Connects to:
-    - .github/copilot-instructions.md: Validates against all Unbreakable Rules
-    - config.py: Ensures proper configuration alignment
-    - user_config.py: Validates user-specific settings compliance
-    - All modules: Monitors and corrects system-wide compliance
+    - config.py:
+        - `_validate_single_database()`: Reads `config.DB_PATH` to ensure the database file exists.
+    - user_config.py:
+        - `_validate_single_user_config()`: Reads `USER_NAME` and `CLEVER_EXTERNAL_ACCESS` to enforce the single-user rule.
+        - `_validate_jay_personalization()`: Reads `USER_NAME`, `USER_EMAIL`, and `USER_FULL_NAME` to verify personalization.
+    - utils/offline_guard.py:
+        - `_validate_offline_enforcement()`: Calls `is_enabled()` and `enable()` to ensure the offline rule is active.
+    - debug_config.py:
+        - `get_debugger()`: Used to get the logger instance for logging validation progress and results.
+    - persona.py:
+        - `_validate_clever_persona()`: Imports `persona_engine` and calls `generate()` to test if the persona is functional.
+    - nlp_processor.py:
+        - `_validate_nlp_capabilities()`: Imports `nlp_processor` and calls `process()` to check its functionality.
+    - evolution_engine.py:
+        - `_validate_evolution_engine_access()`: Imports `get_evolution_engine` and calls `log_interaction()` to verify the engine is working.
 """
 
 from __future__ import annotations
@@ -73,10 +84,14 @@ class SystemValidator:
 
 
     Connects to:
-        - offline_guard: Validates and enforces offline-only operation
-        - config system: Ensures proper configuration compliance
-        - database: Validates single database rule adherence
-        - All modules: Provides system-wide integrity monitoring
+        - utils/offline_guard.py: Validates and enforces offline-only operation.
+        - config.py: Ensures proper configuration compliance.
+        - user_config.py: Validates user-specific settings.
+        - database.py: (Indirectly) Validates single database rule adherence by checking the path from `config.py`.
+        - persona.py: Validates the persona engine is functional.
+        - nlp_processor.py: Validates the NLP processor is working.
+        - evolution_engine.py: Validates the evolution engine is accessible.
+        - debug_config.py: Uses the debugger for logging.
     """
 
     def __init__(self):

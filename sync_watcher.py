@@ -38,6 +38,14 @@ class SyncEventHandler(FileSystemEventHandler):
          synaptic_hub_sync directories for file system events.
     How: Inherits from FileSystemEventHandler, debounces events to prevent
         rapid-fire ingestion, and directly uses FileIngestor for processing.
+
+    Connects to:
+        - file_ingestor.py:
+            - `__init__()`: Creates an instance of `FileIngestor`.
+            - `trigger_ingestion()`: Calls `self.ingestor.ingest_file()` to process the changed file.
+        - config.py:
+            - `main()`: Reads `config.SYNC_DIR` and `config.SYNAPTIC_HUB_DIR` to determine which directories to monitor.
+            - `SyncEventHandler.__init__()`: The `FileIngestor` it creates is initialized with `config.SYNC_DIR`.
     """
     def __init__(self):
         """Initialize sync event handler with debouncing + FileIngestor.

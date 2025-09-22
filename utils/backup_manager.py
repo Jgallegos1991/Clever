@@ -10,6 +10,12 @@ Where: Used by scheduled backup processes, deployment systems, and manual
 
 How: Implements ZIP-based backup creation with timestamp naming, automatic
      cleanup of old backups, and configurable retention policies.
+
+Connects to:
+    - config.py:
+        - Reads `config.ROOT_DIR` to determine the project's root path for creating backups.
+    - (External Scripts):
+        - Designed to be imported and used by automation scripts for scheduled backups or deployment workflows.
 """
 import os
 from pathlib import Path

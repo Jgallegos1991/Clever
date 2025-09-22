@@ -26,6 +26,8 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import config
+
 try:
     from intelligent_analyzer import (
         get_intelligent_analysis,
@@ -187,7 +189,7 @@ def vulnerable_function(user_input):
     """
     # Potential SQL injection
     query = f"SELECT * FROM users WHERE name = '{user_input}'"
-    conn = sqlite3.connect('test.db')
+    conn = sqlite3.connect(config.DB_PATH)
     conn.execute(query)
     
     # Hardcoded credentials

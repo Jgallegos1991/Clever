@@ -4,6 +4,13 @@ Offline Guard Utility for Clever AI
 Why: Enforces strict offline operation by blocking all outbound network connections except loopback, ensuring compliance with project rules.
 Where: Used by app.py and system_validator.py to guarantee offline-only operation for all Clever AI components.
 How: Monkey-patches socket.socket to raise errors on non-loopback connections, provides enable/disable toggles, and utility checks for network references in text.
+
+Connects to:
+    - app.py:
+        - `enable()` is called at startup to enforce the offline mode.
+        - `contains_network_reference()` is used to validate user input against network-related terms.
+    - system_validator.py:
+        - `enable()`, `disable()`, and `is_enabled()` are used to test and verify the offline guard's functionality.
 """
 
 import socket
