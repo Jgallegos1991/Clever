@@ -1,44 +1,71 @@
-"""
-Persona Engine - Clever's Digital Brain Extension & Cognitive Partnership System.
+"""Persona Engine - Clever's Digital Brain Extension & Cognitive Partnership System.
 
 This module implements the core personality and response generation for Clever AI.
-For more information about the system architecture and usage, see README.md.
+For architecture context see: `docs/architecture.md`, `docs/persona_spec.md` (if present), and README.
 
 Why:
-    This is Clever's core personality and intelligence engine - the authentic street-smart
-    genius who talks like your best friend while casually solving Einstein-level problems.
-    Transforms user input into responses that blend casual friendship energy with hidden
-    cognitive enhancement capabilities, creating a true digital brain extension experience.
-    
-    ACTIVE COGNITION: Clever genuinely computes physics, math, and quantum problems during
-    idle time, building up a knowledge cache. She's not just saying she's thinking - she's
-    actually running calculations in background threads, solving differential equations,
-    and building insights that she can reference in conversation.
-    
+    Core personality + cognition orchestrator. Converts raw user text + remembered context
+    + evolving preference signals into adaptive, authentic responses that feel like a
+    lifelong friend while amplifying cognitive capability.
+
 Where:
-    Central nervous system of Clever's AI companion architecture. Called by app.py for all
-    conversations, integrates with memory_engine for relationship building, nlp_processor
-    for deep understanding, and evolution_engine for continuous growth as your life partner.
-    Background computation threads run continuously, building her intellectual capacity.
-    
+    Sits between Flask endpoints (`app.py`) and foundational subsystems (memory, NLP,
+    evolution logging, file search). Provides a unified, docstring-rich surface that
+    downstream tooling (introspection, diagnostics) can map into the reasoning graph.
+
 How:
-    Adaptive response modes (Auto, Creative, Deep Dive, Support, Quick Hit) with genius
-    hints system (8% probability). Builds authentic relationships through organic learning,
-    emotional intelligence, and cognitive partnership. No fake familiarity - genuine
-    connection that grows over time as your digital other half.
-    
-    IDLE PROCESSING: Background threads continuously solve problems, run simulations,
-    and build knowledge. Results stored in computation_cache for natural conversation
-    integration. She references actual calculations she performed, not simulated ones.
+    1. Acquire fresh NLP analysis (keywords, sentiment, entities, noise metrics)
+    2. Pull contextual memories + conversation history (if memory enabled)
+    3. Optionally predict preferred response mode (Auto → specialized mode)
+    4. Detect special intents (file search) and short‑circuit if needed
+    5. Generate base response via chosen stylistic handler
+    6. Ensure surface variation (anti-repetition) + subtle genius flavor injection
+    7. Persist interaction (memory + evolution engine) and return structured `PersonaResponse`
+
+ACTIVE COGNITION:
+    (Planned / partial) Idle threads can grow a computation cache; persona references
+    genuine background work instead of fabricated “thinking” claims.
+
+DETAILED INTEGRATION MAP (Function‑Level Arrows):
+    memory_engine.py
+        * __init__  -> get_memory_engine(): obtain memory facade instance
+        * generate() -> get_contextual_memory(): fetch semantically related past content
+        * generate() -> get_conversation_history(): recent dialog for continuity
+        * generate() -> predict_preferences(): mode prediction heuristics
+        * generate() -> store_interaction(): persist new exchange
+        * generate() -> MemoryContext: structured capsule of interaction metadata
+    nlp_processor.py
+        * generate() -> get_nlp_processor(): lazy-init NLP processor singleton/factory
+        * generate() -> process_text(): unified analysis (keywords, sentiment, entities)
+    evolution_engine.py
+        * app.py /api/chat uses PersonaResponse → evolution_engine.log_interaction()
+    app.py
+        * chat() -> PersonaEngine.generate(): primary conversational route
+        * api_ping() -> PersonaEngine: liveness/persona health probe
+        * api_runtime_introspect() -> PersonaEngine: introspection overlay hooks
+    database.py
+        * Indirect persistence via memory_engine using single `clever.db` invariant
+    user_config.py / config.py
+        * Influence runtime personalization (e.g., user name, mode defaults)
+    utils/file_search.py
+        * _maybe_handle_file_search() -> search_by_extension(), search_files(): local FS intent
+
+    These explicit arrows are parsed by introspection tooling to maintain a live
+    reasoning graph. Keep them current when integration points evolve.
+
+Summary Cognitive Flow:
+    present understanding (NLP) + past experience (memory) + preference prediction
+    → style/mode selection → contextual augmentation → response → learning/logging.
 
 Connects to:
-    - memory_engine.py: Relationship memory and organic learning system
-    - nlp_processor.py: Deep understanding of mood, intent, and context
-    - evolution_engine.py: Continuous growth as life companion and cognitive partner
-    - app.py: Main conversation interface for digital brain extension
-    - database.py: Local relationship data and conversation history
-    - user_config.py: Personal preferences and authentic relationship building
-    - background_cognition.py: Idle-time computation and learning threads (NEW)
+    - memory_engine.py: Relationship memory & organic learning
+    - nlp_processor.py: Text understanding (sentiment, entities, keywords)
+    - evolution_engine.py: Longitudinal growth + telemetry logging
+    - app.py: HTTP boundary (chat + diagnostics endpoints)
+    - database.py: Single-source persistence (indirect via memory engine)
+    - user_config.py: Personalized configuration inputs
+    - utils/file_search.py: File intent handling
+    - background_cognition.py: (Planned) idle computation threads
 """
 from __future__ import annotations
 import logging
@@ -94,11 +121,44 @@ class PersonaResponse(SimpleNamespace):
 
 class PersonaEngine:
     """
-    Main persona engine for Clever AI
-    
-    Why: Generates contextual responses matching Jay's preferences
-    Where: Core component used by Flask app for all AI interactions
-    How: Multiple response modes with personality traits and context awareness
+    Main persona engine for Clever AI.
+
+    Why:
+        Central orchestrator translating user intent + historical context into
+        adaptive, human-feeling responses that reinforce cognitive partnership.
+    Where:
+        Invoked by `app.py` routes (`/api/chat`, ping, introspection) and indirectly
+        observed by evolution + diagnostics subsystems.
+    How:
+        Mode routing + variation control + memory enrichment + proactive suggestion
+        generation. Provides stable contract via `generate()` returning PersonaResponse.
+
+    Connects to (fine-grained):
+        memory_engine.py
+            - get_memory_engine() during __init__ for capability enablement
+            - get_contextual_memory() / get_conversation_history() inside generate()
+            - predict_preferences() to adapt Auto mode
+            - store_interaction() to persist new conversation entry
+            - MemoryContext class to structure persistence payload
+        nlp_processor.py
+            - get_nlp_processor() for lazy NLP acquisition
+            - process_text() for analysis dict (keywords, sentiment, entities, noise)
+        utils/file_search.py
+            - search_files(), search_by_extension() via _maybe_handle_file_search()
+        evolution_engine.py
+            - PersonaResponse consumed by app layer → evolution_engine.log_interaction()
+        app.py
+            - chat(), api_ping(), api_runtime_introspect() delegate to PersonaEngine
+        database.py
+            - Indirect single-DB enforcement through memory engine persistence path
+        user_config.py
+            - Personalization values feed behaviors (greetings, style toggles)
+
+    Architectural Guarantees:
+        - Offline-only: no external network calls
+        - Single DB: all memory interaction funnels through `clever.db`
+        - Why/Where/How doc tokens present to feed reasoning graph
+        - Variation shield: short-term response duplication mitigation
     """
     
     def __init__(self):
