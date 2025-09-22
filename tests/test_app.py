@@ -81,9 +81,8 @@ def test_index(app_client):
 
 
 def test_chat_happy(app_client):
-    """
-    Test successful chat interaction with valid message input.
-    
+    """Test successful chat interaction with valid message input.
+
     Why: Validates core chat functionality works correctly with proper
          message processing and response structure generation.
     Where: Integration test for primary chat API endpoint that handles
@@ -101,9 +100,9 @@ def test_chat_happy(app_client):
     for k in ['approach', 'mood', 'particle_intensity']:
         if k in data:
             assert data[k] is not None
-     # Intent key is optional; when present, it should be a string
-     if 'intent' in data['analysis'] and data['analysis']['intent'] is not None:
-          assert isinstance(data['analysis']['intent'], str)
+    # Intent key is optional; when present, it should be a string
+    if 'intent' in data['analysis'] and data['analysis']['intent'] is not None:
+        assert isinstance(data['analysis']['intent'], str)
 
 
 def test_chat_bad_request(app_client):

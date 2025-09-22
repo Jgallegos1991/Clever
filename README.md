@@ -343,6 +343,21 @@ Comprehensive documentation is available in the `docs/` directory:
 - **Deployment Guide** - Production setup and configuration
  - **Diagnostics & Drift** - See `docs/copilot_diagnostics.md` for current alignment snapshot
 
+### Canonical Spec Index (New)
+
+| Topic | Canonical Doc |
+|-------|---------------|
+| Persona Behavior | `docs/persona_spec.md` |
+| GitHub / Contribution Workflow | `docs/github_workflow.md` |
+| Configuration & Invariants | `docs/configuration.md` |
+| UI Overview (Minimal Chat + Particles) | `docs/ui_overview.md` |
+| Application Entry (`app.py`) | `docs/app_overview.md` |
+| Frontend ↔ Backend Contract | `docs/frontend_backend_overview.md` |
+| Architecture (Deep) | `docs/architecture.md` |
+| Changelog | `CHANGELOG.md` (root) |
+
+Deprecated duplicates in `docs/` (e.g., `docs/CHANGELOG.md`, older audit summaries) now act as pointers only—do not append content there.
+
 ### Diagnostics & Documentation Enforcement
 
 Two guardrail tools help prevent architectural drift:
