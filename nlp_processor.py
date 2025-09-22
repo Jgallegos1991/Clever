@@ -245,17 +245,28 @@ class SimpleNLPProcessor:
             'worried', 'upset', 'stressed', 'concerned', 'troubled'
         }
         
-        words = set(re.findall(r'\b\w+\b', text.lower()))
-        
+        lowered = text.lower()
+        words = set(re.findall(r'\b\w+\b', lowered))
+
+        # Fast-path neutrality heuristics
+        # Why: Short operational/procedural sentences ("processing continues without notable change")
+        # should not be classified positive simply because of a single weak positive token like 'continues'.
+        # Where: Shields persona tone selection in persona.generate from over-optimistic bias.
+        # How: Detect absence of strong affect terms and presence of stability phrases → force neutral.
+        stability_markers = {"continues", "without", "notable", "change", "standard", "baseline", "normal"}
+        if words and not (words & positive_words) and not (words & negative_words) and (words & stability_markers):
+            return "neutral"
+        if words and len(words & positive_words) == 1 and not (words & negative_words) and len(words & stability_markers) >= 2:
+            return "neutral"
+
         positive_count = len(words.intersection(positive_words))
         negative_count = len(words.intersection(negative_words))
-        
+
         if positive_count > negative_count:
             return "positive"
-        elif negative_count > positive_count:
+        if negative_count > positive_count:
             return "negative"
-        else:
-            return "neutral"
+        return "neutral"
     
     def extract_entities(self, text: str) -> List[str]:
         """

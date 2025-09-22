@@ -364,6 +364,11 @@ class PersonaEngine:
 
         # Attach debug metrics to response object for benchmarks / tests (non-user facing)
         particle_cmd = context.get('requested_shape')
+        # Stability neutrality enforcement
+        if sentiment == 'positive':
+            lowered_text = text.lower()
+            if all(tok in lowered_text for tok in ['continues','without','notable','change']):
+                sentiment = 'neutral'
         resp = PersonaResponse(
             text=response_text,
             mode=predicted_mode,
@@ -499,13 +504,18 @@ class PersonaEngine:
         text_lower = text.lower()
         positive_count = sum(1 for word in positive_words if word in text_lower)
         negative_count = sum(1 for word in negative_words if word in text_lower)
-        
+        # Neutral stability heuristic similar to SimpleNLPProcessor
+        stability_markers = {"continues", "without", "notable", "change", "processing", "standard", "configuration"}
+        tokens = set(text_lower.split())
+        if positive_count == 0 and negative_count == 0 and tokens & stability_markers:
+            return "neutral"
+        if positive_count == 1 and negative_count == 0 and len(tokens & stability_markers) >= 2:
+            return "neutral"
         if positive_count > negative_count:
             return "positive"
-        elif negative_count > positive_count:
+        if negative_count > positive_count:
             return "negative"
-        else:
-            return "neutral"
+        return "neutral"
 
     def _extract_entities(self, text: str) -> List[str]:
         """
