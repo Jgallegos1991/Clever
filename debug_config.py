@@ -6,8 +6,13 @@ Where: Used by app.py and other modules for status messages
 How: Simple class-based debugger with print-based logging
 
 Connects to:
-    - app.py: Main application logging
-    - system_validator.py: Validation logging
+    - app.py: `get_debugger()` is used for logging throughout the main application.
+    - persona.py: `get_debugger()` is used for logging engine state and performance.
+    - memory_engine.py: `get_debugger()` is used for logging memory operations.
+    - system_validator.py: `get_debugger()` is used to log the results of validation checks.
+    - health_monitor.py: `get_debugger()` is used for logging health status, and `performance_monitor` is used to track the duration of health checks.
+    - introspection.py: The `performance_monitor` decorator is used to wrap functions to gather performance data.
+    - intelligent_analyzer.py: `get_performance_stats()` and `get_component_health()` are called to provide data for analysis.
 """
 import os
 import time

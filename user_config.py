@@ -12,6 +12,12 @@ Where: Core of Clever's single-user design - imported by all systems that need t
 How: Personal settings that enable Clever to grow as Jay's life companion and
      digital other half. Supports organic relationship building without fake
      familiarity - real connection that develops over time.
+
+Connects to:
+    - config.py: This is the primary consumer of `user_config.py`. It imports all settings from this file to configure the application's behavior, such as server host/port and debug modes.
+    - app.py: Uses `USER_NAME` and `USER_EMAIL` to personalize the rendered `index.html` template.
+    - persona.py: (Indirectly) The personality settings defined in `CLEVER_PERSONALITY` are intended to be used by the persona engine to shape its responses, although this connection might be indirect via `config.py`.
+    - system_validator.py: `_validate_single_user_config()` and `_validate_jay_personalization()` read variables like `USER_NAME`, `USER_EMAIL`, and `CLEVER_EXTERNAL_ACCESS` to ensure the system is correctly configured for a single, private user.
 """
 
 # User Identity Configuration

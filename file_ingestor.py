@@ -83,9 +83,16 @@ class FileIngestor:
             str: One of "inserted", "updated", "unchanged", "empty", or "failed".
         
         Connects to:
-            - database.py via db_manager.add_or_update_source
-            - evolution_engine.py for autonomous learning triggers
-            - nlp_processor for local NLP enrichment (entities / keywords)
+            - database.py:
+                - `ingest_file()` -> `db_manager.add_or_update_source()`: The core function of this module is to process a file and store its contents in the database.
+            - evolution_engine.py:
+                - `ingest_file()` -> `get_evolution_engine().log_interaction()`: After a file is successfully ingested, it logs an event to the evolution engine to signal that new knowledge has been acquired.
+            - nlp_processor.py:
+                - `ingest_file()` -> `nlp_processor.process_text()`: It uses the NLP processor to extract keywords and entities from the file content before storing it.
+            - config.py:
+                - The `if __name__ == "__main__"` block initializes the `FileIngestor` with `config.SYNC_DIR`, making it the default directory for ingestion when run as a script.
+            - sync_watcher.py:
+                - `SyncEventHandler` in `sync_watcher.py` creates an instance of `FileIngestor` and calls `ingest_file()` whenever a file change is detected.
         """
         try:
             file_path = os.path.abspath(file_path)

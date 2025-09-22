@@ -12,11 +12,15 @@ and secure defaults. Single database design ensures coherent memory system for
 continuous relationship building with Jay.
 
 Connects to:
-    - user_config.py: Jay's personal preferences and cognitive enhancement settings
-    - database.py: Single unified memory system (clever.db) for relationship continuity
-    - persona.py: Personality settings for authentic genius friend experience
-    - app.py: Local server configuration for complete digital sovereignty
-    - All cognitive systems: Unified configuration for seamless brain extension
+    - user_config.py: Imports `user_config` to source user-specific settings like `CLEVER_HOST`, `CLEVER_PORT`, and `DEBUG_MODE`.
+    - database.py: The `db_manager` instance is initialized using `config.DB_PATH`, making this the central point for defining the database location.
+    - memory_engine.py: The `get_memory_engine()` factory function uses `config.DB_PATH` when creating the `DatabaseManager`.
+    - app.py: Uses `APP_HOST`, `APP_PORT`, and `DEBUG` to configure the Flask server, ensuring it respects the local-only rule.
+    - sync_watcher.py: Uses `SYNC_DIR` and `SYNAPTIC_HUB_DIR` to know which directories to monitor for file changes.
+    - file_ingestor.py: The main `FileIngestor` is instantiated using `config.SYNC_DIR` to know where to look for files to ingest.
+    - pdf_ingestor.py: The `EnhancedFileIngestor` uses `config.SYNC_DIR` as one of its default source directories.
+    - system_validator.py: `_validate_single_database()` reads `config.DB_PATH` to verify the single database rule.
+    - health_monitor.py: `check_database_health()` reads `config.DB_PATH` to locate and check the database file.
 """
 
 import os

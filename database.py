@@ -26,12 +26,14 @@ How:
     module opens SQLite connections; callers should never manage raw connections.
 
 Connects to:
-    - config.py: Source of the authoritative ``DB_PATH`` constant.
-    - evolution_engine.py: Logs interactions for adaptive learning.
-    - persona.py: Persists utterances and retrieves recent context windows.
-    - file_ingestor.py / pdf_ingestor.py: Store and update ingested source documents.
-    - sync_watcher.py: Detects file changes and triggers source re-ingestion.
-    - health_monitor.py / system_validator.py: Perform integrity & readiness checks.
+    - config.py: Imports `DB_PATH` to define the single source of truth for the database file location.
+    - evolution_engine.py: `add_interaction` is called (often via `app.py`) to log user interactions, which are fundamental to the evolution engine's learning process.
+    - persona.py: (Indirectly via `memory_engine.py`) The persona engine relies on the database for all its memory functions, using methods like `add_utterance` to record conversations and `list_utterances` to retrieve history for contextual responses.
+    - file_ingestor.py: `FileIngestor.ingest_file()` calls `add_or_update_source()` to add or update file-based knowledge into the database.
+    - pdf_ingestor.py: `EnhancedFileIngestor.ingest_file()` calls `add_or_update_source()` to process and store PDF content.
+    - sync_watcher.py: The `SyncEventHandler` triggers the file ingestors, which in turn write to the database, keeping Clever's knowledge synchronized.
+    - health_monitor.py: `SystemHealthMonitor.check_database_health()` connects to the database to verify its existence, check table integrity, and report statistics.
+    - system_validator.py: `SystemValidator._validate_single_database()` checks for the existence of the database file specified in `config.py` to enforce the single database rule.
 """
 
 import threading

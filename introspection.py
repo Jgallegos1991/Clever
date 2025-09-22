@@ -14,9 +14,20 @@ metadata derived from Flask routes, parsed Why/Where/How sections, last error
 captured by a global error handler, and lightweight git version discovery.
 
 Connects to:
-    - app.py: Provides decorators and helper functions used in route handlers
-    - templates/index.html: Source of main render events tracked
-    - static/js/main.js: Frontend can poll runtime introspection for overlay
+    - app.py:
+        - `traced_render` is called by `app.py`'s `home()` route to render templates.
+        - `register_error_handler` is called in `app.py` to set up global error catching.
+        - `runtime_state` is called by the `/api/runtime_introspect` route in `app.py`.
+    - evolution_engine.py:
+        - `get_evolution_engine` is called by `_build_concept_graph` and `runtime_state` to fetch concept data and interaction statistics.
+    - intelligent_analyzer.py:
+        - `get_intelligent_analysis` is called by `runtime_state` to include AI-powered analysis in the introspection payload.
+    - tools/runtime_dump.py:
+        - This utility script consumes the JSON output from the `/api/runtime_introspect` endpoint.
+    - templates/index.html:
+        - The main HTML file whose rendering is tracked by `record_render`.
+    - static/js/main.js:
+        - The frontend JavaScript can poll the `/api/runtime_introspect` endpoint to display debug data.
 """
 from __future__ import annotations
 import inspect
@@ -25,8 +36,8 @@ import threading
 import time
 from collections import deque
 from typing import Any, Callable, Deque, Dict, List, Optional, Set
-from pathlib import Path  # Reintroduced for code health scanning
-import ast  # Reintroduced for static analysis of functions
+from pathlib import Path  # For code health & component graph scanning
+import ast  # For static analysis of functions & imports
 
 # Regular expression to extract Why/Where/How sections from docstrings (case-insensitive)
 _SECTION_RE = re.compile(r"^(why|where|how)\s*:\s*(.*)$", re.IGNORECASE)
@@ -389,8 +400,7 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
 
     reasoning_graph = _build_reasoning_graph(endpoints, app)
     concept_graph = _build_concept_graph()
-
-    # Code health + dependency graph (best-effort; never raise to caller)
+    # Code health + component graph (best-effort; never raise to caller)
     try:
         code_health = _scan_code_health()
     except Exception as e:  # noqa: BLE001
@@ -399,9 +409,10 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
         component_graph = _build_component_graph()
     except Exception as e:  # noqa: BLE001
         component_graph = {"error": f"component graph failed: {e}"}
-
     # JSON safety pass (convert sets recursively)
-    def _json_safe(obj):  # Why: Prevent jsonify errors on set output
+    def _json_safe(obj):  # Why: Prevent Flask jsonify errors on non-serializable containers
+        # Where: Applied just before assembling final runtime_state dict
+        # How: Recursively convert set -> sorted list; walk dict/list/tuple
         if isinstance(obj, set):
             try:
                 return sorted(list(obj))
@@ -492,16 +503,25 @@ def register_error_handler(app):
     return app
 
 # ---------------------------------------------------------------------------
-# Code Health & Dependency Graph Enhancements (restored)
+# Code Health & Dependency Graph Enhancements (clean implementation)
 # ---------------------------------------------------------------------------
 
 def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
     """Perform lightweight repository code health scan.
 
-    Why: Provide instant in-memory insight for drift detection (docstring coverage,
-         merge conflicts, meta token leakage) without external tooling.
-    Where: Returned via runtime_state -> used by debug overlay / tests.
-    How: Walk project tree (bounded), parse AST for functions and inspect docstrings.
+    Why: Provide fast, offline insight into documentation coverage and potential
+         merge/conflict drift so Jay sees immediate cognitive wiring health.
+    Where: Returned inside `runtime_state` under `code_health`; consumed by
+           debug overlay + tests to guard enforced Why/Where/How contract.
+    How: Walk project root (bounded), AST-parse Python files, measure function
+         doc token presence (why/where/how), detect merge conflict markers and
+         meta leakage patterns. Returns summary counts + sample gaps.
+
+    Args:
+        max_files: Safety cap to avoid excessive traversal cost.
+
+    Returns:
+        Dict with counts, percentages, gaps, and timestamps.
     """
     root = Path(__file__).resolve().parent
     py_files: List[Path] = []
@@ -525,7 +545,7 @@ def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
             text = file_path.read_text(encoding="utf-8", errors="ignore")
         except Exception:
             continue
-        if "<<<<<<" in text or ">>>>>>>" in text:
+        if any(m in text for m in ("<<<<<<<", ">>>>>>>", "=======")):
             conflict_markers += 1
         if meta_pattern.search(text):
             meta_token_hits += 1
@@ -546,29 +566,31 @@ def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
                 if not (has_why and has_where and has_how) and len(missing_samples) < 12:
                     rel = file_path.relative_to(root)
                     missing_samples.append(f"{rel}:{getattr(node,'name','<anon>')}")
-    coverage_percent = (functions_with_why / functions_total * 100.0) if functions_total else 100.0
+    coverage_any_percent = (functions_with_why / functions_total * 100.0) if functions_total else 100.0
     combined_with_all = min(functions_with_why, functions_with_where, functions_with_how)
-    combined_percent = (combined_with_all / functions_total * 100.0) if functions_total else 100.0
+    coverage_all_percent = (combined_with_all / functions_total * 100.0) if functions_total else 100.0
     return {
         "files_scanned": len(py_files),
         "functions_total": functions_total,
         "functions_with_why": functions_with_why,
         "functions_with_where": functions_with_where,
         "functions_with_how": functions_with_how,
-        "coverage_percent_any_why": round(coverage_percent, 2),
-        "coverage_percent_all": round(combined_percent, 2),
+        "coverage_percent_any_why": round(coverage_any_percent, 2),
+        "coverage_percent_all": round(coverage_all_percent, 2),
         "conflict_markers": conflict_markers,
         "meta_token_hits": meta_token_hits,
         "missing_samples": missing_samples,
         "generated_ts": time.time(),
     }
 
-def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[str, Any]:
-    """Build import dependency graph across local modules.
 
-    Why: Visualize coupling and potential circular risk.
-    Where: Returned via runtime_state -> component_graph.
-    How: Parse AST imports; edge source->target for intra-project references.
+def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[str, Any]:
+    """Build lightweight intra-project import dependency graph.
+
+    Why: Visualize coupling to keep cognitive architecture clean & traceable.
+    Where: Returned via runtime_state -> `component_graph`; supports debug graph overlay.
+    How: Parse AST of Python files in root + selected subdirs, add node per
+         module, edge per intra-project import. Apply size caps to stay payload-light.
     """
     root = Path(__file__).resolve().parent
     py_files: List[Path] = [p for p in root.glob("*.py")]
@@ -577,14 +599,15 @@ def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[s
         if sp.exists():
             for p in sp.rglob("*.py"):
                 py_files.append(p)
-    modules: Dict[str, Dict[str, Any]] = {}
-    edges: List[Dict[str, str]] = []
     def norm(p: Path) -> str:
         rel = p.relative_to(root).as_posix()
         return rel[:-3] if rel.endswith('.py') else rel
     local = {norm(p) for p in py_files}
+    modules: Dict[str, Dict[str, Any]] = {}
+    edges: List[Dict[str, str]] = []
     for p in py_files:
-        if len(modules) >= max_nodes: break
+        if len(modules) >= max_nodes:
+            break
         try:
             text = p.read_text(encoding='utf-8', errors='ignore')
             tree = ast.parse(text)
@@ -603,7 +626,8 @@ def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[s
                     tgt = node.module.split('.')[0]
                     if tgt in local:
                         edges.append({"source": src_id, "target": tgt, "type": "import"})
-        if len(edges) >= max_edges: break
+        if len(edges) >= max_edges:
+            break
     truncated = len(modules) > max_nodes or len(edges) > max_edges
     return {
         "nodes": list(modules.values())[:max_nodes],
@@ -611,3 +635,4 @@ def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[s
         "truncated": truncated,
         "generated_ts": time.time(),
     }
+

@@ -1,3 +1,21 @@
+"""
+File Inventory Generator
+
+Why: To automatically create a markdown file (`file-inventory.md`) that provides
+     a statistical overview of the project's files. This helps in understanding
+     the project's composition, such as which file types are most common.
+Where: This is a standalone utility script, typically run from the command line
+       or via a `make` command (`make file-inventory`). It is not imported by
+       other parts of the Clever application.
+How: It walks through the project directory, collects statistics (count, lines of
+     code, size) for each file extension, and gets the last modification date for
+     each file. It then formats this information into a markdown table and writes
+     it to `file-inventory.md`.
+
+Connects to:
+    - (None): This script is self-contained and does not import or interact with other custom modules from the Clever project.
+"""
+
 import os
 import pathlib
 import datetime

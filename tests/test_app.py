@@ -78,9 +78,8 @@ def test_index(app_client):
 
 
 def test_chat_happy(app_client):
-    """
-    Test successful chat interaction with valid message input.
-    
+    """Test successful chat interaction with valid message input.
+
     Why: Validates core chat functionality works correctly with proper
          message processing and response structure generation.
     Where: Integration test for primary chat API endpoint that handles

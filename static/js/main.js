@@ -89,12 +89,6 @@ async function sendMessage() {
         const data = await response.json();
         createChatBubble(data.response || 'I hear you!', 'ai');
         
-        // Handle particle formation command
-        if (data.particle_command && holographicChamber) {
-            console.log('🔮 Executing particle command:', data.particle_command);
-            holographicChamber.morphToFormation(data.particle_command);
-        }
-        
     } catch (error) {
         console.error('Chat error:', error);
         createChatBubble('Processing... try again!', 'ai');
@@ -124,23 +118,3 @@ function createChatBubble(text, type = 'ai') {
     }, 20000);
 }
 
-// Debug function for testing shape formation
-function testShape(formation) {
-    console.log(`🔧 Testing shape: ${formation}`);
-    
-    if (!window.holographicChamber) {
-        console.error('❌ holographicChamber not found on window');
-        return;
-    }
-    
-    if (typeof window.holographicChamber.morphToFormation !== 'function') {
-        console.error('❌ morphToFormation method not found');
-        return;
-    }
-    
-    console.log('✅ Calling morphToFormation...');
-    window.holographicChamber.morphToFormation(formation);
-}
-
-// Make testShape globally available
-window.testShape = testShape;

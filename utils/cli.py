@@ -1,3 +1,24 @@
+"""
+Command-Line Interface for Clever AI
+
+Why: Provides a direct way to interact with Clever's core functionalities like
+     file ingestion and database queries without needing the web server. This is
+     essential for administration, debugging, and automated scripting.
+Where: This script is the main entry point for any command-line operations. It
+       is not typically imported by other modules but executed directly.
+How: Uses Python's `argparse` library to define and handle subcommands for
+     different actions (`ingest`, `list`, `search`, `show`). Each subcommand
+     calls the appropriate function from other modules to perform the task.
+
+Connects to:
+    - config.py:
+        - Reads `config.SYNC_DIR` as the default path for file ingestion.
+    - file_ingestor.py:
+        - `FileIngestor` is instantiated and its `ingest_all_files()` method is called by `cmd_ingest` to process files.
+    - database.py:
+        - `db_manager` is used by `cmd_list`, `cmd_search`, and `cmd_show` to query the database for sources.
+"""
+
 from __future__ import annotations
 
 import argparse

@@ -5,6 +5,16 @@ Enhanced File Ingestor with PDF Support
 Why: Automates ingestion and processing of PDFs, text files, and other documents for Clever's knowledge base, enabling intelligent search and learning.
 Where: Used by sync watchers, manual ingestion scripts, and background automation to populate and update the knowledge base from local and synced sources.
 How: Detects supported files, extracts content and metadata, chunks large documents, performs NLP analysis, and stores results in the database via DatabaseManager.
+
+Connects to:
+    - database.py:
+        - `ingest_file()` -> `db_manager.add_or_update_source()`: The core function is to process files (including PDFs) and store their content as chunks in the database.
+        - `ingest_file()` -> `db_manager.get_source_by_path()`: Checks if a file has already been ingested and is unchanged to avoid reprocessing.
+    - nlp_processor.py: This file is imported, but `nlp_processor` is not directly used in this version of the file. The connection is implicit for future enhancement.
+    - config.py:
+        - `__init__()`: Uses `config.SYNC_DIR` as a default directory for ingestion.
+    - sync_watcher.py:
+        - `watch_and_ingest()` -> `EnhancedSyncHandler`: This class uses `EnhancedFileIngestor` to process files when changes are detected by the watcher.
 """
 
 import os

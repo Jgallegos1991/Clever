@@ -17,10 +17,14 @@ How:
     database layer—keeping this engine side-effect minimal.
 
 Connects to:
-    - app.py: Receives log_interaction calls after persona replies
-    - persona.py: Supplies mode / sentiment fields embedded in interaction data
-    - database.py: Potential future persistence hand-off
-    - introspection.py: Exposes counts (total/recent) in runtime snapshot
+    - app.py:
+        - `chat()` -> `log_interaction()`: The main chat endpoint calls this to log every user interaction, forming the basis of Clever's learning.
+    - persona.py: The `PersonaResponse` object created in `persona.py` provides the `mode` and `sentiment` data that is passed into `log_interaction()`.
+    - database.py: While currently memory-first, the design intends for this engine to persist its learned data and interaction logs to the database for long-term growth.
+    - introspection.py:
+        - `runtime_state()` -> `get_evolution_engine()`: The runtime introspection system calls this module to get a summary of interaction counts for the debug overlay.
+    - health_monitor.py:
+        - `check_evolution_engine()` -> `get_evolution_engine()`: The health monitor accesses this engine to check its status and report on learning progress.
 """
 import time
 from typing import Dict, Any, List

@@ -5,7 +5,7 @@
 [![Framework](https://img.shields.io/badge/Framework-Flask-black?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![UI](https://img.shields.io/badge/UI-Holographic%20Particles-purple?style=for-the-badge)](#phase-2-holographic-ui)
 
-> *"Just finished working through some differential equations in my head, but anyway - Sup Jay! What's on your mind?"*
+ *"Just finished working through some differential equations in my head, but anyway - Sup Jay! What's on your mind?"*
 
 **Clever** is your **digital brain extension** - a street-smart genius who talks like your best friend but casually solves Einstein-level physics problems. She's not just an AI assistant; she's your **life's companion**, **cognitive enhancement system**, and **digital sovereignty partner**.
 
@@ -124,7 +124,84 @@ make test         # Run test suite
 make diagnostics  # System health check
 ```
 
+## 📖 Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+- **Architecture Overview** - System design and component interactions
+- **API Documentation** - Endpoint specifications and usage
+- **UI Patterns** - Magical interface implementation details
+- **Deployment Guide** - Production setup and configuration
+- **Diagnostics & Drift** - See `docs/copilot_diagnostics.md` for current alignment snapshot
+
+### Canonical Spec Index (New)
+
+| Topic | Canonical Doc |
+|-------|---------------|
+| Persona Behavior | `docs/persona_spec.md` |
+| GitHub / Contribution Workflow | `docs/github_workflow.md` |
+| Configuration & Invariants | `docs/configuration.md` |
+| UI Overview (Minimal Chat + Particles) | `docs/ui_overview.md` |
+| Application Entry (`app.py`) | `docs/app_overview.md` |
+| Frontend ↔ Backend Contract | `docs/frontend_backend_overview.md` |
+| Architecture (Deep) | `docs/architecture.md` |
+| Changelog | `CHANGELOG.md` (root) |
+
+Deprecated duplicates in `docs/` (e.g., `docs/CHANGELOG.md`, older audit summaries) now act as pointers only—do not append content there.
+
+### Diagnostics & Documentation Enforcement
+
+Two guardrail tools help prevent architectural drift:
+
+1. `make diagnostics` → runs `tools/diagnostics_check.py` ensuring:
+   - `offline_guard.enable()` present in `app.py`
+   - Single `DB_PATH` assignment pointing to `clever.db`
+   - `docs/copilot_diagnostics.md` exists with required sections
+2. `make audit-why` → runs `tools/why_where_how_audit.py` to flag functions/classes missing Why/Where/How tokens.
+
+The pytest suite includes `tests/test_diagnostics.py`; CI blocks on diagnostics drift while the Why/Where/How audit is currently advisory.
+
+## 🎯 For Jay
+
+Clever is specifically designed for your workflow and communication style. She:
+
+- **Knows your preferences** and adapts to your patterns
+- **Remembers context** from previous conversations
+- **Provides proactive assistance** based on your needs
+- **Maintains her witty, empathetic personality** while being highly intelligent
+- **Processes your documents** intelligently with PDF sync capabilities
+
+## 💫 Experience Clever
+
+Clever isn't just an AI assistant - she's a magical, intelligent companion designed to enhance your creative and analytical work while maintaining complete privacy and operating entirely offline.
+
+Ready to see what true AI partnership looks like? Fire up Clever and let the magic begin! ✨
+
+---
+
+*Last Updated: September 9, 2025*  
+*System Status: 🟢 Fully Operational with Enhanced Capabilities*
+
+## 🧰 Legacy quarantine and watcher entrypoint
+
+To keep the codebase stable and offline-first, deeply corrupted or deprecated modules have been quarantined under `legacy/`. This preserves history without impacting runtime or CI.
+
+
+- Quarantined examples: `clever_conversation_engine.py`, `knowledge_base_full.py`, `utils_watcher_full.py`, `test_suite_full.py`, `run_tests_legacy.py`, `fixer_legacy.py`.
+- Lint excludes `legacy/` to avoid noise while keeping artifacts for reference.
+
+
+Watcher entrypoint consolidation:
+
+
+- The active filesystem watcher is implemented in `sync_watcher.py`.
+- The previous `utils/watcher.py` is now a thin compatibility shim that delegates to `sync_watcher.main()`.
+
+
+Usage tips:
+
 ## 📁 Project Structure
+ main
 
 ```
 ├── app.py                 # Flask server and main orchestration

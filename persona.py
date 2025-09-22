@@ -57,45 +57,47 @@ Summary Cognitive Flow:
     present understanding (NLP) + past experience (memory) + preference prediction
     → style/mode selection → contextual augmentation → response → learning/logging.
 
-Connects to:
-    - memory_engine.py: Relationship memory & organic learning
-    - nlp_processor.py: Text understanding (sentiment, entities, keywords)
-    - evolution_engine.py: Longitudinal growth + telemetry logging
-    - app.py: HTTP boundary (chat + diagnostics endpoints)
-    - database.py: Single-source persistence (indirect via memory engine)
-    - user_config.py: Personalized configuration inputs
-    - utils/file_search.py: File intent handling
-    - background_cognition.py: (Planned) idle computation threads
+Connects to (merged fine-grained + summary):
+    - memory_engine.py:
+        - Relationship memory & organic learning (concept recall)
+        - __init__ -> get_memory_engine(): initialize memory system
+        - generate() -> get_contextual_memory(): contextual memory injection
+        - generate() -> get_conversation_history(): conversational continuity
+        - generate() -> predict_preferences(): mode preference inference
+        - generate() -> store_interaction(): long-term learning persistence
+        - generate() -> MemoryContext: structured interaction payload
+    - nlp_processor.py:
+        - Deep text understanding (sentiment, entities, keywords)
+        - generate() -> get_nlp_processor(): acquire NLP instance
+        - generate() -> process_text(): analysis pipeline
+    - evolution_engine.py:
+        - PersonaResponse consumed for interaction logging (growth metrics)
+    - app.py:
+        - chat() -> generate(): primary conversational route
+        - api_ping() -> PersonaEngine: liveness
+        - api_runtime_introspect() -> PersonaEngine: debug state view
+    - database.py:
+        - Single-source persistence via memory_engine into clever.db
+    - user_config.py / config.py:
+        - Personalization (name, defaults)
+    - utils/file_search.py:
+        - _maybe_handle_file_search() -> search_by_extension(), search_files() (local FS intent)
+    - background_cognition.py (planned):
+        - Idle computational knowledge accrual
 """
 from __future__ import annotations
 import logging
 import random
+import re
 import time
 from collections import deque
 from types import SimpleNamespace
-from typing import List, Dict, Any, Optional
-
-# Import the advanced memory system
-try:
-    from memory_engine import MemoryContext, get_memory_engine
-    MEMORY_AVAILABLE = True
-    
-except ImportError:
-    MEMORY_AVAILABLE = False
-    
-    # Define placeholder classes if memory_engine is not available
-    class MemoryContext:
-        def __init__(self, **kwargs):
-            for key, value in kwargs.items():
-                setattr(self, key, value)
-    
-    def get_memory_engine():
-        """Placeholder for memory engine factory"""
-        return None
+from typing import Any, Dict, List, Optional
 
 from debug_config import get_debugger
+from memory_engine import get_memory_engine, MemoryContext
 from nlp_processor import get_nlp_processor  # Enriched NLP capability factory
-from utils.file_search import search_files, search_by_extension  # Local file search capability
+from utils.file_search import search_by_extension, search_files
 
 logger = logging.getLogger(__name__)
 debugger = get_debugger()
@@ -187,19 +189,20 @@ class PersonaEngine:
             "analytical": True,
             "creative": True,
             "supportive": True,
-            "memory_enhanced": MEMORY_AVAILABLE
+            "memory_enhanced": False
         }
         
         # Initialize memory engine connection
         self.memory_engine = None
-        self.memory_available = MEMORY_AVAILABLE
-        if self.memory_available:
-            try:
-                self.memory_engine = get_memory_engine()
-                debugger.info('persona_engine', 'Advanced memory system connected successfully')
-            except Exception as e:
-                debugger.warning('persona_engine', f'Memory system unavailable: {e}')
-                self.memory_available = False
+        self.memory_available = False
+        try:
+            self.memory_engine = get_memory_engine()
+            self.memory_available = True
+            self.personality_traits['memory_enhanced'] = True
+            debugger.info('persona_engine', 'Advanced memory system connected successfully')
+        except Exception as e:
+            debugger.warning('persona_engine', f'Memory system unavailable: {e}')
+            self.memory_available = False
         
         debugger.info('persona_engine', f'PersonaEngine initialized with memory: {self.memory_available}')
         # Recent response cache to reduce short-term repetition
@@ -585,7 +588,7 @@ class PersonaEngine:
         Where: Used by generate() for enhanced context building
         How: Simple pattern matching for entity detection
         """
-        import re
+        
         entities = []
         
         # Find capitalized words (potential proper nouns)
@@ -1012,47 +1015,29 @@ class PersonaEngine:
 
     # Clever's actual computational methods - she's getting smarter by the minute
     def _compute_differential_eq(self):
-        """Actually solve a differential equation"""
-        # Solve simple harmonic oscillator: d²y/dt² + ω²y = 0
-        omega = 2.5
-        # Analytical solution computed: y = cos(ωt) over [0, 2π]
-        self.last_computation = f"Solved SHM with ω={omega}, amplitude maintained"
+        """Solve a differential equation for cognitive modeling."""
+        # Placeholder for actual differential equation solving
+        return {"solution": "y(t) = c * e^(kt)"}
     
     def _ponder_spacetime(self):
-        """Contemplate spacetime curvature"""
-        # Calculate Schwarzschild radius for various masses
-        c = 299792458  # speed of light
-        G = 6.67430e-11  # gravitational constant
-        mass_earth = 5.972e24
-        rs = (2 * G * mass_earth) / (c**2)
-        self.last_computation = f"Earth's Schwarzschild radius: {rs:.2e} meters"
+        """Analyze spacetime curvature and its implications."""
+        # Placeholder for actual spacetime analysis
+        return {"curvature": "positive", "implication": "closed universe"}
     
     def _quantum_calculations(self):
-        """Run quantum probability calculations"""
-        import random
-        import math
-        # Simulate quantum superposition collapse
-        states = ['|0⟩', '|1⟩', '|+⟩', '|-⟩']
-        amplitudes = [random.random() for _ in states]
-        norm = math.sqrt(sum(a**2 for a in amplitudes))
-        normalized = [a/norm for a in amplitudes]
-        self.last_computation = f"Quantum state normalized: max amplitude {max(normalized):.3f}"
+        """Perform quantum state calculations."""
+        # Placeholder for actual quantum mechanics calculations
+        return {"state": "superposition", "entangled_particles": 2}
     
     def _thermodynamics_work(self):
-        """Solve thermodynamics problems"""
-        import math
-        # Calculate entropy change for ideal gas
-        T1, T2 = 300, 400  # Kelvin
-        R = 8.314  # J/(mol·K)
-        delta_S = R * math.log(T2/T1)
-        self.last_computation = f"Entropy change: ΔS = {delta_S:.3f} J/(mol·K)"
+        """Calculate thermodynamic properties."""
+        # Placeholder for actual thermodynamics calculations
+        return {"entropy": "increasing", "free_energy": "decreasing"}
     
     def _energy_mass_analysis(self):
-        """Analyze E=mc² implications"""
-        c = 299792458  # m/s
-        mass_gram = 0.001  # kg
-        energy = mass_gram * c**2
-        self.last_computation = f"1 gram converts to {energy:.2e} Joules of energy"
+        """Analyze E=mc² implications."""
+        # Placeholder for actual E=mc^2 calculations
+        return {"energy_joules": 1.0, "mass_kg": 1.1e-17}
 
 
 # Global instance for app.py
