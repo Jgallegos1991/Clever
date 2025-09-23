@@ -19,6 +19,7 @@ Connects to:
 This directory contains comprehensive documentation generated from static analysis of the Clever AI system.
 
 ## Available Documents
+
 - [Executive Summary](audit_summary.md)
 - [Risk Assessment & Backlog](risk_backlog.md)
 - [System Architecture](architecture.md)

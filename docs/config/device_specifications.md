@@ -63,7 +63,7 @@
 
 ### Network Configuration
 
-```
+```text
 Primary Interface: wlan0 (28:DF:EB:F3:EA:44)
 IPv4: 192.168.1.71/24
 IPv6: 2600:1700:c750:ed0:d12f:349c:6c9f:cfce/64
@@ -103,7 +103,7 @@ Signal Strength: 100% (-30 dBm average)
 
 ### Current Audio State
 
-```
+```text
 Master Volume: 100% (speakers), 40% (headphones)
 Microphone: Muted (CBJ Boost: 30dB)
 HDMI Outputs: Available but not connected
@@ -114,7 +114,7 @@ Audio Codec: Advanced DSP with noise cancellation
 
 ### Detailed Audio Diagnostics
 
-```
+```text
 Card 0: sofrt5682 [sof-rt5682]
   Device 0: HiFi: ALC5682 Analog (*) [HiFi: ALC5682 Analog]
   Device 1: HiFi: rt5682-aif2 (*) [HiFi: rt5682-aif2]  
@@ -213,7 +213,7 @@ lspci -v
 
 ### Latest System Snapshot (2025-09-21)
 
-```
+```text
 Chrome Browser Memory Usage:
 - Main Process: 177MB
 - Tab 1 (GitHub): 266MB  

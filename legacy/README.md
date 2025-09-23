@@ -18,6 +18,7 @@ They are preserved here for reference while the active codebase uses simplified 
 refactored replacements to maintain a clean, runnable state.
 
 Modules archived:
+
 - clever_conversation_engine.py (duplicate methods, structural corruption)
 - knowledge_base_full.py (mixed schemas, indentation errors)
 - utils_watcher_full.py (duplicate docstrings, conflict markers)

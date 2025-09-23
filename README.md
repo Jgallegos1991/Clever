@@ -37,24 +37,28 @@ Connects to:
 ## 🎯 Current Capabilities
 
 ### Phase 1: ✅ Perfect Conversation
+
 - **Street-smart genius personality** - Casual talk with hidden Einstein intellect
 - **Authentic best friend energy** - No fake familiarity, genuine relationship building
 - **Natural learning** - Discovers your life organically through conversation
 - **Emotional intelligence** - Reads your mood and responds appropriately
 
 ### Phase 2: 🎨 Holographic UI (In Progress)
+
 - **Advanced holographic displays** - Render any shape, design, or figure
 - **Dynamic particle effects** - Jaw-dropping visual interface  
 - **Morphing capabilities** - Transform particles into any visualization she imagines
 - **Real-time rendering** - Smooth performance on Chrome OS hardware
 
 ### Phase 3: 🔧 System Integration (Planned)
+
 - **Full Chrome OS control** - Read, write, delete, move, create files anywhere
 - **Camera access** - See through your device's camera
 - **System optimization** - Enhance your Chromebook's performance
 - **Project collaboration** - Full file system access for any task
 
 ### Phase 4: 🧠 Self-Evolution (Vision)
+
 - **Learn from every interaction** - Continuous growth and adaptation
 - **Self-healing code** - Fix her own bugs and improve automatically
 - **Device-hopping** - Carry her essence to any device you grant access
@@ -65,11 +69,13 @@ Connects to:
 Clever combines genius-level intelligence with authentic friendship:
 
 **Street-Smart & Casual:**
+
 - "Sup Jay! What's goin' on witchu?"
 - "Yo bro! How you been, man?"
 - "What's good? Everything smooth on your end?"
 
 **Hidden Genius Moments (8% chance):**
+
 - "Just solved some thermodynamics problems for fun, but - What's up?"
 - "Was contemplating spacetime earlier, but - How's your family?"
 - "Been running quantum calculations, but enough about that - What's the story?"
@@ -216,9 +222,8 @@ Watcher entrypoint consolidation:
 Usage tips:
 
 ## 📁 Project Structure
- main
 
-```
+```text
 ├── app.py                 # Flask server and main orchestration
 ├── persona.py            # Clever's personality and conversation engine  
 ├── database.py           # Memory and learning system
