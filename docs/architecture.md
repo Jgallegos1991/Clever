@@ -41,7 +41,149 @@ Connects to:
 
 ## Architecture Layers
 
-```text
+### System Architecture Diagram
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   Digital Brain Extension Architecture           │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                         RUNTIME INTROSPECTION LAYER              │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │   introspection.py  │  │  Runtime State API  │  │  Debug   ││
+│  │  (Live System Map)  │  │ /api/runtime_intro  │  │  Overlay ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+│                    Monitors All Layers Below                     │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                        FRONTEND LAYER                            │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │ Holographic Chamber │  │   User Interface    │  │Performance││
+│  │ (Three.js/WebGL)    │  │ (Particle Effects)  │  │ Governor  ││
+│  │ 10,000 particles    │  │ Immersive UI        │  │ (45 FPS)  ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+│         Constrained by device_specifications.md                 │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                     FLASK APPLICATION LAYER                      │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │   API Endpoints     │  │  Template Engine    │  │  Error   ││
+│  │  (REST + WebSocket) │  │     (Jinja2)        │  │ Handler  ││
+│  │  traced_render()    │  │  Dark Theme UI      │  │(Global)  ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                   COGNITIVE PARTNERSHIP LAYER                    │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │  PersonaEngine      │  │  Evolution Engine   │  │  NLP     ││
+│  │ Street-smart genius │  │ Continuous learning │  │Processor ││
+│  │ Multiple modes      │  │ Memory formation    │  │ (spaCy)  ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+│              Digital Brain Extension Core Logic                  │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                     DATA PERSISTENCE LAYER                       │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                    SINGLE DATABASE (clever.db)               ││
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────┐││
+│  │  │conversations│  │  knowledge │  │   sources  │  │ system ││││
+│  │  │  (context) │  │   (facts)  │  │   (docs)   │  │ state  ││││
+│  │  └────────────┘  └────────────┘  └────────────┘  └────────┘││
+│  │                Thread-safe DatabaseManager                    ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                      SYSTEM CONSTRAINTS                          │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │ Device Specs (i7)   │  │  Offline Guard      │  │  Privacy ││
+│  │ 16GB RAM / GTX 1060 │  │ offline_guard.py    │  │  First   ││
+│  │ Linux Environment   │  │ No external calls   │  │  Design  ││
+│  └─────────────────────┘  └─────────────────────────┘  └──────────┘│
+└─────────────────────────────────────────────────────────────────┘
+
+Key Architectural Connections:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Runtime Introspection monitors ALL layers for drift detection
+• Device specifications constrain particle count and effects
+• Single database enforces data coherence and relationship memory
+• Offline guard ensures complete digital sovereignty
+• Evolution engine enables continuous cognitive partnership growth
+```
+│                   Digital Brain Extension Architecture           │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                         RUNTIME INTROSPECTION LAYER              │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │   introspection.py  │  │  Runtime State API  │  │  Debug   ││
+│  │  (Live System Map)  │  │ /api/runtime_intro  │  │  Overlay ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+│                    Monitors All Layers Below                     │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                        FRONTEND LAYER                            │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │ Holographic Chamber │  │   User Interface    │  │Performance││
+│  │ (Three.js/WebGL)    │  │ (Particle Effects)  │  │ Governor  ││
+│  │ 10,000 particles    │  │ Immersive UI        │  │ (45 FPS)  ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+│         Constrained by device_specifications.md                 │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                     FLASK APPLICATION LAYER                      │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │   API Endpoints     │  │  Template Engine    │  │  Error   ││
+│  │  (REST + WebSocket) │  │     (Jinja2)        │  │ Handler  ││
+│  │  traced_render()    │  │  Dark Theme UI      │  │(Global)  ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                   COGNITIVE PARTNERSHIP LAYER                    │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │  PersonaEngine      │  │  Evolution Engine   │  │  NLP     ││
+│  │ Street-smart genius │  │ Continuous learning │  │Processor ││
+│  │ Multiple modes      │  │ Memory formation    │  │ (spaCy)  ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+│              Digital Brain Extension Core Logic                  │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                     DATA PERSISTENCE LAYER                       │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                    SINGLE DATABASE (clever.db)               ││
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────┐││
+│  │  │conversations│  │  knowledge │  │   sources  │  │ system ││││
+│  │  │  (context) │  │   (facts)  │  │   (docs)   │  │ state  ││││
+│  │  └────────────┘  └────────────┘  └────────────┘  └────────┘││
+│  │                Thread-safe DatabaseManager                    ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────┐
+│                      SYSTEM CONSTRAINTS                          │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────┐│
+│  │ Device Specs (i7)   │  │  Offline Guard      │  │  Privacy ││
+│  │ 16GB RAM / GTX 1060 │  │ offline_guard.py    │  │  First   ││
+│  │ Linux Environment   │  │ No external calls   │  │  Design  ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────┘│
+└─────────────────────────────────────────────────────────────────┘
+
+Key Architectural Connections:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Runtime Introspection monitors ALL layers for drift detection
+• Device specifications constrain particle count and effects
+• Single database enforces data coherence and relationship memory
+• Offline guard ensures complete digital sovereignty
+• Evolution engine enables continuous cognitive partnership growth
+```
 ┌─────────────────────────────────────────────┐
 │              Frontend Layer                  │
 │  ┌─────────────────┐  ┌─────────────────────┐│

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minimal Particle Test</title>
+    <style>
+        body { margin: 0; background: #000; }
+        canvas { display: block; background: #111; }
+        .info { position: fixed; top: 10px; left: 10px; color: white; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <canvas id="test-canvas"></canvas>
+    <div class="info" id="info">Starting test...</div>
+
+    <script>
+        const info = document.getElementById('info');
+        const canvas = document.getElementById('test-canvas');
+        
+        function log(msg) {
+            console.log(msg);
+            info.innerHTML += '<br>' + msg;
+        }
+        
+        // Test 1: Basic canvas functionality
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        
+        log('Canvas size: ' + canvas.width + 'x' + canvas.height);
+        
+        // Test 2: Simple particle system
+        const particles = [];
+        const numParticles = 50;
+        
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                size: Math.random() * 3 + 1,
+                hue: Math.random() * 360
+            });
+        }
+        
+        log('Created ' + particles.length + ' test particles');
+        
+        // Test 3: Animation loop
+        let frameCount = 0;
+        function animate() {
+            frameCount++;
+            
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Update and draw particles
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // Bounce off edges
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                
+                // Draw particle
+                ctx.fillStyle = `hsl(${p.hue}, 100%, 70%)`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            if (frameCount % 60 === 0) {
+                log('Frame ' + frameCount + ' - particles animated');
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        log('Animation started');
+    </script>
+</body>
+</html>

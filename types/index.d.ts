@@ -18,13 +18,26 @@ declare global {
     // Holographic Chamber particle system
     holographicChamber?: {
       morphToFormation: (formation: string) => void;
+      morphToFormationWithHold?: (formation: string, opts?: { holdMs?: number; postDriftMs?: number }) => void;
       summon: () => void;
       idle: () => void;
       dialogue: () => void;
       particles?: any[];
       currentFormation?: string;
+      triggerPulse?: (intensity: number) => void;
+      explode?: (intensity?: number) => void;
+      implode?: (intensity?: number) => void;
+      createVortex?: (x: number, y: number, strength?: number, duration?: number) => void;
+      morphToText?: (text: string, fontSize?: number) => void;
+      danceParty?: (duration?: number) => void;
+      createLightning?: (fromIndex: number, toIndex: number) => void;
+      toggleTrailMode?: () => void;
+      addMagneticField?: (x: number, y: number, strength?: number, radius?: number, polarity?: number) => void;
+      createEnergyWave?: (x: number, y: number, maxRadius?: number, speed?: number, intensity?: number) => void;
     };
     startHolographicChamber?: (canvas: HTMLCanvasElement) => any;
+    cleverIntent?: string;
+  morphToText?: (text: string) => void;
 
     // Particle effects functions
     explodeParticles?: (intensity: number) => void;

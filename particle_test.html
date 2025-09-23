@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Particle System Test</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: monospace;
+        }
+        canvas {
+            display: block;
+            background: #000;
+        }
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: #69EACB;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            width: 350px;
+        }
+        .controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            color: #69EACB;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+        }
+        button {
+            background: #1a1a1a;
+            color: #69EACB;
+            border: 1px solid #69EACB;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        button:hover {
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    
+    <div class="debug-info" id="debug">
+        <strong>Particle System Diagnostics</strong><br>
+        Starting...
+    </div>
+    
+    <div class="controls">
+        <button onclick="testBasicDraw()">Test Basic Draw</button>
+        <button onclick="testParticleInit()">Test Particle Init</button>
+        <button onclick="testAnimation()">Test Animation</button>
+        <button onclick="clearDebug()">Clear Debug</button>
+    </div>
+
+    <script>
+        const debug = document.getElementById('debug');
+        let chamber = null;
+        let frameCount = 0;
+        
+        function log(msg) {
+            console.log(msg);
+            debug.innerHTML += '<br>' + msg;
+            debug.scrollTop = debug.scrollHeight;
+        }
+        
+        function clearDebug() {
+            debug.innerHTML = '<strong>Particle System Diagnostics</strong><br>';
+        }
+        
+        function testBasicDraw() {
+            log('=== Testing Basic Canvas Drawing ===');
+            const canvas = document.getElementById('particles');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Test basic shapes
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(50, 50, 100, 100);
+            log('✅ Red rectangle drawn');
+            
+            ctx.fillStyle = '#00ff00';
+            ctx.beginPath();
+            ctx.arc(200, 100, 50, 0, Math.PI * 2);
+            ctx.fill();
+            log('✅ Green circle drawn');
+            
+            // Test gradient
+            const gradient = ctx.createRadialGradient(350, 100, 0, 350, 100, 50);
+            gradient.addColorStop(0, '#69EACB');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(350, 100, 50, 0, Math.PI * 2);
+            ctx.fill();
+            log('✅ Gradient circle drawn');
+        }
+        
+        function testParticleInit() {
+            log('=== Testing Particle System Initialization ===');
+            
+            if (typeof window.startHolographicChamber === 'undefined') {
+                log('❌ startHolographicChamber function not found');
+                return;
+            }
+            
+            const canvas = document.getElementById('particles');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            try {
+                chamber = window.startHolographicChamber(canvas);
+                if (chamber) {
+                    log('✅ HolographicChamber initialized');
+                    log(`Particles created: ${chamber.particles ? chamber.particles.length : 'Unknown'}`);
+                    log(`Canvas size: ${chamber.width}x${chamber.height}`);
+                    log(`Max particles: ${chamber.maxParticles}`);
+                    log(`Current state: ${chamber.state}`);
+                    
+                    if (chamber.particles && chamber.particles.length > 0) {
+                        const p = chamber.particles[0];
+                        log(`Sample particle: x=${p.x.toFixed(1)}, y=${p.y.toFixed(1)}, size=${p.size.toFixed(1)}`);
+                    }
+                } else {
+                    log('❌ HolographicChamber returned null');
+                }
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+                log('Stack: ' + error.stack);
+            }
+        }
+        
+        function testAnimation() {
+            if (!chamber) {
+                log('❌ No chamber instance - run particle init first');
+                return;
+            }
+            
+            log('=== Testing Animation Loop ===');
+            frameCount = 0;
+            
+            const testDuration = 3000; // 3 seconds
+            const startTime = Date.now();
+            
+            const animTest = () => {
+                frameCount++;
+                const elapsed = Date.now() - startTime;
+                
+                if (elapsed < testDuration) {
+                    requestAnimationFrame(animTest);
+                } else {
+                    log(`✅ Animation test complete: ${frameCount} frames in ${elapsed}ms`);
+                    log(`Average FPS: ${(frameCount / (elapsed / 1000)).toFixed(1)}`);
+                    
+                    if (chamber.particles && chamber.particles.length > 0) {
+                        const p = chamber.particles[0];
+                        log(`Final particle position: x=${p.x.toFixed(1)}, y=${p.y.toFixed(1)}`);
+                    }
+                }
+            };
+            
+            animTest();
+        }
+        
+        // Auto-start basic canvas test
+        window.onload = () => {
+            log('Window loaded, starting tests...');
+            testBasicDraw();
+        };
+    </script>
+    
+    <!-- Load the holographic chamber script -->
+    <script src="/static/js/engines/holographic-chamber.js"></script>
+    
+    <script>
+        // Auto-test after script loads
+        setTimeout(() => {
+            testParticleInit();
+        }, 500);
+    </script>
+</body>
+</html>

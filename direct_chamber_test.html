@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct HolographicChamber Test</title>
+    <style>
+        body { margin: 0; background: #000; font-family: monospace; }
+        canvas { border: 1px solid #333; }
+        .debug { color: white; padding: 10px; }
+        .error { color: #ff6666; }
+        .success { color: #66ff66; }
+        .warning { color: #ffff66; }
+    </style>
+</head>
+<body>
+    <div class="debug">
+        <h3>HolographicChamber Direct Test</h3>
+        <div id="log"></div>
+    </div>
+    <canvas id="test-canvas" width="800" height="600"></canvas>
+
+    <script>
+        const log = document.getElementById('log');
+        
+        function addLog(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            log.appendChild(div);
+            console.log(message);
+        }
+        
+        addLog('Starting HolographicChamber direct test...');
+        
+        // Load holographic chamber script dynamically
+        const script = document.createElement('script');
+        script.src = '/static/js/engines/holographic-chamber.js';
+        
+        script.onload = function() {
+            addLog('✅ HolographicChamber script loaded', 'success');
+            
+            // Test class availability
+            if (typeof HolographicChamber === 'undefined') {
+                addLog('❌ HolographicChamber class not found', 'error');
+                return;
+            }
+            addLog('✅ HolographicChamber class found', 'success');
+            
+            // Test canvas
+            const canvas = document.getElementById('test-canvas');
+            if (!canvas) {
+                addLog('❌ Canvas not found', 'error');
+                return;
+            }
+            addLog('✅ Canvas found', 'success');
+            
+            // Test canvas context
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                addLog('❌ Canvas context not available', 'error');
+                return;
+            }
+            addLog('✅ Canvas context available', 'success');
+            
+            // Draw test pattern on canvas first
+            ctx.fillStyle = '#222';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.fillText('Canvas Test', 10, 30);
+            addLog('✅ Canvas drawing test complete', 'success');
+            
+            // Test direct class instantiation
+            try {
+                addLog('Creating HolographicChamber instance...');
+                const chamber = new HolographicChamber(canvas);
+                addLog('✅ HolographicChamber instance created', 'success');
+                
+                // Check properties
+                addLog(`Canvas size: ${chamber.width}x${chamber.height}`);
+                addLog(`Max particles: ${chamber.maxParticles}`);
+                addLog(`State: ${chamber.state}`);
+                addLog(`Particles array length: ${chamber.particles ? chamber.particles.length : 'undefined'}`);
+                
+                if (chamber.particles && chamber.particles.length > 0) {
+                    const p = chamber.particles[0];
+                    addLog(`First particle: x=${p.x.toFixed(1)}, y=${p.y.toFixed(1)}, size=${p.size.toFixed(1)}`, 'success');
+                } else {
+                    addLog('❌ No particles created', 'error');
+                }
+                
+                // Test startHolographicChamber function
+                if (typeof window.startHolographicChamber === 'function') {
+                    addLog('✅ startHolographicChamber function available', 'success');
+                    
+                    // Create a fresh canvas for the wrapper function test
+                    const canvas2 = document.createElement('canvas');
+                    canvas2.width = 400;
+                    canvas2.height = 300;
+                    canvas2.style.border = '1px solid #666';
+                    document.body.appendChild(canvas2);
+                    
+                    const chamber2 = window.startHolographicChamber(canvas2);
+                    if (chamber2) {
+                        addLog('✅ startHolographicChamber wrapper works', 'success');
+                        addLog(`Wrapper instance particles: ${chamber2.particles ? chamber2.particles.length : 'undefined'}`);
+                    } else {
+                        addLog('❌ startHolographicChamber returned null', 'error');
+                    }
+                } else {
+                    addLog('❌ startHolographicChamber function not available', 'error');
+                }
+                
+            } catch (error) {
+                addLog('❌ Error creating HolographicChamber: ' + error.message, 'error');
+                addLog('Stack trace: ' + error.stack, 'error');
+            }
+        };
+        
+        script.onerror = function() {
+            addLog('❌ Failed to load HolographicChamber script', 'error');
+        };
+        
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

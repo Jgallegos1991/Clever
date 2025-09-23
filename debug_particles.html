@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Debug</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        #particles {
+            display: block;
+            background: #000;
+        }
+        #debug {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: monospace;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            font-size: 12px;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    <div id="debug">Loading...</div>
+    
+    <script>
+        const debug = document.getElementById('debug');
+        function log(msg) {
+            console.log(msg);
+            debug.innerHTML += msg + '<br>';
+            debug.scrollTop = debug.scrollHeight;
+        }
+        
+        log('Starting particle debug...');
+        
+        // Test canvas creation
+        const canvas = document.getElementById('particles');
+        if (!canvas) {
+            log('❌ Canvas not found');
+        } else {
+            log('✅ Canvas found');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            log(`Canvas size: ${canvas.width}x${canvas.height}`);
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                log('❌ Canvas context not available');
+            } else {
+                log('✅ Canvas context available');
+                
+                // Test basic drawing
+                ctx.fillStyle = 'red';
+                ctx.fillRect(100, 100, 50, 50);
+                log('✅ Basic drawing test complete');
+            }
+        }
+    </script>
+    
+    <script src="/static/js/engines/holographic-chamber.js"></script>
+    
+    <script>
+        setTimeout(() => {
+            log('Testing holographic chamber...');
+            
+            if (typeof window.startHolographicChamber === 'undefined') {
+                log('❌ startHolographicChamber not available');
+            } else {
+                log('✅ startHolographicChamber available');
+                
+                try {
+                    const chamber = window.startHolographicChamber(canvas);
+                    if (chamber) {
+                        log('✅ Chamber initialized successfully');
+                        log(`Particles: ${chamber.particles ? chamber.particles.length : 'N/A'}`);
+                        
+                        // Test animation
+                        let frameCount = 0;
+                        const testAnimation = () => {
+                            frameCount++;
+                            if (frameCount <= 60) { // Test for 1 second at 60fps
+                                requestAnimationFrame(testAnimation);
+                            } else {
+                                log(`✅ Animation test complete (${frameCount} frames)`);
+                            }
+                        };
+                        testAnimation();
+                        
+                    } else {
+                        log('❌ Chamber initialization returned null');
+                    }
+                } catch (error) {
+                    log('❌ Chamber initialization error: ' + error.message);
+                }
+            }
+        }, 100);
+    </script>
+</body>
+</html>

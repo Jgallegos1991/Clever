@@ -34,12 +34,21 @@ class HolographicChamber {
     // Visual enhancement settings
     this.trailMode = false;
     this.energyFlowMode = true;
+    this.debugMode = false; // Enable simple particle rendering for debugging
+    this.enableFormationRotation = true; // Enable rotation for 3D thought formations
     this.particlePhysics = {
       gravity: 0,
       magnetism: 0.5,
       cohesion: 0.3,
       separation: 0.2
     };
+    // Roaming / spatial expansion controls
+    // Why: Allow Clever's particles to gradually occupy more screen real estate to avoid unused dead space
+    // Where: Used in resize(), morphToFormation(), update() to scale formation radius and roaming targets
+    // How: roamExpansion interpolates from 1.0 to maxRoamExpansion when idle (not holding formation); reset on new formation
+    this.roamExpansion = 1.0;
+    this.maxRoamExpansion = 1.45; // up to 45% larger radius coverage
+    this.roamGrowthRate = 0.0006; // per frame growth while idle
     
     this.init();
   }
@@ -56,10 +65,8 @@ class HolographicChamber {
     this.accessibilityEnabled = false;
     this.debugOverlayEnabled = false;
     
-  // Always start with whirlpool formation for idle
-  this.morphToFormation('whirlpool');
-  
   // Start Clever's thinking pattern - she forms shapes based on what she's pondering
+  // This is Clever's visual language and cognitive representation
   this.startThoughtFormations();
     
   this.animate();
@@ -79,14 +86,15 @@ class HolographicChamber {
 
   startThoughtFormations() {
     // Clever's thinking patterns - she forms shapes based on what she's pondering
+    // Updated: fast converge -> hold (slow rotate) -> gentle drift
     const thoughtPatterns = [
-      { shape: 'cube', thought: 'quantum mechanics', duration: 8000 },
-      { shape: 'torus', thought: 'creative solutions', duration: 6000 },
-      { shape: 'helix', thought: 'DNA structures', duration: 7000 },
-      { shape: 'sphere', thought: 'planetary motion', duration: 5000 },
-      { shape: 'wave', thought: 'electromagnetic waves', duration: 6000 },
-      { shape: 'spiral', thought: 'fibonacci sequences', duration: 7000 },
-      { shape: 'whirlpool', thought: 'fluid dynamics', duration: 4000 }
+      { shape: 'cube', thought: 'quantum mechanics', hold: 4200, post: 1200 },
+      { shape: 'torus', thought: 'creative solutions', hold: 3800, post: 1200 },
+      { shape: 'helix', thought: 'DNA structures', hold: 4200, post: 1400 },
+      { shape: 'sphere', thought: 'planetary motion', hold: 3600, post: 1000 },
+      { shape: 'wave', thought: 'electromagnetic waves', hold: 3400, post: 1400 },
+      { shape: 'spiral', thought: 'fibonacci sequences', hold: 4200, post: 1400 },
+      { shape: 'whirlpool', thought: 'fluid dynamics', hold: 3000, post: 1000 }
     ];
     
     let currentIndex = 0;
@@ -94,13 +102,11 @@ class HolographicChamber {
     // Start thinking cycle - Clever forms shapes based on her thoughts
     const thinkingCycle = () => {
       const pattern = thoughtPatterns[currentIndex];
-      this.morphToFormation(pattern.shape);
       this.currentThought = pattern.thought;
-      
-      // Move to next thought pattern
+      this.morphToFormationWithHold(pattern.shape, { holdMs: pattern.hold, postDriftMs: pattern.post });
       currentIndex = (currentIndex + 1) % thoughtPatterns.length;
-      
-      setTimeout(thinkingCycle, pattern.duration);
+      const totalDelay = pattern.hold + pattern.post + 400; // buffer between cycles
+      setTimeout(thinkingCycle, totalDelay);
     };
     
     // Start first thought after a brief moment
@@ -128,9 +134,14 @@ class HolographicChamber {
   }
 
   resize() {
-  // Use canvas dimensions instead of window dimensions for proper particle placement
-  this.width = this.canvas.width || 1366;
-  this.height = this.canvas.height || 768;
+  // Dynamic full-viewport adaptation
+  // Why: Ensure particles utilize entire available stage (no unused margins)
+  // Where: Called on init + window resize event
+  // How: Resize underlying canvas buffer to window size; update internal width/height
+  this.canvas.width = window.innerWidth;
+  this.canvas.height = window.innerHeight;
+  this.width = this.canvas.width;
+  this.height = this.canvas.height;
   
   console.log(`🔧 HolographicChamber resize: ${this.width}x${this.height}, particles: ${this.particles.length}`);
   
@@ -144,15 +155,24 @@ class HolographicChamber {
       this.particles.push({
         x: Math.random() * this.width,
         y: Math.random() * this.height,
-    vx: (Math.random() - 0.5) * 0.05, // Much slower initial velocity (reduced from 0.2 to 0.05)
-    vy: (Math.random() - 0.5) * 0.05, // Much slower initial velocity (reduced from 0.2 to 0.05)
+    // Much slower initial velocities for very calm start
+    vx: (Math.random() - 0.5) * 0.005,
+    vy: (Math.random() - 0.5) * 0.005,
     targetX: Math.random() * this.width,
     targetY: Math.random() * this.height,
     size: Math.random() * 2 + 1,
     alpha: Math.random() * 0.4 + 0.6,
     hue: Math.random() * 60 + 160,
     phase: Math.random() * Math.PI * 2,
-    speed: 0.05 + Math.random() * 0.03, // Increased speed range: 0.05-0.08 for visible movement
+    // Much lower natural speed for very calm movement
+    speed: 0.005 + Math.random() * 0.01, // 0.005–0.015 (much slower)
+    baseSpeed: 0.005 + Math.random() * 0.01,
+    // Noise parameters per particle for organic drift
+    noisePhase1: Math.random() * Math.PI * 2,
+    noisePhase2: Math.random() * Math.PI * 2,
+    noiseSpeed1: 0.12 + Math.random() * 0.05,
+    noiseSpeed2: 0.05 + Math.random() * 0.03,
+    noiseScale: 0.006 + Math.random() * 0.004, // tiny per-frame velocity drift
     energy: Math.random() * 0.04 + 0.04 // Slowed down pulsing from 0.08-0.16 to 0.04-0.08
       });
     }
@@ -160,12 +180,17 @@ class HolographicChamber {
   }
 
   morphToFormation(formation) {
+    // Cancel any existing hold so new formation can take priority
+    this.isHoldingFormation = false;
     console.log(`🔄 HolographicChamber.morphToFormation called with: ${formation}`);
     console.log(`📊 Particle count: ${this.particles.length}, Canvas size: ${this.width}x${this.height}`);
     
-    const centerX = this.width / 2;
-    const centerY = this.height / 2;
-    const radius = Math.min(this.width, this.height) * 0.35;
+  const centerX = this.width / 2;
+  const centerY = this.height / 2;
+  const baseRadius = Math.min(this.width, this.height) * 0.35;
+  // Reset roam expansion when a distinct formation is explicitly requested (fresh focus)
+  this.roamExpansion = 1.0;
+  const radius = baseRadius * (this.roamExpansion || 1);
     
     console.log(`🎯 Formation center: ${centerX}, ${centerY}, radius: ${radius}`);
     
@@ -262,22 +287,27 @@ class HolographicChamber {
           break;
           
         case 'whirlpool':
-          // Dynamic center-stage whirlpool effect
+          // Thoughtful whirlpool representing active cognitive processing (fluid dynamics thinking)
           const whirlCenterX = centerX;
-          const whirlCenterY = centerY; // True center for stage focus
-          const whirlAngle = (i / this.particles.length) * Math.PI * 8 + Date.now() * 0.0015; // Faster rotation
-          const whirlRadius = radius * (0.4 + Math.sin(whirlAngle * 0.3) * 0.3);
-          const whirlHeight = Math.sin(whirlAngle * 1.5) * 40; // Gentle vertical motion
-          const whirlSpiral = (i / this.particles.length) * radius * 0.2; // Spiral inward/outward
+          const whirlCenterY = centerY;
+          // Gentle time-based rotation to show active thinking, much slower than before
+          const whirlAngle = (i / this.particles.length) * Math.PI * 8 + Date.now() * 0.0003; // Much slower rotation
+          const whirlRadius = radius * (0.5 + Math.sin(whirlAngle * 0.2) * 0.1); // Gentle pulsing
+          const whirlHeight = Math.sin(whirlAngle * 0.8) * 15; // Subtle vertical motion
+          const whirlSpiral = (i / this.particles.length) * radius * 0.12;
           
           particle.targetX = whirlCenterX + Math.cos(whirlAngle) * (whirlRadius + whirlSpiral) + randomOffset();
-          particle.targetY = whirlCenterY + Math.sin(whirlAngle) * (whirlRadius + whirlSpiral) * 0.6 + whirlHeight;
+          particle.targetY = whirlCenterY + Math.sin(whirlAngle) * (whirlRadius + whirlSpiral) * 0.7 + whirlHeight;
           break;
           
         case 'scatter':
         default:
-          particle.targetX = Math.random() * this.width;
-          particle.targetY = Math.random() * this.height;
+          // Calm, gentle scatter with slight bias toward center
+          const scatterX = Math.random() * this.width;
+          const scatterY = Math.random() * this.height;
+          // Gentle bias toward center for more cohesive look
+          particle.targetX = scatterX * 0.7 + centerX * 0.3 + randomOffset();
+          particle.targetY = scatterY * 0.7 + centerY * 0.3 + randomOffset();
           break;
       }
     });
@@ -290,6 +320,23 @@ class HolographicChamber {
     }
   }
 
+  /**
+   * morphToFormationWithHold
+   * Why: Present shape clearly (slow rotation) so user can cognitively parse structure before returning to organic motion
+   * Where: Invoked by thought pattern cycle & potential external triggers
+   * How: Boost particle speeds for rapid convergence, set hold timers, slow rotate, then restore speeds
+   */
+  morphToFormationWithHold(formation, opts = {}) {
+    const { holdMs = 4000, postDriftMs = 1200 } = opts;
+    this.morphToFormation(formation);
+    this.isHoldingFormation = true;
+    this.holdFormation = formation;
+    this.holdUntil = performance.now() + holdMs;
+    this.postDriftUntil = this.holdUntil + postDriftMs;
+    this.holdRotationAngle = 0;
+    this.particles.forEach(p => { p.__origSpeed = p.speed; p.speed *= 4; });
+  }
+
   setState(newState) {
     if (this.state === newState) return;
     
@@ -298,8 +345,9 @@ class HolographicChamber {
     // Map Clever's thought process/intent to formation
     switch (newState) {
       case 'idle':
-        // Clever's idol: angled whirlpool as default idle state
-        this.morphToFormation('whirlpool');
+        // Return to natural thinking patterns - let her mind wander
+        // Don't override the thought formation system, just ensure it's active
+        console.log('🧠 Clever returning to natural thought patterns');
         break;
       case 'summon':
         this.morphToFormation('sphere');
@@ -324,6 +372,18 @@ class HolographicChamber {
   }
 
   update() {
+    const now = performance.now();
+    this._holding = this.isHoldingFormation && now < this.holdUntil;
+    this._inPostDrift = this.isHoldingFormation && now >= this.holdUntil && now < this.postDriftUntil;
+    if (this.isHoldingFormation && now >= this.postDriftUntil) {
+      this.isHoldingFormation = false;
+      this.particles.forEach(p => { if (p.__origSpeed) { p.speed = p.__origSpeed; delete p.__origSpeed; } });
+    }
+
+    // Grow roaming radius gradually when not in hold (gives expansive feel using unused space)
+    if (!this._holding && !this._inPostDrift) {
+      this.roamExpansion = Math.min(this.maxRoamExpansion, this.roamExpansion + this.roamGrowthRate);
+    }
     // Update magnetic fields
     this.magneticFields = this.magneticFields.filter(field => {
       field.strength *= field.decay;
@@ -343,14 +403,35 @@ class HolographicChamber {
     });
 
     this.particles.forEach((particle, i) => {
-      // Move towards target formation
+      // Move towards target formation using a soft spring-damper + organic drift
+      // Why: Replace straight-line acceleration with a spring-like approach and low-frequency noise to feel more alive and less mechanical
+      // Where: Core motion model for free movement and formation convergence
+      // How: ax = k * (target - pos) - c * v + low-frequency noise + slight tangential swirl
       const dx = particle.targetX - particle.x;
       const dy = particle.targetY - particle.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
+      const distance = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+
+      // Low-frequency noise drift (two-band sine blend)
+      const t = now * 0.001;
+      const n1x = Math.sin(t * particle.noiseSpeed1 + particle.noisePhase1);
+      const n1y = Math.cos(t * particle.noiseSpeed1 + particle.noisePhase2);
+      const n2x = Math.cos(t * particle.noiseSpeed2 + particle.noisePhase2);
+      const n2y = Math.sin(t * (particle.noiseSpeed2 * 1.1) + particle.noisePhase1);
+      const noiseFactor = (this._holding ? 0.2 : (this._inPostDrift ? 0.6 : 1.0)) * this.roamExpansion;
+      const nx = (n1x + n2x) * 0.5 * particle.noiseScale * noiseFactor;
+      const ny = (n1y + n2y) * 0.5 * particle.noiseScale * noiseFactor;
+
       if (distance > 1) {
-        particle.vx += dx * (particle.speed * 0.1); // Increased movement speed for visible shape morphing
-        particle.vy += dy * (particle.speed * 0.1); // Increased movement speed for visible shape morphing
+        // Spring attraction with light velocity damping to avoid robotic motion
+        const k = (this._holding ? 0.06 : (this._inPostDrift ? 0.045 : 0.03)); // stiffness
+        const c = 0.015; // velocity damping term
+        const att = particle.speed * k;
+        particle.vx += dx * att - particle.vx * c + nx * 0.5;
+        particle.vy += dy * att - particle.vy * c + ny * 0.5;
+      } else {
+        // Near target: roam gently with organic noise
+        particle.vx += nx;
+        particle.vy += ny;
       }
 
       // Apply magnetic field effects
@@ -454,12 +535,15 @@ class HolographicChamber {
         }
       }
       
-      // Apply velocity with stronger damping for slower, calmer movement
-      particle.vx *= 0.98; // Stronger damping to slow down particles (reduced from 0.992 to 0.98)
-      particle.vy *= 0.98;
+      // Apply velocity with gentler damping for smooth, slower motion
+      let damping = 0.987;
+      if (this._holding) damping = 0.95; // keep slight movement for rotation effect
+      if (this._inPostDrift) damping = 0.992; // very gentle release
+      particle.vx *= damping;
+      particle.vy *= damping;
       
-      // Cap maximum velocity to slow down the fastest moving particles specifically
-      const maxSpeed = 1.5; // Increased speed limit (was 0.8, now 1.5 for better movement)
+      // Cap maximum velocity for calm feel (lower than before, dynamic per state)
+      const maxSpeed = this._holding ? 0.55 : (this._inPostDrift ? 0.8 : 0.9);
       const currentSpeed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
       if (currentSpeed > maxSpeed) {
         particle.vx = (particle.vx / currentSpeed) * maxSpeed;
@@ -470,7 +554,7 @@ class HolographicChamber {
       particle.y += particle.vy;
       
       // Update phase for pulsing with breathing effect (MUCH more chill and slower)
-      particle.phase += 0.0003 + particle.energy * 0.0005; // Much slower phase updates (reduced from 0.001 + 0.002 to 0.0003 + 0.0005)
+  particle.phase += (this._holding ? 0.00015 : 0.0003) + particle.energy * 0.0005;
       
       // Gentle size pulsing based on energy (way less seizure-inducing and much slower!)
       const breathingPhase = Date.now() * 0.0001 + particle.phase; // Much slower breathing (reduced from 0.0003 to 0.0001)
@@ -483,11 +567,11 @@ class HolographicChamber {
       if (particle.hue > 220) particle.hue = 160;
       if (particle.hue < 160) particle.hue = 220;
       
-      // Wrap around screen edges
-      if (particle.x < 0) particle.x = this.width;
-      if (particle.x > this.width) particle.x = 0;
-      if (particle.y < 0) particle.y = this.height;
-      if (particle.y > this.height) particle.y = 0;
+      // Soft boundary reflection (keeps particles visible while using full space)
+      if (particle.x < 0) { particle.x = 0; particle.vx *= -0.6; }
+      if (particle.x > this.width) { particle.x = this.width; particle.vx *= -0.6; }
+      if (particle.y < 0) { particle.y = 0; particle.vy *= -0.6; }
+      if (particle.y > this.height) { particle.y = this.height; particle.vy *= -0.6; }
     });
 
     // Update energy streams
@@ -509,10 +593,11 @@ class HolographicChamber {
   draw() {
     // Debug particle count every 60 frames
     if ((this.frameCount || 0) % 60 === 0) {
-      console.log(`🎨 Drawing ${this.particles.length} particles`);
+      console.log(`🎨 Drawing ${this.particles.length} particles on ${this.width}x${this.height} canvas`);
       if (this.particles.length > 0) {
         const sample = this.particles[0];
         console.log(`📍 Sample particle: x=${sample.x.toFixed(1)}, y=${sample.y.toFixed(1)}, size=${sample.size.toFixed(1)}, alpha=${sample.alpha.toFixed(2)}`);
+        console.log(`🎯 Sample targets: targetX=${sample.targetX.toFixed(1)}, targetY=${sample.targetY.toFixed(1)}`);
       }
     }
     
@@ -538,11 +623,28 @@ class HolographicChamber {
 
     // Draw particles with enhanced effects
     this.particles.forEach((particle, i) => {
+      // Ensure particle position is valid
+      if (isNaN(particle.x) || isNaN(particle.y)) {
+        console.warn(`⚠️ Invalid particle position at index ${i}: x=${particle.x}, y=${particle.y}`);
+        return;
+      }
+      
       this.ctx.save();
+      
+      // Debug mode: simple rendering for performance testing
+      if (this.debugMode || this.frameCount < 10) {
+        this.ctx.fillStyle = '#69EACB';
+        this.ctx.globalAlpha = 0.8;
+        this.ctx.beginPath();
+        this.ctx.arc(particle.x, particle.y, Math.max(2, particle.size), 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.restore();
+        return;
+      }
       
       // Gentle alpha variation (no more seizure strobing!)
       const dynamicAlpha = particle.alpha * (0.8 + Math.sin(particle.phase) * 0.15) * (0.9 + particle.energy * 0.1);
-      this.ctx.globalAlpha = dynamicAlpha;
+      this.ctx.globalAlpha = Math.max(0.1, Math.min(1, dynamicAlpha)); // Clamp alpha
       
       // Subtle energy-based size multiplier
       const energySize = particle.size * (1 + particle.energy * 0.3);
@@ -555,28 +657,32 @@ class HolographicChamber {
       ];
       
       layers.forEach(layer => {
-        const gradient = this.ctx.createRadialGradient(
-          particle.x, particle.y, 0,
-          particle.x, particle.y, layer.radius
-        );
-        // Use formation color if available, otherwise use particle hue
-        const baseHue = particle.formationHue || particle.hue;
-        const hue = (baseHue + layer.hueShift) % 360;
-        const lightness = 60 + particle.energy * 20;
-        
-        gradient.addColorStop(0, `hsla(${hue}, 85%, ${lightness}%, ${layer.alpha})`);
-        gradient.addColorStop(0.7, `hsla(${hue}, 85%, ${lightness}%, ${layer.alpha * 0.5})`);
-        gradient.addColorStop(1, `hsla(${hue}, 85%, ${lightness}%, 0)`);
-        
-        this.ctx.fillStyle = gradient;
-        this.ctx.beginPath();
-        this.ctx.arc(particle.x, particle.y, layer.radius, 0, Math.PI * 2);
-        this.ctx.fill();
+        try {
+          const gradient = this.ctx.createRadialGradient(
+            particle.x, particle.y, 0,
+            particle.x, particle.y, layer.radius
+          );
+          // Use formation color if available, otherwise use particle hue
+          const baseHue = particle.formationHue || particle.hue;
+          const hue = (baseHue + layer.hueShift) % 360;
+          const lightness = 60 + particle.energy * 20;
+          
+          gradient.addColorStop(0, `hsla(${hue}, 85%, ${lightness}%, ${layer.alpha})`);
+          gradient.addColorStop(0.7, `hsla(${hue}, 85%, ${lightness}%, ${layer.alpha * 0.5})`);
+          gradient.addColorStop(1, `hsla(${hue}, 85%, ${lightness}%, 0)`);
+          
+          this.ctx.fillStyle = gradient;
+          this.ctx.beginPath();
+          this.ctx.arc(particle.x, particle.y, layer.radius, 0, Math.PI * 2);
+          this.ctx.fill();
+        } catch (error) {
+          console.warn(`⚠️ Gradient rendering error for particle ${i}:`, error);
+        }
       });
       
       // Gentle center core (less eye-searing!)
       this.ctx.globalAlpha = 0.9;
-      const coreSize = 1 + particle.energy * 1;
+      const coreSize = Math.max(1, 1 + particle.energy * 1);
       const coreHue = (particle.hue + 20) % 360;
       this.ctx.fillStyle = `hsl(${coreHue}, 90%, 70%)`;
       this.ctx.beginPath();
@@ -589,6 +695,23 @@ class HolographicChamber {
       
       this.ctx.restore();
     });
+
+    // Apply slow rotation to held 3D formations only when explicitly enabled
+    if (this._holding && this.enableFormationRotation && ['sphere','cube','torus','helix'].includes(this.holdFormation)) {
+      this.holdRotationAngle += 0.002; // slow, readable
+      const centerX = this.width / 2;
+      const centerY = this.height / 2;
+      const cosA = Math.cos(this.holdRotationAngle);
+      const sinA = Math.sin(this.holdRotationAngle);
+      this.particles.forEach(p => {
+        const dx = p.x - centerX;
+        const dy = p.y - centerY;
+        const rx = dx * cosA - dy * sinA;
+        const ry = dx * sinA + dy * cosA;
+        p.x = centerX + rx;
+        p.y = centerY + ry;
+      });
+    }
   }
 
   drawEnergyWaves() {
@@ -748,6 +871,12 @@ class HolographicChamber {
     // Slower, more consistent animation loop
     this.frameCount = (this.frameCount || 0) + 1;
     
+    // Check if animation should continue
+    if (!this.canvas || !this.ctx) {
+      console.error('❌ Animation stopped: canvas or context lost');
+      return;
+    }
+    
     // Update every 2nd frame for slower motion, but ensure consistent speed
     if (this.frameCount % 2 === 0) {
       this.update();
@@ -755,6 +884,12 @@ class HolographicChamber {
     
     // Always draw to maintain smooth visuals
     this.draw();
+    
+    // Debug logging every 120 frames (every ~2 seconds at 60fps)
+    if (this.frameCount % 120 === 0) {
+      console.log(`🎬 Animation frame ${this.frameCount}, particles: ${this.particles.length}, state: ${this.state}`);
+    }
+    
     requestAnimationFrame(() => this.animate());
   }
 
@@ -1201,6 +1336,13 @@ window.createLightning = function() {
 window.toggleTrails = function() {
   if (window.holographicChamber) {
     window.holographicChamber.toggleTrailMode();
+  }
+};
+
+window.toggleDebugMode = function() {
+  if (window.holographicChamber) {
+    window.holographicChamber.debugMode = !window.holographicChamber.debugMode;
+    console.log(`Debug mode: ${window.holographicChamber.debugMode ? 'ON' : 'OFF'}`);
   }
 };
 

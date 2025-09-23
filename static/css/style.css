@@ -20,6 +20,11 @@ How: Dark cosmic theme with particle focus, no buttons
   --glow-teal: rgba(105, 234, 203, 0.35);
   --glow-magenta: rgba(255, 107, 255, 0.35);
   --glass-bg: rgba(11, 15, 20, 0.7);
+  /* Message lifecycle timings (mirror JS constants) */
+  --bubble-fade-in-ms: 500ms;
+  --bubble-visible-ms: 6000ms; /* kept for reference; not directly used in CSS */
+  --bubble-fade-out-ms: 800ms;
+  --input-focus-pulse: 2400ms;
 }
 
 /* CSS Reset - Clean Foundation */
@@ -48,6 +53,17 @@ body {
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Full-stage particle canvas (#particles) */
+#particles {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
 }
 
 /* Grid Background Overlay for Better Visibility */
@@ -92,7 +108,7 @@ body::before {
   pointer-events: none;
 }
 
-/* Individual Chat Bubbles */
+/* Individual Chat Bubbles (Ephemeral Thought Forms) */
 .chat-message {
   background: var(--glass-bg);
   border: 1px solid var(--neon-teal);
@@ -105,7 +121,20 @@ body::before {
   color: var(--fg);
   max-width: 80%;
   pointer-events: auto;
-  animation: fadeInUp 0.3s ease-out;
+  opacity: 0;
+  transform: translateY(6px) scale(.97);
+  transition: opacity var(--bubble-fade-in-ms) ease, transform var(--bubble-fade-in-ms) cubic-bezier(.4,.16,.2,1);
+}
+
+.chat-message.manifested {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.chat-message.fade-out {
+  opacity: 0 !important;
+  transform: translateY(-6px) scale(.985);
+  transition: opacity var(--bubble-fade-out-ms) ease, transform var(--bubble-fade-out-ms) ease;
 }
 
 .chat-message.user {
@@ -180,6 +209,27 @@ button, .button, [style*="button"] {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Input focus pulse */
+@keyframes inputFocusPulse {
+  0% { box-shadow: 0 0 0 0 rgba(105,234,203,0.18); }
+  60% { box-shadow: 0 0 0 14px rgba(105,234,203,0); }
+  100% { box-shadow: 0 0 0 0 rgba(105,234,203,0); }
+}
+
+.floating-input:focus-within {
+  animation: inputFocusPulse var(--input-focus-pulse) ease-in-out;
+}
+
+/* Reduced motion preference: remove transitions */
+@media (prefers-reduced-motion: reduce) {
+  .chat-message, .chat-message.fade-out, .chat-message.manifested {
+    transition: none !important;
+    animation: none !important;
+  }
+  .chat-message { opacity: 1; transform: none; }
+  .floating-input:focus-within { animation: none; }
 }
 
 /* Scrollbar Styling */

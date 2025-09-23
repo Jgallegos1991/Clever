@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clever Particle System Final Test</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0B0F14;
+            font-family: monospace;
+            color: #69EACB;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .controls {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 300px;
+        }
+        .status {
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        button {
+            background: #1a1a1a;
+            color: #69EACB;
+            border: 1px solid #69EACB;
+            padding: 8px 12px;
+            margin: 3px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        button:hover {
+            background: #333;
+        }
+        .error {
+            color: #ff6666;
+        }
+        .success {
+            color: #66ff66;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    
+    <div class="controls">
+        <h3>🧠 Clever Particle System Test</h3>
+        <div class="status" id="status">Initializing...</div>
+        
+        <div>
+            <button onclick="testBasicRendering()">Test Basic Rendering</button>
+            <button onclick="toggleDebugParticles()">Toggle Debug Mode</button>
+            <button onclick="testFormations()">Test Formations</button>
+        </div>
+        
+        <div>
+            <button onclick="window.explodeParticles && window.explodeParticles(1)">Explode</button>
+            <button onclick="window.implodeParticles && window.implodeParticles(1)">Implode</button>
+            <button onclick="window.createVortex && window.createVortex()">Vortex</button>
+        </div>
+        
+        <div>
+            <button onclick="morphTo('sphere')">Sphere</button>
+            <button onclick="morphTo('cube')">Cube</button>
+            <button onclick="morphTo('whirlpool')">Whirlpool</button>
+            <button onclick="morphTo('scatter')">Scatter</button>
+        </div>
+        
+        <div class="status" id="debug-info" style="font-size: 10px; margin-top: 10px;"></div>
+    </div>
+
+    <script src="/static/js/engines/holographic-chamber.js"></script>
+    
+    <script>
+        const status = document.getElementById('status');
+        const debugInfo = document.getElementById('debug-info');
+        let chamber = null;
+        let debugMode = false;
+        
+        function updateStatus(msg, type = 'info') {
+            status.innerHTML = `<span class="${type}">${msg}</span>`;
+            console.log(msg);
+        }
+        
+        function updateDebugInfo() {
+            if (chamber) {
+                const particles = chamber.particles || [];
+                const frameCount = chamber.frameCount || 0;
+                debugInfo.innerHTML = `
+                    Particles: ${particles.length}<br>
+                    Frame: ${frameCount}<br>
+                    State: ${chamber.state}<br>
+                    Canvas: ${chamber.width}x${chamber.height}<br>
+                    Debug: ${chamber.debugMode ? 'ON' : 'OFF'}
+                `;
+            }
+        }
+        
+        function testBasicRendering() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear and draw test pattern
+            ctx.fillStyle = '#0B0F14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw some test circles
+            for (let i = 0; i < 20; i++) {
+                ctx.fillStyle = `hsl(${180 + i * 10}, 100%, 70%)`;
+                ctx.beginPath();
+                ctx.arc(
+                    50 + (i % 5) * 60, 
+                    50 + Math.floor(i / 5) * 60, 
+                    10, 0, Math.PI * 2
+                );
+                ctx.fill();
+            }
+            
+            updateStatus('✅ Basic rendering test complete', 'success');
+            
+            setTimeout(() => {
+                if (chamber) {
+                    chamber.draw();
+                }
+            }, 2000);
+        }
+        
+        function toggleDebugParticles() {
+            if (chamber) {
+                chamber.debugMode = !chamber.debugMode;
+                debugMode = chamber.debugMode;
+                updateStatus(`Debug mode: ${debugMode ? 'ON' : 'OFF'}`, debugMode ? 'success' : 'info');
+            }
+        }
+        
+        function testFormations() {
+            if (!chamber) {
+                updateStatus('❌ No chamber instance', 'error');
+                return;
+            }
+            
+            const formations = ['sphere', 'cube', 'whirlpool', 'torus', 'helix'];
+            let index = 0;
+            
+            const cycleFormations = () => {
+                if (index < formations.length) {
+                    const formation = formations[index];
+                    updateStatus(`Testing formation: ${formation}`, 'info');
+                    chamber.morphToFormation(formation);
+                    index++;
+                    setTimeout(cycleFormations, 3000);
+                } else {
+                    updateStatus('✅ Formation test complete', 'success');
+                    chamber.morphToFormation('whirlpool');
+                }
+            };
+            
+            cycleFormations();
+        }
+        
+        function morphTo(formation) {
+            if (chamber && chamber.morphToFormation) {
+                chamber.morphToFormation(formation);
+                updateStatus(`Morphed to: ${formation}`, 'info');
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            updateStatus('Loading particle system...', 'info');
+            
+            const canvas = document.getElementById('particles');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            if (typeof window.startHolographicChamber === 'function') {
+                try {
+                    chamber = window.startHolographicChamber(canvas);
+                    if (chamber) {
+                        updateStatus('✅ Particle system initialized', 'success');
+                        window.holographicChamber = chamber;
+                        
+                        // Start debug info updates
+                        setInterval(updateDebugInfo, 1000);
+                        
+                        // Enable debug mode initially
+                        setTimeout(() => {
+                            toggleDebugParticles();
+                        }, 500);
+                        
+                    } else {
+                        updateStatus('❌ Particle system failed to initialize', 'error');
+                    }
+                } catch (error) {
+                    updateStatus('❌ Error: ' + error.message, 'error');
+                    console.error(error);
+                }
+            } else {
+                updateStatus('❌ startHolographicChamber not found', 'error');
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('particles');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            if (chamber && chamber.resize) {
+                chamber.resize();
+            }
+        });
+    </script>
+</body>
+</html>

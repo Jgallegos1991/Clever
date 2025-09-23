@@ -446,6 +446,29 @@ def search():
         }), 500
 
 
+@app.route('/<path:filename>')
+def serve_test_files(filename):
+    """
+    Serve test HTML files from root directory
+    
+    Why: Test pages need to be accessible for particle system debugging
+    Where: Handles requests for .html files in root directory  
+    How: Check if file exists and serve it, otherwise 404
+    """
+    import os
+    from flask import send_file, abort
+    
+    # Only serve .html files for security
+    if not filename.endswith('.html'):
+        abort(404)
+        
+    filepath = os.path.join(os.getcwd(), filename)
+    if os.path.exists(filepath):
+        return send_file(filepath)
+    else:
+        abort(404)
+
+
 @app.route('/api/runtime_introspect', methods=['GET'])
 def api_runtime_introspect():
     """Runtime introspection snapshot endpoint
