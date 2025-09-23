@@ -1,6 +1,7 @@
 # Clever - Digital Brain Extension & Cognitive Partnership Architecture
 
 ## Changelog
+
 - **2025-09-21**: Updated to reflect Clever's true vision as digital brain extension
 - **2025-09-04**: Initial architecture documentation via static analysis
 - **Author**: Documentation Audit Agent
@@ -29,6 +30,7 @@ Connects to:
 **Clever** is Jay's **digital brain extension** and **cognitive partnership system** - a street-smart genius who talks like your best friend but casually solves Einstein-level physics problems. Built with Flask, SQLite, and spaCy, featuring advanced holographic particle UI for immersive cognitive enhancement.
 
 ### Core Philosophy
+
 - **Digital Sovereignty**: Complete local control, total privacy, zero external dependencies
 - **Cognitive Partnership**: Authentic relationship building and life companionship
 - **Genius Friend Experience**: Street-smart casual talk with hidden Einstein intellect
@@ -39,7 +41,7 @@ Connects to:
 
 ## Architecture Layers
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │              Frontend Layer                  │
 │  ┌─────────────────┐  ┌─────────────────────┐│
@@ -80,9 +82,11 @@ Connects to:
 ### Frontend Layer
 
 #### 3D UI Engine (`static/js/orb_engine.js`)
+
 **Purpose**: Magical particle-based interface  
 **Technology**: Three.js, WebGL  
 **Key Features**:
+
 - 8000+ particle swarm system
 - Morphing shapes (sphere, cube, torus)
 - Real-time grid ripple effects
@@ -90,6 +94,7 @@ Connects to:
 - CSS3D panel integration
 
 **Performance Characteristics**:
+
 ```javascript
 const PARTICLE_COUNT = 8000;
 let activeCount = PARTICLE_COUNT; // Dynamic for performance
