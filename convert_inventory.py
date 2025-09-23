@@ -5,6 +5,11 @@ Convert file-inventory.json to file-inventory.md
 Why: Automates the conversion of JSON-based file inventory into a human-readable Markdown report for project documentation and auditing.
 Where: Used by developers and CI scripts to generate up-to-date file-inventory.md from the latest repository analysis.
 How: Loads JSON, computes statistics, groups files, and writes a formatted Markdown summary with tables and breakdowns.
+
+Connects to:
+    - file-inventory.md: Target output file for documentation
+    - file-inventory.json: Source data for conversion (if exists)
+    - Makefile: Typically called by make file-inventory command
 """
 import json
 import os

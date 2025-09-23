@@ -4,6 +4,11 @@ Simple Persona Engine for Clever AI
 Why: Provides basic AI personality and response generation
 Where: Used by app.py for chat responses
 How: Simple response generation with personality traits
+
+Connects to:
+    - app.py: Main interface for chat response generation
+    - database.py: May log interactions (if implemented)
+    - user_config.py: User personalization settings
 """
 
 from dataclasses import dataclass

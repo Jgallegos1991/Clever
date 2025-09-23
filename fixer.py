@@ -2,6 +2,19 @@ from __future__ import annotations
 
 """
 Safe, opt-in fixer for small self-repairs. Only runs whitelisted operations.
+
+Why: Provides automated system maintenance and repair capabilities through
+safe, whitelisted operations that can fix common issues without manual intervention.
+Where: Used by system monitoring tools and maintenance scripts for automated
+system health maintenance and issue resolution.
+How: Implements controlled self-repair operations with validation and safety
+checks to prevent unintended system modifications.
+
+Connects to:
+    - system_validator.py: Provides repair operations for validation failures
+    - automated_monitor.py: Used for automated system maintenance
+    - debug_config.py: Logs repair operations and results
+    - Various system files: Applies targeted fixes to maintain system health
 """
 from typing import Tuple, List
 from pathlib import Path

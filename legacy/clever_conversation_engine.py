@@ -5,6 +5,10 @@ structures, and merge artifact text causing syntax errors (E999). It is retained
 verbatim (trimmed of runtime side-effects) for future reference during refactor.
 Where: Moved under legacy/ to be excluded from linting and imports.
 How: Active conversation logic now resides in `persona.py`; this file is inert.
+
+Connects to:
+    - persona.py: Current active conversation engine implementation
+    - Legacy archive: Historical reference only - DO NOT IMPORT
 """
 
 # NOTE: Intentionally not executing any code. Original implementation superseded

@@ -5,6 +5,11 @@ Quick script to fix line length issues for seamless operation
 Why: Ensures code quality compliance for smooth system operation
 Where: Fixes line length issues in app.py and other core files
 How: Applies consistent line breaking for 79 character limit
+
+Connects to:
+    - app.py: Primary target for line length fixes
+    - Code quality tools: Ensures compliance with linting standards
+    - CI/CD pipeline: Supports automated code quality checks
 """
 
 import re

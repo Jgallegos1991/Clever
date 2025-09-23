@@ -6,6 +6,12 @@ Why: Validates and benchmarks spaCy lazy loading and pipeline optimization patte
 Where: Used by developers to test and compare NLP loading strategies for memory and speed improvements in local environments.
 How: Runs standard, lazy, and minimal pipeline loading tests, measures memory and time, and prints results for analysis.
 
+Connects to:
+    - nlp_processor.py: Validates current NLP implementation patterns
+    - docs/config/device_specifications.md: Hardware performance constraints
+    - spaCy: Core NLP library being benchmarked
+    - Performance optimization: Memory and speed benchmarking
+
 Usage: python docs/nlp/validate_lazy_loading.py
 """
 

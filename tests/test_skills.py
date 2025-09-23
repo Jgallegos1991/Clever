@@ -1,3 +1,18 @@
+"""
+Test suite for Clever AI skills and capabilities
+
+Why: Validates core AI capabilities like text summarization and processing
+to ensure Clever's skills operate correctly and reliably.
+Where: Part of pytest test suite for comprehensive system validation.
+How: Tests API endpoints and skill functions with various input scenarios.
+
+Connects to:
+    - app.py: Flask application endpoints being tested
+    - nlp_processor.py: Natural language processing capabilities
+    - persona.py: AI skill integration and response generation
+    - pytest: Testing framework and assertions
+"""
+
 import importlib.util
 from pathlib import Path
 import io

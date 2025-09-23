@@ -1,3 +1,17 @@
+"""
+Flask application tests for Clever AI
+
+Why: Validates Flask application routes, endpoints, and core functionality
+to ensure web interface operates correctly and safely.
+Where: Part of pytest test suite for comprehensive system validation.
+How: Uses Flask test client with isolated database for endpoint testing.
+
+Connects to:
+    - app.py: Main Flask application being tested
+    - database.py: Database operations and isolation for testing
+    - pytest: Testing framework and fixtures
+"""
+
 import tempfile
 import pytest
 

@@ -1,3 +1,16 @@
+"""Tests that deliberately avoid meta-discussion to reduce Clever's over-analysis
+
+Why: Some queries benefit from direct answers without extensive reasoning 
+chains, so we test persona modes that prioritize concise, focused responses
+Where: Validates persona responses don't contain internal reasoning markers
+How: Tests persona generation and verifies responses avoid meta-commentary
+
+Connects to:
+    - persona.py: PersonaEngine response generation and mode handling
+    - Response quality control: Testing directness vs meta-discussion
+    - pytest: Testing framework and assertions
+"""
+
 from persona import PersonaEngine
 
 META_TOKENS = [

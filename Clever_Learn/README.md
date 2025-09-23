@@ -1,5 +1,18 @@
 # Clever Learn Directory
 
+<!--
+Why: Provides automatic knowledge ingestion for Clever's learning system
+Where: Monitored by sync watchers for automatic PDF and document processing
+How: Files dropped here trigger automatic extraction, chunking, and database ingestion
+
+Connects to:
+    - sync_watcher.py: Monitors this directory for new files to process
+    - pdf_ingestor.py: Processes PDF files dropped in this directory
+    - file_ingestor.py: Handles text and markdown file ingestion
+    - database.py: Stores extracted content in Clever's knowledge base
+    - config.py: Directory path configuration for sync operations
+-->
+
 **Purpose:** Drop PDFs here for Clever to automatically learn from.
 
 ## How it Works

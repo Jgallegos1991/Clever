@@ -6,6 +6,11 @@ Where: Part of automated test suite executed in CI along with UI acceptance
 checks and docstring coverage enforcement.
 How: Uses Flask test client to hit home (trigger a render) then queries
 introspection endpoint and validates expected structural keys.
+
+Connects to:
+    - introspection.py: Runtime introspection functionality
+    - app.py: Flask application and /api/runtime_introspect endpoint
+    - pytest: Testing framework and fixtures
 """
 from __future__ import annotations
 import json

@@ -5,6 +5,9 @@ Why: Upgrades the original cleaner to handle indentation errors inside functions
 Where: Run in project root to scan/fix all .py files (excluding venv and third-party packages).
 How: Uses ast and regex to detect/fix errors, outputs a detailed report, and can auto-fix issues.
 
+Connects to:
+    - None: This is a standalone utility script.
+
 Usage:
     python3 auto_code_cleaner_v2.py [--fix]
 """

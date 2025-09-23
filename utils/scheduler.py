@@ -1,3 +1,20 @@
+"""
+Automated scheduler for sync and ingestion operations
+
+Why: Provides automated background synchronization and file ingestion for
+maintaining up-to-date knowledge base without manual intervention.
+Where: Used as background service for continuous sync operations when 
+AUTO_RCLONE_SCHEDULE is enabled in configuration.
+How: Implements scheduling loop with configurable intervals for sync and
+ingestion operations with graceful shutdown capabilities.
+
+Connects to:
+    - sync_tools.py: Remote synchronization operations
+    - file_ingestor.py: Automated file processing and ingestion
+    - config.py: Scheduling configuration and sync directories
+    - Threading: Background service operation with stop events
+"""
+
 from __future__ import annotations
 
 import time

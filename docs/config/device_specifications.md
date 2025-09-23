@@ -13,6 +13,16 @@
 
 **How:** Comprehensive system diagnostic data captured from Chrome OS device running Clever through GitHub Codespaces development environment.
 
+**Connects to:**
+    - config.py: Hardware-aware configuration settings and performance limits
+    - debug_config.py: Performance monitoring and optimization based on device capabilities  
+    - persona.py: Response generation limits guided by processing constraints
+    - nlp_processor.py: spaCy model selection and processing limits for device performance
+    - static/js/engines/holographic-chamber.js: Particle count and rendering limits for GPU
+    - evolution_engine.py: Learning batch sizes and processing intervals for device capacity
+    - database.py: SQLite optimization settings and query limits for storage constraints
+    - All Python modules: Referenced for performance-conscious implementation decisions
+
 ---
 
 ## Primary Host Device

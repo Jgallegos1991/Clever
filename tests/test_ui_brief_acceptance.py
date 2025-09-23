@@ -15,6 +15,12 @@ def test_index_has_core_elements():
            design specifications for particle UI and grid overlay.
     How: Parses index.html with BeautifulSoup, searches for specific
          elements by ID and class, asserts their existence.
+
+    Connects to:
+        - templates/index.html: Main UI template being validated
+        - BeautifulSoup: HTML parsing and element validation
+        - UI design specifications: Holographic chamber requirements
+        - docs/config/device_specifications.md: Performance constraints for UI elements
     """
     html = INDEX.read_text(encoding='utf-8')
     soup = BeautifulSoup(html, 'html.parser')

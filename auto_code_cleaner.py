@@ -8,6 +8,9 @@ How: Scans files, applies regex-based fixes, and outputs a report or auto-fixes 
 Usage:
     python auto_code_cleaner.py [--fix]
     # --fix: actually applies fixes, otherwise just reports
+
+Connects to:
+    - None: This is a standalone utility script.
 """
 
 import os

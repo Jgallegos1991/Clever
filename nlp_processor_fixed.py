@@ -1,5 +1,5 @@
 """
-NLP Processor for Clever AI - Full Potential Operation
+NLP Processor for Clever AI - Full Potential Operation (FIXED)
 
 Why: Provides advanced natural language processing capabilities for Clever,
 including entity extraction, sentiment analysis, and keyword identification.
@@ -14,6 +14,7 @@ Connects to:
     - evolution_engine.py: Concept extraction and learning
     - app.py: Request analysis and NLP pipeline
     - config.py: Centralized configuration
+    - docs/config/device_specifications.md: Hardware performance constraints
 """
 
 from __future__ import annotations

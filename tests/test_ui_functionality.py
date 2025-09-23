@@ -1,6 +1,17 @@
 """
 UI Tooltip Testing Module
 Tests tooltip functionality using built-in libraries
+
+Why: Validates UI tooltip consistency and accessibility standards across
+Clever AI's interface components for optimal user experience.
+Where: Part of comprehensive test suite for UI quality assurance.
+How: Uses regex parsing and file analysis for tooltip validation.
+
+Connects to:
+    - templates/: HTML templates with tooltip implementations
+    - static/: JavaScript and CSS files with tooltip logic
+    - UI accessibility standards: Tooltip consistency validation
+    - pytest: Testing framework integration
 """
 
 import re

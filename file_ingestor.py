@@ -16,6 +16,13 @@ class FileIngestor:
     Where: Used by sync watchers, CLI ops, or manual runs.
     How: Recursively scans a directory, extracts text, runs NLP, hashes content,
     and upserts into the unified database; triggers evolution learning when meaningful.
+
+    Connects to:
+        - database.py: Uses `db_manager` for storing ingested content in single SQLite file
+        - nlp_processor.py: Uses `nlp_processor` for keyword extraction and content analysis
+        - evolution_engine.py: Uses `get_evolution_engine()` to log ingestion events
+        - config.py: Uses configuration values for directory paths and processing settings
+        - docs/config/device_specifications.md: Processing limits guided by hardware constraints
     """
 
     def __init__(self, base_dir: str):

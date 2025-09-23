@@ -5,6 +5,12 @@ Simplified Integration Test for Enhanced Clever AI System
 Why: Validates core enhanced capabilities without external dependencies
 Where: Tests essential system enhancements for perfect conversational capability
 How: Tests system validation, conversation engine, and file access without scheduler
+
+Connects to:
+    - system_validator.py: Tests comprehensive system validation
+    - enhanced_conversation_engine.py: Tests conversation processing
+    - debug_config.py: Uses debugging and logging capabilities
+    - All core modules: Integration testing across system components
 """
 
 import sys

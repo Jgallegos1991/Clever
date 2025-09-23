@@ -1,5 +1,19 @@
 # Clever Static Assets Organization
 
+<!--
+Why: Organizes frontend assets for Clever's holographic UI and particle system
+Where: Serves CSS, JavaScript, and assets to Flask app for browser rendering
+How: Structured directory layout with engines, components, and performance modules
+
+Connects to:
+    - templates/index.html: HTML template that loads these CSS and JS assets
+    - app.py: Flask static file serving for CSS, JS, and asset delivery
+    - static/js/engines/holographic-chamber.js: Main particle engine for UI
+    - static/css/style.css: Primary stylesheet for dark theme and particle UI
+    - docs/config/device_specifications.md: Asset optimization for hardware limits
+    - tests/test_ui_brief_acceptance.py: Validates proper asset linking
+-->
+
 This directory contains all frontend assets for Clever, organized for maintainability and clarity.
 
 

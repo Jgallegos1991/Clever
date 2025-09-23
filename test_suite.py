@@ -10,6 +10,12 @@ Where:
     Used by run_tests.py to run a lightweight smoke check.
 How:
     Provides CleverTestSuite with only core database/knowledge smoke tests.
+
+Connects to:
+    - run_tests.py: Main test runner interface
+    - database.py: Database connectivity and integrity tests
+    - debug_config.py: Logging and debugging capabilities
+    - pytest tests/: Modern test suite with comprehensive coverage
 """
 
 import sqlite3

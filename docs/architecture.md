@@ -6,6 +6,22 @@
 - **Author**: Documentation Audit Agent
 - **Purpose**: Document cognitive partnership system architecture and components
 
+<!--
+Why: Comprehensive architectural documentation for Clever's digital brain extension system
+Where: Central reference for developers, system understanding, and architectural decisions
+How: Documents component relationships, data flows, and cognitive partnership capabilities
+
+Connects to:
+    - app.py: Main Flask application implementing the documented architecture
+    - persona.py: Personality engine that embodies the cognitive partnership design
+    - database.py: SQLite persistence layer supporting the single-database architecture
+    - config.py: Configuration system that enforces architectural constraints
+    - docs/config/device_specifications.md: Hardware environment defining performance limits
+    - evolution_engine.py: Learning system implementing the continuous growth philosophy
+    - static/js/engines/holographic-chamber.js: 3D UI engine for cognitive enhancement interface
+    - introspection.py: Runtime system analysis supporting architectural transparency
+-->
+
 ---
 
 ## System Overview

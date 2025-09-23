@@ -1,5 +1,20 @@
 # Clever - Your Digital Companion
 
+<!-- 
+Why: Main project documentation and onboarding for Clever's digital brain extension system
+Where: Root documentation accessed by developers, users, and GitHub visitors  
+How: Comprehensive guide covering capabilities, setup, architecture, and usage patterns
+
+Connects to:
+    - docs/architecture.md: Detailed system architecture and component relationships
+    - docs/config/device_specifications.md: Hardware requirements and performance constraints
+    - .github/copilot-instructions.md: Development guidelines and coding standards
+    - app.py: Entry point for the Flask application and core system
+    - config.py: Configuration management and system settings
+    - persona.py: Core personality engine that defines Clever's character
+    - Makefile: Build, setup, and development commands
+-->
+
 [![Status](https://img.shields.io/badge/status-fully%20operational-success?style=for-the-badge)](https://github.com/Jgallegos1991/clever)
 [![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/Framework-Flask-black?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)

@@ -3,6 +3,12 @@
 Why: Ensure graph backend feature (reasoning + optional concept graph) is present so frontend debug overlay can rely on stable contract.
 Where: Part of tests/ executed in CI before deployment; touches /api/runtime_introspect endpoint.
 How: Uses Flask test client to query endpoint and assert minimal shape & required keys.
+
+Connects to:
+    - introspection.py: Runtime graph generation and reasoning system
+    - app.py: /api/runtime_introspect endpoint functionality
+    - Frontend debug overlay: Graph visualization requirements
+    - pytest: Testing framework and Flask test client
 """
 from __future__ import annotations
 import importlib

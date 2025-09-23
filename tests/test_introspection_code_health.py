@@ -9,6 +9,12 @@ def test_runtime_state_includes_code_health_and_component_graph():
        so they remain available for tooling and UI overlays.
    Where: Part of test suite enforcing architectural transparency signals.
    How: Calls runtime_state() and asserts expected keys + structural fields.
+
+   Connects to:
+       - introspection.py: Runtime state provider with code health analysis
+       - app.py: Flask application context for state introspection
+       - UI debug overlays: Consume runtime state for development visibility
+       - docs/config/device_specifications.md: Performance limits for introspection data
    """
    state = runtime_state(flask_app, include_intelligent_analysis=False)
    assert 'code_health' in state, 'code_health field missing'

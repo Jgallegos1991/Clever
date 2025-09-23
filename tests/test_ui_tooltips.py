@@ -4,6 +4,12 @@ Unit tests for UI tooltip functionality
 Why: Ensures all UI buttons have consistent, accessible tooltip implementations for better user experience and compliance.
 Where: Used in automated test suite to validate HTML templates in Clever's frontend.
 How: Parses HTML files, checks for title attributes on buttons, and enforces tooltip consistency across templates.
+
+Connects to:
+    - templates/: HTML templates being tested for tooltip compliance
+    - BeautifulSoup: HTML parsing and validation library
+    - UI accessibility standards: Tooltip consistency requirements
+    - pytest: Testing framework and assertions
 """
 
 import pytest

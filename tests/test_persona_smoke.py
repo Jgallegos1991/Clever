@@ -8,6 +8,11 @@ persona/nlp integration.
 How: Instantiate PersonaEngine, generate multiple responses for same
 prompt, assert non-empty text, presence of mode/sentiment, and at least
 two distinct first lines across attempts.
+
+Connects to:
+    - persona.py: PersonaEngine core functionality being tested
+    - nlp_processor.py: NLP integration for response generation
+    - pytest: Testing framework and assertions
 """
 
 from persona import PersonaEngine
