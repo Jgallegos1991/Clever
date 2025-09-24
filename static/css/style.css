@@ -184,6 +184,110 @@ How: Backdrop-filter blur, neon glow effects, and smooth fade transitions
     opacity: 0.7;
 }
 
+/* === COGNITIVE STATUS OVERLAY === */
+
+/*
+Why: Display real-time cognitive health and connection status for system monitoring
+Where: Top-left positioned overlay for non-intrusive system feedback
+How: Glassmorphism design with color-coded metrics and smooth updates
+*/
+.cognitive-status {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 280px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    box-shadow: var(--glow-radius) rgba(0, 255, 255, 0.1);
+    z-index: 15;
+    pointer-events: auto;
+    font-size: 13px;
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.status-icon {
+    font-size: 16px;
+}
+
+.status-title {
+    font-weight: 600;
+    color: var(--accent-cyan);
+}
+
+.status-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.metric-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.metric-value {
+    font-weight: 500;
+    font-family: 'Courier New', monospace;
+}
+
+/* Cognitive health color coding */
+.health-good {
+    color: #00FF88;
+}
+
+.health-medium {
+    color: #FFD700;
+}
+
+.health-low {
+    color: #FF6B6B;
+}
+
+/* Mode-specific styling */
+.mode-idle {
+    color: var(--accent-cyan);
+}
+
+.mode-thinking {
+    color: #00FF88;
+    animation: thinking-pulse 1s ease-in-out infinite alternate;
+}
+
+.mode-creative {
+    color: #FF6B9D;
+}
+
+.mode-observing {
+    color: #FFD700;
+}
+
+.status-indicator {
+    font-size: 14px;
+    cursor: help;
+}
+
+@keyframes thinking-pulse {
+    from { opacity: 0.7; }
+    to { opacity: 1; }
+}
+
 /* === FLOATING INPUT === */
 
 /*

@@ -124,6 +124,14 @@
         -->
     </script>
     
+    <script src="{{ url_for('static', filename='js/components/cognitive-status.js') }}?v={{ cache_buster }}">
+        <!--
+        Connects to:
+            - Cognitive status overlay and live monitoring
+            - main.js: Real-time particle system health display
+        -->
+    </script>
+    
     <!-- Main Application Logic -->
     <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}">
         <!--

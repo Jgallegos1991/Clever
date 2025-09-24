@@ -20,18 +20,27 @@ const PARTICLE_CONFIG = {
 const VISUAL_THEMES = {
     idle: {
         colors: ['#00FFFF', '#4A9EFF', '#00BFFF'],
-        energy: 0.3,
-        formation: 'sphere'
+        energy: 0.4,
+        formation: 'rotating_sphere',
+        pulse: true
     },
     thinking: {
         colors: ['#00FF88', '#00FFFF', '#88FFFF'],
         energy: 0.7,
-        formation: 'helix'
+        formation: 'helix',
+        pulse: false
     },
     creative: {
         colors: ['#FF6B9D', '#C44569', '#F8B500'],
         energy: 0.9,
-        formation: 'constellation'
+        formation: 'constellation',
+        pulse: false
+    },
+    observing: {
+        colors: ['#FFD700', '#FFA500', '#FF8C00'],
+        energy: 0.6,
+        formation: 'rotating_sphere',
+        pulse: true
     }
 };
 
@@ -54,12 +63,24 @@ class Particle {
         this.formationStrength = 0.1;
         this.isInFormation = false;
         
+        // Rotation properties for idle state
+        this.rotationAngle = Math.random() * Math.PI * 2;
+        this.rotationRadius = 0;
+        this.baseX = x;
+        this.baseY = y;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+        
         // Visual properties
         this.opacity = Math.random() * 0.5 + 0.5;
         this.colorIndex = Math.floor(Math.random() * 3);
+        this.pulsePhase = Math.random() * Math.PI * 2;
+        this.basePulse = Math.random() * 0.3 + 0.7;
     }
     
     update() {
+        // Update rotation angle for continuous movement
+        this.rotationAngle += this.rotationSpeed;
+        
         // Formation behavior
         if (this.isInFormation) {
             const dx = this.targetX - this.x;
@@ -70,12 +91,26 @@ class Particle {
                 this.vx += dx * this.formationStrength * 0.01;
                 this.vy += dy * this.formationStrength * 0.01;
             }
+            
+            // Add rotation to formation targets for rotating formations
+            if (this.chamber.currentFormation === 'rotating_sphere') {
+                this.targetX += Math.cos(this.rotationAngle) * 0.5;
+                this.targetY += Math.sin(this.rotationAngle) * 0.5;
+            }
         }
         
-        // Free movement
+        // Free movement with subtle rotation
         if (!this.isInFormation) {
+            // Add rotational movement around base position
+            const rotX = Math.cos(this.rotationAngle) * this.rotationRadius;
+            const rotY = Math.sin(this.rotationAngle) * this.rotationRadius;
+            
             this.vx += (Math.random() - 0.5) * 0.02;
             this.vy += (Math.random() - 0.5) * 0.02;
+            
+            // Subtle gravitational pull towards rotation center
+            this.vx += (rotX * 0.001);
+            this.vy += (rotY * 0.001);
         }
         
         // Apply velocity
@@ -114,12 +149,37 @@ class Particle {
         const theme = VISUAL_THEMES[this.chamber.currentMode] || VISUAL_THEMES.idle;
         const color = theme.colors[this.colorIndex % theme.colors.length];
         
+        // Calculate pulse effect if enabled
+        let pulseMultiplier = 1;
+        if (theme.pulse) {
+            this.pulsePhase += 0.05;
+            pulseMultiplier = this.basePulse + Math.sin(this.pulsePhase) * 0.3;
+        }
+        
         ctx.save();
-        ctx.globalAlpha = this.opacity;
+        
+        // Apply pulsing opacity and size
+        ctx.globalAlpha = this.opacity * pulseMultiplier;
+        const renderSize = this.size * pulseMultiplier;
+        
+        // Create glow effect
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, renderSize * 2);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(0.5, color + '80'); // Semi-transparent
+        gradient.addColorStop(1, color + '00'); // Fully transparent
+        
+        // Draw glow
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, renderSize * 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw core particle
         ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, renderSize, 0, Math.PI * 2);
         ctx.fill();
+        
         ctx.restore();
     }
     
@@ -174,20 +234,87 @@ class HolographicChamber {
     
     setMode(mode) {
         if (VISUAL_THEMES[mode]) {
-            console.log('Switching to mode:', mode);
+            console.log('🧠 Cognitive mode transition:', this.currentMode, '->', mode);
             this.currentMode = mode;
             const theme = VISUAL_THEMES[mode];
             
-            // Update particle energy
+            // Update particle energy with smooth transition
             this.particles.forEach(particle => {
                 particle.energy = Math.random() * theme.energy + (1 - theme.energy) * 0.5;
+                // Reset pulse phase for synchronized transitions
+                if (theme.pulse) {
+                    particle.pulsePhase = Math.random() * Math.PI * 2;
+                }
             });
             
-            // Morph formation
+            // Morph formation if different
             if (theme.formation !== this.currentFormation) {
                 this.morphToFormation(theme.formation);
             }
+            
+            console.log('✅ Cognitive state synchronized:', mode);
         }
+    }
+
+    /**
+     * Maintain Cognitive Connection
+     * 
+     * Why: Ensures Clever maintains continuous cognitive presence and connection awareness
+     * Where: Called periodically to maintain system coherence and prevent drift
+     * How: Monitors particle coherence, adjusts formation strength, maintains cognitive flow
+     * 
+     * Connects to:
+     *     - main.js: Should be called periodically to maintain system health
+     *     - evolution_engine.py: Cognitive state should be logged for learning
+     *     - persona.py: Mode changes should trigger cognitive adjustments
+     */
+    maintainCognitiveConnection() {
+        // Check if particles are maintaining formation coherence
+        let formationCoherence = 0;
+        let totalEnergy = 0;
+        
+        this.particles.forEach(particle => {
+            if (particle.isInFormation) {
+                const dx = particle.targetX - particle.x;
+                const dy = particle.targetY - particle.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                formationCoherence += (distance < 50) ? 1 : 0;
+            }
+            totalEnergy += particle.energy;
+        });
+        
+        const coherenceRatio = formationCoherence / this.particles.length;
+        const avgEnergy = totalEnergy / this.particles.length;
+        
+        // Adjust formation strength if coherence is low
+        if (coherenceRatio < 0.7) {
+            this.particles.forEach(particle => {
+                if (particle.isInFormation) {
+                    particle.formationStrength = Math.min(0.3, particle.formationStrength + 0.01);
+                }
+            });
+        }
+        
+        // Boost energy if system is getting sluggish
+        if (avgEnergy < 0.3) {
+            this.particles.forEach(particle => {
+                particle.energy = Math.max(particle.energy, 0.4);
+            });
+        }
+        
+        // Log cognitive health
+        const cognitiveHealth = {
+            coherence: coherenceRatio,
+            energy: avgEnergy,
+            mode: this.currentMode,
+            formation: this.currentFormation,
+            timestamp: Date.now()
+        };
+        
+        // Expose to window for external monitoring
+        window.cleverCognitiveStatus = cognitiveHealth;
+        
+        return cognitiveHealth;
     }
     
     morphToFormation(formationType) {
@@ -197,6 +324,9 @@ class HolographicChamber {
         switch (formationType) {
             case 'sphere':
                 this.createSphereFormation();
+                break;
+            case 'rotating_sphere':
+                this.createRotatingSphereFormation();
                 break;
             case 'helix':
                 this.createHelixFormation();
@@ -223,6 +353,46 @@ class HolographicChamber {
             particle.isInFormation = true;
             particle.formationStrength = 0.15;
         });
+    }
+
+    /**
+     * Create Rotating Sphere Formation for Idle State
+     * 
+     * Why: Provides continuous gentle rotation representing Clever's cognitive background processing
+     * Where: Used by idle and observing modes for continuous visual engagement
+     * How: Fibonacci sphere distribution with rotation parameters for smooth orbital motion
+     * 
+     * Connects to:
+     *     - setMode(): Called when switching to idle or observing modes
+     *     - Particle.update(): Particles use rotation properties for continuous movement
+     *     - VISUAL_THEMES: Uses rotation settings from theme configuration
+     */
+    createRotatingSphereFormation() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.25;
+        
+        this.particles.forEach((particle, index) => {
+            // Fibonacci sphere distribution for optimal coverage
+            const phi = Math.acos(1 - 2 * (index + 0.5) / this.particles.length);
+            const theta = Math.PI * (1 + Math.sqrt(5)) * (index + 0.5);
+            
+            // Base sphere position
+            particle.baseX = centerX;
+            particle.baseY = centerY;
+            particle.rotationRadius = radius * Math.sin(phi);
+            particle.targetX = centerX + particle.rotationRadius * Math.cos(theta);
+            particle.targetY = centerY + particle.rotationRadius * Math.sin(theta);
+            
+            // Set rotation properties for continuous movement
+            particle.rotationAngle = theta;
+            particle.rotationSpeed = (0.005 + Math.random() * 0.01) * (Math.random() > 0.5 ? 1 : -1);
+            
+            particle.isInFormation = true;
+            particle.formationStrength = 0.12;
+        });
+        
+        console.log('🌀 Rotating sphere formation created for continuous cognitive visualization');
     }
     
     createHelixFormation() {
@@ -321,11 +491,17 @@ class HolographicChamber {
         if (this.isAnimating) return;
         
         this.isAnimating = true;
+        let frameCount = 0;
         
         const animateFrame = () => {
-            // Clear canvas completely (no trails)
+            frameCount++;
+            
+            // Clear canvas with subtle fade for smoother trails
             this.ctx.fillStyle = '#0B0F14';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            // Add cognitive background grid for depth
+            this.renderCognitiveGrid(frameCount);
             
             // Update particles
             this.particles.forEach(particle => {
@@ -340,11 +516,91 @@ class HolographicChamber {
                 particle.render(this.ctx);
             });
             
+            // Add central cognitive pulse for idle state
+            if (this.currentMode === 'idle' || this.currentMode === 'observing') {
+                this.renderCognitiveCore(frameCount);
+            }
+            
             this.animationId = requestAnimationFrame(animateFrame);
         };
         
         animateFrame();
-        console.log('Animation started');
+        console.log('🧠 Cognitive animation started with enhanced visualization');
+    }
+
+    /**
+     * Render Cognitive Grid Background
+     * 
+     * Why: Provides subtle spatial reference and depth for cognitive visualization
+     * Where: Called during animation loop to create immersive background
+     * How: Animated grid with breathing effect synchronized to cognitive state
+     */
+    renderCognitiveGrid(frameCount) {
+        const theme = VISUAL_THEMES[this.currentMode] || VISUAL_THEMES.idle;
+        const breathe = Math.sin(frameCount * 0.01) * 0.1 + 0.9;
+        
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.05 * breathe;
+        this.ctx.strokeStyle = theme.colors[0];
+        this.ctx.lineWidth = 1;
+        
+        const gridSize = 50;
+        for (let x = 0; x < this.canvas.width; x += gridSize) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, 0);
+            this.ctx.lineTo(x, this.canvas.height);
+            this.ctx.stroke();
+        }
+        
+        for (let y = 0; y < this.canvas.height; y += gridSize) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(this.canvas.width, y);
+            this.ctx.stroke();
+        }
+        
+        this.ctx.restore();
+    }
+
+    /**
+     * Render Central Cognitive Core
+     * 
+     * Why: Visual representation of Clever's central processing during idle states
+     * Where: Called during idle/observing animation loops for cognitive presence
+     * How: Pulsing central glow with synchronized breathing pattern
+     */
+    renderCognitiveCore(frameCount) {
+        const theme = VISUAL_THEMES[this.currentMode] || VISUAL_THEMES.idle;
+        const pulse = Math.sin(frameCount * 0.02) * 0.3 + 0.7;
+        
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const coreRadius = 15 * pulse;
+        
+        this.ctx.save();
+        
+        // Create radial gradient for core
+        const gradient = this.ctx.createRadialGradient(
+            centerX, centerY, 0,
+            centerX, centerY, coreRadius * 3
+        );
+        gradient.addColorStop(0, theme.colors[0] + '40');
+        gradient.addColorStop(0.5, theme.colors[1] + '20');
+        gradient.addColorStop(1, theme.colors[2] + '00');
+        
+        // Draw cognitive core
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, coreRadius * 3, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Draw inner core
+        this.ctx.fillStyle = theme.colors[0] + '60';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, coreRadius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.restore();
     }
     
     stop() {
