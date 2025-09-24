@@ -7,7 +7,7 @@ How: Comprehensive guide covering capabilities, setup, architecture, and usage p
 
 Connects to:
     - docs/architecture.md: Detailed system architecture and component relationships
-    - docs/config/device_specifications.md: Hardware requirements and performance constraints
+    - docs/config/device_specifications.md: Hardware requirements and performance constraints (last updated: 2025-09-24)
     - .github/copilot-instructions.md: Development guidelines and coding standards
     - app.py: Entry point for the Flask application and core system
     - config.py: Configuration management and system settings
@@ -104,6 +104,7 @@ Experience the magic of talking to your genius best friend! ✨
 - **SQLite Memory** - Learns and remembers everything locally  
 - **Particle UI** - Holographic interface with stunning visuals
 - **Zero External Calls** - 100% offline operation
+- **Hardware Reference** - Chrome OS 16371.49.0, Chrome 140.0.7339.201, Intel(R) Pentium(R) Silver N6000 @ 1.10GHz, 3.7GB RAM, 114GB disk (see [device_specifications.md](./docs/config/device_specifications.md))
 
 ## 🛡️ Privacy & Security
 
@@ -117,7 +118,7 @@ Experience the magic of talking to your genius best friend! ✨
 **Before working on Clever, ALL agents must read:**
 
 - [`.github/AGENT_ONBOARDING.md`](./.github/AGENT_ONBOARDING.md) - Required onboarding checklist
-- [`docs/config/device_specifications.md`](./docs/config/device_specifications.md) - Hardware environment
+- [`docs/config/device_specifications.md`](./docs/config/device_specifications.md) - Hardware environment (last updated: 2025-09-24)
 - [`docs/architecture.md`](./docs/architecture.md) - System architecture
 
 This ensures changes are safe, performant, and aligned with Clever's vision.

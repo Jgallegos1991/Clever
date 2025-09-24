@@ -9,9 +9,9 @@ How: Extracts critical limits (CPU class, disk space, resolution, memory pressur
 ## Critical Constraints
 | Category | Key Facts | Design Impact |
 |----------|----------|---------------|
-| CPU | Intel Jasper Lake (low-power) | Keep persona + NLP lightweight; avoid heavy parallelism |
-| Storage | 6.9GB free (94% used) | Keep DB < 1GB; prune logs; avoid large cached artifacts |
-| Memory | Browser tabs consume significant RAM | Limit in-memory caches; stream where possible |
+| CPU | Intel(R) Pentium(R) Silver N6000 @ 1.10GHz (Jasper Lake) | Keep persona + NLP lightweight; avoid heavy parallelism |
+| Storage | 85.6GB free (114GB total) | Keep DB < 1GB; prune logs; avoid large cached artifacts |
+| Memory | 3.7GB RAM (3862416 kB); browser/Chrome tabs consume significant RAM | Limit in-memory caches; stream where possible |
 | Display | 1366x768 primary | Favor minimal UI footprint; avoid verbose panels |
 | Network | Offline-first requirement | No runtime external fetches; local models only |
 | GPU/Canvas | Capable of particle effects | Maintain adaptive particle count for 45–60fps |
@@ -43,4 +43,4 @@ Before merging a performance-sensitive feature:
 4. Does it slow baseline chat latency? Measure & optimize.
 
 ---
-*Canonical Source*: `docs/device_specs_overview.md`
+*Canonical Source*: `docs/config/device_specifications.md` (last updated: 2025-09-24)

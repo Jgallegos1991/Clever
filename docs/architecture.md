@@ -17,7 +17,7 @@ Connects to:
     - persona.py: Personality engine that embodies the cognitive partnership design
     - database.py: SQLite persistence layer supporting the single-database architecture
     - config.py: Configuration system that enforces architectural constraints
-    - docs/config/device_specifications.md: Hardware environment defining performance limits
+    - docs/config/device_specifications.md: Hardware environment defining performance limits (last updated: 2025-09-24)
     - evolution_engine.py: Learning system implementing the continuous growth philosophy
     - static/js/engines/holographic-chamber.js: 3D UI engine for cognitive enhancement interface
     - introspection.py: Runtime system analysis supporting architectural transparency
@@ -63,7 +63,7 @@ Connects to:
 │  │ (Three.js/WebGL)    │  │ (Particle Effects)  │  │ Governor  ││
 │  │ 10,000 particles    │  │ Immersive UI        │  │ (45 FPS)  ││
 │  └─────────────────────┘  └─────────────────────┘  └──────────┘│
-│         Constrained by device_specifications.md                 │
+│         Constrained by device_specifications.md (2025-09-24)   │
 └─────────────────────────────────────────────────────────────────┘
                                     │
 ┌─────────────────────────────────────────────────────────────────┐
@@ -133,7 +133,7 @@ Key Architectural Connections:
 │  │ (Three.js/WebGL)    │  │ (Particle Effects)  │  │ Governor  ││
 │  │ 10,000 particles    │  │ Immersive UI        │  │ (45 FPS)  ││
 │  └─────────────────────┘  └─────────────────────┘  └──────────┘│
-│         Constrained by device_specifications.md                 │
+│         Constrained by device_specifications.md (2025-09-24)   │
 └─────────────────────────────────────────────────────────────────┘
                                     │
 ┌─────────────────────────────────────────────────────────────────┐

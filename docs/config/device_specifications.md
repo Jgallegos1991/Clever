@@ -1,6 +1,6 @@
 # Clever AI Device Specifications
 
-**Last updated:** 2025-09-21  
+**Last updated:** 2025-09-24  
 **Generation:** Born in GitHub Codespaces, Lives on Chrome OS
 
 ---
@@ -30,8 +30,8 @@
 ### Chrome OS System
 
 - **Device Model:** Google Pirika (HWID: PASARA-TZNR C3B-D3B-B3B-C3Q-A8C)
-- **Chrome OS Version:** 16328.72.0 (Official Build) stable-channel
-- **Chrome Version:** 139.0.7258.172
+- **Chrome OS Version:** 16371.49.0 (Official Build) stable-channel
+- **Chrome Version:** 140.0.7339.201
 - **Firmware:** Google_Pirika.13606.646.0
 - **Architecture:** dedede-signed-mp-v57keys
 - **Board:** dedede (Chromebook platform)
@@ -46,7 +46,7 @@
 ### Input Devices
 
 - **Keyboard:** AT Translated Set 2 keyboard (Internal)
-- **Touchpad:** Elan Touchpad (Vendor: 04F3, Product: 0124)
+- **Touchpad:** Elan Touchpad (Vendor: Elan, Product: 0x0124)
 - **External:** 2.4G RF Keyboard & Mouse (USB, Vendor: 3938, Product: 1192)
 - **Audio:** sof-rt5682 with Headset Jack, HDMI/DP audio support
 
@@ -78,16 +78,19 @@ Signal Strength: 100% (-30 dBm average)
 
 ### Disk Usage
 
-- **Total Space:** 107GB (eMMC storage)
-- **Available:** 6.9GB free (94% utilization)
-- **Encrypted:** 32GB encrypted stateful partition (7% used)
-- **Root:** 3.4GB ChromeOS system (87% used)
+- **Total Space:** 114GB (eMMC storage)
+- **Available:** 85.6GB free (75% utilization)
+- **Encrypted:** 32GB encrypted stateful partition (usage varies)
+- **Root:** ChromeOS system (usage varies)
 
 ### Memory Allocation
 
-- **Chrome Browser:** 177MB + multiple tabs (266MB, 183MB, 78MB, 40MB, 27MB)
-- **Extensions:** Application Launcher (50MB), Image Loader (27MB)
-- **System Services:** Network (31MB), Input Method (24MB+21MB), Storage (19MB)
+- **MemTotal:** 3.68GB (3862416 kB)
+- **MemFree:** 49MB (50384 kB)
+- **MemAvailable:** 427MB (437628 kB)
+- **Chrome Browser:** 206MB + multiple tabs (163MB, 53MB, 40MB, 33MB, 27MB)
+- **Extensions:** Application Launcher (39MB), Image Loader (25MB)
+- **System Services:** Network (28MB), Input Method (27MB+21MB), Storage (19MB)
 
 ---
 
@@ -152,9 +155,9 @@ Control Elements:
 
 ### Performance Characteristics
 
-- **CPU:** Intel Jasper Lake (low-power Chromebook processor)
+- **CPU:** Intel(R) Pentium(R) Silver N6000 @ 1.10GHz (Jasper Lake family)
 - **Storage:** eMMC (sequential, good for SQLite operations)
-- **Memory:** Limited RAM requires efficient caching strategies
+- **Memory:** 3.7GB RAM (see above for allocation)
 - **Network:** WiFi 802.11ac (866.7 Mbps capable, excellent signal)
 
 ---
@@ -167,7 +170,7 @@ Control Elements:
 - **Sync:** Google Sync enabled with encryption
 - **VPN:** Available but not connected
 - **Bluetooth:** Floss enabled
-- **ARC:** Android Runtime for Chrome (enabled)
+- **ARC:** Android Runtime for Chrome (enabled, SDK 33, ARC version 14059694)
 
 ### Data Protection
 
@@ -211,28 +214,25 @@ cat /proc/meminfo
 lspci -v
 ```
 
-### Latest System Snapshot (2025-09-21)
+### Latest System Snapshot (2025-09-24)
 
 ```text
-Chrome Browser Memory Usage:
-- Main Process: 177MB
-- Tab 1 (GitHub): 266MB  
-- Tab 2 (Codespaces): 183MB
-- Tab 3 (DevTools): 78MB
-- Tab 4 (Documentation): 40MB
-- Tab 5 (Utils): 27MB
-
-System Services:
-- Network Service: 31MB
-- Input Method (Japanese): 24MB + 21MB
-- Storage Manager: 19MB
-- Extensions: App Launcher (50MB), Image Loader (27MB)
-
-Disk Status:
-- Root partition: 3.4GB (87% used)
-- Stateful: 32GB encrypted (7% used)  
-- Downloads: Active user content
-- Total Available: 6.9GB free space
+Chrome Version: 140.0.7339.201
+Chrome OS Version: 16371.49.0 (Official Build) stable-channel dedede
+Firmware: Google_Pirika.13606.646.0
+Board: dedede-signed-mp-v57keys
+CPU: Intel(R) Pentium(R) Silver N6000 @ 1.10GHz
+Memory: 3.7GB RAM (MemTotal: 3862416 kB)
+Free Memory: 49MB (MemFree: 50384 kB)
+Available Memory: 427MB (MemAvailable: 437628 kB)
+Disk: 114GB total, 85.6GB free
+HWID: PASARA-TZNR C3B-D3B-B3B-C3Q-A8C
+Touchpad: Elan (elan_i2c, PID 0x0124)
+Bluetooth: Floss enabled
+ARC: enabled (SDK 33, ARC version 14059694)
+Enterprise Enrolled: Not managed
+Network: WiFi, excellent signal
+Uptime: 3351.02 seconds
 ```
 
 ---
