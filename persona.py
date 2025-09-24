@@ -873,14 +873,30 @@ class PersonaEngine:
         # Actually process the input text to understand what the user is asking
         text_lower = text.lower().strip()
         
-        # Check for shape commands first
+        # Check for mathematical shape commands - enhanced with ShapeGenerator
         shape_commands = {
-            'cube': ['cube', 'box', 'square'],
-            'sphere': ['sphere', 'ball', 'circle'],
+            # Basic geometric shapes
+            'triangle': ['triangle', 'triangular'],
+            'square': ['square', 'rectangle'],
+            'pentagon': ['pentagon', 'pentagonal'],
+            'hexagon': ['hexagon', 'hexagonal'],
+            'octagon': ['octagon', 'octagonal'],
+            'polygon': ['polygon', 'polygonal'],
+            
+            # Curved shapes  
+            'circle': ['circle', 'circular', 'round'],
+            'sphere': ['sphere', 'ball', 'spherical'],
             'torus': ['torus', 'donut', 'ring'],
-            'helix': ['helix', 'spiral', 'dna'],
+            
+            # Complex mathematical shapes
+            'spiral': ['spiral', 'helix', 'coil'],
+            'fibonacci': ['fibonacci', 'golden spiral'],
+            'fractal': ['fractal', 'koch', 'snowflake'],
+            
+            # Special formations (existing particle system)
+            'cube': ['cube', 'box'],
             'wave': ['wave', 'ripple', 'sine'],
-            'scatter': ['scatter', 'spread', 'random']
+            'scatter': ['scatter', 'spread', 'random', 'chaos']
         }
         
         detected_shape = None
@@ -945,18 +961,59 @@ class PersonaEngine:
             ]
             response = random.choice(casual_greetings)
             
-        # Handle shape commands  
+        # Handle mathematical shape commands with ShapeGenerator
         elif detected_shape:
-            # Trigger the shape formation
-            context['requested_shape'] = detected_shape  # Pass to main.js for morphing
-            shape_responses = [
-                f"Yo, check it out! Formin' a {detected_shape} for you right now!",
-                f"Aight bet, let me shape these particles into a {detected_shape}!",
-                f"Say no more! {detected_shape.capitalize()} comin' right up!",
-                f"Got you covered! Watch me make a clean {detected_shape}!",
-                f"Oh snap, {detected_shape}? I got you! Check this out!"
-            ]
-            response = random.choice(shape_responses)
+            # Import here to avoid circular imports
+            from shape_generator import get_shape_generator
+            
+            try:
+                # Generate the mathematical shape
+                shape_gen = get_shape_generator()
+                shape_data = shape_gen.create_shape(detected_shape)
+                
+                # Store shape data for frontend visualization
+                context['requested_shape'] = detected_shape
+                context['shape_data'] = {
+                    'name': shape_data.name,
+                    'points': [{'x': p.x, 'y': p.y, 'z': p.z} for p in shape_data.points],
+                    'center': shape_data.center,
+                    'properties': shape_data.properties
+                }
+                
+                # Generate educational response about the shape
+                props = shape_data.properties
+                educational_info = ""
+                
+                if 'sides' in props:
+                    educational_info = f"This {props['sides']}-sided polygon has interior angles of {props['interior_angle']}° each."
+                elif 'radius' in props:
+                    educational_info = f"Perfect circle with radius {props['radius']:.1f} and area of {props['area']:.1f} square units."
+                elif 'fractal_dimension' in props:
+                    educational_info = f"This fractal has dimension {props['fractal_dimension']:.2f} - it's more complex than a line but less than a plane!"
+                elif 'turns' in props:
+                    educational_info = f"This {props['type']} spiral makes {props['turns']} complete turns."
+                
+                shape_responses = [
+                    f"Yo! Check this {detected_shape} I just generated for you! {educational_info}",
+                    f"Boom! Mathematical {detected_shape} comin' at you with {len(shape_data.points)} precise coordinate points! {educational_info}",
+                    f"Say less! I just calculated a perfect {detected_shape} using pure mathematics. {educational_info}",
+                    f"Got you! Watch me manifest this {detected_shape} through geometric computation. {educational_info}",
+                    f"Oh snap! {detected_shape.capitalize()} generation complete! {educational_info}"
+                ]
+                response = random.choice(shape_responses)
+                
+            except Exception as e:
+                # Fallback to basic particle formation
+                context['requested_shape'] = detected_shape
+                debugger.error('persona', f'Shape generation error: {str(e)}')
+                
+                fallback_responses = [
+                    f"Aight, formin' a {detected_shape} with my particles right now!",
+                    f"Let me shape these particles into a {detected_shape} for you!",
+                    f"Say no more! {detected_shape.capitalize()} formation incoming!",
+                    f"Got you covered! Watch me make a clean {detected_shape}!"
+                ]
+                response = random.choice(fallback_responses)
             
         # Handle AI/capability discussions
         elif any(keyword in text_lower for keyword in ['capabilit', 'particle', 'holographic', 'formation', 'ai', 'system', 'interface', 'working on you']):

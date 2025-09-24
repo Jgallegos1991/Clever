@@ -279,6 +279,51 @@ async function handleMessageSubmit() {
 
         const data = await response.json();
         
+        // Process shape data if present (mathematical shape generation)
+        if (data.shape_data && holographicChamber && typeof holographicChamber.createMathematicalShape === 'function') {
+            console.log('📐 Processing mathematical shape data:', data.shape_data);
+            
+            // Create mathematical shape formation
+            holographicChamber.createMathematicalShape(data.shape_data);
+            
+            // Set to creative mode temporarily to highlight the mathematical shape
+            holographicChamber.setMode('creative');
+            
+            // Return to observing mode after shape is formed
+            setTimeout(() => {
+                if (holographicChamber && typeof holographicChamber.setMode === 'function') {
+                    holographicChamber.setMode('observing');
+                }
+            }, 3000);
+        }
+        // Handle legacy particle commands for backwards compatibility
+        else if (data.requested_shape && holographicChamber) {
+            console.log('🔄 Processing legacy shape command:', data.requested_shape);
+            
+            // Map to existing formations
+            const shapeMap = {
+                'cube': 'createCubeFormation',
+                'sphere': 'createSphereFormation', 
+                'torus': 'createTorusFormation',
+                'helix': 'createHelixFormation',
+                'spiral': 'createHelixFormation',
+                'constellation': 'createConstellationFormation'
+            };
+            
+            const formationMethod = shapeMap[data.requested_shape];
+            if (formationMethod && typeof holographicChamber[formationMethod] === 'function') {
+                holographicChamber[formationMethod]();
+                holographicChamber.setMode('creative');
+                
+                // Return to idle after formation
+                setTimeout(() => {
+                    if (holographicChamber && typeof holographicChamber.setMode === 'function') {
+                        holographicChamber.setMode('idle');
+                    }
+                }, 2000);
+            }
+        }
+        
         // Display Clever's response
         if (data.response) {
             displayMessage(data.response, 'clever');
@@ -287,8 +332,8 @@ async function handleMessageSubmit() {
             showSystemMessage('❌ No response received from Clever');
         }
 
-        // Return to idle mode
-        if (holographicChamber && typeof holographicChamber.setMode === 'function') {
+        // Return to idle mode if no shape processing occurred
+        if (!data.shape_data && !data.requested_shape && holographicChamber && typeof holographicChamber.setMode === 'function') {
             holographicChamber.setMode('idle');
         }
 
@@ -406,6 +451,98 @@ function initializeCognitiveStatus() {
     } else {
         console.warn('⚠️ Cognitive status component not available');
     }
+}
+
+/**
+ * Generate Mathematical Shape
+ * 
+ * Why: Direct API interface for mathematical shape generation and visualization
+ * Where: Can be called programmatically or via console for shape testing
+ * How: Makes API request to shape generator, applies result to particle system
+ * 
+ * Connects to:
+ *     - app.py: POST request to /api/generate_shape endpoint
+ *     - shape_generator.py: Backend mathematical shape generation
+ *     - holographic-chamber.js: createMathematicalShape() for visualization
+ */
+async function generateShape(shapeName, options = {}) {
+    try {
+        console.log(`📐 Generating mathematical shape: ${shapeName}`);
+        
+        const response = await fetch('/api/generate_shape', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                shape: shapeName,
+                ...options
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.shape) {
+            console.log(`✅ Shape generated: ${data.shape.name} with ${data.shape.point_count} points`);
+            
+            // Apply to particle system if available
+            if (holographicChamber && typeof holographicChamber.createMathematicalShape === 'function') {
+                holographicChamber.createMathematicalShape(data.shape);
+                holographicChamber.setMode('creative');
+                
+                // Return to observing mode after visualization
+                setTimeout(() => {
+                    if (holographicChamber && typeof holographicChamber.setMode === 'function') {
+                        holographicChamber.setMode('observing');
+                    }
+                }, 4000);
+            }
+            
+            return data.shape;
+        } else {
+            throw new Error(data.error || 'Shape generation failed');
+        }
+        
+    } catch (error) {
+        console.error('❌ Shape generation error:', error);
+        showSystemMessage(`❌ Shape generation failed: ${error.message}`);
+        throw error;
+    }
+}
+
+/**
+ * Get Available Shapes
+ * 
+ * Why: Provides list of available shapes for UI controls and help systems
+ * Where: Called by UI components that need shape selection options
+ * How: Fetches shape catalog from API with categorized information
+ */
+async function getAvailableShapes() {
+    try {
+        const response = await fetch('/api/available_shapes');
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`📚 Available shapes: ${data.total_shapes} shapes in ${Object.keys(data.categories).length} categories`);
+            return data.categories;
+        } else {
+            throw new Error(data.error || 'Failed to get available shapes');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error fetching available shapes:', error);
+        return {};
+    }
+}
+
+// Expose shape functions globally for console access and testing
+if (typeof window !== 'undefined') {
+    window.generateShape = generateShape;
+    window.getAvailableShapes = getAvailableShapes;
 }
 
 /**

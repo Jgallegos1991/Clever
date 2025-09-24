@@ -487,7 +487,184 @@ def api_runtime_introspect():
     """
     return jsonify(runtime_state(app, persona_engine=clever_persona))
 
+
+@app.route('/api/generate_shape', methods=['POST'])
+def api_generate_shape():
+    """Generate mathematical shapes for cognitive visualization
     
+    Why: Provides shape generation capabilities to enhance Clever's mathematical
+         and geometric demonstration abilities as part of her digital brain extension
+    Where: Called by frontend when shape commands are issued or by external tools
+           needing geometric shape data for visualization
+    How: Accepts shape parameters via JSON, uses ShapeGenerator to create mathematical
+         shapes, returns coordinate data for particle system visualization
+    
+    Connects to:
+        - shape_generator.py: ShapeGenerator.create_shape() for mathematical generation
+        - static/js/engines/holographic-chamber.js: Frontend particle positioning
+        - persona.py: PersonaEngine shape command handling integration
+    """
+    try:
+        data = request.get_json() or {}
+        shape_name = data.get('shape', 'circle')
+        
+        # Extract shape parameters
+        kwargs = {}
+        if 'size' in data:
+            kwargs['size'] = float(data['size'])
+        if 'radius' in data:
+            kwargs['radius'] = float(data['radius'])
+        if 'center' in data:
+            kwargs['center'] = tuple(data['center'])
+        if 'sides' in data:
+            kwargs['sides'] = int(data['sides'])
+        if 'turns' in data:
+            kwargs['turns'] = float(data['turns'])
+        if 'iterations' in data:
+            kwargs['iterations'] = int(data['iterations'])
+        if 'type' in data:
+            kwargs['type'] = data['type']
+        if 'point_count' in data:
+            kwargs['point_count'] = int(data['point_count'])
+        
+        # Generate the shape
+        from shape_generator import get_shape_generator
+        shape_gen = get_shape_generator()
+        shape = shape_gen.create_shape(shape_name, **kwargs)
+        
+        # Convert to JSON-serializable format
+        shape_data = {
+            'name': shape.name,
+            'points': [{'x': p.x, 'y': p.y, 'z': p.z, 'color': p.color, 'size': p.size} for p in shape.points],
+            'center': shape.center,
+            'bounding_box': shape.bounding_box,
+            'properties': shape.properties,
+            'point_count': len(shape.points)
+        }
+        
+        # Log for evolution tracking
+        TELEMETRY["shapes_generated"] = TELEMETRY.get("shapes_generated", 0) + 1
+        debugger.info('api.generate_shape', f'Generated {shape_name} with {len(shape.points)} points')
+        
+        return jsonify({
+            'success': True,
+            'shape': shape_data,
+            'message': f'Generated {shape.name} with {len(shape.points)} coordinate points'
+        })
+        
+    except Exception as e:
+        debugger.error('api.generate_shape', f'Shape generation failed: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Shape generation failed'
+        }), 500
+
+
+@app.route('/api/shape_info/<shape_name>', methods=['GET'])
+def api_shape_info(shape_name):
+    """Get information about available shapes and their properties
+    
+    Why: Provides educational information about geometric shapes and their
+         mathematical properties for learning and reference
+    Where: Called by frontend for shape documentation or educational displays
+    How: Generates example shape and returns comprehensive information including
+         mathematical properties, educational content, and usage examples
+    
+    Connects to:
+        - shape_generator.py: ShapeGenerator.create_shape() and get_shape_info()
+        - Frontend UI: Shape selection and educational information display
+    """
+    try:
+        from shape_generator import get_shape_generator
+        shape_gen = get_shape_generator()
+        
+        # Generate example shape with default parameters
+        shape = shape_gen.create_shape(shape_name)
+        info = shape_gen.get_shape_info(shape)
+        
+        # Add educational content
+        educational_content = {
+            'triangle': 'A three-sided polygon, the simplest polygon in Euclidean geometry.',
+            'square': 'A regular quadrilateral with four equal sides and four right angles.',  
+            'pentagon': 'A five-sided polygon, famous for its use in the Pentagon building.',
+            'hexagon': 'A six-sided polygon found in nature (honeycomb, crystal structures).',
+            'circle': 'A perfectly round shape with all points equidistant from the center.',
+            'spiral': 'A curve that winds around a center point, growing progressively farther away.',
+            'fractal': 'A self-similar pattern that repeats at different scales infinitely.',
+            'koch_snowflake': 'A mathematical snowflake fractal with infinite perimeter but finite area.'
+        }
+        
+        info['educational'] = educational_content.get(shape_name.lower(), 'A geometric shape with mathematical properties.')
+        
+        # Add usage examples
+        info['examples'] = [
+            f"Create a {shape_name}: 'form a {shape_name}'",
+            f"Generate {shape_name}: 'make a {shape_name}'",
+            f"Show {shape_name}: 'show me a {shape_name}'"
+        ]
+        
+        return jsonify({
+            'success': True,
+            'shape_name': shape_name,
+            'info': info
+        })
+        
+    except Exception as e:
+        debugger.error('api.shape_info', f'Shape info retrieval failed: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': f'Could not get information for shape: {shape_name}'
+        }), 500
+
+
+@app.route('/api/available_shapes', methods=['GET'])
+def api_available_shapes():
+    """List all available shapes that can be generated
+    
+    Why: Provides frontend with comprehensive list of supported shapes for
+         UI controls, help documentation, and command suggestions
+    Where: Called by frontend during initialization or for shape selection UI
+    How: Returns categorized list of all supported shape types with descriptions
+    
+    Connects to:
+        - shape_generator.py: References all supported shape types
+        - Frontend UI: Shape selection menus and help systems
+    """
+    shapes = {
+        'basic_polygons': {
+            'triangle': {'sides': 3, 'description': 'Three-sided regular polygon'},
+            'square': {'sides': 4, 'description': 'Four-sided regular polygon'},  
+            'pentagon': {'sides': 5, 'description': 'Five-sided regular polygon'},
+            'hexagon': {'sides': 6, 'description': 'Six-sided regular polygon'},
+            'octagon': {'sides': 8, 'description': 'Eight-sided regular polygon'}
+        },
+        'curved_shapes': {
+            'circle': {'description': 'Perfect circular shape'},
+            'sphere': {'description': 'Three-dimensional sphere (projected as circle)'},
+            'torus': {'description': 'Donut-shaped ring'}
+        },
+        'complex_shapes': {
+            'spiral': {'description': 'Mathematical spiral patterns', 'types': ['archimedean', 'logarithmic', 'fibonacci']},
+            'fractal': {'description': 'Self-similar fractal patterns'},
+            'koch_snowflake': {'description': 'Recursive snowflake fractal'}
+        },
+        'particle_formations': {
+            'cube': {'description': 'Cubic particle formation'},
+            'wave': {'description': 'Wave-like particle motion'},
+            'scatter': {'description': 'Random particle distribution'}
+        }
+    }
+    
+    return jsonify({
+        'success': True,
+        'categories': shapes,
+        'total_shapes': sum(len(category) for category in shapes.values()),
+        'message': 'Available shape types for generation'
+    })
+
+
     
 if __name__ == '__main__':
     debugger.info("app", "Clever AI starting...")
