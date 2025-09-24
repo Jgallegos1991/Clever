@@ -15,10 +15,16 @@ Connects to:
 """
 
 import math
-import numpy as np
 from typing import List, Dict, Tuple, Any, Optional
 from dataclasses import dataclass
 from debug_config import get_debugger, performance_monitor
+
+# Try to import numpy for enhanced calculations, fallback to math if not available
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
 
 debugger = get_debugger()
 
