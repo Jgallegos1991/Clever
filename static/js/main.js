@@ -41,7 +41,7 @@ function initializeParticleSystem() {
     canvas.style.position = 'fixed';
     canvas.style.top = '0';
     canvas.style.left = '0';
-    canvas.style.zIndex = '1';
+    canvas.style.zIndex = '9999';
     canvas.style.pointerEvents = 'none';
     
     console.log(`🎨 Canvas configured: ${canvas.width}x${canvas.height}`);
@@ -66,6 +66,20 @@ function initializeParticleSystem() {
                 console.log('✅ Particle system ready');
                 console.log(`📊 Particles created: ${holographicChamber.particles ? holographicChamber.particles.length : 'Unknown'}`);
                 
+                // Force animation to start
+                if (typeof holographicChamber.animate === 'function') {
+                    holographicChamber.animate();
+                    console.log('🎬 Animation loop started');
+                }
+                
+                // Force immediate visible formation
+                setTimeout(() => {
+                    if (typeof holographicChamber.morphToFormation === 'function') {
+                        holographicChamber.morphToFormation('sphere');
+                        console.log('🔮 Forced sphere formation for visibility');
+                    }
+                }, 1000);
+                
                 // Let Clever's natural thinking patterns initialize
                 // Her particles represent her cognitive state and thoughts
                 console.log('🧠 Clever\'s particle system ready - letting her think naturally');
@@ -74,9 +88,13 @@ function initializeParticleSystem() {
             }
         } catch (error) {
             console.error('❌ Particle system initialization failed:', error);
+            return;
         }
-    } else {
+    }
+    
+    if (typeof window.startHolographicChamber !== 'function') {
         console.error('❌ startHolographicChamber function not available');
+        return;
     }
 }
 

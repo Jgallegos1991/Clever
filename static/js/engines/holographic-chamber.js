@@ -34,7 +34,7 @@ class HolographicChamber {
     // Visual enhancement settings
     this.trailMode = false;
     this.energyFlowMode = true;
-    this.debugMode = false; // Enable simple particle rendering for debugging
+  this.debugMode = true; // Force simple, bright particle rendering for visibility
     this.enableFormationRotation = true; // Enable rotation for 3D thought formations
     this.particlePhysics = {
       gravity: 0,
@@ -51,6 +51,12 @@ class HolographicChamber {
     this.roamGrowthRate = 0.0006; // per frame growth while idle
     
     this.init();
+    // Force a visible formation on load for maximum visibility
+    setTimeout(() => {
+      if (typeof this.morphToFormation === 'function') {
+        this.morphToFormation('sphere');
+      }
+    }, 500);
   }
 
   init() {
@@ -141,6 +147,9 @@ class HolographicChamber {
       setTimeout(thinkingCycle, totalDelay);
     };
     
+    thinkingCycle(); // Start the cycle
+  }
+  
   startFormationCycle() {
     const formations = ['whirlpool', 'sphere', 'cube', 'torus', 'helix', 'wave', 'spiral', 'scatter'];
     let currentIndex = 0;
@@ -239,25 +248,25 @@ class HolographicChamber {
       this.particles.push({
         x: Math.random() * this.width,
         y: Math.random() * this.height,
-    // Much slower initial velocities for very calm start
-    vx: (Math.random() - 0.5) * 0.005,
-    vy: (Math.random() - 0.5) * 0.005,
-    targetX: Math.random() * this.width,
-    targetY: Math.random() * this.height,
-    size: Math.random() * 2 + 1,
-    alpha: Math.random() * 0.4 + 0.6,
-    hue: Math.random() * 60 + 160,
-    phase: Math.random() * Math.PI * 2,
-    // Much lower natural speed for very calm movement
-    speed: 0.005 + Math.random() * 0.01, // 0.005–0.015 (much slower)
-    baseSpeed: 0.005 + Math.random() * 0.01,
-    // Noise parameters per particle for organic drift
-    noisePhase1: Math.random() * Math.PI * 2,
-    noisePhase2: Math.random() * Math.PI * 2,
-    noiseSpeed1: 0.12 + Math.random() * 0.05,
-    noiseSpeed2: 0.05 + Math.random() * 0.03,
-    noiseScale: 0.006 + Math.random() * 0.004, // tiny per-frame velocity drift
-    energy: Math.random() * 0.04 + 0.04 // Slowed down pulsing from 0.08-0.16 to 0.04-0.08
+        // Much slower initial velocities for very calm start
+        vx: (Math.random() - 0.5) * 0.005,
+        vy: (Math.random() - 0.5) * 0.005,
+        targetX: Math.random() * this.width,
+        targetY: Math.random() * this.height,
+        size: Math.random() * 4 + 2, // Larger and more visible
+        alpha: 0.95, // Nearly fully opaque for visibility
+        hue: Math.random() * 60 + 160,
+        phase: Math.random() * Math.PI * 2,
+        // Much lower natural speed for very calm movement
+        speed: 0.005 + Math.random() * 0.01, // 0.005–0.015 (much slower)
+        baseSpeed: 0.005 + Math.random() * 0.01,
+        // Noise parameters per particle for organic drift
+        noisePhase1: Math.random() * Math.PI * 2,
+        noisePhase2: Math.random() * Math.PI * 2,
+        noiseSpeed1: 0.12 + Math.random() * 0.05,
+        noiseSpeed2: 0.05 + Math.random() * 0.03,
+        noiseScale: 0.006 + Math.random() * 0.004, // tiny per-frame velocity drift
+        energy: Math.random() * 0.04 + 0.04 // Slowed down pulsing from 0.08-0.16 to 0.04-0.08
       });
     }
     console.log(`✅ Created ${this.particles.length} particles successfully`);
@@ -683,6 +692,8 @@ class HolographicChamber {
         console.log(`🎯 Sample targets: targetX=${sample.targetX.toFixed(1)}, targetY=${sample.targetY.toFixed(1)}`);
       }
     }
+
+
     
     // Clear canvas (or create trail effect if enabled)
     if (this.trailMode) {
@@ -715,15 +726,46 @@ class HolographicChamber {
       this.ctx.save();
       
       // Debug mode: simple rendering for performance testing
-      if (this.debugMode || this.frameCount < 10) {
-        this.ctx.fillStyle = '#69EACB';
-        this.ctx.globalAlpha = 0.8;
-        this.ctx.beginPath();
-        this.ctx.arc(particle.x, particle.y, Math.max(2, particle.size), 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.restore();
-        return;
-      }
+      // Enhanced: Render with much higher lightness and alpha for visibility
+      // Multi-layer glow effect (brighter)
+      const debugLayers = [
+        { radius: particle.size * 3, alpha: 0.45, hueShift: 0 },
+        { radius: particle.size * 2, alpha: 0.7, hueShift: 15 },
+        { radius: particle.size * 1.2, alpha: 0.9, hueShift: 8 }
+      ];
+      debugLayers.forEach(layer => {
+        try {
+          const gradient = this.ctx.createRadialGradient(
+            particle.x, particle.y, 0,
+            particle.x, particle.y, layer.radius
+          );
+          const baseHue = particle.formationHue || particle.hue;
+          const hue = (baseHue + layer.hueShift) % 360;
+          const lightness = 85 + particle.energy * 10; // much brighter
+          gradient.addColorStop(0, `hsla(${hue}, 100%, ${lightness}%, ${layer.alpha})`);
+          gradient.addColorStop(0.7, `hsla(${hue}, 100%, ${lightness}%, ${layer.alpha * 0.5})`);
+          gradient.addColorStop(1, `hsla(${hue}, 100%, ${lightness}%, 0)`);
+          this.ctx.fillStyle = gradient;
+          this.ctx.beginPath();
+          this.ctx.arc(particle.x, particle.y, layer.radius, 0, Math.PI * 2);
+          this.ctx.fill();
+        } catch (error) {
+          console.warn(`⚠️ Gradient rendering error for particle ${i}:`, error);
+        }
+      });
+      // Brighter core
+      this.ctx.globalAlpha = 1.0;
+      const debugCoreSize = Math.max(1.5, 1.5 + particle.energy * 1.5);
+      const debugCoreHue = (particle.hue + 20) % 360;
+      this.ctx.fillStyle = `hsl(${debugCoreHue}, 100%, 95%)`;
+      this.ctx.beginPath();
+      this.ctx.arc(particle.x, particle.y, debugCoreSize, 0, Math.PI * 2);
+      this.ctx.fill();
+      // Subtle pixel center (bright cyan)
+      this.ctx.fillStyle = '#BFFFFF';
+      this.ctx.fillRect(Math.round(particle.x - 0.5), Math.round(particle.y - 0.5), 1, 1);
+      this.ctx.restore();
+      return;
       
       // Gentle alpha variation (no more seizure strobing!)
       const dynamicAlpha = particle.alpha * (0.8 + Math.sin(particle.phase) * 0.15) * (0.9 + particle.energy * 0.1);
@@ -733,13 +775,13 @@ class HolographicChamber {
       const energySize = particle.size * (1 + particle.energy * 0.3);
       
       // Toned down multi-layer glow effect
-      const layers = [
+      const normalLayers = [
         { radius: energySize * 3, alpha: 0.15, hueShift: 0 },
         { radius: energySize * 2, alpha: 0.3, hueShift: 15 },
         { radius: energySize * 1.2, alpha: 0.5, hueShift: 8 }
       ];
       
-      layers.forEach(layer => {
+      normalLayers.forEach(layer => {
         try {
           const gradient = this.ctx.createRadialGradient(
             particle.x, particle.y, 0,
@@ -765,11 +807,11 @@ class HolographicChamber {
       
       // Gentle center core (less eye-searing!)
       this.ctx.globalAlpha = 0.9;
-      const coreSize = Math.max(1, 1 + particle.energy * 1);
-      const coreHue = (particle.hue + 20) % 360;
-      this.ctx.fillStyle = `hsl(${coreHue}, 90%, 70%)`;
+      const normalCoreSize = Math.max(1, 1 + particle.energy * 1);
+      const normalCoreHue = (particle.hue + 20) % 360;
+      this.ctx.fillStyle = `hsl(${normalCoreHue}, 90%, 70%)`;
       this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, coreSize, 0, Math.PI * 2);
+      this.ctx.arc(particle.x, particle.y, normalCoreSize, 0, Math.PI * 2);
       this.ctx.fill();
       
       // Subtle pixel center (not blinding white)
