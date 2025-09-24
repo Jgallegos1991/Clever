@@ -1,6 +1,8 @@
 // Clever Digital Brain Extension - Main Logic
 console.log('🧠 Clever initializing...');
 
+
+
 let holographicChamber = null;
 
 // Lifecycle timing constants (ms)

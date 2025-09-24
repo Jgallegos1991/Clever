@@ -693,8 +693,6 @@ class HolographicChamber {
       }
     }
 
-
-    
     // Clear canvas (or create trail effect if enabled)
     if (this.trailMode) {
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
@@ -723,49 +721,17 @@ class HolographicChamber {
         return;
       }
       
-      this.ctx.save();
-      
-      // Debug mode: simple rendering for performance testing
-      // Enhanced: Render with much higher lightness and alpha for visibility
-      // Multi-layer glow effect (brighter)
-      const debugLayers = [
-        { radius: particle.size * 3, alpha: 0.45, hueShift: 0 },
-        { radius: particle.size * 2, alpha: 0.7, hueShift: 15 },
-        { radius: particle.size * 1.2, alpha: 0.9, hueShift: 8 }
-      ];
-      debugLayers.forEach(layer => {
-        try {
-          const gradient = this.ctx.createRadialGradient(
-            particle.x, particle.y, 0,
-            particle.x, particle.y, layer.radius
-          );
-          const baseHue = particle.formationHue || particle.hue;
-          const hue = (baseHue + layer.hueShift) % 360;
-          const lightness = 85 + particle.energy * 10; // much brighter
-          gradient.addColorStop(0, `hsla(${hue}, 100%, ${lightness}%, ${layer.alpha})`);
-          gradient.addColorStop(0.7, `hsla(${hue}, 100%, ${lightness}%, ${layer.alpha * 0.5})`);
-          gradient.addColorStop(1, `hsla(${hue}, 100%, ${lightness}%, 0)`);
-          this.ctx.fillStyle = gradient;
-          this.ctx.beginPath();
-          this.ctx.arc(particle.x, particle.y, layer.radius, 0, Math.PI * 2);
-          this.ctx.fill();
-        } catch (error) {
-          console.warn(`⚠️ Gradient rendering error for particle ${i}:`, error);
-        }
-      });
-      // Brighter core
-      this.ctx.globalAlpha = 1.0;
-      const debugCoreSize = Math.max(1.5, 1.5 + particle.energy * 1.5);
-      const debugCoreHue = (particle.hue + 20) % 360;
-      this.ctx.fillStyle = `hsl(${debugCoreHue}, 100%, 95%)`;
+      // SIMPLE, GUARANTEED-VISIBLE PARTICLES
+      this.ctx.fillStyle = '#FFFFFF';
       this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, debugCoreSize, 0, Math.PI * 2);
+      this.ctx.arc(particle.x, particle.y, 8, 0, Math.PI * 2);
       this.ctx.fill();
-      // Subtle pixel center (bright cyan)
-      this.ctx.fillStyle = '#BFFFFF';
-      this.ctx.fillRect(Math.round(particle.x - 0.5), Math.round(particle.y - 0.5), 1, 1);
-      this.ctx.restore();
-      return;
+      
+      // Add bright colored glow
+      this.ctx.fillStyle = '#00FFFF';
+      this.ctx.beginPath();
+      this.ctx.arc(particle.x, particle.y, 4, 0, Math.PI * 2);
+      this.ctx.fill();
       
       // Gentle alpha variation (no more seizure strobing!)
       const dynamicAlpha = particle.alpha * (0.8 + Math.sin(particle.phase) * 0.15) * (0.9 + particle.energy * 0.1);
