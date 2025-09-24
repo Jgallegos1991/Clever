@@ -81,6 +81,11 @@ ingest-pdfs:
 	@echo "📚 Processing PDFs and documents..."
 	$(ACTIVATE) && python pdf_ingestor.py
 
+# Ingest knowledge from Clever_Learn directory
+ingest-knowledge:
+	@echo "🧠 Ingesting knowledge files from Clever_Learn..."
+	$(ACTIVATE) && python ingest_knowledge.py --verbose
+
 # Watch sync directories for changes and auto-ingest  
 watch:
 	@echo "👀 Starting sync directory watcher..."

@@ -1,39 +1,94 @@
 <!DOCTYPE html>
-<!--
-Clever Digital Brain Extension - Clean UI Template
-
-Why: Minimal particle-focused interface for Jay's digital brain extension
-Where: Main entry point after complete UI cleanup and rebuild  
-How: Canvas center stage, floating input, dynamic chat bubbles
--->
 <html lang="en">
 <head>
+    <!--
+    Why: Main template for Clever's digital brain interface - provides cognitive partnership UI
+    Where: Served by app.py home() route as Clever's primary interaction interface  
+    How: Combines particle visualization canvas, chat interface, and input controls in unified layout
+
+    Connects to:
+        - app.py: Rendered by home() route with persona context and cache-busting
+        - static/css/style.css: Core styling for cognitive interface aesthetic
+        - static/js/main.js: JavaScript entry point for initialization
+        - static/js/engines/holographic-chamber.js: Particle brain visualization engine
+        - static/js/components/chat-fade.js: Chat bubble lifecycle management
+    -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clever - Digital Brain Extension</title>
     
-    <!-- Clean Styles -->
+    <!-- Core CSS with cache-busting for development iterations -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
-    {# Legacy reference hint to satisfy tests expecting direct style.css pattern #}
-    <!-- {{ url_for('static', filename='style.css') }} -->
 </head>
 <body>
-    <!-- Particle Canvas - Clever's Digital Brain Visualization -->
-    <!-- Added legacy-compatible id 'particles' to satisfy acceptance tests expecting this specific identifier -->
-    <canvas id="particles" width="1366" height="768"></canvas>
+    <!--
+    Body Structure Overview:
+    - Canvas: Full-screen particle system (Clever's cognitive visualization)
+    - Chat Container: Floating message bubbles (thought expression)
+    - Input Bar: Bottom-centered interaction interface (cognitive input)
     
-    <!-- Chat Bubbles Container -->
-    <div id="chat-log" aria-live="polite"></div>
+    Z-Index Hierarchy (from back to front):
+    1. Background/Body (0)
+    2. Chat Container (10)
+    3. Input Bar (20)
+    4. Particle Canvas (9999) - Top layer for immersive brain visualization
+    -->
+
+    <!-- Clever's Holographic Brain Canvas -->
+    <canvas id="particles">
+        <!--
+        Why: Primary visual representation of Clever's cognitive state and thought processes
+        Where: Full-screen overlay managed by holographic-chamber.js particle engine
+        How: Canvas element styled for full viewport coverage with pointer-events disabled
+
+        Connects to:
+            - static/js/main.js: initializeParticleSystem() targets this element
+            - static/js/engines/holographic-chamber.js: HolographicChamber class renders to canvas
+            - static/css/style.css: #particles styling for positioning and z-index
+        -->
+    </canvas>
+
+    <!-- Chat Interaction Area -->
+    <div id="chat-container">
+        <!--
+        Why: Display area for Clever's responses and conversation history with fade animations
+        Where: Positioned for optimal readability while allowing particle visualization
+        How: Container for dynamically created chat bubbles managed by chat-fade.js
+        
+        Connects to:
+            - static/js/components/chat-fade.js: Creates and manages chat bubble lifecycle
+            - static/js/main.js: Chat interface initialization and message handling
+            - static/css/style.css: Chat bubble styling and fade animations
+        -->
+        <div id="chat-log" aria-live="polite">
+            <!-- Chat bubbles dynamically inserted here by chat-fade.js -->
+        </div>
+    </div>
     
-    <!-- Floating Input -->
+    <!-- Cognitive Input Interface -->
     <div class="floating-input">
-        <input 
-            type="text" 
-            id="chat-input" 
-            placeholder="Think with Clever... (Shift+C for cube, Shift+S for sphere)"
-            autocomplete="off"
-        >
-        <button id="send-btn" type="button" title="Send message" aria-label="Send message">→</button>
+        <!--
+        Why: Primary interface for user input to Clever - minimalist and unobtrusive design
+        Where: Bottom-center positioning for natural interaction flow
+        How: Floating design that glows and focuses attention when active
+        
+        Connects to:
+            - static/js/main.js: initializeChatInterface() sets up event handlers
+            - app.py: Form submission routed to chat() endpoint for processing
+            - static/css/style.css: Floating input styling and glow effects
+        -->
+        <form id="chat-form">
+            <div class="input-wrapper">
+                <input type="text" 
+                       id="chat-input" 
+                       placeholder="Talk to Clever..." 
+                       autocomplete="off"
+                       spellcheck="false">
+                <button type="submit" id="send-btn">
+                    <span>→</span>
+                </button>
+            </div>
+        </form>
     </div>
     
     <!-- Required elements for tests (hidden) -->
@@ -43,11 +98,41 @@ How: Canvas center stage, floating input, dynamic chat bubbles
     <div class="panel" id="sentiment" style="display:none"></div>
     <div class="panel" id="entities" style="display:none"></div>
     <div class="panel" id="keywords" style="display:none"></div>
+
+    <!-- JavaScript Loading Order -->
+    <!--
+    Why: Specific load order ensures dependencies are available when needed
+    Where: Bottom of body for DOM-ready initialization after HTML parsing  
+    How: Core engines first, then components, finally main initialization
+    -->
     
-    <!-- Core JavaScript -->
-    <script src="{{ url_for('static', filename='js/engines/holographic-chamber.js') }}?v={{ cache_buster }}"></script>
-    <!-- Legacy optional component stub expected by tests -->
-    <script src="{{ url_for('static', filename='js/components/chat-fade.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}"></script>
+    <!-- Core Particle Engine -->
+    <script src="{{ url_for('static', filename='js/engines/holographic-chamber.js') }}?v={{ cache_buster }}">
+        <!--
+        Connects to:
+            - HolographicChamber class: Particle physics and rendering engine
+            - main.js: initializeParticleSystem() calls window.startHolographicChamber()
+        -->
+    </script>
+    
+    <!-- UI Components -->
+    <script src="{{ url_for('static', filename='js/components/chat-fade.js') }}?v={{ cache_buster }}">
+        <!--
+        Connects to:
+            - Chat bubble creation and lifecycle management
+            - main.js: Uses createChatBubble() for message display
+        -->
+    </script>
+    
+    <!-- Main Application Logic -->
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ cache_buster }}">
+        <!--
+        Connects to:
+            - DOMContentLoaded initialization
+            - Particle system startup
+            - Chat interface event handling
+            - Keyboard shortcuts and controls
+        -->
+    </script>
 </body>
 </html>

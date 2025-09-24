@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Debug</title>
+    <style>
+        #chat-log { 
+            border: 2px solid red; 
+            height: 200px; 
+            overflow-y: auto; 
+            padding: 10px;
+        }
+        .chat-message { 
+            background: #333; 
+            color: white; 
+            margin: 5px 0; 
+            padding: 10px;
+        }
+        .chat-message.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="chat-log">Chat log container</div>
+    <button onclick="testMessage()">Test Message</button>
+    
+    <script>
+        function createChatBubble(text, sender) {
+            console.log('createChatBubble called with:', text, sender);
+            const chatLog = document.getElementById('chat-log');
+            
+            if (!chatLog) {
+                console.error('No chat log container');
+                return;
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message ' + sender;
+            messageDiv.innerHTML = '<div>' + text + '</div>';
+            
+            chatLog.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.classList.add('show');
+            }, 100);
+            
+            console.log('Message added to DOM');
+        }
+        
+        function testMessage() {
+            console.log('Testing message creation...');
+            createChatBubble('Test message', 'user');
+        }
+        
+        window.createChatBubble = createChatBubble;
+        console.log('Debug chat loaded');
+    </script>
+</body>
+</html>

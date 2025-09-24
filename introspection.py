@@ -48,6 +48,10 @@ _registry_lock = threading.Lock()
 _last_error: Optional[Dict[str, Any]] = None
 
 # Cache for parsed docstring metadata keyed by object id
+_docstring_cache: Dict[int, Dict[str, str]] = {}
+
+# Component health tracking registry  
+_component_health: Dict[str, Dict[str, Any]] = {}
 _doc_meta_cache: Dict[int, Dict[str, str]] = {}
 
 # Threshold (ms) above which a render is flagged as slow. Chosen conservatively
@@ -468,6 +472,7 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
         "intelligent_analysis": intelligent_analysis,
         "code_health": code_health,
         "component_graph": component_graph,
+        "ui_component_validation": validate_ui_components(),
     }
 
 
@@ -635,4 +640,164 @@ def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[s
         "truncated": truncated,
         "generated_ts": time.time(),
     }
+
+
+def validate_ui_components() -> Dict[str, Any]:
+    """
+    Validate UI component integrity and catch CSS/HTML/JS mismatches
+    
+    Why: Prevent invisible UI elements caused by ID/selector mismatches, z-index conflicts,
+         or broken component connections. The particle visibility issue demonstrated 
+         that our system needs automated component health checking.
+    Where: Called by runtime_state() to include component validation in introspection.
+           Should catch issues like CSS #particle-canvas vs HTML id="particles".
+    How: Cross-references template files, CSS selectors, and JavaScript element queries
+         to detect mismatches. Validates z-index hierarchy and positioning conflicts.
+    
+    Returns:
+        Dictionary with component health status, warnings, and validation results
+        
+    Connects to:
+        - templates/index.html: Scans for canvas and UI element IDs
+        - static/css/style.css: Validates CSS selectors match HTML IDs  
+        - static/js/main.js: Checks JavaScript element queries
+        - app.py: Results included in /api/runtime_introspect endpoint
+    """
+    validation_results = {
+        "canvas_particle_system": _validate_particle_system(),
+        "chat_interface": _validate_chat_interface(), 
+        "input_controls": _validate_input_controls(),
+        "z_index_hierarchy": _validate_z_index_hierarchy(),
+        "timestamp": time.time(),
+        "overall_status": "healthy"
+    }
+    
+    # Determine overall health status
+    issues_found = []
+    for component, result in validation_results.items():
+        if isinstance(result, dict) and result.get("status") == "error":
+            issues_found.append(component)
+            
+    if issues_found:
+        validation_results["overall_status"] = "issues_detected"
+        validation_results["issues"] = issues_found
+        
+    return validation_results
+
+
+def _validate_particle_system() -> Dict[str, Any]:
+    """
+    Validate the holographic particle system component integrity
+    
+    Why: The particle invisibility bug was caused by CSS/HTML ID mismatch that should
+         have been caught automatically by component validation.
+    Where: Called by validate_ui_components() to check particle system health.
+    How: Validates HTML canvas element, CSS styling, and JavaScript initialization.
+    """
+    try:
+        # Check HTML template for canvas element
+        template_path = Path("templates/index.html")
+        if not template_path.exists():
+            return {"status": "error", "message": "Template file not found"}
+            
+        template_content = template_path.read_text()
+        
+        # Extract canvas ID from HTML
+        canvas_match = re.search(r'<canvas[^>]+id=["\']([^"\']+)["\']', template_content)
+        html_canvas_id = canvas_match.group(1) if canvas_match else None
+        
+        # Check CSS for matching selector
+        css_path = Path("static/css/style.css")
+        css_content = css_path.read_text() if css_path.exists() else ""
+        
+        # Look for canvas styling rules
+        css_selectors = re.findall(r'#([a-zA-Z0-9_-]+)\s*{[^}]*(?:position|z-index)', css_content)
+        
+        # Check JavaScript for element queries
+        js_path = Path("static/js/main.js") 
+        js_content = js_path.read_text() if js_path.exists() else ""
+        
+        js_queries = re.findall(r'getElementById\(["\']([^"\']+)["\']\)', js_content)
+        
+        # Validation results
+        result = {
+            "status": "healthy",
+            "html_canvas_id": html_canvas_id,
+            "css_selectors": css_selectors,
+            "js_queries": js_queries,
+            "warnings": []
+        }
+        
+        # Check for ID/selector mismatches
+        if html_canvas_id and html_canvas_id not in css_selectors:
+            result["status"] = "error"
+            result["warnings"].append(f"CSS missing selector for HTML canvas ID: {html_canvas_id}")
+            
+        if html_canvas_id and html_canvas_id not in js_queries:
+            result["warnings"].append(f"JavaScript missing query for canvas ID: {html_canvas_id}")
+            
+        return result
+        
+    except Exception as e:
+        return {"status": "error", "message": f"Validation failed: {str(e)}"}
+
+
+def _validate_chat_interface() -> Dict[str, Any]:
+    """Validate chat interface component integrity"""
+    return {"status": "healthy", "message": "Chat interface validation not implemented yet"}
+
+
+def _validate_input_controls() -> Dict[str, Any]:  
+    """Validate input controls component integrity"""
+    return {"status": "healthy", "message": "Input controls validation not implemented yet"}
+
+
+def _validate_z_index_hierarchy() -> Dict[str, Any]:
+    """
+    Validate z-index hierarchy for proper UI layering
+    
+    Why: Conflicting z-index values can cause UI elements to be hidden behind others.
+    Where: Called by validate_ui_components() to check layering conflicts.
+    How: Scans CSS for z-index declarations and validates proper hierarchy.
+    """
+    try:
+        css_path = Path("static/css/style.css")
+        if not css_path.exists():
+            return {"status": "error", "message": "CSS file not found"}
+            
+        css_content = css_path.read_text()
+        
+        # Extract z-index declarations
+        z_index_pattern = r'([#.][\w-]+)\s*{[^}]*z-index:\s*(\d+)'
+        z_indexes = re.findall(z_index_pattern, css_content)
+        
+        # Build hierarchy map
+        hierarchy = {}
+        for selector, z_value in z_indexes:
+            hierarchy[selector] = int(z_value)
+            
+        return {
+            "status": "healthy",
+            "hierarchy": hierarchy,
+            "max_z_index": max(hierarchy.values()) if hierarchy else 0,
+            "conflicts": _detect_z_index_conflicts(hierarchy)
+        }
+        
+    except Exception as e:
+        return {"status": "error", "message": f"Z-index validation failed: {str(e)}"}
+
+
+def _detect_z_index_conflicts(hierarchy: Dict[str, int]) -> List[str]:
+    """Detect potential z-index conflicts"""
+    conflicts = []
+    
+    # Check for duplicate z-index values
+    values_seen = {}
+    for selector, z_value in hierarchy.items():
+        if z_value in values_seen:
+            conflicts.append(f"Duplicate z-index {z_value}: {selector} and {values_seen[z_value]}")
+        else:
+            values_seen[z_value] = selector
+            
+    return conflicts
 

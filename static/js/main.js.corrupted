@@ -1,0 +1,977 @@
+/*/*// Clever Digital Brain Extension - Main Logic
+
+Clever Digital Brain Extension - Main Application Logic
+
+Clever Digital Brain Extension - Main Application Logicconsole.log('🧠 Clever initializing...');
+
+Why: Central JavaScript controller orchestrating Clever's cognitive interface initialization
+
+Where: Loaded by templates/index.html as primary script after engine dependencies
+
+How: Coordinates particle system, chat interface, and user interaction handling
+
+Why: Central JavaScript controller orchestrating Clever's cognitive interface initialization
+
+Connects to:
+
+    - templates/index.html: Script loaded after DOM parsing for initializationWhere: Loaded by templates/index.html as primary script after engine dependencies
+
+    - static/js/engines/holographic-chamber.js: Uses window.startHolographicChamber()
+
+    - static/js/components/chat-fade.js: Uses createChatBubble() for message displayHow: Coordinates particle system, chat interface, and user interaction handlinglet holographicChamber = null;
+
+    - static/css/style.css: Queries and manipulates elements styled by CSS
+
+    - app.py: Sends requests to /api/chat endpoint for Clever responses
+
+*/
+
+Connects to:// Lifecycle timing constants (ms)
+
+console.log('🧠 Clever Digital Brain Extension initializing...');
+
+    - templates/index.html: Script loaded after DOM parsing for initialization// Why: Centralized timing ensures consistent cognitive rhythm & easy tuning
+
+// Global state management for cognitive interface
+
+let holographicChamber = null;    - static/js/engines/holographic-chamber.js: Uses window.startHolographicChamber()// Where: Consumed by createChatBubble() + scheduleAutoHide()
+
+let isProcessingMessage = false;
+
+    - static/js/components/chat-fade.js: Uses createChatBubble() for message display// How: Single source of truth; CSS variables mirror these for transitions
+
+// Timing constants for chat bubble lifecycle management
+
+/*    - static/css/style.css: Queries and manipulates elements styled by CSSconst BUBBLE_FADE_IN_MS = 500;
+
+Why: Centralized timing ensures consistent cognitive rhythm and easy tuning
+
+Where: Used by createChatBubble() and scheduleAutoHide() for message flow    - app.py: Sends requests to /api/chat endpoint for Clever responsesconst BUBBLE_VISIBLE_MS = 6000; // base visible window before fade
+
+How: Single source of truth mirrored by CSS transition durations
+
+*/const BUBBLE_FADE_OUT_MS = 800;
+
+Connects to:
+
+    - static/css/style.css: CSS transition durations should match these valuesconst BUBBLE_TOTAL_LIFETIME = BUBBLE_FADE_IN_MS + BUBBLE_VISIBLE_MS + BUBBLE_FADE_OUT_MS;
+
+    - static/js/components/chat-fade.js: Uses these constants for animation timing
+
+*/console.log('🧠 Clever Digital Brain Extension initializing...');
+
+const BUBBLE_FADE_IN_MS = 500;
+
+const BUBBLE_VISIBLE_MS = 6000;// Respect reduced motion preference
+
+const BUBBLE_FADE_OUT_MS = 800;
+
+const BUBBLE_TOTAL_LIFETIME = BUBBLE_FADE_IN_MS + BUBBLE_VISIBLE_MS + BUBBLE_FADE_OUT_MS;// Global state management for cognitive interfaceconst prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+
+
+// Respect user accessibility preferenceslet holographicChamber = null;const EFFECTIVE_FADE_IN = prefersReducedMotion ? 0 : BUBBLE_FADE_IN_MS;
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const EFFECTIVE_FADE_IN = prefersReducedMotion ? 0 : BUBBLE_FADE_IN_MS;let isProcessingMessage = false;const EFFECTIVE_FADE_OUT = prefersReducedMotion ? 0 : BUBBLE_FADE_OUT_MS;
+
+const EFFECTIVE_FADE_OUT = prefersReducedMotion ? 0 : BUBBLE_FADE_OUT_MS;
+
+
+
+/*
+
+Primary initialization when DOM is ready// Timing constants for chat bubble lifecycle managementdocument.addEventListener('DOMContentLoaded', function() {
+
+
+
+Why: Ensure all HTML elements exist before JavaScript attempts to interact with them/*    initializeParticleSystem();
+
+Where: Standard DOMContentLoaded event listener for reliable initialization
+
+How: Sequential initialization of core systems with error handlingWhy: Centralized timing ensures consistent cognitive rhythm and easy tuning    initializeChatInterface();
+
+
+
+Connects to:Where: Used by createChatBubble() and scheduleAutoHide() for message flow    initializeKeyboardControls();
+
+    - templates/index.html: Fires after HTML parsing complete
+
+    - All initialization functions: Coordinates startup sequenceHow: Single source of truth mirrored by CSS transition durations    console.log('✨ Clever ready!');
+
+*/
+
+document.addEventListener('DOMContentLoaded', function() {});
+
+    console.log('✅ DOM loaded, starting Clever initialization...');
+
+    Connects to:
+
+    try {
+
+        initializeParticleSystem();    - static/css/style.css: CSS transition durations should match these valuesfunction initializeParticleSystem() {
+
+        initializeChatInterface();
+
+        initializeKeyboardControls();    - static/js/components/chat-fade.js: Uses these constants for animation timing    // Why: Particle canvas is the cognitive stage; must initialize or gracefully degrade
+
+        console.log('✨ Clever cognitive interface ready!');
+
+    } catch (error) {*/    // Where: Connects to holographic-chamber.js which exposes startHolographicChamber
+
+        console.error('❌ Clever initialization failed:', error);
+
+        showFallbackInterface();const BUBBLE_FADE_IN_MS = 500;    // How: Locate canonical #particles (contract in index.html). Fallback logged if absent
+
+    }
+
+});const BUBBLE_VISIBLE_MS = 6000;    const canvas = document.getElementById('particles');
+
+
+
+/*const BUBBLE_FADE_OUT_MS = 800;    if (!canvas) {
+
+Particle System Initialization
+
+const BUBBLE_TOTAL_LIFETIME = BUBBLE_FADE_IN_MS + BUBBLE_VISIBLE_MS + BUBBLE_FADE_OUT_MS;        console.error('❌ Canvas #particles not found');
+
+Why: Clever's particle canvas is the core cognitive visualization - must initialize properly
+
+Where: Called during main initialization to start holographic brain visualization        return;
+
+How: Validates canvas element, configures dimensions, starts HolographicChamber engine
+
+// Respect user accessibility preferences    }
+
+Connects to:
+
+    - templates/index.html: Targets <canvas id="particles"> elementconst prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;    
+
+    - static/css/style.css: Canvas styled with #particles selector for positioning
+
+    - static/js/engines/holographic-chamber.js: Creates HolographicChamber instanceconst EFFECTIVE_FADE_IN = prefersReducedMotion ? 0 : BUBBLE_FADE_IN_MS;    // Ensure canvas is properly sized
+
+    - tools/validate_components.py: Component validation verifies this connection
+
+*/const EFFECTIVE_FADE_OUT = prefersReducedMotion ? 0 : BUBBLE_FADE_OUT_MS;    canvas.width = window.innerWidth;
+
+function initializeParticleSystem() {
+
+    console.log('🎨 Initializing particle system...');    canvas.height = window.innerHeight;
+
+    
+
+    const canvas = document.getElementById('particles');/*    canvas.style.display = 'block';
+
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+
+        console.error('❌ Canvas #particles not found - particle system disabled');Primary initialization when DOM is ready    canvas.style.position = 'fixed';
+
+        return false;
+
+    }    canvas.style.top = '0';
+
+    
+
+    // Configure canvas for full-viewport cognitive visualizationWhy: Ensure all HTML elements exist before JavaScript attempts to interact with them    canvas.style.left = '0';
+
+    canvas.width = window.innerWidth;
+
+    canvas.height = window.innerHeight;Where: Standard DOMContentLoaded event listener for reliable initialization    canvas.style.zIndex = '9999';
+
+    canvas.style.display = 'block';
+
+    How: Sequential initialization of core systems with error handling    canvas.style.pointerEvents = 'none';
+
+    console.log(`📐 Canvas configured: ${canvas.width}x${canvas.height}`);
+
+        
+
+    // Validate canvas context availability
+
+    const ctx = canvas.getContext('2d');Connects to:    console.log(`🎨 Canvas configured: ${canvas.width}x${canvas.height}`);
+
+    if (!ctx) {
+
+        console.error('❌ Canvas context unavailable - particle system disabled');    - templates/index.html: Fires after HTML parsing complete    
+
+        return false;
+
+    }    - All initialization functions: Coordinates startup sequence    // Test basic canvas functionality
+
+    
+
+    // Initialize holographic brain engine*/    const ctx = canvas.getContext('2d');
+
+    if (typeof window.startHolographicChamber === 'function') {
+
+        try {document.addEventListener('DOMContentLoaded', function() {    if (!ctx) {
+
+            holographicChamber = window.startHolographicChamber(canvas);
+
+            if (holographicChamber) {    console.log('✅ DOM loaded, starting Clever initialization...');        console.error('❌ Canvas context not available');
+
+                window.holographicChamber = holographicChamber; // Global access for debugging
+
+                console.log('✅ Holographic brain chamber active');            return;
+
+                console.log(`🌟 Particles initialized: ${holographicChamber.particles ? holographicChamber.particles.length : 'Unknown'}`);
+
+                    try {    }
+
+                // Start cognitive visualization animation
+
+                if (typeof holographicChamber.animate === 'function') {        initializeParticleSystem();    
+
+                    holographicChamber.animate();
+
+                    console.log('🎬 Cognitive animation loop started');        initializeChatInterface();    // Clear canvas with a test pattern first
+
+                }
+
+                        initializeKeyboardControls();    ctx.fillStyle = '#0B0F14';
+
+                return true;
+
+            } else {        console.log('✨ Clever cognitive interface ready!');    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                console.error('❌ Holographic chamber initialization returned null');
+
+                return false;    } catch (error) {    console.log('✅ Canvas cleared and ready');
+
+            }
+
+        } catch (error) {        console.error('❌ Clever initialization failed:', error);    
+
+            console.error('❌ Particle system initialization failed:', error);
+
+            return false;        showFallbackInterface();    if (canvas instanceof HTMLCanvasElement && typeof window.startHolographicChamber === 'function') {
+
+        }
+
+    } else {    }        try {
+
+        console.error('❌ startHolographicChamber function not available');
+
+        return false;});            holographicChamber = window.startHolographicChamber(canvas);
+
+    }
+
+}            if (holographicChamber) {
+
+
+
+/*/*                window.holographicChamber = holographicChamber;
+
+Chat Interface Initialization
+
+Particle System Initialization                console.log('✅ Particle system ready');
+
+Why: Set up interaction system for cognitive partnership communication with Clever
+
+Where: Called during main initialization to enable user-Clever conversation                console.log(`📊 Particles created: ${holographicChamber.particles ? holographicChamber.particles.length : 'Unknown'}`);
+
+How: Form submission handling, input validation, and response display coordination
+
+Why: Clever's particle canvas is the core cognitive visualization - must initialize properly                
+
+Connects to:
+
+    - templates/index.html: Targets #chat-form, #chat-input, #send-btn elementsWhere: Called during main initialization to start holographic brain visualization                // Force animation to start
+
+    - app.py: Sends POST requests to /api/chat endpoint
+
+    - static/js/components/chat-fade.js: Uses createChatBubble() for message displayHow: Validates canvas element, configures dimensions, starts HolographicChamber engine                if (typeof holographicChamber.animate === 'function') {
+
+*/
+
+function initializeChatInterface() {                    holographicChamber.animate();
+
+    console.log('💬 Initializing chat interface...');
+
+    Connects to:                    console.log('🎬 Animation loop started');
+
+    const chatForm = document.getElementById('chat-form');
+
+    const chatInput = document.getElementById('chat-input');    - templates/index.html: Targets <canvas id="particles"> element                }
+
+    const sendBtn = document.getElementById('send-btn');
+
+        - static/css/style.css: Canvas styled with #particles selector for positioning                
+
+    if (!chatForm || !chatInput || !sendBtn) {
+
+        console.error('❌ Chat interface elements missing');    - static/js/engines/holographic-chamber.js: Creates HolographicChamber instance                // Force immediate visible formation
+
+        return false;
+
+    }    - tools/validate_components.py: Component validation verifies this connection                setTimeout(() => {
+
+    
+
+    // Form submission handler for sending messages to Clever*/                    if (typeof holographicChamber.morphToFormation === 'function') {
+
+    chatForm.addEventListener('submit', async function(e) {
+
+        e.preventDefault();function initializeParticleSystem() {                        holographicChamber.morphToFormation('sphere');
+
+        
+
+        const message = chatInput.value.trim();    console.log('🎨 Initializing particle system...');                        console.log('🔮 Forced sphere formation for visibility');
+
+        if (!message || isProcessingMessage) {
+
+            return;                        }
+
+        }
+
+            const canvas = document.getElementById('particles');                }, 1000);
+
+        await sendMessageToClever(message);
+
+    });    if (!canvas) {                
+
+    
+
+    // Auto-focus input for immediate interaction readiness        console.error('❌ Canvas #particles not found - particle system disabled');                // Let Clever's natural thinking patterns initialize
+
+    chatInput.focus();
+
+            return false;                // Her particles represent her cognitive state and thoughts
+
+    console.log('✅ Chat interface ready for cognitive partnership');
+
+    return true;    }                console.log('🧠 Clever\'s particle system ready - letting her think naturally');
+
+}
+
+                } else {
+
+/*
+
+Message Processing and Display    // Configure canvas for full-viewport cognitive visualization                console.error('❌ startHolographicChamber returned null');
+
+
+
+Why: Handle user input, send to Clever's backend, and display responses with proper UI feedback    canvas.width = window.innerWidth;            }
+
+Where: Called by chat form submission handler for conversation flow
+
+How: API communication with loading states and error handling    canvas.height = window.innerHeight;        } catch (error) {
+
+
+
+Connects to:    canvas.style.display = 'block';            console.error('❌ Particle system initialization failed:', error);
+
+    - app.py: POST /api/chat endpoint for message processing
+
+    - static/js/components/chat-fade.js: createChatBubble() for message display                return;
+
+    - persona.py: Backend processes message and returns PersonaResponse
+
+*/    console.log(`📐 Canvas configured: ${canvas.width}x${canvas.height}`);        }
+
+async function sendMessageToClever(message) {
+
+    console.log(`📤 Sending to Clever: ${message}`);        }
+
+    
+
+    isProcessingMessage = true;    // Validate canvas context availability    
+
+    const chatInput = document.getElementById('chat-input');
+
+    const sendBtn = document.getElementById('send-btn');    const ctx = canvas.getContext('2d');    if (typeof window.startHolographicChamber !== 'function') {
+
+    
+
+    // Display user message immediately    if (!ctx) {        console.error('❌ startHolographicChamber function not available');
+
+    if (typeof createChatBubble === 'function') {
+
+        createChatBubble(message, 'user');        console.error('❌ Canvas context unavailable - particle system disabled');        return;
+
+    }
+
+            return false;    }
+
+    // Clear input and show processing state
+
+    chatInput.value = '';    }}
+
+    sendBtn.textContent = '⏳';
+
+    sendBtn.disabled = true;    
+
+    
+
+    try {    // Initialize holographic brain enginefunction initializeChatInterface() {
+
+        const response = await fetch('/api/chat', {
+
+            method: 'POST',    if (typeof window.startHolographicChamber === 'function') {    const chatInput = document.getElementById('chat-input');
+
+            headers: {
+
+                'Content-Type': 'application/json',        try {    const sendBtn = document.getElementById('send-btn');
+
+            },
+
+            body: JSON.stringify({ message: message })            holographicChamber = window.startHolographicChamber(canvas);    
+
+        });
+
+                    if (holographicChamber) {    if (!chatInput || !sendBtn) return;
+
+        if (!response.ok) {
+
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);                window.holographicChamber = holographicChamber; // Global access for debugging    
+
+        }
+
+                        console.log('✅ Holographic brain chamber active');    chatInput.addEventListener('keypress', function(e) {
+
+        const data = await response.json();
+
+                        console.log(`🌟 Particles initialized: ${holographicChamber.particles ? holographicChamber.particles.length : 'Unknown'}`);        if (e.key === 'Enter') {
+
+        if (data.reply) {
+
+            // Display Clever's response                            e.preventDefault();
+
+            if (typeof createChatBubble === 'function') {
+
+                createChatBubble(data.reply, 'clever');                // Start cognitive visualization animation            sendMessage();
+
+            }
+
+                            if (typeof holographicChamber.animate === 'function') {        }
+
+            // Update particle system based on Clever's mood/mode if available
+
+            if (holographicChamber && data.mode && typeof holographicChamber.setMode === 'function') {                    holographicChamber.animate();    });
+
+                holographicChamber.setMode(data.mode);
+
+            }                    console.log('🎬 Cognitive animation loop started');    
+
+            
+
+            console.log(`📨 Clever responded (${data.mode || 'unknown'} mode)`);                }    sendBtn.addEventListener('click', sendMessage);
+
+        } else {
+
+            throw new Error('No reply received from Clever');                }
+
+        }
+
+                        return true;
+
+    } catch (error) {
+
+        console.error('❌ Communication with Clever failed:', error);            } else {function initializeKeyboardControls() {
+
+        
+
+        // Display error message to user                console.error('❌ Holographic chamber initialization returned null');    document.addEventListener('keydown', function(e) {
+
+        if (typeof createChatBubble === 'function') {
+
+            createChatBubble('Sorry, I\'m having trouble processing that right now. Please try again.', 'clever');                return false;        if (!e.shiftKey || !holographicChamber) return;
+
+        }
+
+    } finally {            }        
+
+        // Reset interface to ready state
+
+        sendBtn.textContent = '→';        } catch (error) {        const formations = {
+
+        sendBtn.disabled = false;
+
+        isProcessingMessage = false;            console.error('❌ Particle system initialization failed:', error);            'c': 'cube',
+
+        chatInput.focus();
+
+    }            return false;            's': 'sphere',
+
+}
+
+        }            'h': 'helix',
+
+/*
+
+Keyboard Controls and Shortcuts    } else {            't': 'torus',
+
+
+
+Why: Provide keyboard shortcuts for power users and accessibility        console.error('❌ startHolographicChamber function not available');            'w': 'wave'
+
+Where: Called during initialization to set up global keyboard event handling
+
+How: Event listeners for common shortcuts and navigation commands        return false;        };
+
+
+
+Connects to:    }        
+
+    - Global document: Listens to keydown events for shortcuts
+
+    - Chat interface: Integrates with message sending and input management}        const formation = formations[e.key.toLowerCase()];
+
+*/
+
+function initializeKeyboardControls() {        if (formation) {
+
+    console.log('⌨️  Setting up keyboard controls...');
+
+    /*            e.preventDefault();
+
+    document.addEventListener('keydown', function(e) {
+
+        // ESC - Clear current inputChat Interface Initialization            holographicChamber.morphToFormation(formation);
+
+        if (e.key === 'Escape') {
+
+            const chatInput = document.getElementById('chat-input');        }
+
+            if (chatInput && chatInput instanceof HTMLInputElement) {
+
+                chatInput.value = '';Why: Set up interaction system for cognitive partnership communication with Clever    });
+
+                chatInput.blur();
+
+            }Where: Called during main initialization to enable user-Clever conversation}
+
+        }
+
+        How: Form submission handling, input validation, and response display coordination
+
+        // Ctrl/Cmd + Enter - Force send message
+
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {async function sendMessage() {
+
+            const chatForm = document.getElementById('chat-form');
+
+            if (chatForm && !isProcessingMessage) {Connects to:    const input = document.getElementById('chat-input');
+
+                chatForm.dispatchEvent(new Event('submit'));
+
+            }    - templates/index.html: Targets #chat-form, #chat-input, #send-btn elements    if (!(input instanceof HTMLInputElement)) return;
+
+        }
+
+            - app.py: Sends POST requests to /api/chat endpoint    const message = input.value.trim();
+
+        // Focus input on any typing (if not already focused)
+
+        if (e.key.length === 1 && !isProcessingMessage) {    - static/js/components/chat-fade.js: Uses createChatBubble() for message display    
+
+            const chatInput = document.getElementById('chat-input');
+
+            if (chatInput && chatInput instanceof HTMLInputElement && document.activeElement !== chatInput) {*/    if (!message) return;
+
+                chatInput.focus();
+
+            }function initializeChatInterface() {    
+
+        }
+
+    });    console.log('💬 Initializing chat interface...');    input.value = '';
+
+    
+
+    console.log('✅ Keyboard controls active');        createChatBubble(message, 'user');
+
+}
+
+    const chatForm = document.getElementById('chat-form');    
+
+/*
+
+Fallback Interface for Error Recovery    const chatInput = document.getElementById('chat-input');    // Clever's particles respond to conversation state
+
+
+
+Why: Provide basic functionality if particle system or advanced features fail    const sendBtn = document.getElementById('send-btn');    if (holographicChamber) {
+
+Where: Called if main initialization encounters errors
+
+How: Displays error state and enables basic chat functionality            holographicChamber.summon(); // Clever focuses attention when user speaks
+
+
+
+Connects to:    if (!chatForm || !chatInput || !sendBtn) {    }
+
+    - Error handling: Called when initialization fails
+
+    - Basic DOM manipulation: Provides minimal working interface        console.error('❌ Chat interface elements missing');    
+
+*/
+
+function showFallbackInterface() {        return false;    try {
+
+    console.log('🔧 Activating fallback interface...');
+
+        }        const response = await fetch('/chat', {
+
+    // Hide particle canvas if it's causing issues
+
+    const canvas = document.getElementById('particles');                method: 'POST',
+
+    if (canvas) {
+
+        canvas.style.display = 'none';    // Form submission handler for sending messages to Clever            headers: { 'Content-Type': 'application/json' },
+
+    }
+
+        chatForm.addEventListener('submit', async function(e) {            body: JSON.stringify({ message: message })
+
+    // Show simple error message
+
+    const chatContainer = document.getElementById('chat-container');        e.preventDefault();        });
+
+    if (chatContainer && typeof createChatBubble === 'function') {
+
+        createChatBubble('Clever is running in simplified mode. Some visual features may be limited.', 'clever');                
+
+    }
+
+            const message = chatInput.value.trim();        const data = await response.json();
+
+    console.log('✅ Fallback interface ready');
+
+}        if (!message || isProcessingMessage) {        
+
+
+
+/*            return;        // Handle particle commands from Clever's response
+
+Window Resize Handler for Dynamic Canvas Adjustment
+
+        }        if (holographicChamber) {
+
+Why: Maintain particle system visual quality when browser window size changes
+
+Where: Window resize event for responsive particle canvas management                    if (data.particle_command) {
+
+How: Updates canvas dimensions and notifies particle engine of size change
+
+        await sendMessageToClever(message);                // Clever wants to show a specific formation
+
+Connects to:
+
+    - Window resize events: Automatically triggered on viewport changes    });                console.log(`🎨 Clever particle command: ${data.particle_command}`);
+
+    - holographicChamber: Calls resize method if available
+
+*/                    holographicChamber.morphToFormation(data.particle_command);
+
+window.addEventListener('resize', function() {
+
+    if (holographicChamber) {    // Auto-focus input for immediate interaction readiness            } else {
+
+        const canvas = document.getElementById('particles');
+
+        if (canvas && canvas instanceof HTMLCanvasElement) {    chatInput.focus();                // Default dialogue state when responding
+
+            canvas.width = window.innerWidth;
+
+            canvas.height = window.innerHeight;                    holographicChamber.dialogue();
+
+            
+
+            // Notify particle engine of size change    console.log('✅ Chat interface ready for cognitive partnership');            }
+
+            if (typeof holographicChamber.resize === 'function') {
+
+                holographicChamber.resize(window.innerWidth, window.innerHeight);    return true;        }
+
+            }
+
+        }}        
+
+    }
+
+});        createChatBubble(data.response || 'I hear you!', 'ai');
+
+
+
+// Export for global access and debugging/*        
+
+window.CleverInterface = {
+
+    holographicChamber,Message Processing and Display        // Return to idle/thinking state after responding
+
+    sendMessageToClever,
+
+    initializeParticleSystem,        setTimeout(() => {
+
+    isProcessingMessage: () => isProcessingMessage
+
+};Why: Handle user input, send to Clever's backend, and display responses with proper UI feedback            if (holographicChamber) {
+
+Where: Called by chat form submission handler for conversation flow                holographicChamber.idle();
+
+How: API communication with loading states and error handling            }
+
+        }, 3000);
+
+Connects to:        
+
+    - app.py: POST /api/chat endpoint for message processing    } catch (error) {
+
+    - static/js/components/chat-fade.js: createChatBubble() for message display        console.error('Chat error:', error);
+
+    - persona.py: Backend processes message and returns PersonaResponse        createChatBubble('Processing... try again!', 'ai');
+
+*/        
+
+async function sendMessageToClever(message) {        // Return to idle state even on error
+
+    console.log(`📤 Sending to Clever: ${message}`);        if (holographicChamber) {
+
+                setTimeout(() => holographicChamber.idle(), 2000);
+
+    isProcessingMessage = true;        }
+
+    const chatInput = document.getElementById('chat-input');    }
+
+    const sendBtn = document.getElementById('send-btn');}
+
+    
+
+    // Display user message immediatelyfunction createChatBubble(text, type = 'ai') {
+
+    if (typeof createChatBubble === 'function') {    /**
+
+        createChatBubble(message, 'user');     * Why: Render an ephemeral thought bubble that reinforces conversational flow without clutter
+
+    }     * Where: Appended under #chat-log; timeline interacts with particle engine (thinking/respond states)
+
+         * How: Create DOM node, apply manifest/fade classes, schedule auto-hide respecting reduced motion
+
+    // Clear input and show processing state     */
+
+    chatInput.value = '';    const chatLog = document.getElementById('chat-log');
+
+    sendBtn.textContent = '⏳';    if (!chatLog) return;
+
+    sendBtn.disabled = true;
+
+        const bubble = document.createElement('div');
+
+    try {    // Map internal type to stylesheet naming (ai -> clever)
+
+        const response = await fetch('/api/chat', {    const roleClass = type === 'user' ? 'user' : 'clever';
+
+            method: 'POST',    bubble.className = 'chat-message manifesting ' + roleClass;
+
+            headers: {    bubble.textContent = text;
+
+                'Content-Type': 'application/json',
+
+            },    chatLog.appendChild(bubble);
+
+            body: JSON.stringify({ message: message })
+
+        });    // Force reflow then manifest
+
+            requestAnimationFrame(() => {
+
+        if (!response.ok) {        bubble.classList.add('manifested');
+
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);        bubble.classList.remove('manifesting');
+
+        }    });
+
+        
+
+        const data = await response.json();    scheduleAutoHide(bubble);
+
+            announceForScreenReaders(text);
+
+        if (data.reply) {    return bubble;
+
+            // Display Clever's response}
+
+            if (typeof createChatBubble === 'function') {
+
+                createChatBubble(data.reply, 'clever');function scheduleAutoHide(bubble) {
+
+            }    /**
+
+                 * Why: Keep interface uncluttered; prevent memory bloat / DOM growth
+
+            // Update particle system based on Clever's mood/mode if available     * Where: Called by createChatBubble; interacts with CSS fade transitions
+
+            if (holographicChamber && data.mode && typeof holographicChamber.setMode === 'function') {     * How: Timer -> add fade-out class -> remove after transition (or immediate if reduced motion)
+
+                holographicChamber.setMode(data.mode);     */
+
+            }    const visibleWindow = BUBBLE_VISIBLE_MS;
+
+                const preRemovalDelay = EFFECTIVE_FADE_OUT || 0;
+
+            console.log(`📨 Clever responded (${data.mode || 'unknown'} mode)`);
+
+        } else {    setTimeout(() => {
+
+            throw new Error('No reply received from Clever');        if (!bubble.isConnected) return;
+
+        }        bubble.classList.add('fade-out');
+
+                setTimeout(() => {
+
+    } catch (error) {            if (bubble.isConnected) bubble.remove();
+
+        console.error('❌ Communication with Clever failed:', error);        }, preRemovalDelay + 30); // 30ms buffer
+
+            }, visibleWindow);
+
+        // Display error message to user}
+
+        if (typeof createChatBubble === 'function') {
+
+            createChatBubble('Sorry, I\'m having trouble processing that right now. Please try again.', 'clever');function announceForScreenReaders(text) {
+
+        }    /**
+
+    } finally {     * Why: Accessibility — provide conversational updates to assistive tech without duplicating UI noise
+
+        // Reset interface to ready state     * Where: Live region element #sr-live (created lazily if absent)
+
+        sendBtn.textContent = '→';     * How: Inject sanitized text into aria-live region; throttle floods if needed
+
+        sendBtn.disabled = false;     */
+
+        isProcessingMessage = false;    const MAX_LEN = 400;
+
+        chatInput.focus();    const sanitized = (text || '').slice(0, MAX_LEN).replace(/\s+/g, ' ').trim();
+
+    }    if (!sanitized) return;
+
+}    let region = document.getElementById('sr-live');
+
+    if (!region) {
+
+/*        region = document.createElement('div');
+
+Keyboard Controls and Shortcuts        region.id = 'sr-live';
+
+        region.setAttribute('aria-live', 'polite');
+
+Why: Provide keyboard shortcuts for power users and accessibility        region.setAttribute('aria-atomic', 'false');
+
+Where: Called during initialization to set up global keyboard event handling        region.style.position = 'absolute';
+
+How: Event listeners for common shortcuts and navigation commands        region.style.left = '-9999px';
+
+        document.body.appendChild(region);
+
+Connects to:    }
+
+    - Global document: Listens to keydown events for shortcuts    // Clear to retrigger announcement
+
+    - Chat interface: Integrates with message sending and input management    region.textContent = '';
+
+*/    setTimeout(() => { region.textContent = sanitized; }, 10);
+
+function initializeKeyboardControls() {}
+
+    console.log('⌨️  Setting up keyboard controls...');
+
+    
+    document.addEventListener('keydown', function(e) {
+        // ESC - Clear current input
+        if (e.key === 'Escape') {
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.value = '';
+                chatInput.blur();
+            }
+        }
+        
+        // Ctrl/Cmd + Enter - Force send message
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            const chatForm = document.getElementById('chat-form');
+            if (chatForm && !isProcessingMessage) {
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        }
+        
+        // Focus input on any typing (if not already focused)
+        if (e.key.length === 1 && !isProcessingMessage) {
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput && document.activeElement !== chatInput) {
+                chatInput.focus();
+            }
+        }
+    });
+    
+    console.log('✅ Keyboard controls active');
+}
+
+/*
+Fallback Interface for Error Recovery
+
+Why: Provide basic functionality if particle system or advanced features fail
+Where: Called if main initialization encounters errors
+How: Displays error state and enables basic chat functionality
+
+Connects to:
+    - Error handling: Called when initialization fails
+    - Basic DOM manipulation: Provides minimal working interface
+*/
+function showFallbackInterface() {
+    console.log('🔧 Activating fallback interface...');
+    
+    // Hide particle canvas if it's causing issues
+    const canvas = document.getElementById('particles');
+    if (canvas) {
+        canvas.style.display = 'none';
+    }
+    
+    // Show simple error message
+    const chatContainer = document.getElementById('chat-container');
+    if (chatContainer && typeof createChatBubble === 'function') {
+        createChatBubble('Clever is running in simplified mode. Some visual features may be limited.', 'clever');
+    }
+    
+    console.log('✅ Fallback interface ready');
+}
+
+/*
+Window Resize Handler for Dynamic Canvas Adjustment
+
+Why: Maintain particle system visual quality when browser window size changes
+Where: Window resize event for responsive particle canvas management
+How: Updates canvas dimensions and notifies particle engine of size change
+
+Connects to:
+    - Window resize events: Automatically triggered on viewport changes
+    - holographicChamber: Calls resize method if available
+*/
+window.addEventListener('resize', function() {
+    if (holographicChamber) {
+        const canvas = document.getElementById('particles');
+        if (canvas) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Notify particle engine of size change
+            if (typeof holographicChamber.resize === 'function') {
+                holographicChamber.resize(window.innerWidth, window.innerHeight);
+            }
+        }
+    }
+});
+
+// Export for global access and debugging
+window.CleverInterface = {
+    holographicChamber,
+    sendMessageToClever,
+    initializeParticleSystem,
+    isProcessingMessage: () => isProcessingMessage
+};

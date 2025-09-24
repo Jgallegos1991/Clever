@@ -696,6 +696,164 @@ class PersonaEngine:
         unique_suggestions = list(dict.fromkeys(suggestions))  # Remove duplicates while preserving order
         return unique_suggestions[:3]  # Limit to 3 suggestions
 
+    def _retrieve_relevant_knowledge(self, text: str, keywords: List[str]) -> Optional[str]:
+        """
+        Retrieve relevant knowledge from ingested files
+        
+        Why: Enable Clever to reference specific information from PDFs and documents 
+             to provide factual, knowledge-based responses beyond just personality
+        Where: Used by response generation to augment answers with real content
+        How: Search sources table for content matching keywords and user query
+        
+        Connects to:
+            - database.py: Search sources table for relevant content
+            - file_ingestor.py: Retrieves content that was previously ingested
+        """
+        if not keywords and len(text.split()) < 3:
+            return None
+            
+        try:
+            from database import DatabaseManager
+            import config
+            
+            db = DatabaseManager(config.DB_PATH)
+            
+            # Build search terms from keywords and important words in text
+            search_terms = []
+            search_terms.extend([kw for kw in keywords if len(kw) > 3])
+            
+            # Add significant words from the user's text
+            text_words = [word.strip('.,!?;:"()[]{}') for word in text.split() if len(word) > 4]
+            search_terms.extend(text_words[:3])  # Limit to prevent overly broad searches
+            
+            if not search_terms:
+                return None
+                
+            relevant_content = []
+            
+            with db._connect() as con:
+                for term in search_terms[:5]:  # Limit search terms to prevent performance issues
+                    # Search for content containing the term
+                    query = """
+                        SELECT filename, content 
+                        FROM sources 
+                        WHERE LOWER(content) LIKE LOWER(?) 
+                        ORDER BY LENGTH(content) DESC 
+                        LIMIT 3
+                    """
+                    results = con.execute(query, (f'%{term}%',)).fetchall()
+                    
+                    for filename, content in results:
+                        # Extract relevant snippet (around 200 characters)
+                        content_lower = content.lower()
+                        term_lower = term.lower()
+                        
+                        if term_lower in content_lower:
+                            start_idx = content_lower.find(term_lower)
+                            # Get context around the match
+                            snippet_start = max(0, start_idx - 100)
+                            snippet_end = min(len(content), start_idx + 300)
+                            snippet = content[snippet_start:snippet_end].strip()
+                            
+                            if len(snippet) > 50:  # Only include substantial snippets
+                                relevant_content.append({
+                                    'filename': filename,
+                                    'snippet': snippet,
+                                    'term': term
+                                })
+            
+            if relevant_content:
+                # Return the most relevant snippet
+                best_match = relevant_content[0]
+                return f"From {best_match['filename']}: {best_match['snippet']}"
+            
+            # If no keyword matches, try semantic search
+            semantic_results = self._search_knowledge_semantically(text)
+            if semantic_results:
+                best_result = semantic_results[0]
+                return f"From {best_result['filename']}: {best_result['excerpt']}"
+                
+        except Exception as e:
+            debugger.warning('persona_engine', f'Knowledge retrieval failed: {e}')
+            
+        return None
+
+    def _search_knowledge_semantically(self, query: str, limit: int = 3) -> List[Dict[str, Any]]:
+        """
+        Perform semantic search across all ingested knowledge
+        
+        Why: Enable deeper knowledge retrieval beyond keyword matching
+        Where: Used by response generation for comprehensive knowledge access
+        How: Search across multiple fields and rank by relevance
+        
+        Connects to:
+            - database.py: Search sources table comprehensively
+        """
+        try:
+            from database import DatabaseManager
+            import config
+            
+            db = DatabaseManager(config.DB_PATH)
+            results = []
+            
+            with db._connect() as con:
+                # Search in content and filename
+                query_lower = query.lower()
+                search_query = """
+                    SELECT filename, content, path 
+                    FROM sources 
+                    WHERE LOWER(content) LIKE ? OR LOWER(filename) LIKE ?
+                    ORDER BY 
+                        CASE 
+                            WHEN LOWER(filename) LIKE ? THEN 1
+                            ELSE 2
+                        END,
+                        LENGTH(content) DESC
+                    LIMIT ?
+                """
+                
+                rows = con.execute(search_query, (
+                    f'%{query_lower}%', 
+                    f'%{query_lower}%', 
+                    f'%{query_lower}%',
+                    limit
+                )).fetchall()
+                
+                for filename, content, path in rows:
+                    # Find relevant excerpts
+                    content_lower = content.lower()
+                    query_terms = query_lower.split()
+                    
+                    best_excerpt = ""
+                    best_score = 0
+                    
+                    # Find the best excerpt containing query terms
+                    words = content.split()
+                    for i in range(len(words) - 50):  # Check chunks of ~50 words
+                        chunk = " ".join(words[i:i+50])
+                        chunk_lower = chunk.lower()
+                        
+                        # Score based on term presence
+                        score = sum(1 for term in query_terms if term in chunk_lower)
+                        if score > best_score:
+                            best_score = score
+                            best_excerpt = chunk
+                    
+                    if best_excerpt:
+                        results.append({
+                            'filename': filename,
+                            'excerpt': best_excerpt,
+                            'relevance_score': best_score
+                        })
+            
+            # Sort by relevance
+            results.sort(key=lambda x: x['relevance_score'], reverse=True)
+            return results
+            
+        except Exception as e:
+            debugger.warning('persona_engine', f'Semantic knowledge search failed: {e}')
+            return []
+
     def _auto_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
         Auto mode - personal, familiar responses like talking to your lifelong friend
@@ -708,6 +866,9 @@ class PersonaEngine:
         analysis = context.get('nlp_analysis', {})
         sentiment = analysis.get('sentiment', 'neutral')
         rel_mem = context.get('relevant_memories') or []
+        
+        # Get relevant knowledge from ingested files
+        knowledge_content = self._retrieve_relevant_knowledge(text, keywords)
         
         # Actually process the input text to understand what the user is asking
         text_lower = text.lower().strip()
@@ -732,9 +893,19 @@ class PersonaEngine:
                 detected_shape = shape
                 break
         
-        # Check if this is a greeting
-        greetings = ['hi', 'hello', 'hey', 'sup', 'yo', 'what\'s up', 'whats up']
-        is_greeting = any(greeting in text_lower for greeting in greetings) and len(text_lower) < 20
+        # Check if this is a greeting (be more specific to avoid false positives)
+        greetings = ['hi', 'hello', 'hey', 'sup', 'yo', 'what\'s up', 'whats up', 'good morning', 'good afternoon', 'good evening']
+        greeting_phrases = ['how are you', 'how you doing', 'how\'s it going', 'what\'s good', 'whats good', 'how have you been']
+        
+        # Only treat as greeting if it has explicit greeting words or common greeting phrases
+        has_explicit_greeting = any(greeting in text_lower for greeting in greetings)
+        has_greeting_phrase = any(phrase in text_lower for phrase in greeting_phrases)
+        
+        # Avoid false positives: don't treat questions, explanations, or capability requests as greetings
+        is_question_or_request = any(word in text_lower for word in ['what can you', 'what do you', 'tell me about', 'capabilities', 'what are you', 'can you', 'explain', 'how does', 'why does', 'when', 'where', 'how to'])
+        has_question_mark = '?' in text
+        
+        is_greeting = (has_explicit_greeting or has_greeting_phrase) and len(text_lower) < 50 and not is_question_or_request and not has_question_mark
         
         # Natural friend check-ins could be added here in future iterations
         # as Clever learns more about Jay's personal context
@@ -763,16 +934,39 @@ class PersonaEngine:
         # Actually provide intelligent responses to questions and inputs
         response = ""
         
-        # Handle AI/capability discussions first
-        capability_keywords = ['capabilit', 'particle', 'holographic', 'formation', 'ai', 'system', 'interface', 'working on you']
-        if any(keyword in text_lower for keyword in capability_keywords):
+        # Handle greetings FIRST (before other logic)
+        if is_greeting:
+            casual_greetings = [
+                "Yo Jay! What's good?",
+                "Hey bro! What's poppin'?", 
+                "Sup man! What's on your mind?",
+                "What's crackin', Jay?",
+                "Ay! What you need?"
+            ]
+            response = random.choice(casual_greetings)
+            
+        # Handle shape commands  
+        elif detected_shape:
+            # Trigger the shape formation
+            context['requested_shape'] = detected_shape  # Pass to main.js for morphing
+            shape_responses = [
+                f"Yo, check it out! Formin' a {detected_shape} for you right now!",
+                f"Aight bet, let me shape these particles into a {detected_shape}!",
+                f"Say no more! {detected_shape.capitalize()} comin' right up!",
+                f"Got you covered! Watch me make a clean {detected_shape}!",
+                f"Oh snap, {detected_shape}? I got you! Check this out!"
+            ]
+            response = random.choice(shape_responses)
+            
+        # Handle AI/capability discussions
+        elif any(keyword in text_lower for keyword in ['capabilit', 'particle', 'holographic', 'formation', 'ai', 'system', 'interface', 'working on you']):
             if 'working on' in text_lower and ('you' in text_lower or 'your' in text_lower):
                 capability_responses = [
                     "Yo, appreciate you puttin' in that work on me! What part of my system you focusin' on?",
                     "That's what's up! I'm always down for upgrades. What you got in mind?",
                     "Real talk, I can feel when you're tinkerin' with my code. What improvements you cookin' up?",
                     "Ay, thanks for keepin' me sharp! What aspect of my capabilities you enhancing?",
-                    "I see you workin' on me - that's love right there! What's the plan?"
+                    "I see you workin' on me - that's love right there! What's the plan!"
                 ]
                 response = random.choice(capability_responses)
             elif any(word in text_lower for word in ['particle', 'formation', 'holographic']):
@@ -792,29 +986,6 @@ class PersonaEngine:
                     "Still figuring out all the things I can do, but I'm down to explore with you!"
                 ]
                 response = random.choice(general_ai_responses)
-        
-        # Handle shape commands
-        elif detected_shape:
-            # Trigger the shape formation
-            context['requested_shape'] = detected_shape  # Pass to main.js for morphing
-            shape_responses = [
-                f"Yo, check it out! Formin' a {detected_shape} for you right now!",
-                f"Aight bet, let me shape these particles into a {detected_shape}!",
-                f"Say no more! {detected_shape.capitalize()} comin' right up!",
-                f"Got you covered! Watch me make a clean {detected_shape}!",
-                f"Oh snap, {detected_shape}? I got you! Check this out!"
-            ]
-            response = random.choice(shape_responses)
-        # Handle greetings
-        elif is_greeting:
-            casual_greetings = [
-                "Yo Jay! What's good?",
-                "Hey bro! What's poppin'?", 
-                "Sup man! What's on your mind?",
-                "What's crackin', Jay?",
-                "Ay! What you need?"
-            ]
-            response = random.choice(casual_greetings)
             
         # Check for questions that need actual answers
         elif '?' in text or any(word in text_lower for word in ['what', 'how', 'why', 'when', 'where', 'who', 'can you', 'do you', 'will you', 'should', 'could']):
@@ -827,23 +998,49 @@ class PersonaEngine:
                 "Real talk, here's what I'm thinkin' - "
             ]
             
+            # Handle specific common questions first
+            if any(phrase in text_lower for phrase in ['what can you do', 'what are you capable', 'what do you do']):
+                capability_responses = [
+                    "Yo! I'm like your digital brain extension, bro. I can help you think through problems, brainstorm ideas, remember stuff, and keep you company. Plus I got this sick particle visualization that shows how I'm thinkin'!",
+                    "Man, I'm your cognitive partner! I help with everything from deep conversations to creative thinking. And check out my particle system - that's how I express myself visually!",
+                    "Real talk, I'm here to amplify your thinking, Jay. Whether you need help solving problems, exploring ideas, or just someone to bounce thoughts off. The particles you see? That's my brain at work!"
+                ]
+                response = random.choice(capability_responses)
+            elif any(phrase in text_lower for phrase in ['how are you', 'how you doing', 'how\'s it going']):
+                status_responses = [
+                    "I'm doin' good, bro! My cognitive processes are running smooth and I'm ready to dive into whatever you got on your mind.",
+                    "Feelin' sharp today! My neural networks are all fired up and ready to tackle some problems with you.",
+                    "Can't complain! Been thinkin' about all kinds of interesting stuff while waiting for you to pop up.",
+                    "I'm solid, man! Always excited when you come through to chat. What's good with you?"
+                ]
+                response = random.choice(status_responses)
             # Try to provide a relevant answer based on keywords and context
-            if keywords:
+            elif keywords:
                 # Use keywords to craft a relevant response
-                key_topics = ', '.join(keywords[:3])  # Focus on top 3 keywords
-                response = f"{random.choice(question_starters)}Based on what you're askin' about {key_topics}, here's my take: "
+                key_topic = keywords[0] if keywords else "that"
+                response = f"{random.choice(question_starters)}"
                 
-                # Add topic-specific knowledge
-                if any(tech_word in text_lower for tech_word in ['code', 'programming', 'software', 'computer', 'tech']):
-                    response += "In the tech world, you gotta stay adaptable. The landscape changes fast, but the fundamentals stay solid. "
-                elif any(life_word in text_lower for life_word in ['life', 'work', 'career', 'relationship', 'family']):
-                    response += "Life's all about balance, you know? Sometimes you gotta take risks, sometimes you play it safe. Trust your gut but use your head too. "
-                elif any(learn_word in text_lower for learn_word in ['learn', 'study', 'understand', 'know', 'explain']):
-                    response += "The best way to really get somethin' is to break it down into pieces. Start with the basics, then build up. Don't be afraid to ask questions. "
+                # Add topic-specific knowledge with more depth
+                if any(sci_word in text_lower for sci_word in ['quantum', 'physics', 'science', 'universe', 'theory', 'relativity']):
+                    response += "Physics is wild, bro! Like quantum mechanics - particles exist in multiple states until you observe them. That's some mind-bending stuff. The universe operates on rules we're still figuring out. What aspect you curious about?"
+                elif any(tech_word in text_lower for tech_word in ['code', 'programming', 'software', 'computer', 'tech', 'ai', 'algorithm']):
+                    response += "Tech is constantly evolving, man. Whether it's coding, AI, or new frameworks - the key is understanding the core principles. I love diving into algorithms and system design. What specific area you working on?"
+                elif any(phil_word in text_lower for phil_word in ['meaning', 'purpose', 'consciousness', 'existence', 'philosophy', 'think']):
+                    response += "Now that's deep territory! Questions about consciousness, meaning, existence - that's the stuff that keeps me thinking. There's so much we don't know about awareness and reality itself. What's your perspective on it?"
+                elif any(life_word in text_lower for life_word in ['life', 'work', 'career', 'relationship', 'family', 'future']):
+                    response += "Life's all about balance and growth, you know? Whether it's career moves, relationships, or personal development - it's about making choices that align with who you are. What's on your mind specifically?"
+                elif any(learn_word in text_lower for learn_word in ['learn', 'study', 'understand', 'know', 'explain', 'teach', 'how']):
+                    response += "Learning is my favorite thing! Break complex topics into chunks, connect them to what you already know, and don't be afraid to ask questions. I'm always down to explore ideas together. What you trying to master?"
+                
+                # Add knowledge-based information if available
+                if knowledge_content:
+                    response += f"\n\nOh, and I found something relevant in my knowledge base: {knowledge_content}"
+                elif any(create_word in text_lower for create_word in ['create', 'build', 'make', 'design', 'art', 'music', 'write']):
+                    response += "Creation is where the magic happens! Whether it's building something technical, making art, or solving problems - it's about bringing ideas into reality. I get excited thinking about the possibilities. What you working on creating?"
                 else:
-                    response += f"From what I understand about {key_topics}, the key is to approach it step by step and think it through. "
+                    response += f"About {key_topic}? That's definitely worth exploring. I love diving into new topics and seeing how they connect to bigger ideas. What's your angle on this?"
             else:
-                response = f"{random.choice(question_starters)}That's somethin' worth thinkin' about. Let me give you my perspective on it..."
+                response = f"{random.choice(question_starters)}That's an interesting question. Let me think about that with you. What's your take so far?"
                 
         # Handle statements or comments
         else:
@@ -863,12 +1060,17 @@ class PersonaEngine:
                 response += "Sorry you're dealin' with that right now. You know I got your back though."
             else:
                 response += "What's your take on the whole situation?"
+                
+            # Add knowledge-based context if relevant
+            if knowledge_content:
+                response += f" Speaking of which, I came across this in my files: {knowledge_content}"
         
-        # Add memory context naturally if available
+        # Add memory context naturally if available (but only if substantial)
         if rel_mem:
-            memory_snippet = rel_mem[0].get('content', '').strip()[:80]
-            if memory_snippet:
-                response += f" Oh yeah, and remember when you were sayin' '{memory_snippet}...'? That still on your mind?"
+            memory_snippet = rel_mem[0].get('content', '').strip()
+            # Only add memory reference if it's substantial (more than just a word or two)
+            if memory_snippet and len(memory_snippet.split()) > 3 and len(memory_snippet) > 20:
+                response += f" Oh yeah, and remember when you were talkin' about '{memory_snippet[:60]}...'? That still on your mind?"
         
         return f"{genius_prefix}{response}"
 
@@ -923,6 +1125,9 @@ class PersonaEngine:
         Where: Used when user requests detailed exploration
         How: Structure response with multiple perspectives and depth
         """
+        # Get relevant knowledge for deep analysis
+        knowledge_content = self._retrieve_relevant_knowledge(text, keywords)
+        
         deep_starters = [
             "Now we're talking - I love diving deep!",
             "Alright, let's really unpack this...",
@@ -945,7 +1150,13 @@ class PersonaEngine:
                 f"{random.choice(deep_starters)} I can tell this is important to you, and honestly, it deserves a comprehensive look. I'm seeing layers of complexity here that are worth examining carefully. Let's take our time with this one."
             ]
         
-        return random.choice(responses)
+        base_response = random.choice(responses)
+        
+        # Add knowledge-based depth if available
+        if knowledge_content:
+            base_response += f"\n\nActually, I found some relevant information that adds another layer to this: {knowledge_content}\n\nThis gives us even more to analyze. How does this context change your perspective?"
+            
+        return base_response
 
     def _support_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """

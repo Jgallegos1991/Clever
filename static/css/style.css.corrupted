@@ -1,0 +1,643 @@
+/*/*
+
+Clever Digital Brain Extension - Core StylesClever Digital Brain Extension - Core Styles
+
+
+
+Why: Provides immersive cognitive interface styling for Clever's digital brain visualizationWhy: Clean, immersive UI for digital brain interaction
+
+Where: Imported by templates/index.html as primary stylesheet for UI components  Where: Main stylesheet loaded by templates/index.html
+
+How: Dark theme with neon accents, particle canvas positioning, chat bubbles, floating inputHow: Dark cosmic theme with particle focus, no buttons
+
+*/
+
+Connects to:
+
+    - templates/index.html: Applied to all UI elements for consistent aesthetic:root {
+
+    - static/js/main.js: JavaScript queries elements styled here (#particles, #chat-input, etc.)  /* UI Brief core colors */
+
+    - static/js/engines/holographic-chamber.js: Canvas styling affects particle rendering  --bg-cosmic: #0B0F14;
+
+    - static/js/components/chat-fade.js: Chat bubble animations use CSS classes defined here  --bg-cosmic-2: #121821;
+
+*/  --fg: #e9f1fb;
+
+  --muted: #95a3b3;
+
+/* === FOUNDATION RESET & VARIABLES === */  --neon-teal: #69EACB;
+
+  --neon-magenta: #FF6BFF;
+
+/*  --soft-cyan: #33ccff;
+
+Why: Establish consistent base styling and theme variables for cognitive interface  --chip: #0f1b24;
+
+Where: Applied globally to create immersive dark environment  --bubble: #101821;
+
+How: CSS custom properties for maintainable color scheme and spacing  --glow-teal: rgba(105, 234, 203, 0.35);
+
+*/  --glow-magenta: rgba(255, 107, 255, 0.35);
+
+:root {  --glass-bg: rgba(11, 15, 20, 0.7);
+
+    --bg-primary: #0B0F14;        /* Deep space background */  /* Message lifecycle timings (mirror JS constants) */
+
+    --bg-secondary: #1A1F26;      /* Card/container backgrounds */  --bubble-fade-in-ms: 500ms;
+
+    --accent-cyan: #00FFFF;       /* Clever's signature neon cyan */  --bubble-visible-ms: 6000ms; /* kept for reference; not directly used in CSS */
+
+    --accent-blue: #4A9EFF;       /* Secondary blue accent */  --bubble-fade-out-ms: 800ms;
+
+    --text-primary: #E8E8E8;      /* Primary text color */  --input-focus-pulse: 2400ms;
+
+    --text-secondary: #B0B0B0;    /* Secondary text color */}
+
+    --glass-bg: rgba(26, 31, 38, 0.7);  /* Frosted glass effect */
+
+    --glow-cyan: 0 0 20px rgba(0, 255, 255, 0.5);  /* Neon glow effect *//* CSS Reset - Clean Foundation */
+
+    --border-radius: 12px;        /* Consistent corner rounding */*, *::before, *::after {
+
+    --transition-fast: 0.2s ease; /* Quick interactions */  box-sizing: border-box;
+
+    --transition-smooth: 0.5s ease; /* Smooth animations */  margin: 0;
+
+}  padding: 0;
+
+}
+
+* {
+
+    margin: 0;html {
+
+    padding: 0;  font-size: 16px;
+
+    box-sizing: border-box;  scroll-behavior: smooth;
+
+}  height: 100%;
+
+}
+
+body {
+
+    /*body {
+
+    Why: Create immersive cognitive environment with no distractions  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    Where: Base styling for entire application interface  font-weight: 400;
+
+    How: Dark background, hidden overflow for full-screen particle effect  line-height: 1.6;
+
+      color: var(--fg);
+
+    Connects to:  background: 
+
+        - templates/index.html: Body element receives these base styles    radial-gradient(1200px 800px at 15% -20%, rgba(105, 234, 203, 0.08), transparent 70%),
+
+        - #particles canvas: Overlays this background for cognitive visualization    radial-gradient(1000px 600px at 85% 120%, rgba(255, 107, 255, 0.06), transparent 70%),
+
+    */    linear-gradient(180deg, var(--bg-cosmic) 0%, var(--bg-cosmic-2) 100%);
+
+    background: var(--bg-primary);  min-height: 100vh;
+
+    color: var(--text-primary);  overflow: hidden;
+
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;  -webkit-font-smoothing: antialiased;
+
+    font-weight: 300;  -moz-osx-font-smoothing: grayscale;
+
+    overflow: hidden;}
+
+    height: 100vh;
+
+    width: 100vw;/* Full-stage particle canvas (#particles) */
+
+    position: relative;#particles {
+
+}  position: fixed;
+
+  inset: 0;
+
+/* === PARTICLE CANVAS SYSTEM === */  width: 100vw;
+
+  height: 100vh;
+
+#particles {  z-index: 9999;
+
+    /*  pointer-events: none;
+
+    Why: Full-screen particle canvas represents Clever's cognitive state and thought visualization  background: transparent;
+
+    Where: Top layer (z-index 9999) overlaying all other UI elements for immersive brain effect}
+
+    How: Fixed positioning covers entire viewport, pointer-events disabled for UI interaction
+
+    /* Grid Background Overlay for Better Visibility */
+
+    Connects to:body::before {
+
+        - templates/index.html: Canvas element with id="particles"  content: '';
+
+        - static/js/main.js: initializeParticleSystem() configures canvas dimensions  position: fixed;
+
+        - static/js/engines/holographic-chamber.js: HolographicChamber renders particles here  top: 0;
+
+        - tools/validate_components.py: Component validation checks this CSS selector matches HTML  left: 0;
+
+    */  width: 100%;
+
+    position: fixed;  height: 100%;
+
+    top: 0;  background-image: 
+
+    left: 0;    linear-gradient(rgba(105, 234, 203, 0.1) 1px, transparent 1px),
+
+    width: 100vw;    linear-gradient(90deg, rgba(105, 234, 203, 0.1) 1px, transparent 1px);
+
+    height: 100vh;  background-size: 20px 20px;
+
+    z-index: 9999;  pointer-events: none;
+
+    pointer-events: none;  /* Allow interaction with UI beneath particles */  z-index: 0;
+
+    display: block;  opacity: 0.3;
+
+    background: transparent;}
+
+}
+
+/* Duplicate removed - using the z-index: 9999 version above */
+
+/* === CHAT INTERFACE SYSTEM === */
+
+/* Chat Log - Floating Thought Bubbles */
+
+#chat-container {#chat-log {
+
+    /*  position: fixed;
+
+    Why: Container for Clever's thought expressions and conversation display  bottom: 80px;
+
+    Where: Positioned to allow particle visualization while maintaining readability  left: 20px;
+
+    How: Flexible positioning with z-index below particles but above background  right: 20px;
+
+      max-height: 60vh;
+
+    Connects to:  overflow-y: auto;
+
+        - templates/index.html: Container div for chat interaction area  z-index: 10;
+
+        - static/js/components/chat-fade.js: Creates chat bubbles within this container  padding: 10px;
+
+    */  pointer-events: none;
+
+    position: fixed;}
+
+    top: 20px;
+
+    left: 20px;/* Individual Chat Bubbles (Ephemeral Thought Forms) */
+
+    right: 20px;.chat-message {
+
+    bottom: 120px;  background: var(--glass-bg);
+
+    z-index: 10;  border: 1px solid var(--neon-teal);
+
+    pointer-events: none;  /* Individual bubbles will enable pointer events as needed */  border-radius: 12px;
+
+}  padding: 15px 20px;
+
+  margin: 10px 0;
+
+#chat-log {  backdrop-filter: blur(10px);
+
+    /*  -webkit-backdrop-filter: blur(10px);
+
+    Why: Scrollable area for chat message history with fade animations  box-shadow: 0 4px 20px var(--glow-teal);
+
+    Where: Within chat-container for organized message display  color: var(--fg);
+
+    How: Flexible layout with overflow handling for long conversations  max-width: 80%;
+
+    */  pointer-events: auto;
+
+    display: flex;  opacity: 0;
+
+    flex-direction: column;  transform: translateY(6px) scale(.97);
+
+    gap: 12px;  transition: opacity var(--bubble-fade-in-ms) ease, transform var(--bubble-fade-in-ms) cubic-bezier(.4,.16,.2,1);
+
+    max-height: 100%;}
+
+    overflow-y: auto;
+
+    padding: 0 10px;.chat-message.manifested {
+
+}  opacity: 1;
+
+  transform: translateY(0) scale(1);
+
+.chat-bubble {}
+
+    /*
+
+    Why: Individual message containers with glassmorphism design for cognitive aesthetic.chat-message.fade-out {
+
+    Where: Dynamically created within #chat-log by chat-fade.js component  opacity: 0 !important;
+
+    How: Frosted glass effect with fade animations for natural thought flow  transform: translateY(-6px) scale(.985);
+
+      transition: opacity var(--bubble-fade-out-ms) ease, transform var(--bubble-fade-out-ms) ease;
+
+    Connects to:}
+
+        - static/js/components/chat-fade.js: createChatBubble() applies this class
+
+        - Chat fade animations: CSS transitions for smooth appearance/disappearance.chat-message.user {
+
+    */  margin-left: auto;
+
+    background: var(--glass-bg);  background: var(--bubble);
+
+    backdrop-filter: blur(10px);  border-color: var(--neon-magenta);
+
+    border: 1px solid rgba(0, 255, 255, 0.2);  box-shadow: 0 4px 20px var(--glow-magenta);
+
+    border-radius: var(--border-radius);}
+
+    padding: 16px 20px;
+
+    margin-bottom: 8px;.chat-message.clever {
+
+    max-width: 80%;  margin-right: auto;
+
+    opacity: 0;  background: var(--glass-bg);
+
+    transform: translateY(20px);  border-color: var(--neon-teal);
+
+    transition: all var(--transition-smooth);  box-shadow: 0 4px 20px var(--glow-teal);
+
+    pointer-events: auto;}
+
+    box-shadow: var(--glow-cyan);
+
+}/* Floating Input - Clean Chat Interface */
+
+.floating-input {
+
+.chat-bubble.user {  position: fixed;
+
+    /*  bottom: 20px;
+
+    Why: Distinguish user messages with different positioning and accent  left: 20px;
+
+    Where: Applied to user-sent messages for conversation clarity  right: 20px;
+
+    How: Right-aligned with blue accent for visual hierarchy  display: flex;
+
+    */  align-items: center;
+
+    align-self: flex-end;  gap: 10px;
+
+    background: rgba(74, 158, 255, 0.15);  z-index: 20;
+
+    border-color: var(--accent-blue);  background: var(--glass-bg);
+
+    box-shadow: 0 0 20px rgba(74, 158, 255, 0.3);  border: 1px solid var(--neon-teal);
+
+}  border-radius: 12px;
+
+  padding: 15px;
+
+.chat-bubble.clever {  backdrop-filter: blur(15px);
+
+    /*  -webkit-backdrop-filter: blur(15px);
+
+    Why: Clever's responses with signature cyan accent matching particle system  box-shadow: 0 8px 32px var(--glow-teal);
+
+    Where: Applied to AI-generated responses for brand consistency  }
+
+    How: Left-aligned with cyan accent connecting to holographic brain theme
+
+    */#chat-input {
+
+    align-self: flex-start;  flex: 1;
+
+    background: var(--glass-bg);  background: transparent;
+
+    border-color: var(--accent-cyan);  border: none;
+
+}  color: var(--fg);
+
+  font-size: 16px;
+
+.chat-bubble.fade-in {  font-family: inherit;
+
+    /*  outline: none;
+
+    Why: Smooth appearance animation for new messages entering conversation}
+
+    Where: Applied by chat-fade.js during bubble creation lifecycle
+
+    How: Opacity and transform transition for natural thought emergence#chat-input::placeholder {
+
+    */  color: var(--muted);
+
+    opacity: 1;  opacity: 0.7;
+
+    transform: translateY(0);}
+
+}
+
+#chat-input:focus {
+
+.chat-bubble.fade-out {  outline: none;
+
+    /*}
+
+    Why: Graceful disappearance animation maintaining conversation flow
+
+    Where: Applied by chat-fade.js before bubble removal from DOM/* Hide Send Button - Chat Only Interface */
+
+    How: Fade and slide animation for natural thought dissolution#send-btn {
+
+    */  display: none;
+
+    opacity: 0;}
+
+    transform: translateY(-10px) scale(0.95);
+
+}/* Hide All Debug Buttons */
+
+button, .button, [style*="button"] {
+
+/* === FLOATING INPUT INTERFACE === */  display: none !important;
+
+}
+
+.floating-input {
+
+    /*/* Animations */
+
+    Why: Minimalist input interface that doesn't distract from particle brain visualization@keyframes fadeInUp {
+
+    Where: Bottom-center positioning for natural interaction without blocking particles  from {
+
+    How: Floating design with glow effects that activate on focus    opacity: 0;
+
+        transform: translateY(20px);
+
+    Connects to:  }
+
+        - templates/index.html: Contains chat form and input controls  to {
+
+        - static/js/main.js: initializeChatInterface() handles form submission    opacity: 1;
+
+        - app.py: Form data sent to chat() endpoint for processing    transform: translateY(0);
+
+    */  }
+
+    position: fixed;}
+
+    bottom: 30px;
+
+    left: 50%;/* Input focus pulse */
+
+    transform: translateX(-50%);@keyframes inputFocusPulse {
+
+    z-index: 20;  0% { box-shadow: 0 0 0 0 rgba(105,234,203,0.18); }
+
+    min-width: 400px;  60% { box-shadow: 0 0 0 14px rgba(105,234,203,0); }
+
+    max-width: 600px;  100% { box-shadow: 0 0 0 0 rgba(105,234,203,0); }
+
+    width: 90%;}
+
+}
+
+.floating-input:focus-within {
+
+.input-wrapper {  animation: inputFocusPulse var(--input-focus-pulse) ease-in-out;
+
+    /*}
+
+    Why: Container for input field and send button with glassmorphism aesthetic
+
+    Where: Within floating-input for cohesive input interface design/* Reduced motion preference: remove transitions */
+
+    How: Flexbox layout with frosted glass background matching chat bubbles@media (prefers-reduced-motion: reduce) {
+
+    */  .chat-message, .chat-message.fade-out, .chat-message.manifested {
+
+    display: flex;    transition: none !important;
+
+    background: var(--glass-bg);    animation: none !important;
+
+    backdrop-filter: blur(10px);  }
+
+    border: 1px solid rgba(0, 255, 255, 0.3);  .chat-message { opacity: 1; transform: none; }
+
+    border-radius: var(--border-radius);  .floating-input:focus-within { animation: none; }
+
+    overflow: hidden;}
+
+    transition: all var(--transition-fast);
+
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);/* Scrollbar Styling */
+
+}#chat-log::-webkit-scrollbar {
+
+  width: 4px;
+
+.input-wrapper:focus-within {}
+
+    /*
+
+    Why: Enhanced visual feedback when user is actively typing to Clever#chat-log::-webkit-scrollbar-track {
+
+    Where: Applied when chat input field receives focus  background: transparent;
+
+    How: Intensified glow and border effects for active engagement state}
+
+    */
+
+    border-color: var(--accent-cyan);#chat-log::-webkit-scrollbar-thumb {
+
+    box-shadow: var(--glow-cyan), 0 0 40px rgba(0, 255, 255, 0.4);  background: var(--neon-teal);
+
+    transform: scale(1.02);  border-radius: 2px;
+
+}  opacity: 0.3;
+
+}
+
+#chat-input {
+
+    /*#chat-log::-webkit-scrollbar-thumb:hover {
+
+    Why: Primary text input for cognitive partnership communication with Clever  opacity: 0.6;
+
+    Where: Main input field within floating interface for user messages}
+
+    How: Transparent styling that integrates with glassmorphism design
+
+    /* Responsive Design */
+
+    Connects to:@media (max-width: 768px) {
+
+        - templates/index.html: Input element with id="chat-input"  .floating-input {
+
+        - static/js/main.js: Event listeners for Enter key and form submission    left: 10px;
+
+        - static/js/main.js: initializeKeyboardControls() adds shortcuts    right: 10px;
+
+    */    padding: 12px;
+
+    flex: 1;  }
+
+    background: transparent;  
+
+    border: none;  #chat-log {
+
+    outline: none;    left: 10px;
+
+    color: var(--text-primary);    right: 10px;
+
+    font-size: 16px;    bottom: 70px;
+
+    font-weight: 300;    max-height: 50vh;
+
+    padding: 16px 20px;  }
+
+    placeholder-color: var(--text-secondary);  
+
+}  .chat-message {
+
+    max-width: 90%;
+
+#chat-input::placeholder {    padding: 12px 16px;
+
+    /*  }
+
+    Why: Subtle placeholder text that guides user interaction without distraction}
+
+    Where: Displayed when input field is empty to prompt engagement
+    How: Muted color that complements overall cognitive interface aesthetic
+    */
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+#send-btn {
+    /*
+    Why: Submit button for sending messages to Clever with hover feedback
+    Where: Right side of input wrapper for natural interaction flow
+    How: Transparent button that glows on interaction, matches input aesthetic
+    
+    Connects to:
+        - templates/index.html: Button element with id="send-btn"
+        - static/js/main.js: Form submission handler processes click events
+    */
+    background: transparent;
+    border: none;
+    color: var(--accent-cyan);
+    font-size: 18px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#send-btn:hover {
+    /*
+    Why: Visual feedback for button interaction enhancing user experience
+    Where: Applied on mouse hover over send button
+    How: Glow effect matching Clever's cyan signature color
+    */
+    color: #ffffff;
+    text-shadow: var(--glow-cyan);
+    background: rgba(0, 255, 255, 0.1);
+}
+
+#send-btn:active {
+    /*
+    Why: Tactile feedback for button press confirming user action
+    Where: Applied during button click for immediate response
+    How: Slight scale transformation providing click confirmation
+    */
+    transform: scale(0.95);
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/*
+Why: Ensure cognitive interface works across different screen sizes and devices
+Where: Applied at smaller viewport sizes for mobile/tablet compatibility
+How: Responsive adjustments maintaining particle visualization and interaction quality
+*/
+
+@media (max-width: 768px) {
+    .floating-input {
+        min-width: 300px;
+        width: 95%;
+        bottom: 20px;
+    }
+    
+    .chat-bubble {
+        max-width: 95%;
+        padding: 12px 16px;
+    }
+    
+    #chat-container {
+        left: 10px;
+        right: 10px;
+        bottom: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-wrapper {
+        border-radius: 8px;
+    }
+    
+    #chat-input {
+        font-size: 14px;
+        padding: 12px 16px;
+    }
+    
+    #send-btn {
+        padding: 12px 16px;
+        font-size: 16px;
+    }
+}
+
+/* === ACCESSIBILITY & REDUCED MOTION === */
+
+/*
+Why: Ensure cognitive interface is accessible to users with different needs
+Where: Applied when user prefers reduced motion for accessibility
+How: Disable particle animations and transitions while maintaining functionality
+*/
+
+@media (prefers-reduced-motion: reduce) {
+    .chat-bubble {
+        transition: none;
+    }
+    
+    .input-wrapper {
+        transition: none;
+    }
+    
+    .input-wrapper:focus-within {
+        transform: none;
+    }
+    
+    #send-btn {
+        transition: none;
+    }
+}
