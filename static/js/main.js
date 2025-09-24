@@ -140,9 +140,16 @@ async function sendMessage() {
         
         const data = await response.json();
         
-        // Clever enters dialogue state when responding
+        // Handle particle commands from Clever's response
         if (holographicChamber) {
-            holographicChamber.dialogue();
+            if (data.particle_command) {
+                // Clever wants to show a specific formation
+                console.log(`🎨 Clever particle command: ${data.particle_command}`);
+                holographicChamber.morphToFormation(data.particle_command);
+            } else {
+                // Default dialogue state when responding
+                holographicChamber.dialogue();
+            }
         }
         
         createChatBubble(data.response || 'I hear you!', 'ai');

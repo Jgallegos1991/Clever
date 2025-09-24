@@ -65,9 +65,12 @@ class HolographicChamber {
     this.accessibilityEnabled = false;
     this.debugOverlayEnabled = false;
     
-  // Start Clever's thinking pattern - she forms shapes based on what she's pondering
-  // This is Clever's visual language and cognitive representation
+  // Start Clever's natural thinking patterns - particles reflect her cognitive state
   this.startThoughtFormations();
+  
+  // Start the formation cycle for dynamic particle formations
+  // Note: Commenting this out as it may conflict with thought formations
+  // this.startFormationCycle();
     
   this.animate();
     
@@ -76,14 +79,42 @@ class HolographicChamber {
   }
 
   addMouseInteraction() {
+    // Change cursor to indicate interactivity
+    this.canvas.style.cursor = 'crosshair';
+    
+    // Track mouse movement with throttling to prevent interference
+    let mouseThrottleTimer = null;
     this.canvas.addEventListener('mousemove', (e) => {
+      // Throttle mouse updates to every 50ms to reduce interference
+      if (mouseThrottleTimer) return;
+      mouseThrottleTimer = setTimeout(() => {
+        mouseThrottleTimer = null;
+      }, 50);
+      
       const rect = this.canvas.getBoundingClientRect();
       this.mouse.x = e.clientX - rect.left;
       this.mouse.y = e.clientY - rect.top;
     });
-    // Removed random formation trigger on canvas click to keep whirlpool idle state
+    
+    // Disable mouse interaction during important formations
+    this.canvas.addEventListener('mouseenter', () => {
+      // Only enable mouse interaction if not holding a formation
+      if (!this.isHoldingFormation) {
+        this.mouseInteractionEnabled = true;
+        this.canvas.style.cursor = 'crosshair';
+      } else {
+        this.canvas.style.cursor = 'wait';
+      }
+    });
+    
+    this.canvas.addEventListener('mouseleave', () => {
+      this.mouseInteractionEnabled = false;
+      this.canvas.style.cursor = 'default';
+      // Smoothly return mouse position to center when leaving
+      this.mouse.x = this.width / 2;
+      this.mouse.y = this.height / 2;
+    });
   }
-
   startThoughtFormations() {
     // Clever's thinking patterns - she forms shapes based on what she's pondering
     // Updated: fast converge -> hold (slow rotate) -> gentle drift
@@ -103,27 +134,80 @@ class HolographicChamber {
     const thinkingCycle = () => {
       const pattern = thoughtPatterns[currentIndex];
       this.currentThought = pattern.thought;
+      console.log(`🧠 Clever thinking about: ${pattern.thought} → ${pattern.shape}`);
       this.morphToFormationWithHold(pattern.shape, { holdMs: pattern.hold, postDriftMs: pattern.post });
       currentIndex = (currentIndex + 1) % thoughtPatterns.length;
       const totalDelay = pattern.hold + pattern.post + 400; // buffer between cycles
       setTimeout(thinkingCycle, totalDelay);
     };
     
-    // Start first thought after a brief moment
-    setTimeout(thinkingCycle, 2000);
-  }
-
   startFormationCycle() {
     const formations = ['whirlpool', 'sphere', 'cube', 'torus', 'helix', 'wave', 'spiral', 'scatter'];
     let currentIndex = 0;
     
+    // Start with whirlpool - the signature "bottom centered lively whirlpool"
+    this.morphToFormation('whirlpool');
+    
     // Change formation every 6 seconds for more dynamic feel
     setInterval(() => {
-      this.morphToFormation(formations[currentIndex]);
       currentIndex = (currentIndex + 1) % formations.length;
+      this.morphToFormation(formations[currentIndex]);
     }, 6000);
+  }
     
-    // Start with whirlpool - the signature "bottom centered lively whirlpool"
+    /**
+     * Holographic Chamber - Advanced Particle System for Clever AI
+     * 
+     * Why: Creates an immersive cognitive enhancement interface that visualizes
+     *      Clever's thinking patterns and emotional state through particle animations
+     * Where: Integrated into the main UI as the primary visual feedback system,
+     *        connects to main.js for initialization and particle command processing
+     * How: Uses HTML5 Canvas API with particle physics to create responsive,
+     *      organic animations that reflect Clever's cognitive processes
+     * 
+     * Connects to:
+     *   - static/js/main.js: Initialized via startHolographicChamber(), receives state updates and particle commands
+     *   - static/js/components/chat-fade.js: Chat bubble fade animations (indirectly through main.js)
+     *   - app.py: Receives particle commands through API responses via main.js sendMessage()
+     *   - templates/index.html: Canvas element integration and UI coordination
+     */
+
+    // CONFIG NOTE: For best performance, render particles as simple pixels (fillRect) instead of blurred/glowing circles. This eliminates lag and ensures smooth animation even with high particle counts.
+    // Quantum swarm with morphing behaviors: idle → summon → dialogue → dissolve
+
+    // Initialize window properties if they don't exist
+    if (typeof window.cleverIntent === 'undefined') {
+      window.cleverIntent = '';
+    }
+    if (typeof window.holographicChamber === 'undefined') {
+      window.holographicChamber = null;
+    }
+
+    class HolographicChamber {
+      constructor(canvas) {
+        // ... rest of the existing constructor code ...
+      }
+
+      // ... rest of the existing code ...
+
+      startThoughtFormations() {
+        /**
+         * Start Clever's thinking pattern cycle
+         * 
+         * Why: Visualizes Clever's cognitive processes through dynamic formations
+         * Where: Called during initialization to begin the autonomous thought visualization
+         * How: Cycles through predefined formations that represent different cognitive states
+         * 
+         * Connects to:
+         *   - morphToFormationWithHold(): Triggers formation changes with timing control
+         */
+        // Clever's thinking patterns - she forms shapes based on what she's pondering
+        // Updated: fast converge -> hold (slow rotate) -> gentle drift
+        // ... rest of the method ...
+      }
+
+      // Continue with rest of file...
+    }
     this.morphToFormation('whirlpool');
   }
 
@@ -287,17 +371,16 @@ class HolographicChamber {
           break;
           
         case 'whirlpool':
-          // Thoughtful whirlpool representing active cognitive processing (fluid dynamics thinking)
+          // Static whirlpool formation - NO time-based spinning
           const whirlCenterX = centerX;
           const whirlCenterY = centerY;
-          // Gentle time-based rotation to show active thinking, much slower than before
-          const whirlAngle = (i / this.particles.length) * Math.PI * 8 + Date.now() * 0.0003; // Much slower rotation
-          const whirlRadius = radius * (0.5 + Math.sin(whirlAngle * 0.2) * 0.1); // Gentle pulsing
-          const whirlHeight = Math.sin(whirlAngle * 0.8) * 15; // Subtle vertical motion
+          // Fixed spiral pattern based only on particle index - NO Date.now()
+          const whirlAngle = (i / this.particles.length) * Math.PI * 8;
+          const whirlRadius = radius * 0.6; // Fixed radius
           const whirlSpiral = (i / this.particles.length) * radius * 0.12;
           
           particle.targetX = whirlCenterX + Math.cos(whirlAngle) * (whirlRadius + whirlSpiral) + randomOffset();
-          particle.targetY = whirlCenterY + Math.sin(whirlAngle) * (whirlRadius + whirlSpiral) * 0.7 + whirlHeight;
+          particle.targetY = whirlCenterY + Math.sin(whirlAngle) * (whirlRadius + whirlSpiral) * 0.7 + randomOffset();
           break;
           
         case 'scatter':
@@ -346,7 +429,7 @@ class HolographicChamber {
     switch (newState) {
       case 'idle':
         // Return to natural thinking patterns - let her mind wander
-        // Don't override the thought formation system, just ensure it's active
+        // The thought formation system will handle the cognitive patterns
         console.log('🧠 Clever returning to natural thought patterns');
         break;
       case 'summon':
@@ -1381,6 +1464,7 @@ window.morphForIntent = function(intent) {
   };
   
   const formation = intentMap[intent.toLowerCase()] || 'whirlpool';
+  console.log(`🎭 Clever responds to intent "${intent}" → ${formation} formation`);
   window.holographicChamber.morphToFormation(formation);
 };
 
