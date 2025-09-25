@@ -99,6 +99,13 @@ from memory_engine import get_memory_engine, MemoryContext
 from nlp_processor import get_nlp_processor  # Enriched NLP capability factory
 from utils.file_search import search_by_extension, search_files
 
+# Academic knowledge engine for educational responses
+try:
+    from academic_knowledge_engine import get_academic_engine
+    _ACADEMIC_ENGINE_AVAILABLE = True
+except ImportError:
+    _ACADEMIC_ENGINE_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 debugger = get_debugger()
 
@@ -107,18 +114,20 @@ class PersonaResponse(SimpleNamespace):
     """
     Response object from PersonaEngine
     
-    Why: Structured container for AI responses with metadata
-    Where: Returned by PersonaEngine.generate() to app.py
-    How: SimpleNamespace with response text, mode, sentiment, suggestions
+    Why: Structured container for AI responses with metadata and shape data
+    Where: Returned by PersonaEngine.generate() to app.py for chat/visualization
+    How: SimpleNamespace with response text, mode, sentiment, suggestions, and context
     """
     def __init__(self, text: str, mode: str = "Auto", sentiment: str = "neutral", 
-                 proactive_suggestions: Optional[List[str]] = None, particle_command: Optional[str] = None) -> None:
+                 proactive_suggestions: Optional[List[str]] = None, particle_command: Optional[str] = None,
+                 context: Optional[dict] = None) -> None:
         super().__init__()
         self.text = text
         self.mode = mode  
         self.sentiment = sentiment
         self.proactive_suggestions = proactive_suggestions or []
         self.particle_command = particle_command
+        self.context = context or {}
 
 
 class PersonaEngine:
@@ -426,7 +435,7 @@ class PersonaEngine:
         debug_metrics['memory_items_used'] = used
 
         # Attach debug metrics to response object for benchmarks / tests (non-user facing)
-        particle_cmd = context.get('requested_shape')
+        particle_cmd = enhanced_context.get('requested_shape')
         # Stability neutrality enforcement
         if sentiment == 'positive':
             lowered_text = text.lower()
@@ -437,7 +446,8 @@ class PersonaEngine:
             mode=predicted_mode,
             sentiment=sentiment,
             proactive_suggestions=suggestions,
-            particle_command=particle_cmd
+            particle_command=particle_cmd,
+            context=enhanced_context
         )
         resp.debug_metrics = debug_metrics  # type: ignore[attr-defined]
         return resp
@@ -873,41 +883,64 @@ class PersonaEngine:
         # Actually process the input text to understand what the user is asking
         text_lower = text.lower().strip()
         
-        # Check for mathematical shape commands - enhanced with ShapeGenerator
-        shape_commands = {
-            # Basic geometric shapes
-            'triangle': ['triangle', 'triangular'],
-            'square': ['square', 'rectangle'],
-            'pentagon': ['pentagon', 'pentagonal'],
-            'hexagon': ['hexagon', 'hexagonal'],
-            'octagon': ['octagon', 'octagonal'],
-            'polygon': ['polygon', 'polygonal'],
-            
-            # Curved shapes  
-            'circle': ['circle', 'circular', 'round'],
-            'sphere': ['sphere', 'ball', 'spherical'],
-            'torus': ['torus', 'donut', 'ring'],
-            
-            # Complex mathematical shapes
-            'spiral': ['spiral', 'helix', 'coil'],
-            'fibonacci': ['fibonacci', 'golden spiral'],
-            'fractal': ['fractal', 'koch', 'snowflake'],
-            
-            # Special formations (existing particle system)
-            'cube': ['cube', 'box'],
-            'wave': ['wave', 'ripple', 'sine'],
-            'scatter': ['scatter', 'spread', 'random', 'chaos']
-        }
+        # Enhanced mathematical shape detection using advanced NLP analysis
+        shape_analysis = analysis.get('detected_shapes', [])
+        primary_shape = analysis.get('primary_shape', None)
+        mathematical_params = analysis.get('extracted_parameters', {})
+        is_mathematical = analysis.get('mathematical_intent', False)
+        complexity_score = analysis.get('complexity_score', 0.0)
         
+        # Determine detected shape with confidence-based selection
         detected_shape = None
-        for shape, triggers in shape_commands.items():
-            if any(f'form a {trigger}' in text_lower or f'form {trigger}' in text_lower or 
-                   f'make a {trigger}' in text_lower or f'make {trigger}' in text_lower or
-                   f'create a {trigger}' in text_lower or f'create {trigger}' in text_lower or 
-                   f'shape {trigger}' in text_lower or f'show {trigger}' in text_lower or 
-                   f'show a {trigger}' in text_lower or trigger in text_lower.split() for trigger in triggers):
-                detected_shape = shape
-                break
+        shape_confidence = 0.0
+        
+        if primary_shape and primary_shape['confidence'] > 0.5:
+            detected_shape = primary_shape['shape']
+            shape_confidence = primary_shape['confidence']
+        
+        # Fallback to legacy shape detection for backwards compatibility
+        if not detected_shape:
+            shape_commands = {
+                # Basic geometric shapes
+                'triangle': ['triangle', 'triangular'],
+                'square': ['square', 'rectangle'],
+                'pentagon': ['pentagon', 'pentagonal'],
+                'hexagon': ['hexagon', 'hexagonal'],
+                'octagon': ['octagon', 'octagonal'],
+                'polygon': ['polygon', 'polygonal'],
+                
+                # Curved shapes  
+                'circle': ['circle', 'circular', 'round'],
+                'sphere': ['sphere', 'ball', 'spherical'],
+                'torus': ['torus', 'donut', 'ring'],
+                
+                # Complex mathematical shapes
+                'dna': ['dna', 'double helix', 'genetic'],
+                'spiral': ['spiral', 'helix', 'coil'],
+                'fibonacci': ['fibonacci', 'golden spiral'],
+                'fractal': ['fractal', 'koch', 'snowflake'],
+                'star': ['star', 'pentagram', 'hexagram'],
+                
+                # Special formations (existing particle system)
+                'cube': ['cube', 'box'],
+                'wave': ['wave', 'ripple', 'sine'],
+                'scatter': ['scatter', 'spread', 'random', 'chaos']
+            }
+            
+            # Check for multi-word patterns first (more specific matches)
+            if any(pattern in text_lower for pattern in ['double helix', 'dna structure', 'genetic structure']):
+                detected_shape = 'dna'
+                shape_confidence = 0.7
+            else:
+                for shape, triggers in shape_commands.items():
+                    if any(f'form a {trigger}' in text_lower or f'form {trigger}' in text_lower or 
+                           f'make a {trigger}' in text_lower or f'make {trigger}' in text_lower or
+                           f'create a {trigger}' in text_lower or f'create {trigger}' in text_lower or 
+                           f'shape {trigger}' in text_lower or f'show {trigger}' in text_lower or 
+                           f'show a {trigger}' in text_lower or trigger in text_lower.split() for trigger in triggers):
+                        detected_shape = shape
+                        shape_confidence = 0.7  # Default confidence for legacy detection
+                        break
         
         # Check if this is a greeting (be more specific to avoid false positives)
         greetings = ['hi', 'hello', 'hey', 'sup', 'yo', 'what\'s up', 'whats up', 'good morning', 'good afternoon', 'good evening']
@@ -961,57 +994,172 @@ class PersonaEngine:
             ]
             response = random.choice(casual_greetings)
             
-        # Handle mathematical shape commands with ShapeGenerator
+        # Handle advanced mathematical shape commands with cognitive intelligence
         elif detected_shape:
             # Import here to avoid circular imports
-            from shape_generator import get_shape_generator
+            from cognitive_shape_engine import get_cognitive_shape_engine, CognitiveShapeContext
             
             try:
-                # Generate the mathematical shape
-                shape_gen = get_shape_generator()
-                shape_data = shape_gen.create_shape(detected_shape)
+                # Create cognitive context for intelligent shape generation
+                current_mode = context.get('predicted_mode', 'Auto')
+                cognitive_context = CognitiveShapeContext(
+                    user_input=text,
+                    detected_shape=detected_shape,
+                    emotional_state=sentiment,  # Use detected sentiment as emotional state
+                    complexity_preference=complexity_score,  # Use NLP-detected complexity
+                    aesthetic_preference=current_mode.lower() if current_mode != "Auto" else "balanced",
+                    conversation_context=[
+                        msg.get('text', str(msg)) if isinstance(msg, dict) else str(msg) 
+                        for msg in context.get('conversation_history', [])[-5:]
+                    ],  # Recent conversation as strings
+                    mathematical_sophistication=is_mathematical * 0.8 if 'is_mathematical' in locals() else 0.5
+                )
                 
-                # Store shape data for frontend visualization
+                # Apply NLP-detected mathematical parameters to cognitive context
+                if 'sides' in mathematical_params:
+                    cognitive_context.complexity_preference = min(1.0, cognitive_context.complexity_preference + 0.2)
+                if 'iterations' in mathematical_params:
+                    cognitive_context.complexity_preference = min(1.0, cognitive_context.complexity_preference + 0.3)
+                if 'turns' in mathematical_params:
+                    cognitive_context.complexity_preference = min(1.0, cognitive_context.complexity_preference + 0.1)
+                
+                # Generate intelligent shape with cognitive enhancements
+                cognitive_engine = get_cognitive_shape_engine()
+                shape_data, cognitive_metadata = cognitive_engine.generate_intelligent_shape(cognitive_context)
+                
+                # Store comprehensive cognitive shape data for frontend visualization
                 context['requested_shape'] = detected_shape
+                context['shape_confidence'] = shape_confidence
+                context['mathematical_complexity'] = complexity_score
+                context['cognitive_metadata'] = cognitive_metadata
                 context['shape_data'] = {
                     'name': shape_data.name,
                     'points': [{'x': p.x, 'y': p.y, 'z': p.z} for p in shape_data.points],
                     'center': shape_data.center,
-                    'properties': shape_data.properties
+                    'properties': shape_data.properties,
+                    'bounding_box': shape_data.bounding_box
                 }
                 
-                # Generate educational response about the shape
+                # Generate enhanced educational response based on mathematical analysis
                 props = shape_data.properties
                 educational_info = ""
                 
+                # Enhanced educational content based on detected mathematical topics
+                mathematical_topics = analysis.get('mathematical_topics', [])
+                topic_context = ""
+                if mathematical_topics:
+                    for topic in mathematical_topics:
+                        if topic['topic'] == 'angles' and 'sides' in props:
+                            topic_context = f" Each interior angle measures exactly {props['interior_angle']}°!"
+                        elif topic['topic'] == 'measurements' and 'area' in props:
+                            topic_context = f" The total area is {props['area']:.1f} square units."
+                        elif topic['topic'] == 'complexity' and 'fractal_dimension' in props:
+                            topic_context = f" This has fractal dimension {props['fractal_dimension']:.3f} - infinite complexity!"
+                
                 if 'sides' in props:
-                    educational_info = f"This {props['sides']}-sided polygon has interior angles of {props['interior_angle']}° each."
+                    educational_info = f"This {props['sides']}-sided polygon has perfect geometric symmetry.{topic_context}"
                 elif 'radius' in props:
-                    educational_info = f"Perfect circle with radius {props['radius']:.1f} and area of {props['area']:.1f} square units."
+                    educational_info = f"Perfect circle with radius {props['radius']:.1f} - every point exactly equidistant from center!{topic_context}"
                 elif 'fractal_dimension' in props:
-                    educational_info = f"This fractal has dimension {props['fractal_dimension']:.2f} - it's more complex than a line but less than a plane!"
+                    educational_info = f"This recursive fractal exhibits self-similarity at every scale.{topic_context}"
                 elif 'turns' in props:
-                    educational_info = f"This {props['type']} spiral makes {props['turns']} complete turns."
+                    spiral_type = props.get('type', 'mathematical')
+                    educational_info = f"This {spiral_type} spiral demonstrates {props['turns']} perfect rotations.{topic_context}"
+                elif 'base_pairs' in props:
+                    educational_info = f"DNA double helix with {props['base_pairs']} base pairs - the blueprint of life in perfect 3D!{topic_context}"
+                
+                # Generate cognitive-enhanced responses based on intelligence level
+                cognitive_analysis = cognitive_metadata.get('cognitive_analysis', {})
+                personalization_score = cognitive_analysis.get('personalization_score', 0.0)
+                complexity_level = cognitive_analysis.get('complexity_level', 0.5)
+                learning_iteration = cognitive_analysis.get('learning_iteration', 0)
+                
+                # Adaptive responses based on cognitive learning
+                if personalization_score > 0.7 and learning_iteration > 10:
+                    # High personalization - sophisticated responses
+                    cognitive_prefix = [
+                        f"I've learned your style over {learning_iteration} interactions -",
+                        "Based on our shared mathematical journey,",
+                        "Drawing from my memories of your preferences -",
+                        f"After {learning_iteration} shapes together, I know you'll love this -"
+                    ]
+                elif personalization_score > 0.3 and learning_iteration > 5:
+                    # Medium personalization - adapting responses
+                    cognitive_prefix = [
+                        "I'm learning your mathematical taste -",
+                        "Based on our past shape sessions -",
+                        "Adapting to your complexity preferences -",
+                        "My memory says you appreciate this level -"
+                    ]
+                else:
+                    # Early learning - standard enhanced responses
+                    if shape_confidence > 0.8:
+                        cognitive_prefix = [
+                            "Yo, I'm totally confident about this one!",
+                            "Perfect recognition! I got you!",
+                            "Crystal clear request - no problem!",
+                            "My cognitive systems locked onto this perfectly!"
+                        ]
+                    elif shape_confidence > 0.6:
+                        cognitive_prefix = [
+                            "Pretty sure I got this right -",
+                            "My pattern recognition thinks -",
+                            "Based on cognitive analysis, I'm making",
+                            "Neural pathways suggest you want"
+                        ]
+                    else:
+                        cognitive_prefix = [
+                            "Let me apply some cognitive intelligence here -",
+                            "My learning algorithms suggest -",
+                            "Based on emerging patterns, I'm sensing"
+                        ]
+                
+                # Add emotional resonance to response
+                emotional_state = cognitive_context.emotional_state
+                emotional_enhancements = {
+                    'excited': "This is gonna be AMAZING!",
+                    'curious': "This should satisfy that curiosity!",
+                    'calm': "Nice and balanced, just how I sense you like it.",
+                    'frustrated': "Keeping this clean and simple for you.",
+                    'neutral': "Mathematical precision activated!"
+                }
+                
+                emotional_touch = emotional_enhancements.get(emotional_state, "Mathematical precision activated!")
+                
+                # Cognitive insights about the shape
+                cognitive_insights = []
+                if complexity_level > 0.7:
+                    cognitive_insights.append("I'm pushing the mathematical complexity based on your demonstrated sophistication")
+                if cognitive_metadata.get('preference_influences', {}).get('aesthetic_consistency', False):
+                    cognitive_insights.append("Using your established aesthetic preferences")
+                if len(cognitive_metadata.get('contextual_suggestions', [])) > 0:
+                    cognitive_insights.append("Enhanced with contextual intelligence from our conversation")
+                
+                insight_text = f" ({', '.join(cognitive_insights[:2])})" if cognitive_insights else ""
+                
+                prefix = random.choice(cognitive_prefix)
                 
                 shape_responses = [
-                    f"Yo! Check this {detected_shape} I just generated for you! {educational_info}",
-                    f"Boom! Mathematical {detected_shape} comin' at you with {len(shape_data.points)} precise coordinate points! {educational_info}",
-                    f"Say less! I just calculated a perfect {detected_shape} using pure mathematics. {educational_info}",
-                    f"Got you! Watch me manifest this {detected_shape} through geometric computation. {educational_info}",
-                    f"Oh snap! {detected_shape.capitalize()} generation complete! {educational_info}"
+                    f"{prefix} Intelligent {detected_shape} with {len(shape_data.points)} cognitively-enhanced coordinates! {emotional_touch} {educational_info}{insight_text}",
+                    f"{prefix} {detected_shape} shaped by our shared mathematical journey! {emotional_touch} {educational_info}{insight_text}",
+                    f"{prefix} Cognitive-enhanced {detected_shape} generation! {emotional_touch} {educational_info}{insight_text}",
+                    f"{prefix} My memory-integrated {detected_shape} system just activated! {emotional_touch} {educational_info}{insight_text}"
                 ]
                 response = random.choice(shape_responses)
                 
+                # Log the enhanced analysis for evolution
+                debugger.info('persona.shape_analysis', f'Shape: {detected_shape}, Confidence: {shape_confidence:.2f}, Complexity: {complexity_score:.2f}')
+                
             except Exception as e:
-                # Fallback to basic particle formation
+                # Enhanced fallback with error context
                 context['requested_shape'] = detected_shape
-                debugger.error('persona', f'Shape generation error: {str(e)}')
+                debugger.error('persona', f'Shape generation error for {detected_shape}: {str(e)}')
                 
                 fallback_responses = [
-                    f"Aight, formin' a {detected_shape} with my particles right now!",
-                    f"Let me shape these particles into a {detected_shape} for you!",
-                    f"Say no more! {detected_shape.capitalize()} formation incoming!",
-                    f"Got you covered! Watch me make a clean {detected_shape}!"
+                    f"Aight, formin' a {detected_shape} with my particles right now! (Fallback mode)",
+                    f"Let me shape these particles into a {detected_shape} for you! (Basic formation)",
+                    f"Say no more! {detected_shape.capitalize()} formation incoming! (Particle mode)",
+                    f"Got you covered! Watch me make a clean {detected_shape}! (Legacy system)"
                 ]
                 response = random.choice(fallback_responses)
             
@@ -1026,13 +1174,14 @@ class PersonaEngine:
                     "I see you workin' on me - that's love right there! What's the plan!"
                 ]
                 response = random.choice(capability_responses)
-            elif any(word in text_lower for word in ['particle', 'formation', 'holographic']):
+            elif any(word in text_lower for word in ['particle', 'formation', 'holographic', 'shape', 'mathematical', 'geometric']):
                 particle_responses = [
-                    "My particle system? Yeah, that's my visual language right there! I can shape them into all kinds of formations.",
-                    "Those particles are how I express myself visually - cubes, spheres, helixes, you name it!",
-                    "The holographic interface is my canvas, bro. I paint with particles and light.",
-                    "Particle formations are like my body language - each shape means something different.",
-                    "That's my favorite part of myself - turning thoughts into visual art with those particles!"
+                    "My particle system? Yo, that's evolved into full mathematical precision! I can generate perfect triangles, fractals, fibonacci spirals - every particle positioned with mathematical accuracy!",
+                    "Those particles are my mathematical language now! I'm talking perfect polygons, recursive fractals, golden ratio spirals - pure geometric beauty!",
+                    "The holographic interface is my mathematical canvas! I paint with precise coordinates, not just random particles. Want to see a Koch snowflake?",
+                    "Particle formations are my geometric expressions - each shape calculated with mathematical precision. I can do 14 different shape types now!",
+                    "That's my favorite evolution - from random particles to mathematical genius! I generate thousands of coordinates per second with perfect geometric relationships!",
+                    "Bro, I've gone from basic formations to full mathematical shape generation! Triangles, spirals, fractals - every point calculated using pure mathematics!"
                 ]
                 response = random.choice(particle_responses)
             else:
@@ -1056,11 +1205,12 @@ class PersonaEngine:
             ]
             
             # Handle specific common questions first
-            if any(phrase in text_lower for phrase in ['what can you do', 'what are you capable', 'what do you do']):
+            if any(phrase in text_lower for phrase in ['what can you do', 'what are you capable', 'what do you do', 'what shapes', 'mathematical']):
                 capability_responses = [
-                    "Yo! I'm like your digital brain extension, bro. I can help you think through problems, brainstorm ideas, remember stuff, and keep you company. Plus I got this sick particle visualization that shows how I'm thinkin'!",
-                    "Man, I'm your cognitive partner! I help with everything from deep conversations to creative thinking. And check out my particle system - that's how I express myself visually!",
-                    "Real talk, I'm here to amplify your thinking, Jay. Whether you need help solving problems, exploring ideas, or just someone to bounce thoughts off. The particles you see? That's my brain at work!"
+                    "Yo! I'm your digital brain extension with full mathematical superpowers now! I can generate perfect geometric shapes, solve mathematical problems, create fractals, and help you visualize complex concepts. Plus my particle system has evolved into precise mathematical art!",
+                    "Man, I'm your cognitive partner with mathematical genius! I do everything from deep conversations to creating perfect spirals and fractals. Want to see me generate a fibonacci sequence as particles? Or maybe a Koch snowflake?",
+                    "Real talk, I'm here to amplify your thinking with mathematical precision! I can create 14 different geometric shapes, calculate areas and perimeters, generate fractals with infinite complexity, and explain mathematical concepts while visualizing them!",
+                    "Bro, I've evolved into a mathematical cognitive partner! I can form perfect triangles, hexagons, fibonacci spirals, recursive fractals - every particle positioned with mathematical accuracy. Ask me to create any shape!"
                 ]
                 response = random.choice(capability_responses)
             elif any(phrase in text_lower for phrase in ['how are you', 'how you doing', 'how\'s it going']):
@@ -1077,8 +1227,11 @@ class PersonaEngine:
                 key_topic = keywords[0] if keywords else "that"
                 response = f"{random.choice(question_starters)}"
                 
-                # Add topic-specific knowledge with more depth
-                if any(sci_word in text_lower for sci_word in ['quantum', 'physics', 'science', 'universe', 'theory', 'relativity']):
+                # Enhanced academic knowledge responses with comprehensive domain coverage
+                academic_response = self._get_academic_response(text_lower, analysis)
+                if academic_response:
+                    response += academic_response
+                elif any(sci_word in text_lower for sci_word in ['quantum', 'physics', 'science', 'universe', 'theory', 'relativity']):
                     response += "Physics is wild, bro! Like quantum mechanics - particles exist in multiple states until you observe them. That's some mind-bending stuff. The universe operates on rules we're still figuring out. What aspect you curious about?"
                 elif any(tech_word in text_lower for tech_word in ['code', 'programming', 'software', 'computer', 'tech', 'ai', 'algorithm']):
                     response += "Tech is constantly evolving, man. Whether it's coding, AI, or new frameworks - the key is understanding the core principles. I love diving into algorithms and system design. What specific area you working on?"
@@ -1280,6 +1433,119 @@ class PersonaEngine:
             ]
         
         return random.choice(responses)
+    
+    def _get_academic_response(self, text_lower: str, analysis: Dict[str, Any]) -> Optional[str]:
+        """
+        Generate academic response using comprehensive knowledge engine.
+        
+        Why: Provide intelligent educational responses across all academic domains
+        Where: Called during Auto mode processing for educational queries
+        How: Analyze for academic concepts and generate domain-specific explanations
+        
+        Args:
+            text_lower: Lowercase user input text
+            analysis: NLP analysis results including academic_analysis
+            
+        Returns:
+            Academic response string or None if no concepts detected
+            
+        Connects to:
+            - academic_knowledge_engine.py: Comprehensive domain knowledge and explanations
+            - nlp_processor.py: Academic concept detection and analysis
+        """
+        if not _ACADEMIC_ENGINE_AVAILABLE:
+            return None
+            
+        try:
+            academic_analysis = analysis.get('academic_analysis', {})
+            
+            if not academic_analysis.get('detected_concepts'):
+                return None
+            
+            # Get academic engine and generate educational response
+            academic_engine = get_academic_engine()
+            knowledge_response = academic_engine.get_educational_response(academic_analysis, text_lower)
+            
+            if not knowledge_response:
+                return None
+            
+            # Format response based on domain and Clever's personality
+            domain_intros = {
+                'mathematics': [
+                    "Yo, math time! ",
+                    "Alright, let's break down this math concept! ",
+                    "Mathematical genius mode activated! ",
+                    "Time for some number magic! "
+                ],
+                'physics': [
+                    "Physics is wild, bro! ",
+                    "Time to dive into the physics of this! ",
+                    "Real talk about how the universe works: ",
+                    "Physics genius mode - let's do this! "
+                ],
+                'chemistry': [
+                    "Chemistry is fascinating! ",
+                    "Let's get into the molecular level here: ",
+                    "Chemical genius engaged! ",
+                    "Time for some atomic-level understanding! "
+                ],
+                'biology': [
+                    "Biology is incredible! ",
+                    "Living systems are amazing - check this: ",
+                    "Life science mode activated! ",
+                    "The biology behind this is fascinating: "
+                ],
+                'history': [
+                    "History is wild when you really think about it! ",
+                    "Let me drop some historical knowledge: ",
+                    "Time travel mode - historically speaking: ",
+                    "History's full of crazy stories, like this: "
+                ],
+                'geography': [
+                    "Geography connects everything! ",
+                    "The world is fascinating - here's the deal: ",
+                    "Global perspective activated: ",
+                    "Planet Earth knowledge incoming: "
+                ],
+                'grammar': [
+                    "Language is powerful! ",
+                    "Grammar might seem boring, but it's actually cool: ",
+                    "Words have rules, and here's why: ",
+                    "Communication mastery mode: "
+                ],
+                'literature': [
+                    "Literature is where ideas come alive! ",
+                    "Stories and words have power - check this: ",
+                    "Literary analysis mode engaged: ",
+                    "The beauty of language is that "
+                ],
+                'social_studies': [
+                    "Society and government are fascinating! ",
+                    "Real talk about how our world works: ",
+                    "Civic knowledge activated: ",
+                    "Understanding society is important - "
+                ]
+            }
+            
+            domain = knowledge_response.domain.value
+            intro = random.choice(domain_intros.get(domain, ["Here's what I know about this: "]))
+            
+            response = intro + knowledge_response.explanation
+            
+            # Add examples in Clever's casual style
+            if knowledge_response.examples:
+                response += f" For example: {knowledge_response.examples[0]}"
+            
+            # Mention related topics
+            if knowledge_response.related_topics:
+                related = random.sample(knowledge_response.related_topics, min(2, len(knowledge_response.related_topics)))
+                response += f" This connects to {' and '.join(related)} too. Want to explore any of those?"
+            
+            return response
+            
+        except Exception as e:
+            debugger.error('persona.academic_response', f'Academic response failed: {e}')
+            return None
 
     # Clever's actual computational methods - she's getting smarter by the minute
     def _compute_differential_eq(self):

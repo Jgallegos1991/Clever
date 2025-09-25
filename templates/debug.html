@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+    <style>
+        body { 
+            background: red; 
+            color: white; 
+            font-size: 24px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Test Page</h1>
+    <p>If you see this, the Flask server is working.</p>
+    <p>Background should be red.</p>
+    
+    <script>
+        console.log('JavaScript is working');
+        document.body.style.background = 'blue';
+        setTimeout(() => {
+            document.body.innerHTML += '<p>JavaScript executed successfully - background changed to blue</p>';
+        }, 1000);
+    </script>
+</body>
+</html>

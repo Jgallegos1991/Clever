@@ -13,6 +13,14 @@ All notable changes to Clever are documented here. This is the canonical changel
 
 ### Added (Unreleased)
 
+- **🧠 MAJOR: Cognitive Shape Engine** - Revolutionary intelligent shape generation system (`cognitive_shape_engine.py`, 567 lines) connecting Clever's particle formation to her memory and cognitive systems. Fulfills original vision of shapes connected to her mind with:
+  - **Memory Integration**: Learns aesthetic preferences and adapts future generations
+  - **Emotional Intelligence**: Shape complexity/colors respond to user emotional state  
+  - **Contextual Awareness**: Uses conversation history for cognitive enhancement
+  - **Preference Learning**: Builds personalized aesthetic profiles over time
+  - **Advanced Metadata**: Each shape includes cognitive enhancement markers, emotional resonance scores, complexity adaptation, and personalization levels
+  - **Mathematical Sophistication**: Generates up to 195+ coordinates with fractal precision
+  - Integration with `persona.py` for seamless cognitive-enhanced shape responses
 - Placeholder tests `tests/test_util_placeholders.py` safeguarding return contracts for `summarize_repo.summarize()` and `self_fix.plan_self_fixes()`.
 - Runtime introspection system: `introspection.py`, `/api/runtime_introspect` endpoint, and optional `?debug=1` overlay. Converts Why/Where/How docstring pattern into live navigational graph ("arrows between dots") showing recent template renders, endpoint reasoning metadata, persona mode, last error, and git hash for effortless debugging.
 - Follow-up introspection enhancements: slow render flag (heuristic threshold), evolution interaction counters, drift warnings (missing Why/Where/How), accessible ARIA live region announcing AI messages, CLI snapshot tool (`tools/runtime_dump.py`).

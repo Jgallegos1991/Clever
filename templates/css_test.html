@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clever CSS Test</title>
+    <style>
+        :root {
+            --bg-primary: #0B0F14;
+            --bg-secondary: #1A1F26;
+            --text-primary: #FFFFFF;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0F1419 50%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .test-content {
+            text-align: center;
+            padding: 20px;
+            background: rgba(26, 31, 38, 0.8);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-content">
+        <h1>Clever CSS Test</h1>
+        <p>If you can see this with a dark background, CSS is working correctly.</p>
+        <p>Background should be dark blue/black gradient.</p>
+        <p>Text should be white.</p>
+    </div>
+</body>
+</html>

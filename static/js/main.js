@@ -283,18 +283,25 @@ async function handleMessageSubmit() {
         if (data.shape_data && holographicChamber && typeof holographicChamber.createMathematicalShape === 'function') {
             console.log('📐 Processing mathematical shape data:', data.shape_data);
             
-            // Create mathematical shape formation
+            // Create mathematical shape formation with rotation
             holographicChamber.createMathematicalShape(data.shape_data);
             
             // Set to creative mode temporarily to highlight the mathematical shape
             holographicChamber.setMode('creative');
             
-            // Return to observing mode after shape is formed
+            // Start shape rotation after formation completes (1 second delay)
+            setTimeout(() => {
+                if (holographicChamber && typeof holographicChamber.startShapeRotation === 'function') {
+                    holographicChamber.startShapeRotation();
+                }
+            }, 1000);
+            
+            // Return to observing mode after full rotation sequence (10 seconds total)
             setTimeout(() => {
                 if (holographicChamber && typeof holographicChamber.setMode === 'function') {
                     holographicChamber.setMode('observing');
                 }
-            }, 3000);
+            }, 10000);
         }
         // Handle legacy particle commands for backwards compatibility
         else if (data.requested_shape && holographicChamber) {

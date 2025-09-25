@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Formation Debug Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #111;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 1px solid #333;
+            background: #000;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0088ff;
+        }
+        .info {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Shape Formation Debug Test</h1>
+    <p>Testing mathematical shape generation and particle formation</p>
+    
+    <canvas id="testCanvas" width="800" height="600"></canvas>
+    
+    <div class="controls">
+        <button onclick="testTriangle()">Test Triangle</button>
+        <button onclick="testCircle()">Test Circle</button>
+        <button onclick="testHexagon()">Test Hexagon</button>
+        <button onclick="testApiTriangle()">API Triangle</button>
+        <button onclick="resetParticles()">Reset Particles</button>
+    </div>
+    
+    <div class="info" id="debugInfo">Ready for testing...</div>
+
+    <script>
+        // Simplified particle system for debugging
+        class DebugParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.targetX = x;
+                this.targetY = y;
+                this.isInFormation = false;
+                this.formationStrength = 0.2;
+                this.size = 3;
+            }
+            
+            update() {
+                if (this.isInFormation) {
+                    const dx = this.targetX - this.x;
+                    const dy = this.targetY - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 1) {
+                        // Strong formation force for debugging
+                        this.vx += dx * 0.02;
+                        this.vy += dy * 0.02;
+                    }
+                }
+                
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+            }
+            
+            draw(ctx) {
+                ctx.fillStyle = this.isInFormation ? '#00ff00' : '#0088ff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw target if in formation
+                if (this.isInFormation) {
+                    ctx.strokeStyle = '#ffff00';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(this.targetX, this.targetY, 2, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Setup
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const debugInfo = document.getElementById('debugInfo');
+        
+        // Create 30 particles randomly distributed
+        for (let i = 0; i < 30; i++) {
+            particles.push(new DebugParticle(
+                Math.random() * canvas.width,
+                Math.random() * canvas.height
+            ));
+        }
+        
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw(ctx);
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+        
+        // Test functions
+        function testTriangle() {
+            debugInfo.textContent = 'Testing triangle formation...';
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 150;
+            
+            // Create triangle points
+            const trianglePoints = [];
+            for (let i = 0; i < 3; i++) {
+                const angle = (i * 2 * Math.PI / 3) - Math.PI / 2;
+                trianglePoints.push({
+                    x: centerX + Math.cos(angle) * radius,
+                    y: centerY + Math.sin(angle) * radius
+                });
+            }
+            
+            // Distribute particles to triangle points (10 per vertex)
+            for (let i = 0; i < Math.min(particles.length, 30); i++) {
+                const pointIndex = Math.floor(i / 10) % 3;
+                const point = trianglePoints[pointIndex];
+                
+                particles[i].targetX = point.x + (Math.random() - 0.5) * 10;
+                particles[i].targetY = point.y + (Math.random() - 0.5) * 10;
+                particles[i].isInFormation = true;
+            }
+            
+            debugInfo.textContent = `Triangle formation: ${trianglePoints.length} vertices, ${particles.length} particles`;
+        }
+        
+        function testCircle() {
+            debugInfo.textContent = 'Testing circle formation...';
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 120;
+            
+            particles.forEach((particle, i) => {
+                const angle = (i / particles.length) * 2 * Math.PI;
+                particle.targetX = centerX + Math.cos(angle) * radius;
+                particle.targetY = centerY + Math.sin(angle) * radius;
+                particle.isInFormation = true;
+            });
+            
+            debugInfo.textContent = `Circle formation: ${particles.length} particles on circumference`;
+        }
+        
+        function testHexagon() {
+            debugInfo.textContent = 'Testing hexagon formation...';
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 100;
+            
+            // Create hexagon points
+            const hexPoints = [];
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * Math.PI / 3);
+                hexPoints.push({
+                    x: centerX + Math.cos(angle) * radius,
+                    y: centerY + Math.sin(angle) * radius
+                });
+            }
+            
+            // Distribute particles
+            particles.forEach((particle, i) => {
+                const pointIndex = i % 6;
+                const point = hexPoints[pointIndex];
+                
+                particle.targetX = point.x + (Math.random() - 0.5) * 15;
+                particle.targetY = point.y + (Math.random() - 0.5) * 15;
+                particle.isInFormation = true;
+            });
+            
+            debugInfo.textContent = `Hexagon formation: 6 vertices, ${particles.length} particles distributed`;
+        }
+        
+        async function testApiTriangle() {
+            debugInfo.textContent = 'Testing API triangle formation...';
+            
+            try {
+                const response = await fetch('/api/generate_shape', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ shape: 'triangle' })
+                });
+                
+                const data = await response.json();
+                debugInfo.textContent = `API Response: ${data.message}`;
+                
+                if (data.success && data.shape) {
+                    const shapeData = data.shape;
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    
+                    // Simple scaling
+                    const scale = 0.8;
+                    
+                    // Map API points to particles
+                    const pointsNeeded = Math.min(particles.length, shapeData.points.length);
+                    for (let i = 0; i < pointsNeeded; i++) {
+                        const point = shapeData.points[i];
+                        particles[i].targetX = centerX + point.x * scale;
+                        particles[i].targetY = centerY + point.y * scale;
+                        particles[i].isInFormation = true;
+                    }
+                    
+                    debugInfo.textContent = `API Triangle: ${pointsNeeded} particles mapped from ${shapeData.points.length} points`;
+                }
+            } catch (error) {
+                debugInfo.textContent = `API Error: ${error.message}`;
+            }
+        }
+        
+        function resetParticles() {
+            particles.forEach(particle => {
+                particle.x = Math.random() * canvas.width;
+                particle.y = Math.random() * canvas.height;
+                particle.vx = 0;
+                particle.vy = 0;
+                particle.isInFormation = false;
+            });
+            debugInfo.textContent = 'Particles reset to random positions';
+        }
+    </script>
+</body>
+</html>

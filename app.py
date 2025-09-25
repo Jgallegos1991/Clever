@@ -180,6 +180,11 @@ def home():
     )
 
 
+@app.route('/debug')
+def debug():
+    """Temporary debug route to test rendering"""
+    return render_template('debug.html')
+
 @app.route('/api/chat', methods=['POST'])
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -233,6 +238,19 @@ def chat():
                 'particle_command': getattr(persona_response, 'particle_command', None),  # Shape formation command
                 'status': 'success'
             }
+            
+            # Add shape data for mathematical visualization if available
+            debugger.info("app.chat", f"Has context attr: {hasattr(persona_response, 'context')}")
+            if hasattr(persona_response, 'context'):
+                debugger.info("app.chat", f"Context keys: {list(persona_response.context.keys())}")
+                if 'shape_data' in persona_response.context:
+                    debugger.info("app.chat", "Adding shape_data to response")
+                    response['shape_data'] = persona_response.context['shape_data']
+                if 'requested_shape' in persona_response.context:
+                    debugger.info("app.chat", f"Adding requested_shape: {persona_response.context['requested_shape']}")
+                    response['requested_shape'] = persona_response.context['requested_shape']
+            else:
+                debugger.info("app.chat", "No context found on persona response")
             
             # Log interaction for evolution engine
             try:
