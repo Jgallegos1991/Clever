@@ -1,3 +1,37 @@
+# single-db-guard.yml - Single Database Architecture Enforcement Workflow
+#
+# Why: Enforces Clever's "single unified memory system" (clever.db) architectural constraint
+#      to maintain cognitive partnership system integrity and prevent database fragmentation
+# Where: GitHub Actions CI/CD pipeline for database architecture validation and compliance
+# How: Static analysis + runtime validation of database references, config usage, and schema integrity
+#
+# File Usage:
+#     - Triggered by: Push/PR events affecting database-related files (*.py, config.py, database.py, app.py)
+#     - Validates: Single database policy (only clever.db allowed), config.DB_PATH usage, schema integrity
+#     - Enforces: Architectural constraints critical to Clever's cognitive partnership system
+#     - Prevents: Database fragmentation that would break continuous learning and relationship building
+#     - Reports: Compliance status via GitHub Actions summary and failure notifications
+#
+# Connects to:
+#     - config.py: Validates DB_PATH configuration as single source of truth for database location
+#     - database.py: Ensures DatabaseManager uses config.DB_PATH and maintains thread safety
+#     - app.py: Validates main application follows single database architecture
+#     - clever.db: Core unified memory system for Clever's cognitive partnership
+#     - ci.yml: Complementary CI workflow for broader system validation
+#     - clever-ci.yml: Advanced CI with documentation and reasoning validation
+#
+# Performance Notes:
+#     - Memory usage: Minimal (grep-based static analysis)
+#     - CPU impact: Low (simple text processing and file checks)
+#     - I/O operations: File system scanning for database references
+#     - Scaling limits: Linear with codebase size (grep operations)
+#
+# Critical Dependencies:
+#     - Required packages: None (uses standard shell tools)
+#     - System requirements: Linux/Unix environment with grep, wc
+#     - Database schema: Validates clever.db existence and config integration
+#     - Architectural constraint: Single database policy for cognitive partnership system
+
 name: Single Database Guard
 
 on:
@@ -21,36 +55,99 @@ jobs:
       - name: Verify single database usage
         run: |
           echo "Verifying only clever.db is referenced and config.DB_PATH is source of truth"
+          echo "::group::Database Reference Scan"
+          
           # Count occurrences of .db references excluding clever.db and migrations/tools
-          DB_REFERENCES=$(grep -R "\.db" -n . | grep -v "clever.db" | grep -v ".git" | wc -l || true)
+          DB_REFERENCES=$(grep -R "\.db" -n . | grep -v "clever.db" | grep -v ".git" | grep -v "__pycache__" | grep -v "\.pyc" | wc -l || true)
           if [ "$DB_REFERENCES" -gt 0 ]; then
-            echo "Found unexpected .db references (excluding clever.db)." >&2
-            grep -R "\.db" -n . | grep -v "clever.db" | grep -v ".git" || true
+            echo "::error::Found unexpected .db references (excluding clever.db)"
+            echo "Clever's cognitive partnership system requires single database architecture"
+            grep -R "\.db" -n . | grep -v "clever.db" | grep -v ".git" | grep -v "__pycache__" | grep -v "\.pyc" || true
             exit 1
           fi
+          
+          echo "✅ No unauthorized database references found"
+          echo "::endgroup::"
 
+          echo "::group::Configuration Validation"
           # Ensure config.DB_PATH definition exists
           if ! grep -R "DB_PATH" config.py >/dev/null 2>&1; then
-            echo "config.DB_PATH not defined" >&2
+            echo "::error::config.DB_PATH not defined - violates single database architecture"
             exit 1
           fi
+          echo "✅ config.DB_PATH definition found"
 
           # Ensure database.py imports config and uses DB_PATH
-            if ! grep -R "DB_PATH" database.py >/dev/null 2>&1; then
-              echo "database.py does not reference DB_PATH" >&2
-              exit 1
-            fi
-
-          echo "Single database policy OK"
-
-      - name: Fail if clever.db missing
-        run: |
-          if [ ! -f clever.db ]; then
-            echo "Expected clever.db file is missing (should exist or be created at runtime)." >&2
-            # Not failing hard for historical reasons; warn.
-            echo "::warning::clever.db missing in repo snapshot"
+          if ! grep -R "DB_PATH" database.py >/dev/null 2>&1; then
+            echo "::error::database.py does not reference DB_PATH - breaks cognitive partnership integrity"
+            exit 1
           fi
+          echo "✅ database.py correctly uses DB_PATH"
+          echo "::endgroup::"
+
+          echo "::group::Architecture Compliance Check"
+          # Verify DatabaseManager class uses proper patterns
+          if ! grep -q "DatabaseManager" database.py; then
+            echo "::warning::DatabaseManager class not found in database.py"
+          else
+            echo "✅ DatabaseManager class present"
+          fi
+          
+          # Check for thread safety (_lock usage)
+          if grep -q "_lock" database.py; then
+            echo "✅ Thread safety implementation detected"
+          else
+            echo "::warning::Thread safety (_lock) pattern not detected"
+          fi
+          echo "::endgroup::"
+
+          echo "🧠 Single database policy OK - Cognitive partnership architecture intact"
+
+      - name: Database existence and integrity check
+        run: |
+          echo "::group::Database File Validation"
+          if [ ! -f clever.db ]; then
+            echo "::warning::clever.db missing in repo snapshot (will be created at runtime)"
+            echo "This is normal for fresh deployments - Clever creates unified memory on first run"
+          else
+            echo "✅ clever.db present in repository"
+            # Basic integrity check if sqlite3 is available
+            if command -v sqlite3 >/dev/null 2>&1; then
+              if sqlite3 clever.db "PRAGMA integrity_check;" >/dev/null 2>&1; then
+                echo "✅ Database integrity check passed"
+              else
+                echo "::warning::Database integrity check failed - may need regeneration"
+              fi
+            fi
+          fi
+          echo "::endgroup::"
+
+      - name: Digital sovereignty validation
+        run: |
+          echo "::group::Offline Architecture Compliance"
+          # Check for external database connections or cloud dependencies
+          if grep -r -i "postgresql\|mysql\|mongodb\|redis\|firebase" --include="*.py" . >/dev/null 2>&1; then
+            echo "::error::External database dependencies detected - violates digital sovereignty"
+            grep -r -i "postgresql\|mysql\|mongodb\|redis\|firebase" --include="*.py" . || true
+            exit 1
+          fi
+          echo "✅ No external database dependencies found"
+          
+          # Verify offline_guard integration
+          if grep -r "offline_guard" --include="*.py" . >/dev/null 2>&1; then
+            echo "✅ Offline architecture protection detected"
+          else
+            echo "::warning::offline_guard not detected - verify digital sovereignty measures"
+          fi
+          echo "::endgroup::"
 
       - name: Summary
         run: |
-          echo "All single DB guard checks passed" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧠 Single Database Guard Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Single Database Architecture**: Only clever.db detected" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Configuration Integrity**: config.DB_PATH properly configured" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Digital Sovereignty**: No external database dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Cognitive Partnership**: Unified memory system architecture intact" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Clever's single database policy ensures continuous learning and relationship building" >> $GITHUB_STEP_SUMMARY
