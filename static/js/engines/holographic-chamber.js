@@ -1,19 +1,19 @@
 /**
- * holographic-chamber.js - Particle System Engine for Clever's Cognitive Enhancement Interface
+ * holographic-chamber.js - Particle System Engine for Clever Cognitive Enhancement Interface
  * 
- * Why: Creates cognitive visualization representing Clever's thought processes and mental activity,
+ * Why: Creates cognitive visualization representing Clever thought processes and mental activity,
  * providing immersive visual feedback that enhances the digital brain extension experience.
- * Essential for making Clever's cognitive partnership tangible and engaging through dynamic
+ * Essential for making Clever cognitive partnership tangible and engaging through dynamic
  * particle formations that respond to her thinking patterns and user interactions.
  * 
  * Where: Core particle engine loaded by templates/index.html before main.js initialization.
- * Central visual component of Clever's cognitive enhancement interface and digital brain extension.
+ * Central visual component of Clever cognitive enhancement interface and digital brain extension.
  * 
  * How: Canvas-based particle physics with formation morphing, animations, and cognitive state
  * visualization through dynamic particle behavior and visual themes.
  * 
  * File Usage:
- *     - Cognitive visualization: Primary engine for visualizing Clever's thought processes
+ *     - Cognitive visualization: Primary engine for visualizing Clever thought processes
  *     - User engagement: Creates immersive interface enhancing cognitive partnership experience  
  *     - Performance rendering: Optimized particle system for smooth real-time visualization
  *     - State indication: Visual feedback system for Clever's cognitive and emotional states

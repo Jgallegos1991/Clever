@@ -1,18 +1,18 @@
 /*
 main.js - Clever Digital Brain Extension Main Application Logic
 
-Why: Central JavaScript controller orchestrating Clever's cognitive interface initialization,
+Why: Central JavaScript controller orchestrating Clever cognitive interface initialization,
 particle system management, and user interaction handling for the digital brain extension
-experience. Essential for coordinating all frontend components of Clever's cognitive partnership.
+experience. Essential for coordinating all frontend components of Clever cognitive partnership.
 
 Where: Loaded by templates/index.html as primary script after engine dependencies.
-Core frontend component of Clever's cognitive enhancement interface.
+Core frontend component of Clever cognitive enhancement interface.
 
 How: Coordinates particle system, chat interface, and user interaction handling through
 modular component integration and state management.
 
 File Usage:
-    - Frontend initialization: Primary script for initializing Clever's cognitive interface
+    - Frontend initialization: Primary script for initializing Clever cognitive interface
     - User interaction: Handles all user input and chat interface functionality
     - Particle coordination: Manages holographic particle system integration and lifecycle
     - State management: Maintains frontend application state and cognitive interface status
@@ -41,6 +41,7 @@ console.log('🧠 Clever Digital Brain Extension initializing...');
 let holographicChamber = null;
 let isProcessingMessage = false;
 let cognitiveMaintenanceInterval = null;
+let lastInteractionTime = Date.now(); // Shared interaction timestamp for cognitive state management
 
 // Timing constants for chat bubble lifecycle management
 /*
@@ -73,36 +74,39 @@ function startCognitiveMaintenanceLoop() {
         clearInterval(cognitiveMaintenanceInterval);
     }
     
-    let lastObservationTime = Date.now();
-    
     cognitiveMaintenanceInterval = setInterval(() => {
         if (!holographicChamber) return;
         
-        // Maintain cognitive connection
-        const cognitiveStatus = holographicChamber.maintainCognitiveConnection();
-        
-        // Log cognitive health for debugging
-        console.log('🧠 Cognitive Status:', {
-            coherence: Math.round(cognitiveStatus.coherence * 100) + '%',
-            energy: Math.round(cognitiveStatus.energy * 100) + '%',
-            mode: cognitiveStatus.mode
-        });
-        
-        // Switch to observing mode during extended idle periods
-        const now = Date.now();
-        const timeSinceLastInteraction = now - lastObservationTime;
-        
-        if (timeSinceLastInteraction > IDLE_OBSERVATION_INTERVAL && 
-            holographicChamber.currentMode === 'idle') {
-            holographicChamber.setMode('observing');
-            console.log('🔍 Entered observation mode - Clever is actively observing');
-        }
-        
-        // Return to idle if recently active
-        if (timeSinceLastInteraction < IDLE_OBSERVATION_INTERVAL && 
-            holographicChamber.currentMode === 'observing') {
-            holographicChamber.setMode('idle');
-            lastObservationTime = now;
+        try {
+            // Maintain cognitive connection with error handling
+            const cognitiveStatus = holographicChamber.maintainCognitiveConnection();
+            
+            // Log cognitive health for debugging
+            console.log('🧠 Cognitive Status:', {
+                coherence: Math.round(cognitiveStatus.coherence * 100) + '%',
+                energy: Math.round(cognitiveStatus.energy * 100) + '%',
+                mode: cognitiveStatus.mode
+            });
+            
+            // Switch to observing mode during extended idle periods
+            const now = Date.now();
+            const timeSinceLastInteraction = now - lastInteractionTime;
+            
+            if (timeSinceLastInteraction > IDLE_OBSERVATION_INTERVAL && 
+                holographicChamber.currentMode === 'idle') {
+                holographicChamber.setMode('observing');
+                console.log('🔍 Entered observation mode - Clever is actively observing');
+            }
+            
+            // Return to idle if recently active
+            if (timeSinceLastInteraction < IDLE_OBSERVATION_INTERVAL && 
+                holographicChamber.currentMode === 'observing') {
+                holographicChamber.setMode('idle');
+            }
+            
+        } catch (error) {
+            console.error('❌ Cognitive maintenance error:', error);
+            // Continue maintenance even if individual operations fail
         }
         
     }, COGNITIVE_MAINTENANCE_INTERVAL);
@@ -121,14 +125,14 @@ function updateLastInteraction() {
     if (holographicChamber && holographicChamber.currentMode === 'observing') {
         holographicChamber.setMode('idle');
     }
-    // Update maintenance loop's last interaction tracking
-    window.lastInteractionTime = Date.now();
+    // Update global interaction tracking for maintenance loop
+    lastInteractionTime = Date.now();
 }
 
 /**
  * Initialize Particle System
  * 
- * Why: Start Clever's cognitive visualization representing brain activity
+ * Why: Start Clever cognitive visualization representing brain activity
  * Where: Called during DOMContentLoaded to establish visual foundation
  * How: Targets canvas element and initializes HolographicChamber engine
  * 
@@ -225,16 +229,19 @@ function initializeChatInterface() {
             switch (e.key.toLowerCase()) {
                 case 'c':
                     e.preventDefault();
+                    updateLastInteraction();
                     holographicChamber.setMode('creative');
                     showSystemMessage('🎨 Creative mode activated');
                     break;
                 case 's':
                     e.preventDefault();
+                    updateLastInteraction();
                     holographicChamber.setMode('thinking');
                     showSystemMessage('🧠 Thinking mode activated');
                     break;
                 case 'i':
                     e.preventDefault();
+                    updateLastInteraction();
                     holographicChamber.setMode('idle');
                     showSystemMessage('😌 Idle mode activated');
                     break;
@@ -594,6 +601,7 @@ function initializeKeyboardShortcuts() {
         // Ctrl+Shift+O: Switch to observation mode
         if (e.ctrlKey && e.shiftKey && e.key === 'O') {
             e.preventDefault();
+            updateLastInteraction();
             if (holographicChamber && typeof holographicChamber.setMode === 'function') {
                 holographicChamber.setMode('observing');
                 console.log('🔍 Manual observation mode activated');
@@ -603,6 +611,7 @@ function initializeKeyboardShortcuts() {
         // Ctrl+Shift+I: Return to idle mode
         if (e.ctrlKey && e.shiftKey && e.key === 'I') {
             e.preventDefault();
+            updateLastInteraction();
             if (holographicChamber && typeof holographicChamber.setMode === 'function') {
                 holographicChamber.setMode('idle');
                 console.log('🧠 Returned to idle cognitive mode');
@@ -622,10 +631,11 @@ Where: Available in browser console for runtime inspection
 How: Global window properties for key functions and state
 */
 /** @type {any} */ (window).CleverApp = {
-    holographicChamber,
-    isProcessingMessage,
+    get holographicChamber() { return holographicChamber; },
+    get isProcessingMessage() { return isProcessingMessage; },
     displayMessage,
     showSystemMessage,
+    updateLastInteraction,
     version: '1.0.0'
 };
 
