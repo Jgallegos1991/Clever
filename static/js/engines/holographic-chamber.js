@@ -103,6 +103,9 @@ class Particle {
         this.colorIndex = Math.floor(Math.random() * 3);
         this.pulsePhase = Math.random() * Math.PI * 2;
         this.basePulse = Math.random() * 0.3 + 0.7;
+        
+        // Mathematical properties
+        this.mathematicalPoint = false; // Flag for mathematical shape precision
     }
     
     update() {
@@ -529,8 +532,9 @@ class HolographicChamber {
 
         // Clear all particles from previous formations
         this.particles.forEach(particle => {
-            particle.isInFormation = false;
-            particle.mathematicalPoint = null;
+              particle.isInFormation = false;
+              particle.mathematicalPoint = false;
+                particle.mathematicalPoint = false;
         });
 
         // Assign particles to vertices (one particle per vertex + extra distributed)
