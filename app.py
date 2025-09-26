@@ -683,6 +683,331 @@ def api_available_shapes():
     })
 
 
+# NotebookLM-Inspired Document Analysis API Endpoints
+
+@app.route('/api/analyze_document', methods=['POST'])
+def api_analyze_document():
+    """
+    Analyze a specific document to extract key information and create summary.
+    
+    Why: Provides detailed document analysis for source-grounded responses
+    Where: Called when users want to analyze specific documents in their knowledge base
+    How: Uses NotebookLM engine to extract concepts, topics, and generate summaries
+    
+    Connects to:
+        - notebooklm_engine.py: analyze_document() for comprehensive analysis
+        - database.py: Document retrieval and summary storage
+        - Frontend: Document analysis interface and results display
+    """
+    try:
+        from notebooklm_engine import get_notebooklm_engine
+        
+        data = request.get_json(force=True) or {}
+        source_id = data.get('source_id')
+        force_reprocess = data.get('force_reprocess', False)
+        
+        if not source_id:
+            return jsonify({
+                'success': False,
+                'error': 'source_id is required'
+            }), 400
+        
+        engine = get_notebooklm_engine()
+        start_time = time.time()
+        
+        try:
+            summary = engine.analyze_document(source_id, force_reprocess)
+            processing_time = (time.time() - start_time) * 1000
+            
+            return jsonify({
+                'success': True,
+                'summary': {
+                    'source_id': summary.source_id,
+                    'filename': summary.filename,
+                    'key_concepts': summary.key_concepts,
+                    'main_topics': summary.main_topics,
+                    'summary': summary.summary,
+                    'word_count': summary.word_count,
+                    'reading_time_minutes': summary.reading_time_minutes,
+                    'academic_level': summary.academic_level,
+                    'document_type': summary.document_type
+                },
+                'processing_time_ms': processing_time
+            })
+            
+        except ValueError as e:
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 404
+            
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'NotebookLM engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Document analysis error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error during document analysis'
+        }), 500
+
+
+@app.route('/api/query_documents', methods=['POST'])
+def api_query_documents():
+    """
+    Query across all documents to provide source-grounded response with citations.
+    
+    Why: Enables NotebookLM-style document querying with proper source attribution
+    Where: Primary interface for document-based Q&A and research assistance
+    How: Searches across document collection, ranks relevance, provides citations
+    
+    Connects to:
+        - notebooklm_engine.py: query_documents() for source-grounded responses
+        - persona.py: Enhanced responses with document citations
+        - Frontend: Query interface and citation display
+    """
+    try:
+        from notebooklm_engine import get_notebooklm_engine
+        
+        data = request.get_json(force=True) or {}
+        query = data.get('query', '').strip()
+        max_sources = data.get('max_sources', 5)
+        
+        if not query:
+            return jsonify({
+                'success': False,
+                'error': 'query is required'
+            }), 400
+        
+        engine = get_notebooklm_engine()
+        start_time = time.time()
+        
+        response = engine.query_documents(query, max_sources)
+        processing_time = (time.time() - start_time) * 1000
+        
+        # Log interaction for evolution engine
+        try:
+            from evolution_engine import get_evolution_engine
+            evo = get_evolution_engine()
+            evo.log_interaction({
+                "user_input": query,
+                "active_mode": "DocumentQuery",
+                "action_taken": "query_documents",
+                "sources_found": len(response.source_ids),
+                "synthesis_quality": response.synthesis_quality
+            })
+        except ImportError:
+            pass
+        
+        return jsonify({
+            'success': True,
+            'response': {
+                'text': response.text,
+                'citations': [
+                    {
+                        'source_id': c.source_id,
+                        'filename': c.filename,
+                        'excerpt': c.excerpt,
+                        'confidence': c.confidence,
+                        'page_number': c.page_number
+                    } for c in response.citations
+                ],
+                'confidence': response.confidence,
+                'source_ids': response.source_ids,
+                'synthesis_quality': response.synthesis_quality
+            },
+            'processing_time_ms': processing_time,
+            'sources_searched': max_sources
+        })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'NotebookLM engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Document query error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error during document query'
+        }), 500
+
+
+@app.route('/api/document_connections', methods=['GET'])
+def api_document_connections():
+    """
+    Find connections between documents based on shared concepts and topics.
+    
+    Why: Enables discovery of relationships across document collection
+    Where: Called for research assistance and knowledge mapping
+    How: Analyzes document summaries for overlapping concepts and topics
+    
+    Connects to:
+        - notebooklm_engine.py: find_cross_document_connections() for relationship analysis
+        - database.py: Document summary retrieval and connection storage
+        - Frontend: Connection visualization and exploration interface
+    """
+    try:
+        from notebooklm_engine import get_notebooklm_engine
+        
+        source_id = request.args.get('source_id', type=int)
+        
+        engine = get_notebooklm_engine()
+        start_time = time.time()
+        
+        connections = engine.find_cross_document_connections(source_id)
+        processing_time = (time.time() - start_time) * 1000
+        
+        return jsonify({
+            'success': True,
+            'connections': [
+                {
+                    'source_id_1': conn.source_id_1,
+                    'source_id_2': conn.source_id_2,
+                    'connection_type': conn.connection_type,
+                    'strength': conn.strength,
+                    'shared_concepts': conn.shared_concepts,
+                    'explanation': conn.explanation
+                } for conn in connections
+            ],
+            'total_connections': len(connections),
+            'processing_time_ms': processing_time,
+            'focused_document': source_id
+        })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'NotebookLM engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Document connections error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error during connection analysis'
+        }), 500
+
+
+@app.route('/api/collection_overview', methods=['GET'])
+def api_collection_overview():
+    """
+    Generate comprehensive overview of the entire document collection.
+    
+    Why: Provides high-level understanding of all ingested knowledge
+    Where: Called for collection analysis and research starting points  
+    How: Aggregates document summaries and identifies key themes
+    
+    Connects to:
+        - notebooklm_engine.py: generate_collection_overview() for comprehensive analysis
+        - database.py: Document collection retrieval and statistics
+        - Frontend: Collection dashboard and overview interface
+    """
+    try:
+        from notebooklm_engine import get_notebooklm_engine
+        
+        focus_topic = request.args.get('focus_topic')
+        
+        engine = get_notebooklm_engine()
+        start_time = time.time()
+        
+        overview = engine.generate_collection_overview(focus_topic)
+        processing_time = (time.time() - start_time) * 1000
+        
+        return jsonify({
+            'success': True,
+            'overview': overview,
+            'processing_time_ms': processing_time,
+            'generated_at': time.time()
+        })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'NotebookLM engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Collection overview error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error during overview generation'
+        }), 500
+
+
+@app.route('/api/enhance_ingestion', methods=['POST'])
+def api_enhance_ingestion():
+    """
+    Trigger enhanced analysis of recently ingested documents.
+    
+    Why: Ensures new documents get full NotebookLM-style analysis
+    Where: Called after document ingestion to build comprehensive knowledge base
+    How: Analyzes all documents without summaries using NotebookLM engine
+    
+    Connects to:
+        - notebooklm_engine.py: analyze_document() for each unprocessed document
+        - database.py: Document retrieval and analysis status tracking
+        - Ingestion pipeline: Automatic enhancement of new documents
+    """
+    try:
+        from notebooklm_engine import get_notebooklm_engine
+        
+        engine = get_notebooklm_engine()
+        
+        # Find documents without summaries
+        with db_manager._lock, db_manager._connect() as conn:
+            cursor = conn.execute("""
+                SELECT s.id, s.filename 
+                FROM sources s
+                LEFT JOIN document_summaries ds ON s.id = ds.source_id
+                WHERE ds.source_id IS NULL
+                ORDER BY s.id
+            """)
+            unprocessed_docs = cursor.fetchall()
+        
+        if not unprocessed_docs:
+            return jsonify({
+                'success': True,
+                'message': 'All documents already analyzed',
+                'processed_count': 0,
+                'total_documents': 0
+            })
+        
+        start_time = time.time()
+        processed_count = 0
+        errors = []
+        
+        for doc_id, filename in unprocessed_docs:
+            try:
+                engine.analyze_document(doc_id)
+                processed_count += 1
+            except Exception as e:
+                errors.append(f"{filename}: {str(e)}")
+        
+        processing_time = (time.time() - start_time) * 1000
+        
+        return jsonify({
+            'success': True,
+            'message': f'Enhanced analysis completed for {processed_count} documents',
+            'processed_count': processed_count,
+            'total_documents': len(unprocessed_docs),
+            'errors': errors,
+            'processing_time_ms': processing_time
+        })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'NotebookLM engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Enhanced ingestion error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error during enhanced analysis'
+        }), 500
+
+
     
 if __name__ == '__main__':
     debugger.info("app", "Clever AI starting...")

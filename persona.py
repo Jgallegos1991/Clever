@@ -374,6 +374,18 @@ class PersonaEngine:
             'memory_available': self.memory_available
         }
         
+        # NotebookLM-inspired document querying for source-grounded responses
+        document_response = None
+        document_citations = []
+        try:
+            document_response = self._maybe_handle_document_query(text, keywords, enhanced_context)
+            if document_response:
+                enhanced_context['document_response'] = document_response
+                document_citations = getattr(document_response, 'citations', [])
+                enhanced_context['document_citations'] = document_citations
+        except Exception as e:
+            debugger.warning('persona_engine', f'Document query handling failed: {e}')
+        
         # Detect file search intent before mode routing
         file_search_result = None
         try:
@@ -391,6 +403,9 @@ class PersonaEngine:
 
         if file_search_result is not None:
             response_text = file_search_result
+        elif document_response is not None:
+            # Use NotebookLM-style document-grounded response
+            response_text = self._format_document_response(document_response, text, enhanced_context)
         else:
             # Generate initial draft via selected mode handler
             response_text = mode_handler(text, keywords, enhanced_context, history)
@@ -1546,6 +1561,156 @@ class PersonaEngine:
         except Exception as e:
             debugger.error('persona.academic_response', f'Academic response failed: {e}')
             return None
+
+    # NotebookLM-Inspired Document Intelligence Methods
+    
+    def _maybe_handle_document_query(self, text: str, keywords: List[str], context: Dict[str, Any]):
+        """
+        Check if user query should be answered using document knowledge base.
+        
+        Why: Enables source-grounded responses when user asks about document content
+        Where: Called during response generation to check for document relevance
+        How: Analyzes query intent and searches document collection for relevant answers
+        
+        Connects to:
+            - notebooklm_engine.py: Document querying and analysis capabilities
+            - database.py: Document storage and retrieval
+        """
+        try:
+            from notebooklm_engine import get_notebooklm_engine
+            
+            # Check if this looks like a document-answerable question
+            if not self._is_document_query(text, keywords):
+                return None
+            
+            engine = get_notebooklm_engine()
+            
+            # Query documents for relevant information
+            response = engine.query_documents(text, max_sources=3)
+            
+            # Only return if we have decent confidence and citations
+            if response.confidence > 0.3 and response.citations:
+                debugger.info('persona_engine', f'Document query found {len(response.citations)} citations')
+                return response
+            
+            return None
+            
+        except ImportError:
+            # NotebookLM engine not available - that's fine
+            return None
+        except Exception as e:
+            debugger.warning('persona_engine', f'Document query error: {e}')
+            return None
+    
+    def _is_document_query(self, text: str, keywords: List[str]) -> bool:
+        """
+        Determine if a query should be answered from document knowledge base.
+        
+        Why: Filters queries that would benefit from document-grounded responses
+        Where: Called to decide whether to use NotebookLM-style document search
+        How: Uses heuristics and patterns to identify document-answerable questions
+        """
+        text_lower = text.lower()
+        
+        # Question patterns that suggest document content
+        question_patterns = [
+            r'\bwhat (is|are|does|do)\b',
+            r'\bhow (does|do|can|to)\b', 
+            r'\bwhy (is|are|does|do)\b',
+            r'\bwhen (is|are|was|were)\b',
+            r'\bwhere (is|are|can)\b',
+            r'\bwho (is|are|was|were)\b',
+            r'\bexplain\b',
+            r'\bdescribe\b',
+            r'\btell me about\b',
+            r'\bdefin(e|ition)\b',
+            r'\bsummarize\b',
+            r'\baccording to\b',
+            r'\bin the (document|paper|book|article|text)\b'
+        ]
+        
+        has_question_pattern = any(re.search(pattern, text_lower) for pattern in question_patterns)
+        
+        # Keywords that suggest document content lookup
+        document_keywords = {
+            'research', 'study', 'paper', 'document', 'article', 'book', 
+            'theory', 'method', 'analysis', 'data', 'results', 'findings',
+            'according', 'source', 'reference', 'cite', 'mention',
+            'explain', 'definition', 'concept', 'principle'
+        }
+        
+        has_document_keywords = any(keyword in text_lower for keyword in document_keywords)
+        
+        # Content-seeking indicators
+        content_seeking = any(phrase in text_lower for phrase in [
+            'what does', 'how does', 'why does', 'tell me about',
+            'explain', 'describe', 'definition of', 'meaning of',
+            'according to', 'based on', 'from the', 'in the document'
+        ])
+        
+        return has_question_pattern or has_document_keywords or content_seeking
+    
+    def _format_document_response(self, doc_response, original_query: str, context: Dict[str, Any]) -> Optional[str]:
+        """
+        Format a document-grounded response in Clever's authentic style.
+        
+        Why: Presents source-grounded information in Clever's genius friend personality
+        Where: Called when document query provides relevant information with citations
+        How: Combines document content with Clever's conversational style and citations
+        """
+        if not doc_response or not doc_response.citations:
+            return None
+        
+        response_parts = []
+        
+        # Start with Clever's confident but friendly approach
+        intro_phrases = [
+            "Based on what I've got in my knowledge base, here's what I found:",
+            "I've got some solid info on that from my documents:",
+            "Let me pull from what I know about this:",
+            "Found some relevant stuff in my files:",
+            "Here's what the research shows:"
+        ]
+        
+        response_parts.append(random.choice(intro_phrases))
+        response_parts.append("")  # Add blank line
+        
+        # Add the main document response
+        response_parts.append(doc_response.text)
+        
+        # Add citation information in Clever's style
+        if doc_response.citations:
+            response_parts.append("")
+            response_parts.append("📚 Sources:")
+            
+            for i, citation in enumerate(doc_response.citations[:3], 1):  # Limit to top 3
+                # Format citation with confidence indicator
+                confidence_indicator = ""
+                if citation.confidence > 0.8:
+                    confidence_indicator = " (high confidence)"
+                elif citation.confidence > 0.6:
+                    confidence_indicator = " (good match)"
+                elif citation.confidence > 0.4:
+                    confidence_indicator = " (partial match)"
+                
+                response_parts.append(f"{i}. {citation.filename}{confidence_indicator}")
+                
+                # Add a snippet of the excerpt
+                excerpt = citation.excerpt[:150] + "..." if len(citation.excerpt) > 150 else citation.excerpt
+                response_parts.append(f"   \"{excerpt}\"")
+        
+        # Add Clever's follow-up based on synthesis quality
+        if doc_response.synthesis_quality == 'synthesized':
+            response_parts.append("")
+            response_parts.append("I connected info from multiple sources there - pretty neat how it all ties together, right?")
+        elif doc_response.synthesis_quality == 'direct':
+            response_parts.append("")
+            response_parts.append("That's straight from the source - couldn't ask for clearer info!")
+        elif len(doc_response.citations) > 1:
+            response_parts.append("")
+            response_parts.append("Found that across a few different documents. Want me to dig deeper into any particular aspect?")
+        
+        return '\n'.join(response_parts)
 
     # Clever's actual computational methods - she's getting smarter by the minute
     def _compute_differential_eq(self):
