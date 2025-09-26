@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clever Frontend Debug</title>
+    <style>
+        body { background: #0a0a0a; color: #00ff88; font-family: monospace; padding: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #333; }
+        .error { color: #ff4444; }
+        .success { color: #00ff88; }
+        .warning { color: #ffaa00; }
+        button { background: #333; color: #00ff88; border: 1px solid #555; padding: 10px; margin: 5px; }
+        #particles { position: fixed; top: 0; left: 0; z-index: -1; }
+        #chat-log { max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧠 Clever Frontend Debug Interface</h1>
+    
+    <div class="debug-section">
+        <h2>Script Loading Status</h2>
+        <div id="script-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Particle System Test</h2>
+        <canvas id="particles" width="800" height="400"></canvas>
+        <div id="particle-status"></div>
+        <button onclick="testParticleSystem()">Test Particle System</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Chat System Test</h2>
+        <div id="chat-log"></div>
+        <input type="text" id="debug-input" placeholder="Test message..." style="width: 300px; background: #222; color: #fff; border: 1px solid #555;">
+        <button onclick="testChatSystem()">Test Chat</button>
+        <div id="chat-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>API Test</h2>
+        <button onclick="testAPI()">Test /api/chat</button>
+        <div id="api-status"></div>
+    </div>
+
+    <!-- Load scripts in same order as main template -->
+    <script src="/static/js/engines/holographic-chamber.js"></script>
+    <script src="/static/js/components/chat-fade.js"></script>
+    <script src="/static/js/components/cognitive-status.js"></script>
+    
+    <script>
+        console.log('🔍 Debug interface loading...');
+        
+        // Check script loading
+        function checkScriptStatus() {
+            const status = document.getElementById('script-status');
+            let html = '';
+            
+            // Check holographic chamber
+            if (typeof window.startHolographicChamber === 'function') {
+                html += '<div class="success">✅ Holographic Chamber: Loaded</div>';
+            } else {
+                html += '<div class="error">❌ Holographic Chamber: Missing</div>';
+            }
+            
+            // Check chat fade
+            if (typeof window.createChatBubble === 'function') {
+                html += '<div class="success">✅ Chat Fade: Loaded</div>';
+            } else {
+                html += '<div class="error">❌ Chat Fade: Missing</div>';
+            }
+            
+            // Check cognitive status
+            if (typeof window.createCognitiveStatusOverlay === 'function') {
+                html += '<div class="success">✅ Cognitive Status: Loaded</div>';
+            } else {
+                html += '<div class="error">❌ Cognitive Status: Missing</div>';
+            }
+            
+            status.innerHTML = html;
+        }
+        
+        // Test particle system
+        function testParticleSystem() {
+            const canvas = document.getElementById('particles');
+            const status = document.getElementById('particle-status');
+            
+            try {
+                if (typeof window.startHolographicChamber === 'function') {
+                    const chamber = window.startHolographicChamber(canvas);
+                    if (chamber) {
+                        chamber.animate();
+                        status.innerHTML = '<div class="success">✅ Particle system initialized and animating</div>';
+                    } else {
+                        status.innerHTML = '<div class="error">❌ Chamber initialization returned null</div>';
+                    }
+                } else {
+                    status.innerHTML = '<div class="error">❌ startHolographicChamber function not available</div>';
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Particle system error: ${error.message}</div>`;
+                console.error('Particle system error:', error);
+            }
+        }
+        
+        // Test chat system
+        function testChatSystem() {
+            const input = document.getElementById('debug-input');
+            const status = document.getElementById('chat-status');
+            const message = input.value.trim();
+            
+            if (!message) {
+                status.innerHTML = '<div class="warning">⚠️ Enter a test message</div>';
+                return;
+            }
+            
+            try {
+                if (typeof window.createChatBubble === 'function') {
+                    window.createChatBubble(message, 'user');
+                    window.createChatBubble('Test response from Clever', 'clever');
+                    status.innerHTML = '<div class="success">✅ Chat bubbles created</div>';
+                    input.value = '';
+                } else {
+                    status.innerHTML = '<div class="error">❌ createChatBubble function not available</div>';
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Chat system error: ${error.message}</div>`;
+                console.error('Chat system error:', error);
+            }
+        }
+        
+        // Test API
+        async function testAPI() {
+            const status = document.getElementById('api-status');
+            status.innerHTML = '<div class="warning">⏳ Testing API...</div>';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'Debug test' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    status.innerHTML = `<div class="success">✅ API working: ${data.response || 'No response'}</div>`;
+                } else {
+                    status.innerHTML = `<div class="error">❌ API error: ${response.status} ${response.statusText}</div>`;
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ API request failed: ${error.message}</div>`;
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 Debug interface ready');
+            checkScriptStatus();
+        });
+        
+        // Check status every few seconds
+        setInterval(checkScriptStatus, 3000);
+    </script>
+</body>
+</html>
