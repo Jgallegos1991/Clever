@@ -1607,48 +1607,60 @@ class PersonaEngine:
         Determine if a query should be answered from document knowledge base.
         
         Why: Filters queries that would benefit from document-grounded responses
-        Where: Called to decide whether to use NotebookLM-style document search
-        How: Uses heuristics and patterns to identify document-answerable questions
+        Where: Called to decide whether to use NotebookLM-style document search  
+        How: Uses specific patterns to identify document research queries vs personal chat
         """
         text_lower = text.lower()
         
-        # Question patterns that suggest document content
-        question_patterns = [
-            r'\bwhat (is|are|does|do)\b',
-            r'\bhow (does|do|can|to)\b', 
-            r'\bwhy (is|are|does|do)\b',
-            r'\bwhen (is|are|was|were)\b',
-            r'\bwhere (is|are|can)\b',
-            r'\bwho (is|are|was|were)\b',
-            r'\bexplain\b',
-            r'\bdescribe\b',
-            r'\btell me about\b',
-            r'\bdefin(e|ition)\b',
-            r'\bsummarize\b',
-            r'\baccording to\b',
-            r'\bin the (document|paper|book|article|text)\b'
+        # PERSONAL/CONVERSATIONAL exclusions - these should NOT be document queries
+        personal_patterns = [
+            r'\bhow are you\b',
+            r'\bhow do you feel\b',
+            r'\bhow are you (doing|feeling)\b',
+            r'\byour (current|own) (capabilities|abilities|feelings|thoughts|mood|state)\b',
+            r'\bwhat can you (do|help)\b',
+            r'\btell me about (you|yourself|your)\b',
+            r'\bwho are you\b',
+            r'\bwhat are you\b',
+            r'\byour (name|personality|mood)\b',
+            r'\b(current|your) mood\b',
+            r'\bwhat.*thinking about\b',
+            r'\bhow.*feeling.*right now\b'
         ]
         
-        has_question_pattern = any(re.search(pattern, text_lower) for pattern in question_patterns)
+        # If it's clearly personal/conversational, don't use document mode
+        if any(re.search(pattern, text_lower) for pattern in personal_patterns):
+            return False
         
-        # Keywords that suggest document content lookup
-        document_keywords = {
-            'research', 'study', 'paper', 'document', 'article', 'book', 
-            'theory', 'method', 'analysis', 'data', 'results', 'findings',
-            'according', 'source', 'reference', 'cite', 'mention',
-            'explain', 'definition', 'concept', 'principle'
+        # EXPLICIT document references - these SHOULD be document queries
+        explicit_document_patterns = [
+            r'\bin the (document|paper|book|article|file|pdf)\b',
+            r'\baccording to the (document|research|study|paper)\b',
+            r'\bwhat does the (document|paper|research) say\b',
+            r'\bfrom my (documents|files|papers)\b',
+            r'\bsearch my (documents|knowledge|files)\b',
+            r'\banalyze (this|the) document\b',
+            r'\bsummarize (this|the) (document|paper|file)\b'
+        ]
+        
+        has_explicit_reference = any(re.search(pattern, text_lower) for pattern in explicit_document_patterns)
+        
+        # Strong document keywords - require multiple indicators
+        strong_document_keywords = {
+            'research', 'study', 'paper', 'analysis', 'findings', 
+            'methodology', 'results', 'citation', 'reference', 'bibliography'
         }
         
-        has_document_keywords = any(keyword in text_lower for keyword in document_keywords)
+        has_strong_keywords = len([kw for kw in strong_document_keywords if kw in text_lower]) >= 2
         
-        # Content-seeking indicators
-        content_seeking = any(phrase in text_lower for phrase in [
-            'what does', 'how does', 'why does', 'tell me about',
-            'explain', 'describe', 'definition of', 'meaning of',
-            'according to', 'based on', 'from the', 'in the document'
-        ])
+        # Academic/research question patterns with document context
+        academic_with_context = (
+            any(phrase in text_lower for phrase in ['according to', 'based on research', 'studies show']) and
+            any(kw in text_lower for kw in strong_document_keywords)
+        )
         
-        return has_question_pattern or has_document_keywords or content_seeking
+        # Only trigger document mode if we have clear document intent
+        return has_explicit_reference or has_strong_keywords or academic_with_context
     
     def _format_document_response(self, doc_response, original_query: str, context: Dict[str, Any]) -> Optional[str]:
         """

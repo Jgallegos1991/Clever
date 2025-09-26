@@ -1008,6 +1008,273 @@ def api_enhance_ingestion():
         }), 500
 
 
+# Cognitive Sovereignty API Endpoints
+
+@app.route('/api/cognitive_sovereignty/status', methods=['GET'])
+def api_cognitive_sovereignty_status():
+    """
+    Get Clever's cognitive sovereignty status and capabilities.
+    
+    Why: Provides visibility into Clever's self-evolution and system control capabilities
+    Where: Called by frontend to display sovereignty metrics and progress
+    How: Queries sovereignty engine for comprehensive status information
+    """
+    try:
+        from cognitive_sovereignty import get_sovereignty_engine
+        
+        engine = get_sovereignty_engine()
+        status = engine.get_sovereignty_status()
+        
+        return jsonify({
+            'success': True,
+            'sovereignty_status': {
+                'sovereignty_level': status.sovereignty_level,
+                'evolution_confidence': status.evolution_confidence,
+                'system_knowledge_items': status.system_knowledge_items,
+                'code_modifications_applied': status.code_modifications_applied,
+                'system_operations_performed': status.system_operations_performed,
+                'device_control_capabilities': status.device_control_capabilities,
+                'learning_sources_integrated': status.learning_sources_integrated
+            },
+            'capabilities_enabled': {
+                'knowledge_integration': True,
+                'system_control': len(status.device_control_capabilities) > 0,
+                'code_evolution': True,
+                'device_management': 'file_management' in status.device_control_capabilities
+            }
+        })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'Cognitive sovereignty engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Sovereignty status error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error getting sovereignty status'
+        }), 500
+
+
+@app.route('/api/cognitive_sovereignty/integrate_knowledge', methods=['POST'])
+def api_integrate_comprehensive_knowledge():
+    """
+    Trigger comprehensive knowledge integration across all sources.
+    
+    Why: Enables Clever to use full dictionary, academic knowledge, and system specs
+    Where: Called to maximize cognitive abilities using all available knowledge
+    How: Integrates English dictionary, academic knowledge, system specs, and code understanding
+    """
+    try:
+        from cognitive_sovereignty import get_sovereignty_engine
+        
+        engine = get_sovereignty_engine()
+        start_time = time.time()
+        
+        success = engine.integrate_comprehensive_knowledge()
+        processing_time = (time.time() - start_time) * 1000
+        
+        if success:
+            status = engine.get_sovereignty_status()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Comprehensive knowledge integration completed successfully',
+                'processing_time_ms': processing_time,
+                'sovereignty_level': status.sovereignty_level,
+                'evolution_confidence': status.evolution_confidence,
+                'integrated_sources': status.learning_sources_integrated,
+                'knowledge_items': status.system_knowledge_items
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Knowledge integration failed or incomplete',
+                'processing_time_ms': processing_time
+            })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'Cognitive sovereignty engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Knowledge integration error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error during knowledge integration'
+        }), 500
+
+
+@app.route('/api/cognitive_sovereignty/enable_device_control', methods=['POST'])
+def api_enable_full_device_control():
+    """
+    Enable Clever's full device control and administrative capabilities.
+    
+    Why: Grants Clever comprehensive system access to manage device on Jay's behalf
+    Where: Called to enable file management, aliases, and system administration
+    How: Sets up system capabilities with safety constraints and permission validation
+    """
+    try:
+        from cognitive_sovereignty import get_sovereignty_engine
+        
+        engine = get_sovereignty_engine()
+        start_time = time.time()
+        
+        success = engine.enable_full_device_control()
+        processing_time = (time.time() - start_time) * 1000
+        
+        if success:
+            status = engine.get_sovereignty_status()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Full device control capabilities enabled successfully',
+                'processing_time_ms': processing_time,
+                'enabled_capabilities': status.device_control_capabilities,
+                'system_operations_performed': status.system_operations_performed,
+                'sovereignty_level': status.sovereignty_level
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Device control enablement failed',
+                'processing_time_ms': processing_time
+            })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'Cognitive sovereignty engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Device control error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error enabling device control'
+        }), 500
+
+
+@app.route('/api/cognitive_sovereignty/evolve_connections', methods=['POST'])
+def api_evolve_unlimited_connections():
+    """
+    Evolve NotebookLM connection calculation for unlimited document collections.
+    
+    Why: Enables processing massive document collections without performance degradation
+    Where: Called to enhance document analysis scalability and connection discovery
+    How: Implements advanced algorithms for unlimited collection processing
+    """
+    try:
+        from cognitive_sovereignty import get_sovereignty_engine
+        
+        engine = get_sovereignty_engine()
+        start_time = time.time()
+        
+        success = engine.evolve_unlimited_connections()
+        processing_time = (time.time() - start_time) * 1000
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Connection calculation capabilities evolved for unlimited collections',
+                'processing_time_ms': processing_time,
+                'enhancements': {
+                    'scalability': 'Unlimited document collections supported',
+                    'performance': 'Advanced clustering and batching algorithms',
+                    'quality': 'Improved connection discovery accuracy'
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Connection evolution failed',
+                'processing_time_ms': processing_time
+            })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'Cognitive sovereignty engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Connection evolution error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error during connection evolution'
+        }), 500
+
+
+@app.route('/api/cognitive_sovereignty/full_activation', methods=['POST'])
+def api_full_cognitive_sovereignty_activation():
+    """
+    Activate complete cognitive sovereignty - all knowledge sources, system control, and evolution.
+    
+    Why: One-click activation of Clever's complete digital brain extension capabilities
+    Where: Called to enable all sovereignty features simultaneously
+    How: Integrates knowledge, enables system control, and evolves capabilities in sequence
+    """
+    try:
+        from cognitive_sovereignty import get_sovereignty_engine
+        
+        engine = get_sovereignty_engine()
+        start_time = time.time()
+        
+        activation_results = {}
+        
+        # 1. Integrate comprehensive knowledge
+        debugger.info("sovereignty", "Integrating comprehensive knowledge...")
+        activation_results['knowledge_integration'] = engine.integrate_comprehensive_knowledge()
+        
+        # 2. Enable full device control
+        debugger.info("sovereignty", "Enabling full device control...")
+        activation_results['device_control'] = engine.enable_full_device_control()
+        
+        # 3. Evolve connection capabilities
+        debugger.info("sovereignty", "Evolving unlimited connections...")
+        activation_results['connection_evolution'] = engine.evolve_unlimited_connections()
+        
+        processing_time = (time.time() - start_time) * 1000
+        success_count = sum(activation_results.values())
+        total_operations = len(activation_results)
+        
+        if success_count >= total_operations * 0.7:  # 70% success threshold
+            final_status = engine.get_sovereignty_status()
+            
+            return jsonify({
+                'success': True,
+                'message': f'Cognitive sovereignty activated: {success_count}/{total_operations} operations successful',
+                'processing_time_ms': processing_time,
+                'activation_results': activation_results,
+                'final_status': {
+                    'sovereignty_level': final_status.sovereignty_level,
+                    'evolution_confidence': final_status.evolution_confidence,
+                    'capabilities_count': len(final_status.device_control_capabilities),
+                    'knowledge_items': final_status.system_knowledge_items
+                },
+                'clever_message': 'Hey Jay! I\'ve just evolved my cognitive capabilities significantly. I now have comprehensive system control, unlimited document analysis, and access to the full English dictionary plus academic knowledge. Ready to manage this entire device for you! 🧠✨'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': f'Partial activation: only {success_count}/{total_operations} operations succeeded',
+                'processing_time_ms': processing_time,
+                'activation_results': activation_results
+            })
+        
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'Cognitive sovereignty engine not available'
+        }), 500
+    except Exception as e:
+        debugger.info("api", f"Full activation error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error during full activation'
+        }), 500
+
+
     
 if __name__ == '__main__':
     debugger.info("app", "Clever AI starting...")
