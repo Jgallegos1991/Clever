@@ -9,7 +9,7 @@
 #   make freeze         # write requirements-lock.txt
 #   make clean-venv     # remove .venv
 
-.PHONY: default venv install setup setup-full setup-min run fmt lint test ingest ingest-pdfs freeze clean-venv watch watch-pdfs sync-and-ingest tailscale-setup tailscale-status help docstrings
+.PHONY: default venv install setup setup-full setup-min run fmt lint test ingest ingest-pdfs freeze clean-venv watch watch-pdfs sync-and-ingest tailscale-setup tailscale-status help docstrings memory-status memory-optimize memory-monitor memory-emergency
 
 PY ?= python3
 VENV ?= .venv
@@ -254,3 +254,21 @@ bundle-offline:
 	@chmod +x tools/offline_bundle.sh
 	@tools/offline_bundle.sh
 	@echo "✅ Offline bundle ready: clever_offline_bundle.tgz"
+
+# Memory Management Commands for Chromebook Development
+memory-status:
+	@echo "🧠 Checking Clever memory status..."
+	@$(ACTIVATE) && python3 clever_memory_manager.py status
+
+memory-optimize:
+	@echo "🔧 Optimizing Clever memory usage..."
+	@$(ACTIVATE) && python3 clever_memory_manager.py optimize
+
+memory-monitor:
+	@echo "🔍 Starting continuous memory monitoring..."
+	@echo "Press Ctrl+C to stop monitoring"
+	@$(ACTIVATE) && python3 clever_memory_manager.py monitor
+
+memory-emergency:
+	@echo "🚨 EMERGENCY: Applying aggressive memory optimization..."
+	@$(ACTIVATE) && python3 clever_memory_manager.py emergency

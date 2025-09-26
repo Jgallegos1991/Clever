@@ -1,0 +1,28 @@
+{
+  "owner": "Jay",
+  "email": "lapirfta@gmail.com",
+  "sovereignty_level": "MAXIMUM",
+  "access_control": "EXCLUSIVE",
+  "data_ownership": "JAY_ONLY",
+  "cognitive_partnership": "1_TO_1_EXCLUSIVE",
+  "corporate_access": "ABSOLUTELY_FORBIDDEN",
+  "shared_usage": "NEVER",
+  "privacy_level": "TOTAL",
+  "created_timestamp": 1758915945.1054237,
+  "last_sovereignty_check": 1758916310.970648,
+  "authorized_family": [
+    "mom",
+    "brothers",
+    "sons"
+  ],
+  "sovereignty_violations": 1,
+  "exclusivity_confirmed": true,
+  "last_violation": {
+    "timestamp": 1758915945.1080184,
+    "violation_type": "UNAUTHORIZED_USER",
+    "attempted_user": "SomeOtherUser",
+    "sovereignty_response": "ACCESS_DENIED",
+    "protection_level": "MAXIMUM"
+  },
+  "last_jay_access": 1758916310.9706485
+}

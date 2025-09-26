@@ -1,68 +1,97 @@
 {
-<<<<<<< HEAD
-=======
-copilot/vscode1757417374680
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b
-  // General/editor
-  "markdown.validate.enabled": true,
-  "extensions.ignoreRecommendations": true,
-  "workbench.startupEditor": "none",
-  "telemetry.telemetryLevel": "off",
-  "editor.tabSize": 2,
-  "editor.insertSpaces": true,
-  "editor.rulers": [88],
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit",
-    "source.fixAll": "explicit"
-  },
-  "editor.defaultFormatter": "vscode.typescript-language-features",
-  "editor.formatOnSave": false,
-
-  // Python and testing
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-  "python.analysis.typeCheckingMode": "basic",
-  "python.analysis.autoImportCompletions": true,
-  "python.formatting.provider": "black",
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": ["--max-line-length=88"],
-  "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true,
-  "python.testing.pytestArgs": ["tests"],
-
-  // Optional features
-  "github.copilot.chat.codesearch.enabled": true,
-
-  // JS/TS
-  "javascript.suggest.autoImports": true,
-  "javascript.preferences.quoteStyle": "single",
-  "javascript.validate.enable": true,
-  "typescript.validate.enable": true,
-
-  // Search and watcher excludes
-  "search.exclude": {
-    "**/.venv": true,
-    "**/node_modules": true,
-    "**/backups/**": true,
-    "**/logs/**": true
-  },
   "files.watcherExclude": {
     "**/.venv/**": true,
+    "**/venv/**": true,
     "**/node_modules/**": true,
-    "**/backups/**": true,
-    "**/logs/**": true
+    "**/__pycache__/**": true,
+    "**/logs/**": true,
+    "**/perf_history.jsonl": true
   },
-
-  // Remote devcontainer nicety
-  "remote.autoForwardPortsFallback": 0,
-  "[markdown]": {
-    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-  }
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.autoImportCompletions": false,
+  "python.analysis.indexing": false,
+  "python.analysis.packageIndexDepths": [
+    {
+      "name": "",
+      "depth": 2,
+      "includeAllSymbols": false
+    }
+  ],
+  "python.analysis.memory.keepLibraryAst": false,
+  "python.analysis.diagnosticMode": "workspace",
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": false,
+    "plaintext": false,
+    "markdown": true
+  },
+  "editor.minimap.enabled": false,
+  "editor.suggest.maxVisibleSuggestions": 10,
+  "editor.hover.enabled": true,
+  "editor.parameterHints.enabled": true,
+  "files.maxMemoryForLargeFilesMB": 32,
+  "search.maxResults": 1000,
+  "extensions.autoCheckUpdates": false,
+  "extensions.autoUpdate": false,
+  "terminal.integrated.enablePersistentSessions": true,
+  "terminal.integrated.rightClickBehavior": "default",
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 8,
+  "workbench.settings.enableNaturalLanguageSearch": false,
+  "clever.memoryOptimization": {
+    "enabled": true,
+    "processingMode": "standard",
+    "cacheLimits": {
+      "analysis": 50,
+      "completions": 100,
+      "symbols": 1000
+    },
+    "pressureLevel": "low"
+  },
+  "python.analysis.memory.keepLibraryLocalVariables": true,
+  "python.analysis.completeFunctionParens": true,
+  "python.analysis.autoSearchPaths": true,
+  "extensions.experimental.affinity": {
+    "ms-python.python": 1,
+    "ms-python.vscode-pylance": 1
+  },
+  "breadcrumbs.enabled": false,
+  "editor.hover.delay": 500,
+  "editor.quickSuggestionsDelay": 300,
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "files.associations": {
+    "*.py": "python",
+    "Makefile": "makefile",
+    "requirements*.txt": "pip-requirements"
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/logs": true,
+    "**/*.pyc": true,
+    "**/clever.db": false,
+    "**/static/js/engines/*.min.js": true
+  },
+  "search.exclude": {
+    "**/.venv": true,
+    "**/venv": true,
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/logs": true
+  },
+  "python.analysis.extraPaths": [
+    "./",
+    "./utils",
+    "./tools"
+  ],
+  "terminal.integrated.cwd": "/home/jgallegos1991/Clever",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "typescript.suggest.enabled": false,
+  "javascript.suggest.enabled": false,
+  "editor.semanticHighlighting.enabled": false,
+  "workbench.editor.enablePreview": false,
+  "workbench.startupEditor": "none",
+  "git.enabled": true,
+  "git.autoRepositoryDetection": false,
+  "git.autofetch": false,
+  "terminal.integrated.gpuAcceleration": "off"
 }
-<<<<<<< HEAD
-=======
-=======
-    "markdown.validate.enabled": true
-}
-main
->>>>>>> 332a7fbc65d1718ef294b5be0d4b6c43bef8468b

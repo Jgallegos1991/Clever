@@ -405,6 +405,34 @@ class CognitiveSovereigntyEngine:
                 logger.info(f"System awareness integrated: {system_report['device_type']} in {system_report['operational_mode']}")
                 logger.info(f"Codebase analyzed: {codebase_analysis['summary']['files_processed']} files, {codebase_analysis['codebase_health']} health")
                 
+                # Integrate development environment optimization
+                try:
+                    from development_environment_optimizer import get_development_environment_optimizer
+                    
+                    dev_optimizer = get_development_environment_optimizer()
+                    dev_optimizations = dev_optimizer.apply_optimizations()
+                    
+                    if dev_optimizations['success']:
+                        # Store development environment optimization metrics
+                        self._store_sovereignty_metric(
+                            'development_environment',
+                            dev_optimizations['memory_profile']['available_mb'],
+                            {
+                                'pressure_level': dev_optimizations['memory_profile']['pressure_level'],
+                                'vscode_memory_mb': dev_optimizations['memory_profile']['vscode_memory_mb'],
+                                'pylance_memory_mb': dev_optimizations['memory_profile']['pylance_memory_mb'],
+                                'clever_memory_mb': dev_optimizations['memory_profile']['clever_memory_mb'],
+                                'optimizations_applied': dev_optimizations['optimizations_applied'],
+                                'total_memory_optimization': True
+                            },
+                            'development_environment_optimization'
+                        )
+                        
+                        logger.info(f"Development environment optimized: {dev_optimizations['memory_profile']['pressure_level']} pressure, {dev_optimizations['memory_profile']['available_mb']:.0f}MB available")
+                    
+                except ImportError:
+                    logger.warning("Development environment optimizer not available")
+                
                 # Memory cleanup after analysis
                 gc.collect()
                 

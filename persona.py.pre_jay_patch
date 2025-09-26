@@ -298,31 +298,6 @@ class PersonaEngine:
             - memory_engine.py: Advanced memory and learning system
             - nlp_processor.py: Text analysis and processing
         """
-        
-        # === JAY'S AUTHENTIC CLEVER INTEGRATION ===
-        # Use Jay's street-smart genius personality instead of generic AI
-        try:
-            from integrate_jays_clever import JaysCleverIntegration
-            jay_clever = JaysCleverIntegration()
-            
-            jay_context = {
-                'user': 'Jay',
-                'mode': mode,
-                'history': history or [],
-                'timestamp': time.time()
-            }
-            if context:
-                jay_context.update(context)
-                
-            jay_response = jay_clever.generate_jay_response(text, mode, jay_context)
-            return jay_clever.create_persona_response(jay_response)
-            
-        except Exception as e:
-            # Fallback to ensure Clever always responds to Jay
-            print(f"⚠️  Jay's Clever fallback: {e}")
-            pass
-        # === END JAY'S AUTHENTIC CLEVER INTEGRATION ===
-        
         if context is None:
             context = {}
         if history is None:

@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "revolution_level": "adaptive",
+  "breakthrough_techniques": {
+    "pressure_evolution": true,
+    "symbiotic_intelligence": true,
+    "quantum_knowledge": true,
+    "adaptive_learning": true,
+    "cognitive_symbiosis": true
+  },
+  "memory_thresholds": {
+    "abundant": 40,
+    "comfortable": 25,
+    "constrained": 15,
+    "revolutionary": 8
+  },
+  "intelligence_multipliers": {
+    "abundant": 1.0,
+    "comfortable": 1.1,
+    "constrained": 1.3,
+    "revolutionary": 1.8
+  }
+}
