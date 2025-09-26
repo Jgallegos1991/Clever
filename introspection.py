@@ -1,33 +1,49 @@
 """
-Runtime Introspection Utilities for Clever
+introspection.py - Runtime Introspection Utilities for Clever's Cognitive Partnership System
 
 Why: Provide a real-time window into what the system is rendering, which routes
 are active, and the associated Why/Where/How reasoning metadata extracted from
 docstrings. This converts the enforced documentation standard into actionable
 observability for debugging UI/template issues, latency problems, or missing
-persona integration.
+persona integration. Essential for maintaining Clever's cognitive partnership system
+intelligence and debugging efficiency.
+
 Where: Imported by `app.py` to wrap template rendering and serve an
 `/api/runtime_introspect` endpoint. Also consumed implicitly by any frontend
-runtime overlay requesting JSON state.
+runtime overlay requesting JSON state. Central to Clever's self-awareness and
+system intelligence capabilities.
+
 How: Maintains in-memory registries for recent template renders, endpoint
 metadata derived from Flask routes, parsed Why/Where/How sections, last error
 captured by a global error handler, and lightweight git version discovery.
 
+File Usage:
+    - Runtime debugging: Primary tool for real-time system state analysis and debugging
+    - Template rendering: Tracks all template renders for performance and error analysis
+    - Documentation validation: Validates Why/Where/How patterns across system components
+    - Error tracking: Captures and reports system errors for debugging workflows
+    - Performance monitoring: Tracks rendering times and system performance metrics
+    - System intelligence: Provides live introspection for Clever's cognitive partnership
+    - Development tools: Powers debug overlays and development monitoring interfaces
+    - API endpoint: Serves real-time system state via /api/runtime_introspect
+
 Connects to:
-    - app.py:
-        - `traced_render` is called by `app.py`'s `home()` route to render templates.
-        - `register_error_handler` is called in `app.py` to set up global error catching.
-        - `runtime_state` is called by the `/api/runtime_introspect` route in `app.py`.
-    - evolution_engine.py:
-        - `get_evolution_engine` is called by `_build_concept_graph` and `runtime_state` to fetch concept data and interaction statistics.
-    - intelligent_analyzer.py:
-        - `get_intelligent_analysis` is called by `runtime_state` to include AI-powered analysis in the introspection payload.
-    - tools/runtime_dump.py:
-        - This utility script consumes the JSON output from the `/api/runtime_introspect` endpoint.
-    - templates/index.html:
-        - The main HTML file whose rendering is tracked by `record_render`.
-    - static/js/main.js:
-        - The frontend JavaScript can poll the `/api/runtime_introspect` endpoint to display debug data.
+    - app.py: Main Flask application integration for template rendering and error handling
+        - `traced_render` called by `app.py`'s `home()` route to render templates
+        - `register_error_handler` called in `app.py` to set up global error catching
+        - `runtime_state` called by the `/api/runtime_introspect` route in `app.py`
+    - evolution_engine.py: Learning system integration for concept data and interaction statistics
+        - `get_evolution_engine` called by `_build_concept_graph` and `runtime_state`
+    - intelligent_analyzer.py: AI-powered analysis integration for enhanced introspection
+        - `get_intelligent_analysis` called by `runtime_state` for AI analysis payload
+    - tools/runtime_dump.py: CLI utility consuming JSON output from introspection endpoint
+    - templates/index.html: Main UI template whose rendering is tracked by `record_render`
+    - static/js/main.js: Frontend JavaScript polling `/api/runtime_introspect` for debug data
+    - debug_config.py: System debugging and performance monitoring integration
+    - persona.py: Personality engine integration for cognitive partnership insights
+    - database.py: Data persistence layer monitoring and performance tracking
+    - config.py: Configuration system integration for runtime settings
+    - All Python modules: Documentation standard validation and reasoning metadata extraction
 """
 from __future__ import annotations
 import inspect

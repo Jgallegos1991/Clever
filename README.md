@@ -1,19 +1,38 @@
 # Clever - Your Digital Companion
 
-<!-- 
-Why: Main project documentation and onboarding for Clever's digital brain extension system
-Where: Root documentation accessed by developers, users, and GitHub visitors  
-How: Comprehensive guide covering capabilities, setup, architecture, and usage patterns
+**Last updated:** 2025-09-26  
+**Status:** Fully Operational Digital Brain Extension
 
-Connects to:
+**Why:** Main project documentation and onboarding for Clever's digital brain extension system - serves as the primary entry point for understanding Clever's cognitive partnership capabilities
+
+**Where:** Root documentation accessed by developers, users, and GitHub visitors - the first reference point for anyone wanting to understand or contribute to Clever
+
+**How:** Comprehensive guide covering capabilities, setup, architecture, and usage patterns through structured documentation and clear examples
+
+**File Usage:**
+    - Primary onboarding: First document read by new developers and users
+    - Quick reference: Used for understanding system capabilities and features
+    - Setup guide: Referenced during installation and configuration
+    - Feature overview: Consulted when evaluating Clever's capabilities
+    - Troubleshooting: Referenced for common issues and solutions
+    - Development workflow: Used to understand build and deployment processes
+    - Integration guide: Referenced when integrating with Clever's APIs
+    - System requirements: Consulted for hardware and software dependencies
+
+**Connects to:**
     - docs/architecture.md: Detailed system architecture and component relationships
-    - docs/config/device_specifications.md: Hardware requirements and performance constraints (last updated: 2025-09-24)
+    - docs/config/device_specifications.md: Hardware requirements and performance constraints
     - .github/copilot-instructions.md: Development guidelines and coding standards
+    - .github/AGENT_ONBOARDING.md: Complete developer onboarding checklist (MANDATORY)
     - app.py: Entry point for the Flask application and core system
     - config.py: Configuration management and system settings
     - persona.py: Core personality engine that defines Clever's character
+    - evolution_engine.py: Learning and growth system documentation
+    - static/js/engines/holographic-chamber.js: UI particle system capabilities
+    - database.py: Data persistence and memory management
     - Makefile: Build, setup, and development commands
--->
+    - file-inventory.md: Complete system component catalog
+    - requirements.txt: Python dependencies and package management
 
 [![Status](https://img.shields.io/badge/status-fully%20operational-success?style=for-the-badge)](https://github.com/Jgallegos1991/clever)
 [![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)

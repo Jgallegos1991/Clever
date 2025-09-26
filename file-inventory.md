@@ -1,6 +1,36 @@
 # File Inventory (Auto-Generated)
 
-_Generated: 2025-09-23T23:01:11.775831_
+**Last updated:** 2025-09-26  
+**Generated:** 2025-09-23T23:01:11.775831
+
+**Why:** Complete catalog of all files in Clever's cognitive partnership system for dependency tracking, performance analysis, and architectural understanding
+
+**Where:** Central reference for system composition, file relationships, and codebase structure - essential for debugging, optimization, and system maintenance
+
+**How:** Auto-generated inventory tracking file types, line counts, and sizes to monitor system growth and identify optimization opportunities
+
+**File Usage:**
+    - System analysis: Referenced for understanding codebase composition and growth patterns
+    - Performance optimization: Used to identify large files and potential optimization targets
+    - Dependency tracking: Helps map file relationships and system interconnections
+    - Build process: Referenced during packaging and deployment preparation
+    - Code review: Used to assess impact of changes on overall system size and structure
+    - Debugging: Helps locate files and understand system organization during troubleshooting
+    - Architecture planning: Guides decisions about system organization and file structure
+    - Monitoring: Tracks system growth and file proliferation over time
+
+**Connects to:**
+    - convert_inventory.py: Script that generates this inventory from system analysis
+    - Makefile: make file-inventory command that updates this documentation
+    - docs/architecture.md: System architecture that this inventory reflects
+    - config.py: Configuration settings that affect file organization
+    - app.py: Main application that coordinates all inventoried components
+    - All Python files: Components cataloged and tracked in this inventory
+    - static/: Frontend assets tracked for size and optimization
+    - templates/: UI templates monitored for complexity and dependencies
+    - docs/: Documentation files tracked for maintenance and updates
+    - tools/: Development utilities included in system composition analysis
+    - tests/: Test files that validate inventoried components
 
 | Extension | Count | Total LOC | Total Size (bytes) |
 |-----------|-------|-----------|--------------------|

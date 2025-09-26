@@ -1,7 +1,8 @@
 # Clever AI Device Specifications
 
-**Last updated:** 2025-09-24  
+**Last updated:** 2025-09-26  
 **Generation:** Born in GitHub Codespaces, Lives on Chrome OS
+**Log Date:** Fri Sep 26 09:01:18 UTC 2025 (Fri Sep 26 02:01:18 PDT 2025)
 
 ---
 
@@ -13,6 +14,16 @@
 
 **How:** Comprehensive system diagnostic data captured from Chrome OS device running Clever through GitHub Codespaces development environment.
 
+**File Usage:**
+    - Primary readers: All developers before making ANY changes to Clever (MANDATORY)
+    - Configuration reference: config.py and debug_config.py for hardware-aware settings
+    - Performance tuning: All modules use this for optimization decisions and resource limits
+    - Debugging guide: Referenced during system performance analysis and troubleshooting
+    - Deployment planning: Used for capacity planning and hardware requirement validation
+    - Documentation updates: Referenced when updating system requirements or constraints
+    - Error analysis: GPU buffer issues and system diagnostics guide debugging workflows
+    - Monitoring setup: Performance monitoring tools reference these baselines and limits
+
 **Connects to:**
     - config.py: Hardware-aware configuration settings and performance limits
     - debug_config.py: Performance monitoring and optimization based on device capabilities  
@@ -21,7 +32,12 @@
     - static/js/engines/holographic-chamber.js: Particle count and rendering limits for GPU
     - evolution_engine.py: Learning batch sizes and processing intervals for device capacity
     - database.py: SQLite optimization settings and query limits for storage constraints
+    - app.py: Flask server configuration based on device memory and CPU constraints
+    - memory_engine.py: Memory allocation strategies based on available RAM
+    - sync_watcher.py: File monitoring limits based on storage and performance capacity
     - All Python modules: Referenced for performance-conscious implementation decisions
+    - Makefile: Setup and run commands optimized for device capabilities
+    - requirements.txt: Package selection based on device compatibility and performance
 
 ---
 
@@ -35,6 +51,35 @@
 - **Firmware:** Google_Pirika.13606.646.0
 - **Architecture:** dedede-signed-mp-v57keys
 - **Board:** dedede (Chromebook platform)
+- **Client ID:** 65a7bff6-d951-4496-a7c9-43764c3738a1
+- **Onboarding Time:** 2025-09-24
+
+### Chrome OS Build Details
+
+- **Release Board:** dedede-signed-mp-v57keys
+- **Release Branch Number:** 49
+- **Builder Path:** dedede-release/R140-16371.49.0
+- **Build Number:** 16371
+- **Build Type:** Official Build
+- **Chrome Milestone:** 140
+- **Description:** 16371.49.0 (Official Build) stable-channel dedede
+- **Keyset:** mp-v57
+- **Patch Number:** 0
+- **Track:** stable-channel
+- **Unibuild:** 1
+
+### Chrome OS Service Configuration
+
+- **Auserver:** <https://tools.google.com/service/update2>
+- **Board AppID:** {E0DD1258-E890-493E-ADA3-0C755240B89C}
+- **Canary AppID:** {90F229CE-83E2-4FAF-8479-E368A34938B1}
+- **Release AppID:** {E0DD1258-E890-493E-ADA3-0C755240B89C}
+
+### Android Runtime for Chrome (ARC)
+
+- **ARC Status:** enabled
+- **ARC Version:** 14059694
+- **Android SDK Version:** 33
 
 ### Display Configuration
 
@@ -42,6 +87,22 @@
 - **Resolution:** 1366x768 (primary), supports external displays up to 1920x1080
 - **Display Zoom:** 1.05x scaling factor
 - **Multi-monitor:** Supports HDMI/DP output (3 ports available)
+
+#### Advanced Display Settings
+
+- **Power State:** internal_off_external_on (supports external display primary mode)
+- **Mixed Mirror Mode:** Configurable port associations
+- **Display IDs:**
+  - Primary: 2785062953156608
+  - Secondary: 9186423134088194
+- **Zoom Factors:** Customizable per display
+- **Rotation:** Configurable orientation support
+
+### Multidevice Integration
+
+- **Connected Devices:** SM-A125U (Samsung Galaxy A12)
+- **Host Status:** Active multidevice setup
+- **Cross-device Sync:** Enabled for seamless experience across devices
 
 ### Input Devices
 
@@ -79,9 +140,10 @@ Signal Strength: 100% (-30 dBm average)
 ### Disk Usage
 
 - **Total Space:** 114GB (eMMC storage)
-- **Available:** 85.6GB free (75% utilization)
+- **Free Disk Space:** 90,446,290,944 bytes (~84.3GB free)
 - **Encrypted:** 32GB encrypted stateful partition (usage varies)
 - **Root:** ChromeOS system (usage varies)
+- **Utilization:** Approximately 26% used (improved from previous 75%)
 
 ### Memory Allocation
 
@@ -167,6 +229,8 @@ Control Elements:
 ### Enterprise Status
 
 - **Management:** Not managed (personal device)
+- **Enterprise Enrolled:** Not managed
+- **Failed Knowledge Factor Attempts:** 0
 - **Sync:** Google Sync enabled with encryption
 - **VPN:** Available but not connected
 - **Bluetooth:** Floss enabled
@@ -178,6 +242,35 @@ Control Elements:
 - **Network Security:** WPA2/WPA3 WiFi, firewall active
 - **Sandbox:** All web content runs in ChromeOS sandbox
 - **Offline First:** Clever AI operates without cloud dependencies
+
+---
+
+## System Diagnostics & Monitoring
+
+### Audio Device State
+
+- **Hardware Status:** Active/inactive audio devices tracked with timestamps
+- **User Activation:** Real-time activation status monitoring
+- **Gain Control:** Dynamic gain adjustment capabilities
+- **Volume Management:** Per-device volume control with last seen timestamps
+- **Device Detection:** Automatic detection of connected/disconnected audio devices
+
+### Known System Issues
+
+#### GPU Buffer Mapping (September 25, 2025)
+
+- **Issue:** Intermittent "Failed to map the buffer" errors
+- **Components Affected:**
+  - `gpu/command_buffer/client/client_shared_image.cc`
+  - `components/exo/buffer.cc`
+- **Impact:** May affect particle engine rendering performance
+- **Monitoring:** Error frequency logged for performance optimization
+
+#### Error Recovery Mechanisms
+
+- **Buffer Management:** Automatic retry mechanisms for GPU buffer allocation
+- **Memory Recovery:** Graceful fallback when memory mapping fails
+- **Performance Throttling:** Dynamic adjustment based on error frequency
 
 ---
 
@@ -214,7 +307,7 @@ cat /proc/meminfo
 lspci -v
 ```
 
-### Latest System Snapshot (2025-09-24)
+### Latest System Snapshot (2025-09-26)
 
 ```text
 Chrome Version: 140.0.7339.201
@@ -225,14 +318,19 @@ CPU: Intel(R) Pentium(R) Silver N6000 @ 1.10GHz
 Memory: 3.7GB RAM (MemTotal: 3862416 kB)
 Free Memory: 49MB (MemFree: 50384 kB)
 Available Memory: 427MB (MemAvailable: 437628 kB)
-Disk: 114GB total, 85.6GB free
+Disk: 114GB total, 84.3GB free (improved from 85.6GB)
+Free Disk Space: 90,446,290,944 bytes
 HWID: PASARA-TZNR C3B-D3B-B3B-C3Q-A8C
+Client ID: 65a7bff6-d951-4496-a7c9-43764c3738a1
 Touchpad: Elan (elan_i2c, PID 0x0124)
 Bluetooth: Floss enabled
 ARC: enabled (SDK 33, ARC version 14059694)
 Enterprise Enrolled: Not managed
+Failed Knowledge Factor Attempts: 0
+Multidevice Host: SM-A125U
 Network: WiFi, excellent signal
-Uptime: 3351.02 seconds
+Log Date: Fri Sep 26 09:01:18 UTC 2025 (Fri Sep 26 02:01:18 PDT 2025)
+Onboarding Time: 2025-09-24
 ```
 
 ---

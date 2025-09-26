@@ -1,16 +1,38 @@
 /*
-Clever Digital Brain Extension - Main Application Logic
+main.js - Clever Digital Brain Extension Main Application Logic
 
-Why: Central JavaScript controller orchestrating Clever's cognitive interface initialization
-Where: Loaded by templates/index.html as primary script after engine dependencies
-How: Coordinates particle system, chat interface, and user interaction handling
+Why: Central JavaScript controller orchestrating Clever's cognitive interface initialization,
+particle system management, and user interaction handling for the digital brain extension
+experience. Essential for coordinating all frontend components of Clever's cognitive partnership.
+
+Where: Loaded by templates/index.html as primary script after engine dependencies.
+Core frontend component of Clever's cognitive enhancement interface.
+
+How: Coordinates particle system, chat interface, and user interaction handling through
+modular component integration and state management.
+
+File Usage:
+    - Frontend initialization: Primary script for initializing Clever's cognitive interface
+    - User interaction: Handles all user input and chat interface functionality
+    - Particle coordination: Manages holographic particle system integration and lifecycle
+    - State management: Maintains frontend application state and cognitive interface status
+    - API communication: Coordinates requests to Flask backend for Clever responses
+    - Performance monitoring: Tracks and optimizes frontend performance metrics
+    - Debug integration: Supports runtime introspection and debugging capabilities
+    - Component orchestration: Coordinates all frontend components and modules
 
 Connects to:
     - templates/index.html: Script loaded after DOM parsing for initialization
-    - static/js/engines/holographic-chamber.js: Uses window.startHolographicChamber()
-    - static/js/components/chat-fade.js: Uses createChatBubble() for message display
-    - static/css/style.css: Queries and manipulates elements styled by CSS
-    - app.py: Sends requests to /api/chat endpoint for Clever responses
+    - static/js/engines/holographic-chamber.js: Uses window.startHolographicChamber() for particle system
+    - static/js/components/chat-fade.js: Uses createChatBubble() for message display and animation
+    - static/js/core/: Core modules for system functionality and utilities
+    - static/js/performance/: Performance monitoring and optimization modules
+    - static/css/style.css: Queries and manipulates elements styled by CSS system
+    - app.py: Sends requests to /api/chat endpoint for Clever cognitive responses
+    - persona.py: Frontend interface to personality engine and response modes
+    - evolution_engine.py: User interaction tracking and learning system integration
+    - debug_config.py: Frontend debugging and performance monitoring integration
+    - introspection.py: Runtime state polling for debug overlay functionality
 */
 
 console.log('🧠 Clever Digital Brain Extension initializing...');

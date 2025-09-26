@@ -1,27 +1,47 @@
 # Clever - Digital Brain Extension & Cognitive Partnership Architecture
 
+**Last updated:** 2025-09-26  
+**Purpose:** Document cognitive partnership system architecture and components
+
 ## Changelog
 
+- **2025-09-26**: Enhanced with mandatory File Usage and Connects to documentation standards
 - **2025-09-21**: Updated to reflect Clever's true vision as digital brain extension
 - **2025-09-04**: Initial architecture documentation via static analysis
 - **Author**: Documentation Audit Agent
-- **Purpose**: Document cognitive partnership system architecture and components
 
-<!--
-Why: Comprehensive architectural documentation for Clever's digital brain extension system
-Where: Central reference for developers, system understanding, and architectural decisions
-How: Documents component relationships, data flows, and cognitive partnership capabilities
+**Why:** Comprehensive architectural documentation for Clever's digital brain extension system ensuring all developers understand the cognitive partnership design and system interconnections
 
-Connects to:
+**Where:** Central reference for developers, system understanding, and architectural decisions - serves as the definitive guide for all system modifications and enhancements
+
+**How:** Documents component relationships, data flows, and cognitive partnership capabilities through detailed architectural analysis and interconnection mapping
+
+**File Usage:**
+    - Primary reference: All developers must read before making ANY changes to Clever (MANDATORY)
+    - System design guide: Referenced during new feature development and component integration
+    - Debugging reference: Used for understanding system flow during troubleshooting
+    - Onboarding documentation: New developers read to understand Clever's cognitive partnership architecture
+    - Code review guide: Referenced during code reviews to ensure architectural compliance
+    - Performance optimization: Used to identify bottlenecks and optimization opportunities
+    - Integration planning: Referenced when adding new modules or external connections
+    - API design: Guides new endpoint development and data flow patterns
+
+**Connects to:**
     - app.py: Main Flask application implementing the documented architecture
     - persona.py: Personality engine that embodies the cognitive partnership design
     - database.py: SQLite persistence layer supporting the single-database architecture
     - config.py: Configuration system that enforces architectural constraints
-    - docs/config/device_specifications.md: Hardware environment defining performance limits (last updated: 2025-09-24)
+    - docs/config/device_specifications.md: Hardware environment defining performance limits
     - evolution_engine.py: Learning system implementing the continuous growth philosophy
     - static/js/engines/holographic-chamber.js: 3D UI engine for cognitive enhancement interface
     - introspection.py: Runtime system analysis supporting architectural transparency
--->
+    - nlp_processor.py: Natural language processing implementing cognitive capabilities
+    - debug_config.py: System monitoring and performance tracking
+    - memory_engine.py: Memory management and retention systems
+    - sync_watcher.py: File synchronization and knowledge ingestion
+    - All component modules: Architectural compliance and integration patterns
+    - README.md: High-level system overview and quick start information
+    - file-inventory.md: Complete system component catalog and relationships
 
 ---
 

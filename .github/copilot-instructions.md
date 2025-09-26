@@ -90,9 +90,16 @@ def example_function(param1: str, param2: int) -> str:
     Returns:
         Description of return value and its purpose
         
+    File Usage:
+        - Called by: List of files/modules that invoke this function
+        - Calls to: List of files/modules this function invokes
+        - Data flow: How data moves between connected components
+        
     Connects to:
         - module_name.py: Specific connection and data flow
         - another_module.py: How data/control flows between modules
+        - database.py: Data persistence operations
+        - debug_config.py: Logging and performance monitoring
     """
     # Inline comments explaining complex logic
     # Why: This step is necessary because...
@@ -102,6 +109,51 @@ def example_function(param1: str, param2: int) -> str:
     save_result(result)
     
     return result
+```
+
+## File-Level Documentation Standards
+EVERY FILE must begin with a comprehensive header:
+
+```python
+"""
+filename.py - Brief description of file purpose
+
+Why: Core reason this file exists in Clever's cognitive partnership system
+Where: Position in overall architecture and system flow
+How: Technical implementation approach and key patterns used
+
+File Usage:
+    - Primary callers: Files that frequently import/use this module
+    - Key dependencies: Critical files this module requires
+    - Data sources: Where this module gets its input data
+    - Data destinations: Where this module sends its output
+    - Configuration: Config files and settings this module uses
+    - Database interactions: Tables/operations this module performs
+    - API endpoints: Routes this module serves or calls
+    - Frontend connections: UI components that interact with this module
+    - Background processes: Async/scheduled tasks this module handles
+
+Connects to:
+    - app.py: Main Flask application integration
+    - database.py: Data persistence and retrieval operations  
+    - persona.py: Personality and response generation
+    - evolution_engine.py: Learning and growth tracking
+    - debug_config.py: Logging, monitoring, and error handling
+    - config.py: System configuration and settings
+    - [Other specific modules]: Detailed connection descriptions
+
+Performance Notes:
+    - Memory usage: Typical memory footprint and optimization considerations
+    - CPU impact: Processing intensity and optimization strategies
+    - I/O operations: File/network operations and caching strategies
+    - Scaling limits: Known limitations and capacity boundaries
+
+Critical Dependencies:
+    - Required packages: Essential external dependencies
+    - Optional packages: Performance enhancers or feature enablers
+    - System requirements: Hardware or OS-specific needs
+    - Database schema: Required tables and indexes
+"""
 ```
 
 ## Developer Workflows
@@ -132,6 +184,31 @@ def example_function(param1: str, param2: int) -> str:
 - **Database:** Use `DatabaseManager` with thread safety (`_lock`) - ONLY `clever.db` file
 - **Error Handling:** Use debug system (`get_debugger`, `performance_monitor`)
 - **Documentation:** Every function must explain Why/Where/How connections
+
+## MANDATORY Documentation Enforcement
+
+### File Usage Tracking (CRITICAL)
+Every file MUST document its interconnections to maintain Clever's cognitive coherence:
+
+1. **Multi-Usage Documentation:** Track all ways a file is used across the system
+2. **Connection Mapping:** Document every import, call, and data flow relationship
+3. **Performance Impact:** Note how file usage affects system performance
+4. **Dependency Chains:** Map critical path dependencies for debugging
+5. **Cross-Module Communication:** Document all inter-module data exchanges
+
+### Documentation Validation Rules
+- **NO FILE** without complete header documentation
+- **NO FUNCTION** without File Usage and Connects to sections
+- **NO MODULE** without performance and scaling notes
+- **NO CHANGES** without updating interconnection documentation
+- **IMMEDIATE UPDATE** of all connected files when relationships change
+
+### Why This Matters for Clever's Cognitive Partnership
+- **System Intelligence:** Clever's brain extension capabilities depend on knowing how all components interconnect
+- **Debugging Efficiency:** Connection mapping enables rapid problem isolation
+- **Performance Optimization:** Usage patterns guide resource allocation decisions
+- **Evolution Engine:** Relationship tracking feeds into Clever's self-improvement algorithms
+- **Digital Sovereignty:** Complete system understanding maintains independence from external dependencies
 - **Config:** Always import user info from `user_config.py`
 - **Database:** Use `DatabaseManager` with thread safety (`_lock`)
 - **Error Handling:** Use debug system (`get_debugger`, `performance_monitor`)

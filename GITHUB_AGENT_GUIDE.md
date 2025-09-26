@@ -1,7 +1,38 @@
 # GitHub Copilot Agent Implementation Guide
 
+**Last updated:** 2025-09-26  
+**Purpose:** Systematically apply Clever's enhanced documentation standards across all repository files
+
+**Why:** Enables systematic enforcement of Clever's mandatory "File Usage" and "Connects to" documentation standards across the entire cognitive partnership system
+
+**Where:** Used during repository-wide documentation updates and when onboarding new developers to Clever's enhanced standards
+
+**How:** Leverages GitHub's web-based Copilot agent to systematically apply coding standards and documentation requirements
+
+**File Usage:**
+    - Documentation enforcement: Primary guide for applying standards across all files
+    - Agent workflow: Referenced when using GitHub Copilot agents for systematic updates
+    - Quality assurance: Used to ensure consistent documentation across the codebase
+    - Onboarding automation: Referenced when setting up new development workflows
+    - Standards validation: Used in conjunction with validation tools and CI/CD processes
+    - Repository maintenance: Consulted during large-scale documentation updates
+    - Architecture compliance: Used to ensure all files meet Clever's interconnection mapping requirements
+    - Development workflow: Referenced when implementing systematic code improvements
+
+**Connects to:**
+    - .github/copilot-instructions.md: Enhanced documentation standards being enforced
+    - .github/ISSUE_TEMPLATE/enforce-documentation-standards.md: Issue template for agent workflows
+    - .github/pull_request_template.md: PR template ensuring documentation compliance
+    - .github/workflows/enforce-documentation.yml: CI/CD validation of documentation standards
+    - validate-documentation.sh: Local validation script for standards compliance
+    - Makefile: Integration with make validate and other development commands
+    - All repository files: Target files for systematic documentation enhancement
+    - docs/architecture.md: Architecture documentation requiring consistent standards
+    - file-inventory.md: File catalog that benefits from consistent documentation
+    - README.md: Main documentation updated with enhanced standards
+
 ## 🎯 Objective
-Use GitHub's web-based Copilot agent to systematically apply Clever's coding standards across all repository files.
+Use GitHub's web-based Copilot agent to systematically apply Clever's enhanced coding standards (including mandatory "File Usage" and "Connects to" sections) across all repository files.
 
 ## 📋 Preparation Complete ✅
 

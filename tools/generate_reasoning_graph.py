@@ -1,24 +1,44 @@
-"""Generate reasoning graph markdown from Why/Where/How + Connects to tokens.
+"""
+generate_reasoning_graph.py - Generate reasoning graph markdown from Why/Where/How + Connects to tokens
 
 Why: Transform distributed docstring reasoning metadata into a visualizable
 knowledge map so engineers can traverse Clever's architecture via declared
 edges instead of grep. This reinforces the "arrows between dots" paradigm
 and provides an auditable artifact (`docs/reasoning_graph.md`) that CI or
-humans can diff to spot architectural drift.
+humans can diff to spot architectural drift. Essential for maintaining
+Clever's cognitive partnership system architecture and interconnection mapping.
+
 Where: Run manually (`python -m tools.generate_reasoning_graph`) or wired into
 future CI documentation jobs. Consumes in‑repo Python source only (offline).
+Part of Clever's development toolkit for architectural analysis and documentation.
+
 How: Walks the repository for `*.py` files (excluding venv/site-packages),
 parses AST for module/class/function docstrings, extracts Why/Where/How and
 "Connects to" adjacency declarations, and emits a Markdown file summarizing:
-  1. Coverage stats
-  2. Node inventory with condensed Why line
-  3. Edge list (source → targets)
-  4. Orphan detection (nodes without outgoing edges)
+  1. Coverage stats  2. Node inventory with condensed Why line
+  3. Edge list (source → targets)  4. Orphan detection (nodes without outgoing edges)
+
+File Usage:
+    - Architecture analysis: Primary tool for generating system interconnection graphs
+    - Documentation generation: Creates comprehensive reasoning graph documentation
+    - CI/CD integration: Used in automated documentation validation and generation
+    - Development workflow: Run during architectural changes to update system maps
+    - Debugging support: Helps visualize system relationships during troubleshooting
+    - Code review: Generated graphs used to assess architectural impact of changes
+    - Onboarding: Creates visual system maps for new developer orientation
+    - Quality assurance: Validates documentation completeness and system coherence
 
 Connects to:
-    - tools/verify_reasoning_docs.py: Relies on same doc discipline
-    - introspection.py: Runtime surfacing complement to static graph
-    - docs/reasoning_graph.md: Output artifact
+    - tools/verify_reasoning_docs.py: Relies on same documentation discipline and standards
+    - introspection.py: Runtime surfacing complement to static architectural graph
+    - docs/reasoning_graph.md: Output artifact containing comprehensive system map
+    - .github/copilot-instructions.md: Documentation standards this tool validates and enforces
+    - tools/docstring_enforcer.py: Complementary documentation enforcement tooling
+    - All Python modules: Source files analyzed for Why/Where/How and Connects to metadata
+    - CI/CD workflows: Integration with automated documentation generation processes
+    - app.py: Core application architecture mapped and analyzed
+    - persona.py: Personality engine connections documented and graphed
+    - evolution_engine.py: Learning system relationships mapped and tracked
 """
 from __future__ import annotations
 

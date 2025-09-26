@@ -1,9 +1,37 @@
 /**
- * Holographic Chamber - Particle System for Clever AI
+ * holographic-chamber.js - Particle System Engine for Clever's Cognitive Enhancement Interface
  * 
- * Why: Creates cognitive visualization representing Clever's thought processes
- * Where: Core particle engine loaded by templates/index.html before main.js
- * How: Canvas-based particle physics with formation morphing and animations
+ * Why: Creates cognitive visualization representing Clever's thought processes and mental activity,
+ * providing immersive visual feedback that enhances the digital brain extension experience.
+ * Essential for making Clever's cognitive partnership tangible and engaging through dynamic
+ * particle formations that respond to her thinking patterns and user interactions.
+ * 
+ * Where: Core particle engine loaded by templates/index.html before main.js initialization.
+ * Central visual component of Clever's cognitive enhancement interface and digital brain extension.
+ * 
+ * How: Canvas-based particle physics with formation morphing, animations, and cognitive state
+ * visualization through dynamic particle behavior and visual themes.
+ * 
+ * File Usage:
+ *     - Cognitive visualization: Primary engine for visualizing Clever's thought processes
+ *     - User engagement: Creates immersive interface enhancing cognitive partnership experience  
+ *     - Performance rendering: Optimized particle system for smooth real-time visualization
+ *     - State indication: Visual feedback system for Clever's cognitive and emotional states
+ *     - Interactive response: Particle behavior responds to user interactions and system events
+ *     - Theme management: Handles multiple visual themes for different cognitive states
+ *     - Animation control: Manages complex particle animations and formation transitions
+ *     - Hardware optimization: Adapts rendering based on device capabilities and performance
+ * 
+ * Connects to:
+ *     - templates/index.html: Core template loading this engine before main application logic
+ *     - static/js/main.js: Main application coordinating particle system lifecycle and control
+ *     - static/css/style.css: CSS integration for canvas positioning and responsive design
+ *     - app.py: Backend integration for cognitive state updates and particle behavior triggers
+ *     - persona.py: Personality engine integration for particle themes matching Clever's moods
+ *     - evolution_engine.py: Learning system integration for adaptive particle behavior
+ *     - docs/config/device_specifications.md: Hardware constraints defining particle count limits
+ *     - debug_config.py: Performance monitoring and optimization for particle rendering
+ *     - cognitive_shape_engine.py: Advanced shape generation integration for complex formations
  */
 
 console.log('🌟 Holographic Chamber engine loading...');

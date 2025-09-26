@@ -2,16 +2,40 @@
 <html lang="en">
 <head>
     <!--
+    index.html - Main template for Clever's digital brain extension interface
+    
     Why: Main template for Clever's digital brain interface - provides cognitive partnership UI
-    Where: Served by app.py home() route as Clever's primary interaction interface  
+    that enables immersive interaction with Clever's personality and cognitive capabilities.
+    Central to the digital brain extension experience and cognitive enhancement interface.
+    
+    Where: Served by app.py home() route as Clever's primary interaction interface.
+    Core UI component of the cognitive partnership system and digital brain extension.
+    
     How: Combines particle visualization canvas, chat interface, and input controls in unified layout
+    with responsive design and performance optimization for cognitive enhancement experience.
+
+    File Usage:
+        - Primary interface: Main UI template for Clever's cognitive partnership system
+        - User interaction: Primary interface for all user-Clever cognitive interactions  
+        - Particle visualization: Canvas container for holographic cognitive visualization
+        - Chat interface: Container for conversational cognitive partnership experience
+        - Responsive design: Adaptive interface supporting various device configurations
+        - Performance optimization: Cache-busted assets for optimal loading and updates
+        - Accessibility: Semantic HTML structure supporting assistive technologies
+        - Integration hub: Coordinates all frontend components and cognitive interface elements
 
     Connects to:
-        - app.py: Rendered by home() route with persona context and cache-busting
-        - static/css/style.css: Core styling for cognitive interface aesthetic
-        - static/js/main.js: JavaScript entry point for initialization
-        - static/js/engines/holographic-chamber.js: Particle brain visualization engine
-        - static/js/components/chat-fade.js: Chat bubble lifecycle management
+        - app.py: Rendered by home() route with persona context and cache-busting timestamps
+        - static/css/style.css: Core styling for cognitive interface aesthetic and responsive design
+        - static/js/main.js: JavaScript entry point for cognitive interface initialization
+        - static/js/engines/holographic-chamber.js: Particle brain visualization engine for cognitive states
+        - static/js/components/chat-fade.js: Chat bubble lifecycle management and animation
+        - static/js/core/: Core frontend modules supporting cognitive interface functionality
+        - static/js/performance/: Performance monitoring and optimization for smooth experience
+        - persona.py: Backend personality engine providing cognitive responses and interactions
+        - evolution_engine.py: Learning system integration for adaptive interface behavior
+        - debug_config.py: Debug overlay integration and performance monitoring
+        - docs/config/device_specifications.md: Hardware constraints affecting interface performance
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

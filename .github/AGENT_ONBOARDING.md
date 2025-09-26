@@ -1,5 +1,39 @@
 # Clever AI: Agent Onboarding & Required Reading
 
+**Last updated:** 2025-09-26  
+**Purpose:** Comprehensive onboarding for Clever's cognitive partnership system
+
+**Why:** Ensures every agent/developer understands Clever's digital brain extension architecture,
+mandatory documentation standards, and cognitive partnership principles before making changes.
+Critical for maintaining system coherence and preventing architectural violations.
+
+**Where:** Referenced by copilot-instructions.md as MANDATORY first step. Gateway document
+for all Clever development and the definitive onboarding checklist.
+
+**How:** Comprehensive checklist ensuring complete understanding of system architecture,
+documentation standards, and cognitive partnership design principles.
+
+**File Usage:**
+    - Mandatory onboarding: Primary checklist for all new developers and agents
+    - Development gate: Must be completed before any code changes or contributions
+    - Standards enforcement: Ensures understanding of documentation and coding requirements
+    - Architecture education: Comprehensive system understanding for all contributors
+    - Quality assurance: Prevents architectural violations through proper onboarding
+    - Reference guide: Ongoing reference for development standards and practices
+    - Integration workflow: Part of contributor onboarding and code review processes
+    - System protection: Safeguards against uninformed changes to cognitive partnership system
+
+**Connects to:**
+    - .github/copilot-instructions.md: Primary coding standards and enhanced documentation requirements
+    - README.md: Project overview and main entry point documentation
+    - docs/architecture.md: System architecture and component relationships
+    - docs/config/device_specifications.md: Hardware environment and performance constraints
+    - file-inventory.md: Complete file structure and system composition
+    - config.py: Central configuration management and system settings
+    - All system components: Foundation knowledge required for working with any Clever module
+    - SECURITY.md: Security policies and digital sovereignty principles
+    - CHANGELOG.md: Development history and architectural evolution
+
 **⚠️ MANDATORY: Read ALL documents below BEFORE making any changes to Clever**
 
 ---

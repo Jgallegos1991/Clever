@@ -1,11 +1,35 @@
 # Security Policy
 
-Why:
-  Maintain a clear, versioned reference for how security issues (including dependency vulnerabilities) are identified, triaged, and remediated while honoring the project's strict offline and single-database constraints.
-Where:
-  Lives at repository root so GitHub can surface it automatically in the Security tab; referenced by CI security audit step and future contributor guidelines.
-How:
-  Defines supported versions, reporting channels, triage SLAs, dependency management approach (pinning + periodic audit), and remediation workflow integrated with the docstring and performance quality gates.
+**Last updated:** 2025-09-26  
+**Purpose:** Maintain security standards for Clever's cognitive partnership system
+
+**Why:** Maintain a clear, versioned reference for how security issues (including dependency vulnerabilities) are identified, triaged, and remediated while honoring Clever's strict offline and single-database constraints for digital sovereignty
+
+**Where:** Lives at repository root so GitHub can surface it automatically in the Security tab; referenced by CI security audit step and future contributor guidelines
+
+**How:** Defines supported versions, reporting channels, triage SLAs, dependency management approach (pinning + periodic audit), and remediation workflow integrated with the docstring and performance quality gates
+
+**File Usage:**
+    - Security reference: Primary guide for reporting and handling security vulnerabilities
+    - GitHub integration: Automatically surfaced in repository Security tab for transparency
+    - CI/CD workflow: Referenced by automated security audit and validation processes
+    - Dependency management: Used for managing secure package updates and vulnerability patching
+    - Contributor guide: Referenced by developers for understanding security requirements
+    - Incident response: Used during security issue triage and remediation workflows
+    - Compliance reference: Consulted for maintaining security best practices
+    - Audit preparation: Referenced during security audits and vulnerability assessments
+
+**Connects to:**
+    - requirements.txt: Dependency management and security-conscious package pinning
+    - .github/workflows/: CI/CD security audit processes and vulnerability scanning
+    - config.py: Secure configuration management and offline enforcement settings
+    - utils/offline_guard.py: Digital sovereignty enforcement and network isolation
+    - database.py: Secure local data handling and privacy protection
+    - app.py: Security headers and authentication handling
+    - evolution_engine.py: Secure learning data management and privacy protection
+    - docs/config/device_specifications.md: Hardware security and environment constraints
+    - .github/copilot-instructions.md: Security-conscious development standards
+    - README.md: Main documentation referencing security and digital sovereignty principles
 
 ## Supported Versions
 

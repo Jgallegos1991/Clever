@@ -1,16 +1,35 @@
 """
-Offline Guard Utility for Clever AI
+offline_guard.py - Offline Guard Utility for Clever's Digital Sovereignty System
 
-Why: Enforces strict offline operation by blocking all outbound network connections except loopback, ensuring compliance with project rules.
-Where: Used by app.py and system_validator.py to guarantee offline-only operation for all Clever AI components.
+Why: Enforces strict offline operation by blocking all outbound network connections except loopback, ensuring compliance with Clever's digital sovereignty principles and maintaining complete local control of the cognitive partnership system.
+
+Where: Used by app.py and system_validator.py to guarantee offline-only operation for all Clever AI components. Critical component of Clever's digital sovereignty architecture ensuring total privacy and control.
+
 How: Monkey-patches socket.socket to raise errors on non-loopback connections, provides enable/disable toggles, and utility checks for network references in text.
 
+File Usage:
+    - Digital sovereignty: Primary enforcement mechanism for offline-only operation
+    - Network isolation: Ensures no external network calls compromise privacy or control
+    - System startup: Activated during app.py initialization to enforce offline mode
+    - Input validation: Validates user input for network references to prevent external calls
+    - Testing framework: Used by validation systems to test offline compliance
+    - Security enforcement: Prevents accidental network leaks or external dependencies
+    - Privacy protection: Ensures all cognitive partnership data stays local
+    - Development safety: Protects against inadvertent external service calls during development
+
 Connects to:
-    - app.py:
-        - `enable()` is called at startup to enforce the offline mode.
-        - `contains_network_reference()` is used to validate user input against network-related terms.
-    - system_validator.py:
-        - `enable()`, `disable()`, and `is_enabled()` are used to test and verify the offline guard's functionality.
+    - app.py: Core application integration for startup offline enforcement
+        - `enable()` called at startup to enforce offline mode
+        - `contains_network_reference()` used to validate user input against network terms
+    - system_validator.py: System validation and testing integration
+        - `enable()`, `disable()`, and `is_enabled()` used to test offline guard functionality
+    - config.py: Configuration system integration for offline mode settings
+    - evolution_engine.py: Learning system ensuring all data processing stays local
+    - persona.py: Personality engine operating entirely offline for privacy
+    - database.py: Local data persistence without external dependencies
+    - nlp_processor.py: Natural language processing using only local models
+    - .github/copilot-instructions.md: Digital sovereignty principles this utility enforces
+    - SECURITY.md: Security policy supported by offline operation enforcement
 """
 
 import socket
