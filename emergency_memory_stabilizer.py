@@ -12,6 +12,11 @@ How: Real-time memory monitoring with immediate intervention when memory pressur
      Applies progressive optimization strategies to keep system stable.
 """
 
+import psutil
+from typing import Dict, List, Optional, Any
+
+
+
 
 class EmergencyMemoryStabilizer:
     """
@@ -166,7 +171,7 @@ class EmergencyMemoryStabilizer:
             existing.update(emergency_settings)
             vscode_settings_path.write_text(json.dumps(existing, indent=2))
             
-        except Exception as e:
+        except Exception as _e:
             print(f"Failed to optimize VS Code settings: {e}")
     
     def limit_pylance_memory(self):
@@ -187,7 +192,7 @@ class EmergencyMemoryStabilizer:
                 settings.update(pylance_settings)
                 settings_path.write_text(json.dumps(settings, indent=2))
                 
-        except Exception as e:
+        except Exception as _e:
             print(f"Failed to limit Pylance memory: {e}")
     
     def clear_temp_files(self):
@@ -213,7 +218,7 @@ class EmergencyMemoryStabilizer:
                         except Exception:
                             continue
                             
-        except Exception as e:
+        except Exception as _e:
             print(f"Failed to clear temp files: {e}")
     
     def monitor_and_stabilize(self, interval=10):
@@ -254,7 +259,7 @@ class EmergencyMemoryStabilizer:
                 print("\n🛑 Memory monitoring stopped")
                 self.monitoring = False
                 break
-            except Exception as e:
+            except Exception as _e:
                 print(f"❌ Monitoring error: {e}")
                 time.sleep(interval)
     

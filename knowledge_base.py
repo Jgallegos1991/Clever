@@ -14,7 +14,6 @@ Connects to:
 """
 
 from database import DatabaseManager
-import config
 
 # Single shared DatabaseManager instance bound to the configured single DB.
 _db = DatabaseManager(config.DB_PATH)

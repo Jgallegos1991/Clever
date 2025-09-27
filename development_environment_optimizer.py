@@ -437,7 +437,7 @@ class DevelopmentEnvironmentOptimizer:
             except KeyboardInterrupt:
                 print("\n👋 Memory monitoring stopped")
                 break
-            except Exception as e:
+            except Exception as _e:
                 print(f"❌ Monitoring error: {e}")
                 time.sleep(check_interval)
 

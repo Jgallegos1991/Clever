@@ -39,7 +39,7 @@ try:
     from database import DatabaseManager
     from config import DB_PATH
     COMPLETE_SYSTEM_AVAILABLE = True
-except ImportError as e:
+except ImportError as _e:
     print(f"⚠️  System import issue: {e}")
     COMPLETE_SYSTEM_AVAILABLE = False
 
@@ -113,7 +113,7 @@ class CleverCompleteAutonomy:
             
             print("🧠 ALL SYSTEMS INTEGRATED: READY FOR COMPLETE AUTONOMY")
             
-        except Exception as e:
+        except Exception as _e:
             print(f"⚠️  System initialization: {e}")
     
     def demonstrate_complete_autonomy(self) -> Dict[str, Any]:

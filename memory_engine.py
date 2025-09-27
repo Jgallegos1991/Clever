@@ -23,8 +23,6 @@ Connects to:
 """
 import threading
 import json
-import hashlib
-import time
 from datetime import datetime
 from collections import defaultdict, Counter
 from dataclasses import dataclass
@@ -32,7 +30,6 @@ from typing import Dict, List, Any, Optional
 
 from database import DatabaseManager
 from debug_config import get_debugger
-import config
 
 
 debugger = get_debugger()
@@ -142,7 +139,7 @@ class AdvancedMemoryEngine:
                 else:
                     con.commit()
                     return []
-        except Exception as e:
+        except Exception as _e:
             debugger.error('memory_engine', f'Database query failed: {e}')
             raise
     
@@ -236,7 +233,7 @@ class AdvancedMemoryEngine:
                 
                 debugger.info('memory_engine', 'Memory database schema initialized successfully')
                 
-            except Exception as e:
+            except Exception as _e:
                 debugger.error('memory_engine', f'Failed to initialize memory schema: {e}')
                 raise
     
@@ -281,7 +278,7 @@ class AdvancedMemoryEngine:
                 debugger.info('memory_engine', f'Stored interaction with ID: {context_id}')
                 return context_id
                 
-            except Exception as e:
+            except Exception as _e:
                 debugger.error('memory_engine', f'Failed to store interaction: {e}')
                 raise
     
@@ -563,7 +560,7 @@ class AdvancedMemoryEngine:
             
             debugger.info('memory_engine', f'Loaded {len(self.preference_model)} preferences')
             
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('memory_engine', f'Could not load preferences: {e}')
             self.preference_model = {}
     
@@ -626,7 +623,7 @@ class AdvancedMemoryEngine:
             
             return sorted_memories[:max_results]
             
-        except Exception as e:
+        except Exception as _e:
             debugger.error('memory_engine', f'Failed to retrieve contextual memory: {e}')
             return []
     
@@ -654,7 +651,7 @@ class AdvancedMemoryEngine:
                 'timestamp': row[4]
             } for row in history]
             
-        except Exception as e:
+        except Exception as _e:
             debugger.error('memory_engine', f'Failed to retrieve conversation history: {e}')
             return []
     
@@ -697,7 +694,7 @@ class AdvancedMemoryEngine:
                 predictions['suggested_mode'] = best_mode
                 predictions['confidence'] = min(0.9, mode_scores[best_mode])
             
-        except Exception as e:
+        except Exception as _e:
             debugger.error('memory_engine', f'Failed to predict preferences: {e}')
         
         return predictions
@@ -762,7 +759,7 @@ class AdvancedMemoryEngine:
             
             return stats
             
-        except Exception as e:
+        except Exception as _e:
             debugger.error('memory_engine', f'Failed to get memory stats: {e}')
             return {'error': str(e)}
 

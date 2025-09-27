@@ -34,7 +34,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
-import config
 import user_config
 from utils import offline_guard
 from debug_config import get_debugger
@@ -134,7 +133,7 @@ class SystemValidator:
                     )
                 if result.severity == "critical" and not result.passed:
                     critical_issues += 1
-            except Exception as e:
+            except Exception as _e:
                 logger.error(
                     "system_validator",
                     f"Validation check failed: {check.__name__}: {e}",
@@ -212,7 +211,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="Offline Enforcement",
                 passed=False,
@@ -254,7 +253,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="Single User Config",
                 passed=False,
@@ -279,7 +278,7 @@ class SystemValidator:
                 details=(f"Single database properly configured: {expected_db.name}"),
                 severity="info",
             )
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="Single Database",
                 passed=False,
@@ -319,7 +318,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="Jay Personalization",
                 passed=False,
@@ -373,7 +372,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="Clever Persona",
                 passed=False,
@@ -428,7 +427,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="File Structure Compliance",
                 passed=False,
@@ -491,7 +490,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="NLP Capabilities",
                 passed=False,
@@ -522,7 +521,7 @@ class SystemValidator:
 
             try:
                 evo_engine.log_interaction(test_interaction)
-            except Exception as e:
+            except Exception as _e:
                 return ValidationResult(
                     check_name="Evolution Engine Access",
                     passed=False,
@@ -539,7 +538,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="Evolution Engine Access",
                 passed=False,
@@ -588,7 +587,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="Documentation Standards",
                 passed=False,
@@ -656,7 +655,7 @@ class SystemValidator:
                 details=("Performance monitoring unavailable (psutil not installed)"),
                 severity="info",
             )
-        except Exception as e:
+        except Exception as _e:
             return ValidationResult(
                 check_name="Performance Optimization",
                 passed=False,

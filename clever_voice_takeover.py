@@ -59,7 +59,7 @@ class CleverVoiceTakeover:
                 self.clever_personality = JaysAuthenticClever()
                 print("✅ Jay's Authentic Clever: LOADED")
                 self.takeover_ready = True
-            except Exception as e:
+            except Exception as _e:
                 print(f"⚠️  Clever system: {e}")
     
     def activate_gemini_voice(self) -> Dict[str, Any]:

@@ -47,7 +47,6 @@ Connects to:
 """
 from __future__ import annotations
 import ast  # For static analysis of functions & imports
-import inspect
 import re
 from collections import deque
 from pathlib import Path  # For code health & component graph scanning
@@ -420,11 +419,11 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
     # Code health + component graph (best-effort; never raise to caller)
     try:
         code_health = _scan_code_health()
-    except Exception as e:  # noqa: BLE001
+    except Exception as _e:  # noqa: BLE001
         code_health = {"error": f"code health scan failed: {e}"}
     try:
         component_graph = _build_component_graph()
-    except Exception as e:  # noqa: BLE001
+    except Exception as _e:  # noqa: BLE001
         component_graph = {"error": f"component graph failed: {e}"}
     # JSON safety pass (convert sets recursively)
     def _json_safe(obj):  # Why: Prevent Flask jsonify errors on non-serializable containers
@@ -462,7 +461,7 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
         try:
             from intelligent_analyzer import get_intelligent_analysis  # type: ignore
             intelligent_analysis = get_intelligent_analysis()
-        except Exception as e:  # noqa: BLE001 broad purposely
+        except Exception as _e:  # noqa: BLE001 broad purposely
             intelligent_analysis = {
                 'error': f'Intelligent analysis unavailable: {str(e)}',
                 'generated_at': time.time()
@@ -751,7 +750,7 @@ def _validate_particle_system() -> Dict[str, Any]:
             
         return result
         
-    except Exception as e:
+    except Exception as _e:
         return {"status": "error", "message": f"Validation failed: {str(e)}"}
 
 
@@ -796,7 +795,7 @@ def _validate_z_index_hierarchy() -> Dict[str, Any]:
             "conflicts": _detect_z_index_conflicts(hierarchy)
         }
         
-    except Exception as e:
+    except Exception as _e:
         return {"status": "error", "message": f"Z-index validation failed: {str(e)}"}
 
 

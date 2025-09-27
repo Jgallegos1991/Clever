@@ -23,7 +23,7 @@ try:
     from debug_config import get_debugger
 
     print("✅ All enhanced modules imported successfully")
-except ImportError as e:
+except ImportError as _e:
     print(f"❌ Import error: {e}")
     sys.exit(1)
 
@@ -49,7 +49,7 @@ def test_system_validation():
             )
             return False
 
-    except Exception as e:
+    except Exception as _e:
         print(f"❌ Validation test failed: {e}")
         return False
 
@@ -84,7 +84,7 @@ def test_enhanced_conversation():
             print("❌ Enhanced conversation test failed - insufficient response")
             return False
 
-    except Exception as e:
+    except Exception as _e:
         print(f"❌ Conversation test failed: {e}")
         return False
 
@@ -122,7 +122,7 @@ def test_file_access():
             print("❌ File access test failed")
             return False
 
-    except Exception as e:
+    except Exception as _e:
         print(f"❌ File access test failed: {e}")
         return False
 
@@ -152,7 +152,7 @@ def test_conversation_with_file_analysis():
             print("❌ File analysis conversation test failed")
             return False
 
-    except Exception as e:
+    except Exception as _e:
         print(f"❌ File analysis test failed: {e}")
         return False
 
@@ -180,7 +180,7 @@ def main():
             results.append((test_name, result))
             if result:
                 passed += 1
-        except Exception as e:
+        except Exception as _e:
             print(f"❌ {test_name} failed with exception: {e}")
             results.append((test_name, False))
 

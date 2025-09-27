@@ -241,7 +241,7 @@ class CodeIntelligenceEngine:
         if content is None:
             try:
                 content = Path(file_path).read_text(encoding='utf-8')
-            except Exception as e:
+            except Exception as __e:
                 raise ValueError(f"Could not read file {file_path}: {e}")
         
         # Detect language
@@ -354,7 +354,7 @@ class CodeIntelligenceEngine:
                     'modification_id': None
                 }
                 
-        except Exception as e:
+        except Exception as __e:
             return {
                 'success': False,
                 'error': f"Modification failed: {str(e)}",
@@ -412,7 +412,7 @@ class CodeIntelligenceEngine:
                 'optimized': False
             }
             
-        except Exception as e:
+        except Exception as __e:
             return {
                 'success': False,
                 'error': f"Code generation failed: {str(e)}",
@@ -644,7 +644,7 @@ class CodeIntelligenceEngine:
                 analysis_timestamp=time.time()
             )
             
-        except SyntaxError as e:
+        except SyntaxError as _e:
             # Handle syntax errors gracefully
             return CodeAnalysis(
                 language='python',
@@ -866,7 +866,7 @@ class CodeIntelligenceEngine:
         if file_path.suffix == '.py' and modification.new_code:
             try:
                 ast.parse(modification.new_code)
-            except SyntaxError as e:
+            except SyntaxError as _e:
                 return {
                     'valid': False,
                     'error': f'Syntax error in new code: {e}'
@@ -953,7 +953,7 @@ class CodeIntelligenceEngine:
                 }
             }
             
-        except Exception as e:
+        except Exception as __e:
             return {
                 'success': False,
                 'error': str(e)
@@ -982,7 +982,7 @@ class CodeIntelligenceEngine:
                 try:
                     ast.parse(content)
                     return {'valid': True, 'error': None}
-                except SyntaxError as e:
+                except SyntaxError as _e:
                     return {'valid': False, 'error': f'Syntax error: {e}'}
             
             elif path.suffix in ['.js', '.ts']:
@@ -996,7 +996,7 @@ class CodeIntelligenceEngine:
             
             return {'valid': True, 'error': None}
             
-        except Exception as e:
+        except Exception as __e:
             return {'valid': False, 'error': str(e)}
 
     def _rollback_modification(self, file_path: str, backup_path: str) -> bool:
@@ -1280,7 +1280,7 @@ function {name}({param_str}) {{
                     total_analysis['files_analyzed'] += 1
                     total_analysis['total_loc'] += analysis.lines_of_code
                     total_analysis['quality_scores'].append(analysis.quality_score)
-                except Exception as e:
+                except Exception as __e:
                     continue  # Skip problematic files
             
             # Calculate overall code health
@@ -1304,7 +1304,7 @@ function {name}({param_str}) {{
                 'self_modification_status': 'enabled' if avg_quality > 0.6 else 'limited'
             }
             
-        except Exception as e:
+        except Exception as __e:
             return {
                 'success': False,
                 'error': f'Code capability enhancement failed: {str(e)}',
@@ -1364,7 +1364,7 @@ function {name}({param_str}) {{
                 'theoretical_understanding': 'expert_level'
             }
             
-        except Exception as e:
+        except Exception as __e:
             return {
                 'success': False,
                 'error': f'Academic integration failed: {str(e)}',

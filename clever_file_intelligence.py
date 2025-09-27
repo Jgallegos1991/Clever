@@ -191,7 +191,7 @@ class CleverFileIntelligence:
                 if file_stats['total_files'] > 5000:
                     break
         
-        except Exception as e:
+        except Exception as _e:
             print(f"   ⚠️  Scan limitation: {e}")
         
         file_stats['scan_time'] = time.time() - start_time
@@ -297,7 +297,7 @@ class CleverFileIntelligence:
                     except Exception:
                         continue
         
-        except Exception as e:
+        except Exception as _e:
             print(f"   ⚠️  Code analysis limitation: {e}")
         
         # Calculate code analysis score
@@ -379,7 +379,7 @@ class CleverFileIntelligence:
                 if doc_stats['total_documents'] >= 50:
                     break
         
-        except Exception as e:
+        except Exception as _e:
             print(f"   ⚠️  Document analysis limitation: {e}")
         
         # Sort large documents
@@ -462,7 +462,7 @@ class CleverFileIntelligence:
                         except Exception:
                             continue
         
-        except Exception as e:
+        except Exception as _e:
             print(f"   ⚠️  Data analysis limitation: {e}")
         
         data_score = min(100,
@@ -521,7 +521,7 @@ class CleverFileIntelligence:
                         except Exception:
                             continue
         
-        except Exception as e:
+        except Exception as _e:
             print(f"   ⚠️  Config analysis limitation: {e}")
         
         config_score = min(100,

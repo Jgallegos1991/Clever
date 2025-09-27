@@ -18,7 +18,6 @@ Environment Variables:
 import logging
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import config
 
 # Configure logging
 logging.basicConfig(
@@ -96,7 +95,7 @@ class SyncEventHandler(FileSystemEventHandler):
                 logger.info(f"Ingestion {status} for {file_path}")
             else:
                 logger.info(f"No ingestion needed for {file_path} (status: {status})")
-        except Exception as e:
+        except Exception as _e:
             logger.error(f"Error during ingestion of {file_path}: {e}")
 
 def main():

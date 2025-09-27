@@ -79,7 +79,7 @@ def scan_file(path: Path, fix: bool = False):
                             f"{path}: Indentation error in function '{node.name}' at line {stmt.lineno}"
                         )
                         changed = True
-    except Exception as e:
+    except Exception as _e:
         REPORT.append(f"{path}: AST parse error: {e}")
     if changed and fix:
         with path.open("w", encoding="utf-8") as f:

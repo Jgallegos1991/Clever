@@ -24,6 +24,11 @@ Connects to:
     - database.py: Logging optimization events for Clever's learning
 """
 
+import psutil
+from typing import Dict, List, Any, Optional
+
+
+
 
 class VSCodeMemoryOptimizer:
     """
@@ -219,7 +224,7 @@ class VSCodeMemoryOptimizer:
             
             return True
             
-        except Exception as e:
+        except Exception as _e:
             print(f"Failed to apply {target} settings: {e}")
             return False
     

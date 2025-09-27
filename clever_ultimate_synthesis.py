@@ -82,7 +82,7 @@ class CleverUltimateSynthesis:
             try:
                 self.math_engine = CleverUltimateCapabilities()
                 print("✅ Mathematical Genius System: LOADED")
-            except Exception as e:
+            except Exception as _e:
                 print(f"⚠️  Math Engine: {e}")
         
         # Load file intelligence
@@ -90,7 +90,7 @@ class CleverUltimateSynthesis:
             try:
                 self.file_engine = CleverFileIntelligence()
                 print("✅ File Intelligence System: LOADED")
-            except Exception as e:
+            except Exception as _e:
                 print(f"⚠️  File Engine: {e}")
         
         # Load academic knowledge
@@ -98,7 +98,7 @@ class CleverUltimateSynthesis:
             try:
                 self.academic_engine = get_academic_engine()
                 print("✅ Academic Knowledge System: LOADED")
-            except Exception as e:
+            except Exception as _e:
                 print(f"⚠️  Academic Engine: {e}")
         
         # Load authentic personality
@@ -106,7 +106,7 @@ class CleverUltimateSynthesis:
             try:
                 self.personality_engine = JaysAuthenticClever()
                 print("✅ Jay's Authentic Personality: LOADED")
-            except Exception as e:
+            except Exception as _e:
                 print(f"⚠️  Personality Engine: {e}")
         
         print("🧠 All Systems Integrated: READY FOR ULTIMATE DEMONSTRATION")
@@ -408,7 +408,7 @@ class CleverUltimateSynthesis:
                         'sample_size': len(file_data)
                     })
         
-        except Exception as e:
+        except Exception as _e:
             print(f"   ⚠️  Correlation analysis limitation: {e}")
         
         # Naming pattern analysis

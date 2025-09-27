@@ -46,17 +46,14 @@ Critical Dependencies:
 """
 
 import ast
-import inspect
 import importlib.util
 from dataclasses import dataclass
 from collections import defaultdict
 import logging
-import tempfile
 
 # Clever core modules
 from database import DatabaseManager
 from notebooklm_engine import get_notebooklm_engine
-import config
 
 logger = logging.getLogger(__name__)
 
@@ -246,7 +243,7 @@ class SelfEvolutionEngine:
                 'enhancement': 'Document-grounded intelligence with cross-referencing'
             }
             self.integrated_knowledge['document_insights'] = overview['total_documents']
-        except Exception as e:
+        except Exception as _e:
             integration_results['documents'] = {'status': f'error: {e}'}
         
         # Integrate system specifications (from Chrome system dump)
@@ -296,7 +293,7 @@ class SelfEvolutionEngine:
                 """)
                 new_capabilities = [row[0] for row in cursor.fetchall()]
                 
-        except Exception as e:
+        except Exception as _e:
             logger.error(f"Error getting evolution status: {e}")
             mod_stats = (0, 0, 0)
             perf_improvements = {}
@@ -338,7 +335,7 @@ class SelfEvolutionEngine:
                     'enhancement': 'Device-specific optimization enabled',
                     'capabilities_discovered': system_docs
                 }
-        except Exception as e:
+        except Exception as _e:
             logger.debug(f"System specification integration error: {e}")
         
         return {
@@ -361,7 +358,7 @@ class SelfEvolutionEngine:
                     if knowledge_type in self.integrated_knowledge:
                         self.integrated_knowledge[knowledge_type] = total
                     
-        except Exception as e:
+        except Exception as _e:
             logger.warning(f"Could not load evolution state: {e}")
     
     def _log_knowledge_integration(self, results: Dict[str, Any]):

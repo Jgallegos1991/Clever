@@ -48,12 +48,10 @@ Critical Dependencies:
 
 import ast
 import logging
-import tempfile
 from dataclasses import dataclass
 
 # Clever core modules
 from database import DatabaseManager
-import config
 
 # Evolution and learning components
 try:
@@ -245,7 +243,7 @@ class SelfEvolutionEngine:
             logger.info(f"Generated {len(insights)} learning insights from document analysis")
             return insights
             
-        except Exception as e:
+        except Exception as __e:
             logger.error(f"Error analyzing document insights: {e}")
             return insights
     
@@ -286,7 +284,7 @@ class SelfEvolutionEngine:
                 supporting_evidence=supporting_evidence
             )
             
-        except Exception as e:
+        except Exception as __e:
             logger.warning(f"Error generating theme insight for '{theme}': {e}")
             return None
     
@@ -414,7 +412,7 @@ class SelfEvolutionEngine:
                 evolution = self._create_evolution_from_insight(insight)
                 if evolution and self._assess_evolution_safety(evolution):
                     evolutions.append(evolution)
-            except Exception as e:
+            except Exception as __e:
                 logger.warning(f"Error creating evolution from insight: {e}")
         
         # Also check for performance-based evolutions
@@ -559,7 +557,7 @@ class SelfEvolutionEngine:
                 connections = self._notebooklm_engine.find_cross_document_connections()
                 # Use connections for enhanced integration
                 return connections
-        except Exception as e:
+        except Exception as __e:
             logger.warning(f"Integration enhancement failed: {{e}}")
             return []
         """
@@ -727,7 +725,7 @@ class SelfEvolutionEngine:
             else:
                 return self._actually_apply_evolution(evolution, evolution_id)
                 
-        except Exception as e:
+        except Exception as __e:
             logger.error(f"Error applying evolution {evolution_id}: {e}")
             return {'success': False, 'error': str(e)}
     
@@ -749,7 +747,7 @@ class SelfEvolutionEngine:
         try:
             ast.parse(simulated_content)
             syntax_valid = True
-        except SyntaxError as e:
+        except SyntaxError as _e:
             syntax_valid = False
         
         return {
@@ -810,7 +808,7 @@ class SelfEvolutionEngine:
                     'test_results': test_results
                 }
                 
-        except Exception as e:
+        except Exception as __e:
             # Rollback on any error
             shutil.copy2(backup_path, target_path)
             logger.error(f"Evolution {evolution_id} application failed: {e}")
@@ -843,7 +841,7 @@ class SelfEvolutionEngine:
                     module = importlib.import_module(module_name)
                     importlib.reload(module)
                     import_success = True
-                except Exception as import_error:
+                except Exception as _import_error:
                     import_success = False
             else:
                 import_success = True
@@ -861,7 +859,7 @@ class SelfEvolutionEngine:
                 'syntax_valid': False,
                 'error': 'Syntax error in evolved code'
             }
-        except Exception as e:
+        except Exception as __e:
             return {
                 'success': False,
                 'error': str(e)

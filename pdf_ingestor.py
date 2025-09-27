@@ -23,7 +23,6 @@ import logging
 # Core dependencies
 from database import db_manager
 from nlp_processor import nlp_processor
-import config
 
 # PDF processing (optional dependency)
 try:
@@ -100,7 +99,7 @@ class EnhancedFileIngestor:
                         status = self.ingest_file(file_path)
                         stats[status] += 1
                         
-                    except Exception as e:
+                    except Exception as _e:
                         logger.error(f"Error processing {file_path}: {e}")
                         stats["failed"] += 1
         
@@ -133,7 +132,7 @@ class EnhancedFileIngestor:
                 print(f"⚠️  Empty content: {filename}")
                 return "failed"
                 
-        except Exception as e:
+        except Exception as _e:
             logger.error(f"Content extraction failed for {file_path}: {e}")
             return "failed"
         
@@ -158,7 +157,7 @@ class EnhancedFileIngestor:
                 )
                 results.append(status)
                 
-            except Exception as e:
+            except Exception as _e:
                 logger.error(f"Database insertion failed for {chunk_filename}: {e}")
                 results.append("failed")
         
@@ -196,7 +195,7 @@ class EnhancedFileIngestor:
                     page_text = page.extract_text()
                     if page_text.strip():
                         content += f"\n--- Page {page_num + 1} ---\n{page_text}\n"
-                except Exception as e:
+                except Exception as _e:
                     logger.warning(f"Failed to extract page {page_num + 1} from {file_path}: {e}")
         
         return content, metadata
@@ -290,7 +289,7 @@ def watch_and_ingest():
                 try:
                     status = self.ingestor.ingest_file(file_path)
                     print(f"✅ Status: {status}")
-                except Exception as e:
+                except Exception as _e:
                     print(f"❌ Error: {e}")
     
     handler = EnhancedSyncHandler()

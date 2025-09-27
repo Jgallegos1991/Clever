@@ -18,7 +18,6 @@ Connects to:
     - evolution_engine.py: Advanced language learning and cognitive development
 """
 
-import os
 import pickle
 from pathlib import Path
 from typing import Optional, Set
@@ -64,7 +63,7 @@ class EnglishDictionary:
                     word_set = pickle.load(f)
                     print(f"📚 Loaded cached English dictionary: {len(word_set):,} words")
                     return word_set
-            except Exception as e:
+            except Exception as _e:
                 print(f"⚠️ Cache load failed: {e}")
         
         # Load from NLTK and cache for future use
@@ -112,13 +111,13 @@ class EnglishDictionary:
                 with open(self.cache_path, 'wb') as f:
                     pickle.dump(word_set, f)
                 print("💾 Cached dictionary for faster future loading")
-            except Exception as e:
+            except Exception as _e:
                 print(f"⚠️ Could not cache dictionary: {e}")
             
             print(f"✅ Loaded complete English dictionary: {len(word_set):,} words")
             return word_set
             
-        except Exception as e:
+        except Exception as _e:
             print(f"❌ Failed to load NLTK dictionary: {e}")
             print("🔄 Falling back to enhanced core vocabulary...")
             

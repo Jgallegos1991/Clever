@@ -1037,7 +1037,7 @@ class ShapeGenerator:
                 debugger.warning('shape_generator', f'Unknown shape "{shape_name}", defaulting to circle')
                 return self.generate_circle(**kwargs)
                 
-        except Exception as e:
+        except Exception as _e:
             debugger.error('shape_generator', f'Error generating shape "{shape_name}": {str(e)}')
             # Fallback to simple circle
             return self.generate_circle(radius=100, center=(0, 0))

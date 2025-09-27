@@ -210,7 +210,7 @@ class MemoryOptimizedCodeIntelligence:
             self.total_analyzed_files += 1
             return analysis
             
-        except Exception as e:
+        except Exception as _e:
             print(f"Lightweight analysis failed for {file_path}: {e}")
             return None
     

@@ -20,7 +20,6 @@ Comprehensive backup and restoration for all Clever components
 """
 
 import sqlite3
-import config
 import datetime
 import tarfile
 from database import DatabaseManager

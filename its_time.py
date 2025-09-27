@@ -91,7 +91,7 @@ def run_capability_check():
             print("   ✅ Mathematical engine operational")
         else:
             print("   ❌ Mathematical calculation failed")
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ Mathematical test error: {e}")
     
     # Test file system intelligence
@@ -103,7 +103,7 @@ def run_capability_check():
             print(f"   ✅ File system aware ({len(files)} Python files detected)")
         else:
             print("   ❌ File detection insufficient")
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ File intelligence error: {e}")
     
     # Test synthesis capabilities
@@ -123,7 +123,7 @@ def run_capability_check():
             print(f"   ✅ Integration systems ready ({found_files}/{len(key_files)} modules)")
         else:
             print(f"   ❌ Integration incomplete ({found_files}/{len(key_files)} modules)")
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ Synthesis test error: {e}")
     
     # Test autonomy systems
@@ -136,7 +136,7 @@ def run_capability_check():
             print("   ✅ Autonomous systems operational")
         else:
             print("   ❌ Autonomy systems not found or incomplete")
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ Autonomy test error: {e}")
     
     # Test everything capabilities
@@ -148,7 +148,7 @@ def run_capability_check():
             print("   ✅ Universal capability system ready")
         else:
             print("   ❌ Everything capabilities not found")
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ Everything capabilities error: {e}")
     
     # Test voice takeover
@@ -160,7 +160,7 @@ def run_capability_check():
             print("   ✅ Voice system ready for activation")
         else:
             print("   ❌ Voice takeover system not found")
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ Voice test error: {e}")
     
     # Calculate readiness score
@@ -215,7 +215,7 @@ def activate_voice_system():
             print("   ❌ Voice takeover file not found")
             return False
             
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ Voice activation error: {e}")
         return False
 
@@ -254,7 +254,7 @@ def start_main_clever():
             print("   ❌ Main application file not found")
             return False
             
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ Main application error: {e}")
         return False
 

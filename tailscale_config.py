@@ -24,8 +24,6 @@ Connects to:
     - debug_config.py: Remote session logging and monitoring
 """
 
-import subprocess
-import sys
 from pathlib import Path
 
 def get_tailscale_ip():
@@ -50,7 +48,7 @@ def get_tailscale_ip():
             return ips[0].strip() if ips else None
     except FileNotFoundError:
         print("Tailscale not found - install with: curl -fsSL https://tailscale.com/install.sh | sh")
-    except Exception as e:
+    except Exception as _e:
         print(f"Error getting Tailscale IP: {e}")
     return None
 
@@ -87,7 +85,7 @@ def get_tailscale_status():
                 'devices': devices,
                 'network_ready': True
             }
-    except Exception as e:
+    except Exception as _e:
         print(f"Error getting Tailscale status: {e}")
     
     return {

@@ -337,7 +337,7 @@ class KnowledgeRoutingEngine:
                                                       if k.knowledge_type == KnowledgeType.ACADEMIC])
             }
             
-        except Exception as e:
+        except Exception as _e:
             logger.error(f"Academic knowledge integration failed: {e}")
             return {'success': False, 'error': str(e)}
     
@@ -385,7 +385,7 @@ class KnowledgeRoutingEngine:
                 'nlp_integration_active': True
             }
             
-        except Exception as e:
+        except Exception as _e:
             logger.error(f"NLP integration failed: {e}")
             return {'success': False, 'error': str(e)}
     
@@ -429,7 +429,7 @@ class KnowledgeRoutingEngine:
                                 }
                             )
                             sync_stats['cloud_knowledge_items'] += 1
-                        except Exception as e:
+                        except Exception as _e:
                             logger.warning(f"Failed to load sync file {sync_file}: {e}")
             
             # Create sync routing rules
@@ -468,7 +468,7 @@ class KnowledgeRoutingEngine:
                 'cloud_sync_active': True
             }
             
-        except Exception as e:
+        except Exception as _e:
             logger.error(f"Cloud sync integration failed: {e}")
             return {'success': False, 'error': str(e)}
     
@@ -541,7 +541,7 @@ class KnowledgeRoutingEngine:
                 }
             }
             
-        except Exception as e:
+        except Exception as _e:
             logger.error(f"Knowledge storage optimization failed: {e}")
             return {'success': False, 'error': str(e)}
     
@@ -635,7 +635,7 @@ class KnowledgeRoutingEngine:
             
             return insights
             
-        except Exception as e:
+        except Exception as _e:
             logger.error(f"Failed to generate knowledge insights: {e}")
             return {'error': str(e)}
     
@@ -774,7 +774,7 @@ class KnowledgeRoutingEngine:
             try:
                 sync_file.write_text(json.dumps(sync_data, indent=2))
                 logger.debug(f"Synced knowledge {sync_data['id']} to cloud")
-            except Exception as e:
+            except Exception as _e:
                 logger.warning(f"Failed to sync knowledge {sync_data['id']}: {e}")
                 # Re-queue for retry
                 self.sync_queue.append(sync_data)
@@ -893,7 +893,7 @@ class KnowledgeRoutingEngine:
                     if row[0] in self.knowledge_graph.edges and row[1] in self.knowledge_graph.edges:
                         self.knowledge_graph.edges[row[0]].add(row[1])
                 
-        except Exception as e:
+        except Exception as _e:
             logger.warning(f"Failed to load existing knowledge: {e}")
     
     def _store_in_database(self, item: KnowledgeItem):

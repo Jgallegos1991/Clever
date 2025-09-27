@@ -136,7 +136,7 @@ class AutomatedMonitor:
                 schedule.run_pending()
                 time.sleep(30)  # Check every 30 seconds
 
-            except Exception as e:
+            except Exception as _e:
                 logger.error("automated_monitor", f"Monitoring loop error: {e}")
                 time.sleep(60)  # Wait longer on error
 
@@ -205,7 +205,7 @@ class AutomatedMonitor:
             if len(self.alerts) > 50:
                 self.alerts = self.alerts[-50:]
 
-        except Exception as e:
+        except Exception as _e:
             logger.error("automated_monitor", f"Comprehensive validation error: {e}")
 
     def _run_critical_checks(self):
@@ -227,7 +227,7 @@ class AutomatedMonitor:
                 # Simple connection test
                 if hasattr(db_manager, "get_recent_conversations"):
                     pass  # Database accessible
-            except Exception as db_error:
+            except Exception as _db_error:
                 self._log_alert(
                     "critical", "Database", f"Database access error: {db_error}"
                 )
@@ -241,14 +241,14 @@ class AutomatedMonitor:
                     self._log_alert(
                         "critical", "Persona Engine", "Persona engine not responding"
                     )
-            except Exception as persona_error:
+            except Exception as _persona_error:
                 self._log_alert(
                     "critical",
                     "Persona Engine",
                     f"Persona engine error: {persona_error}",
                 )
 
-        except Exception as e:
+        except Exception as _e:
             logger.error("automated_monitor", f"Critical checks error: {e}")
 
     def _monitor_performance(self):
@@ -293,7 +293,7 @@ class AutomatedMonitor:
         except ImportError:
             # psutil not available - skip performance monitoring
             pass
-        except Exception as e:
+        except Exception as _e:
             logger.warning("automated_monitor", f"Performance monitoring error: {e}")
 
     def _log_alert(self, severity: str, component: str, message: str):

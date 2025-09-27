@@ -48,7 +48,7 @@ class SimpleRevolutionaryOptimizer:
                 'free_mb': free_mb,
                 'used_percent': ((total_mb - available_mb) / total_mb) * 100 if total_mb > 0 else 0
             }
-        except Exception as e:
+        except Exception as _e:
             print(f"Warning: Could not read memory info: {e}")
             return {'total_mb': 2700, 'available_mb': 800, 'free_mb': 400, 'used_percent': 70}
     
@@ -147,7 +147,7 @@ class SimpleRevolutionaryOptimizer:
                 
             return True
             
-        except Exception as e:
+        except Exception as _e:
             print(f"   ⚠️  VS Code optimization error: {e}")
             return False
     
@@ -232,7 +232,7 @@ def check_memory():
         
         return available_mb, total_mb
         
-    except Exception as e:
+    except Exception as _e:
         print(f"Memory check failed: {e}")
         return 800, 2700
 

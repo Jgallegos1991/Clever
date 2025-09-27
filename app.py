@@ -39,7 +39,6 @@ Connects to:
     - static/js/main.js: The frontend JavaScript makes calls to the `/api/chat` and `/api/ping` endpoints defined in this file.
 """
 
-import time
 import re
 from flask import Flask, request, jsonify, render_template
 from database import db_manager
@@ -295,7 +294,7 @@ def chat():
         debugger.info("chat", f"Processed message: {user_message[:50]}...")
         return jsonify(response)
         
-    except Exception as e:
+    except Exception as _e:
         TELEMETRY["last_error"] = str(e)
         debugger.info("chat", f"Error processing message: {str(e)}")
         return jsonify({
@@ -392,7 +391,7 @@ def ingest():
             'status': 'success',
             'message': f'Form submitted successfully for {name}' if name else 'Form submitted successfully'
         })
-    except Exception as e:
+    except Exception as _e:
         debugger.info("ingest", f"Error in ingestion: {str(e)}")
         return jsonify({
             'error': 'Ingestion failed',
@@ -422,7 +421,7 @@ def summarize():
             'status': 'success',
             'summary': summary
         })
-    except Exception as e:
+    except Exception as _e:
         debugger.info("summarize", f"Error in summarization: {str(e)}")
         return jsonify({
             'error': 'Summarization failed',
@@ -456,7 +455,7 @@ def search():
             'results': [],
             'message': 'Search endpoint ready'
         })
-    except Exception as e:
+    except Exception as _e:
         debugger.info("search", f"Error in search: {str(e)}")
         return jsonify({
             'error': 'Search failed',
@@ -570,7 +569,7 @@ def api_generate_shape():
             'message': f'Generated {shape.name} with {len(shape.points)} coordinate points'
         })
         
-    except Exception as e:
+    except Exception as _e:
         debugger.error('api.generate_shape', f'Shape generation failed: {str(e)}')
         return jsonify({
             'success': False,
@@ -628,7 +627,7 @@ def api_shape_info(shape_name):
             'info': info
         })
         
-    except Exception as e:
+    except Exception as _e:
         debugger.error('api.shape_info', f'Shape info retrieval failed: {str(e)}')
         return jsonify({
             'success': False,
@@ -735,7 +734,7 @@ def api_analyze_document():
                 'processing_time_ms': processing_time
             })
             
-        except ValueError as e:
+        except ValueError as _e:
             return jsonify({
                 'success': False,
                 'error': str(e)
@@ -746,7 +745,7 @@ def api_analyze_document():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Document analysis error: {str(e)}")
         return jsonify({
             'success': False,
@@ -827,7 +826,7 @@ def api_query_documents():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Document query error: {str(e)}")
         return jsonify({
             'success': False,
@@ -882,7 +881,7 @@ def api_document_connections():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Document connections error: {str(e)}")
         return jsonify({
             'success': False,
@@ -927,7 +926,7 @@ def api_collection_overview():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Collection overview error: {str(e)}")
         return jsonify({
             'success': False,
@@ -981,7 +980,7 @@ def api_enhance_ingestion():
             try:
                 engine.analyze_document(doc_id)
                 processed_count += 1
-            except Exception as e:
+            except Exception as _e:
                 errors.append(f"{filename}: {str(e)}")
         
         processing_time = (time.time() - start_time) * 1000
@@ -1000,7 +999,7 @@ def api_enhance_ingestion():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Enhanced ingestion error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1049,7 +1048,7 @@ def api_cognitive_sovereignty_status():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Sovereignty status error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1099,7 +1098,7 @@ def api_integrate_comprehensive_knowledge():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Knowledge integration error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1148,7 +1147,7 @@ def api_enable_full_device_control():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Device control error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1197,7 +1196,7 @@ def api_evolve_unlimited_connections():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Connection evolution error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1267,7 +1266,7 @@ def api_full_cognitive_sovereignty_activation():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as e:
+    except Exception as _e:
         debugger.info("api", f"Full activation error: {str(e)}")
         return jsonify({
             'success': False,

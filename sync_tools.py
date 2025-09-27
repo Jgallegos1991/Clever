@@ -17,7 +17,6 @@ Connects to:
 from __future__ import annotations
 
 
-import config
 
 
 def run_rclone_sync(

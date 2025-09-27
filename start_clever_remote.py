@@ -71,7 +71,7 @@ def start_clever_remote():
     except KeyboardInterrupt:
         print("\n👋 Clever shutting down gracefully...")
         return True
-    except Exception as e:
+    except Exception as _e:
         print(f"❌ Error starting Clever: {e}")
         return False
 

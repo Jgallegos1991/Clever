@@ -23,7 +23,6 @@ Connects to:
     - health_monitor.py: `check_database_health()` reads `config.DB_PATH` to locate and check the database file.
 """
 
-import os
 from pathlib import Path
 
 # Import user configuration explicitly to avoid star-import issues (F403/F405)

@@ -225,7 +225,7 @@ class SimpleNLPProcessor:
             try:
                 academic_engine = get_academic_engine()
                 academic_analysis = academic_engine.analyze_academic_content(text)
-            except Exception as e:
+            except Exception as _e:
                 print(f"⚠️ Academic analysis failed: {e}")
                 academic_analysis = {
                     'detected_concepts': [],
@@ -323,7 +323,7 @@ class SimpleNLPProcessor:
                         else:
                             misspelled += 1
                             
-            except Exception as e:
+            except Exception as _e:
                 # Fallback to enhanced core vocabulary if dictionary fails
                 print(f"⚠️ Dictionary lookup failed: {e}")
                 misspelled, dictionary_hits = self._fallback_typo_detection(tokens)

@@ -23,7 +23,6 @@ Connects to:
     - digital sovereignty: Complete privacy protection
 """
 
-import sys
 from pathlib import Path
 from typing import Dict, Any
 
@@ -66,7 +65,7 @@ class OfflineSovereigntyEnforcer:
             from utils import offline_guard
             offline_guard.enable()
             print("✅ Network guard: ACTIVE (External connections blocked)")
-        except Exception as e:
+        except Exception as _e:
             print(f"⚠️  Network guard warning: {e}")
             
         # Validate offline components

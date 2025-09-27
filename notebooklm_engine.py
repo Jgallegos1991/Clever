@@ -52,7 +52,6 @@ Critical Dependencies:
 import json
 import logging
 import re
-import time
 from collections import defaultdict, Counter
 from dataclasses import dataclass
 from typing import NamedTuple, Dict, List, Optional, Any, Set, Tuple
@@ -69,9 +68,8 @@ except ImportError:
     _EMBEDDINGS_AVAILABLE = False
 
 try:
-    from sklearn.metrics.pairwise import cosine_similarity
-    from sklearn.cluster import KMeans
-    _SKLEARN_AVAILABLE = True
+    # Optional sklearn for advanced clustering (not currently used)
+    _SKLEARN_AVAILABLE = False  # Disabled for offline sovereignty
 except ImportError:
     _SKLEARN_AVAILABLE = False
 
@@ -149,7 +147,7 @@ class NotebookLMEngine:
             try:
                 self._embeddings_model = SentenceTransformer('all-MiniLM-L6-v2')
                 logger.info("NotebookLM Engine: Sentence embeddings enabled")
-            except Exception as e:
+            except Exception as _e:
                 logger.warning(f"NotebookLM Engine: Could not load embeddings model: {e}")
                 self._embeddings_model = None
         

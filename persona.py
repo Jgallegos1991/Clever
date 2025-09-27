@@ -89,7 +89,6 @@ from __future__ import annotations
 import logging
 import random
 import re
-import time
 from collections import deque
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
@@ -209,7 +208,7 @@ class PersonaEngine:
             self.memory_available = True
             self.personality_traits['memory_enhanced'] = True
             debugger.info('persona_engine', 'Advanced memory system connected successfully')
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('persona_engine', f'Memory system unavailable: {e}')
             self.memory_available = False
         
@@ -317,7 +316,7 @@ class PersonaEngine:
             jay_response = jay_clever.generate_jay_response(text, mode, jay_context)
             return jay_clever.create_persona_response(jay_response)
             
-        except Exception as e:
+        except Exception as _e:
             # Fallback to ensure Clever always responds to Jay
             print(f"⚠️  Jay's Clever fallback: {e}")
             pass
@@ -387,7 +386,7 @@ class PersonaEngine:
                     importance_score=self._calculate_importance(text, keywords, entities)
                 )
                 
-            except Exception as e:
+            except Exception as _e:
                 debugger.warning('persona_engine', f'Memory processing failed: {e}')
         
         # Enhanced context with memory
@@ -408,14 +407,14 @@ class PersonaEngine:
                 enhanced_context['document_response'] = document_response
                 document_citations = getattr(document_response, 'citations', [])
                 enhanced_context['document_citations'] = document_citations
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('persona_engine', f'Document query handling failed: {e}')
         
         # Detect file search intent before mode routing
         file_search_result = None
         try:
             file_search_result = self._maybe_handle_file_search(text)
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('persona_engine', f'File search intent handling failed: {e}')
 
         # Route to appropriate mode handler (skip typical generation if we produced a file search answer)
@@ -459,7 +458,7 @@ class PersonaEngine:
                 memory_context.response_text = response_text
                 self.memory_engine.store_interaction(memory_context)
                 debugger.info('persona_engine', 'Interaction stored in memory successfully')
-            except Exception as e:
+            except Exception as _e:
                 debugger.warning('persona_engine', f'Failed to store interaction: {e}')
         
         # Performance logging
@@ -823,7 +822,7 @@ class PersonaEngine:
                 best_result = semantic_results[0]
                 return f"From {best_result['filename']}: {best_result['excerpt']}"
                 
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('persona_engine', f'Knowledge retrieval failed: {e}')
             
         return None
@@ -899,7 +898,7 @@ class PersonaEngine:
             results.sort(key=lambda x: x['relevance_score'], reverse=True)
             return results
             
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('persona_engine', f'Semantic knowledge search failed: {e}')
             return []
 
@@ -1189,7 +1188,7 @@ class PersonaEngine:
                 # Log the enhanced analysis for evolution
                 debugger.info('persona.shape_analysis', f'Shape: {detected_shape}, Confidence: {shape_confidence:.2f}, Complexity: {complexity_score:.2f}')
                 
-            except Exception as e:
+            except Exception as _e:
                 # Enhanced fallback with error context
                 context['requested_shape'] = detected_shape
                 debugger.error('persona', f'Shape generation error for {detected_shape}: {str(e)}')
@@ -1582,7 +1581,7 @@ class PersonaEngine:
             
             return response
             
-        except Exception as e:
+        except Exception as _e:
             debugger.error('persona.academic_response', f'Academic response failed: {e}')
             return None
 
@@ -1622,7 +1621,7 @@ class PersonaEngine:
         except ImportError:
             # NotebookLM engine not available - that's fine
             return None
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('persona_engine', f'Document query error: {e}')
             return None
     

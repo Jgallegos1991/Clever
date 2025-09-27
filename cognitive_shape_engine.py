@@ -117,7 +117,7 @@ class CognitiveShapeEngine:
                         
             debugger.info('cognitive_shape_engine', f'Loaded {len(self.shape_preferences)} shape preferences and {len(self.complexity_history)} complexity patterns')
             
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('cognitive_shape_engine', f'Could not load preferences: {e}')
             # Initialize with defaults
             self.complexity_history = [0.5]
@@ -307,7 +307,7 @@ class CognitiveShapeEngine:
                 if 'beautiful' in memory.get('content', '').lower():
                     suggestions.append('aesthetic_focus')
                     
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('cognitive_shape_engine', f'Could not load contextual memories: {e}')
         
         return list(set(suggestions))  # Remove duplicates
@@ -510,7 +510,7 @@ class CognitiveShapeEngine:
             
             debugger.info('cognitive_shape_engine', f'Stored cognitive interaction {interaction_id} for learning')
             
-        except Exception as e:
+        except Exception as _e:
             debugger.warning('cognitive_shape_engine', f'Could not store cognitive interaction: {e}')
     
     def _update_cognitive_preferences(self, context: CognitiveShapeContext, metadata: Dict[str, Any]):

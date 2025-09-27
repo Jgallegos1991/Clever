@@ -60,7 +60,7 @@ def find_connects_to_references(file_path: str) -> List[Tuple[int, str, List[str
             else:
                 i += 1
                 
-    except Exception as e:
+    except Exception as _e:
         print(f"Error reading {file_path}: {e}")
     
     return references
@@ -98,7 +98,7 @@ def get_python_imports(file_path: str) -> Set[str]:
                     if match:
                         imports.add(match.group(1))
     
-    except Exception as e:
+    except Exception as _e:
         print(f"Error parsing imports from {file_path}: {e}")
     
     return imports
@@ -123,7 +123,7 @@ def get_javascript_references(file_path: str) -> Set[str]:
             matches = re.findall(pattern, content, re.IGNORECASE)
             references.update(matches)
             
-    except Exception as e:
+    except Exception as _e:
         print(f"Error parsing JavaScript references from {file_path}: {e}")
     
     return references

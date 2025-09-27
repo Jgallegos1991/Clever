@@ -61,7 +61,7 @@ def run_tooltip_tests():
         
         return results
         
-    except Exception as e:
+    except Exception as _e:
         print(f"❌ Error running tooltip tests: {e}")
         return {'status': 'error', 'error': str(e)}
 
@@ -100,7 +100,7 @@ def run_main_test_suite():
         
         return results
         
-    except Exception as e:
+    except Exception as _e:
         print(f"❌ Error running main test suite: {e}")
         return {'status': 'error', 'error': str(e)}
 
@@ -124,7 +124,7 @@ def run_pytest_tests():
     except subprocess.TimeoutExpired:
         print("⏰ Pytest tests timed out")
         return {"status": "timeout"}
-    except Exception as e:  # Fallback unexpected error
+    except Exception as _e:  # Fallback unexpected error
         print(f"❌ Error invoking pytest: {e}")
         return {"status": "error", "error": str(e)}
 
@@ -182,7 +182,7 @@ def create_test_report(tooltip_results, main_results, pytest_results):
         with open(report_filename, 'w') as f:
             json.dump(report, f, indent=2)
         print(f"📄 Test report saved: {report_filename}")
-    except Exception as e:
+    except Exception as _e:
         print(f"⚠️  Could not save report: {e}")
     
     return report

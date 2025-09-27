@@ -55,7 +55,7 @@ def test_shape_generator():
             if 'fractal_dimension' in shape.properties:
                 print(f"   🌀 Fractal Dimension: {shape.properties['fractal_dimension']:.3f}")
                 
-        except Exception as e:
+        except Exception as _e:
             print(f"   ❌ Error: {e}")
 
 def test_api_endpoints():
@@ -80,7 +80,7 @@ def test_api_endpoints():
                 print(f"   📂 {category}: {list(shapes.keys())}")
         else:
             print(f"   ❌ API Error: {response.status_code}")
-    except Exception as e:
+    except Exception as _e:
         print(f"   ❌ Connection Error: {e}")
     
     # Test shape generation
@@ -100,7 +100,7 @@ def test_api_endpoints():
                 print(f"   ✅ Generated {shape['name']} with {shape['point_count']} points")
             else:
                 print(f"   ❌ API Error: {response.status_code}")
-        except Exception as e:
+        except Exception as _e:
             print(f"   ❌ Connection Error: {e}")
 
 def showcase_mathematical_beauty():

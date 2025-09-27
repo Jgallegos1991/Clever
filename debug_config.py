@@ -14,8 +14,6 @@ Connects to:
     - introspection.py: The `performance_monitor` decorator is used to wrap functions to gather performance data.
     - intelligent_analyzer.py: `get_performance_stats()` and `get_component_health()` are called to provide data for analysis.
 """
-import os
-import time
 from collections import defaultdict, deque
 from datetime import datetime
 from typing import Dict, Any, Optional, List
@@ -210,7 +208,7 @@ def performance_monitor(component: str):
                 debugger = get_debugger()
                 debugger.track_performance(component, func.__name__, duration)
                 return result
-            except Exception as e:
+            except Exception as _e:
                 duration = time.time() - start_time
                 debugger = get_debugger()
                 debugger.error(component, f"Error in {func.__name__}: {str(e)}")

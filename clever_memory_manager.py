@@ -27,6 +27,12 @@ Connects to:
     - debug_config.py: Performance monitoring and debugging integration
 """
 
+import gc
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional
+
+
+
 from datetime import datetime, timedelta
 
 class CleverMemoryManager:
@@ -71,7 +77,7 @@ class CleverMemoryManager:
                 'swap_used_mb': int(swap_line[2]) if len(swap_line) > 2 else 0,
                 'timestamp': datetime.now()
             }
-        except Exception as e:
+        except Exception as _e:
             print(f"Error getting memory info: {e}")
             return {
                 'total_mb': 2734, 'used_mb': 2400, 'free_mb': 200,
@@ -118,7 +124,7 @@ class CleverMemoryManager:
             
             return processes
             
-        except Exception as e:
+        except Exception as _e:
             print(f"Error getting process memory: {e}")
             return {}
     
@@ -333,7 +339,7 @@ class CleverMemoryManager:
                 print("\n🛑 Memory monitoring stopped")
                 self.monitoring = False
                 break
-            except Exception as e:
+            except Exception as _e:
                 print(f"❌ Monitoring error: {e}")
                 time.sleep(interval)
     

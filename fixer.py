@@ -107,7 +107,7 @@ def _repair_dependencies() -> Tuple[bool, str]:
             return True, "Dependencies repaired."
         else:
             return False, f"Dependency repair failed: {result.stderr.strip()}"
-    except Exception as e:
+    except Exception as _e:
         return False, f"Dependency repair error: {e}"
 
 
@@ -134,7 +134,7 @@ def _validate_config_files() -> Tuple[bool, str]:
                     for k in missing:
                         f.write(f"\n{k} = None  # Auto-added by fixer\n")
                 fixed.append(f"{fname}: added {missing}")
-        except Exception as e:
+        except Exception as _e:
             fixed.append(f"{fname}: error {e}")
     if fixed:
         return True, ", ".join(fixed)
@@ -160,7 +160,7 @@ def _check_database_integrity() -> Tuple[bool, str]:
             Path(db_path).write_bytes(backup.read_bytes())
             return True, "Database restored from backup."
         return False, f"Database integrity failed: {result[0] if result else 'Unknown error'}"
-    except Exception as e:
+    except Exception as _e:
         return False, f"Database integrity error: {e}"
 
 
@@ -208,7 +208,7 @@ def _run_code_cleaner(mode: str) -> Tuple[bool, str]:
             return True, f"{mode} completed: {result.stdout.strip()}"
         else:
             return False, f"{mode} failed: {result.stderr.strip()}"
-    except Exception as e:
+    except Exception as _e:
         return False, f"{mode} error: {e}"
 
 

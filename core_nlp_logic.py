@@ -61,7 +61,7 @@ def upgrade_configurations() -> None:
         # - Update config files
         logger.info("Configuration upgrade completed successfully")
         
-    except Exception as e:
+    except Exception as _e:
         logger.error(f"Error during configuration upgrade: {e}")
         # Don't raise the exception to avoid blocking app startup
 
@@ -98,7 +98,7 @@ def finalize_configurations() -> None:
         # - Initialize configuration-dependent components
         logger.info("Configuration finalization completed successfully")
         
-    except Exception as e:
+    except Exception as _e:
         logger.error(f"Error during configuration finalization: {e}")
         # Don't raise the exception to avoid blocking app startup
 
