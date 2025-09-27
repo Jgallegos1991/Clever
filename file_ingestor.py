@@ -1,5 +1,3 @@
-import os
-import hashlib
 import pypdf as PyPDF2  # Use pypdf (modern fork) but alias as PyPDF2 for clarity
 import re
 
@@ -114,7 +112,7 @@ class FileIngestor:
             keywords: list = []
 
             # Extract content + lightweight NLP
-            if filename.lower().endswith('.pdf'):
+            if filename.lower().endswith('.pd'):
                 content, entities, keywords = self.process_pdf(file_path)
             else:
                 with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:

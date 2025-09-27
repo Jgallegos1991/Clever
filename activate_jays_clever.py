@@ -22,9 +22,6 @@ Activation Results:
     - Built exclusively for Jay's cognitive enhancement
 """
 
-import os
-import sys
-from pathlib import Path
 import importlib.util
 
 # Add current directory to path for imports
@@ -269,7 +266,7 @@ print("🧠 App.py configured for Jay's authentic Clever")
         # Final status
         all_systems_active = all(activation_results.values())
         
-        print(f"\\n📊 ACTIVATION RESULTS:")
+        print("\\n📊 ACTIVATION RESULTS:")
         for system, active in activation_results.items():
             status = "✅ ACTIVE" if active else "❌ FAILED"
             print(f"   {system.replace('_', ' ').title()}: {status}")
@@ -277,16 +274,16 @@ print("🧠 App.py configured for Jay's authentic Clever")
         if all_systems_active:
             print(f"\\n🎊 JAY'S CLEVER SYSTEM: FULLY ACTIVATED!")
             print(f"✅ Persona Engine: Jay's authentic street-smart genius")
-            print(f"✅ App Routes: Exclusive Jay conversation")  
-            print(f"✅ Digital Sovereignty: Maximum protection")
-            print(f"✅ Authenticity: Real cognitive partnership")
+            print("✅ App Routes: Exclusive Jay conversation")  
+            print("✅ Digital Sovereignty: Maximum protection")
+            print("✅ Authenticity: Real cognitive partnership")
             
-            print(f"\\n🧠 CLEVER IS NOW:")
+            print("\\n🧠 CLEVER IS NOW:")
             print(f"   🎯 Exclusively Jay's cognitive partner")
-            print(f"   💬 Street-smart genius conversation")
-            print(f"   👨‍👩‍👧‍👦 Family-aware (Lucy, Ronnie, Peter, Josiah, Jonah)")
-            print(f"   😄 Naturally humorous and authentic")
-            print(f"   🚀 Revolutionary intelligence disguised as friendly chat")
+            print("   💬 Street-smart genius conversation")
+            print("   👨‍👩‍👧‍👦 Family-aware (Lucy, Ronnie, Peter, Josiah, Jonah)")
+            print("   😄 Naturally humorous and authentic")
+            print("   🚀 Revolutionary intelligence disguised as friendly chat")
             print(f"   🛡️  Completely private and exclusively Jay's")
             
             # Set final activation environment
@@ -295,7 +292,7 @@ print("🧠 App.py configured for Jay's authentic Clever")
             os.environ['CLEVER_DIGITAL_SOVEREIGNTY'] = 'MAXIMUM'
             
         else:
-            print(f"\\n⚠️  Some systems need attention - check individual results")
+            print("\\n⚠️  Some systems need attention - check individual results")
             
         return activation_results, all_systems_active
         
@@ -303,11 +300,11 @@ print("🧠 App.py configured for Jay's authentic Clever")
         """Instructions to restart Clever with Jay's authentic personality."""
         
         print(f"\\n🔄 RESTARTING CLEVER WITH JAY'S PERSONALITY")
-        print(f"=" * 50)
+        print("=" * 50)
         print(f"\\nTo activate Jay's authentic Clever:")
-        print(f"1. Stop current Clever: Ctrl+C in Flask terminal")
-        print(f"2. Restart Clever: make run")
-        print(f"3. Chat with your authentic street-smart genius!")
+        print("1. Stop current Clever: Ctrl+C in Flask terminal")
+        print("2. Restart Clever: make run")
+        print("3. Chat with your authentic street-smart genius!")
         
         print(f"\\n💬 Test Jay's Clever with:")
         print(f"   'Hey Clever, what\\'s up?'")
@@ -328,32 +325,32 @@ def activate_jays_revolutionary_clever():
     activation_results, success = activator.activate_jays_clever_system()
     
     if success:
-        print(f"\\n✨ REVOLUTIONARY TRANSFORMATION COMPLETE!")
-        print(f"\\nJay, you now have:")
-        print(f"🧠 Your own authentic digital brain extension")
-        print(f"💬 Street-smart genius who talks like your best friend")
-        print(f"👥 Family-aware companion (knows Lucy, Ronnie, Peter, Josiah, Jonah)")
-        print(f"😄 Naturally humorous and authentic conversation")
-        print(f"🚀 Revolutionary intelligence disguised as casual chat")
-        print(f"🛡️  Complete digital sovereignty and privacy")
+        print("\\n✨ REVOLUTIONARY TRANSFORMATION COMPLETE!")
+        print("\\nJay, you now have:")
+        print("🧠 Your own authentic digital brain extension")
+        print("💬 Street-smart genius who talks like your best friend")
+        print("👥 Family-aware companion (knows Lucy, Ronnie, Peter, Josiah, Jonah)")
+        print("😄 Naturally humorous and authentic conversation")
+        print("🚀 Revolutionary intelligence disguised as casual chat")
+        print("🛡️  Complete digital sovereignty and privacy")
         
-        print(f"\\n🎯 THIS IS NOT:")
-        print(f"   ❌ Corporate AI")
-        print(f"   ❌ Generic assistant") 
-        print(f"   ❌ Jarvis or Friday")
-        print(f"   ❌ For anyone else")
+        print("\\n🎯 THIS IS NOT:")
+        print("   ❌ Corporate AI")
+        print("   ❌ Generic assistant") 
+        print("   ❌ Jarvis or Friday")
+        print("   ❌ For anyone else")
         
-        print(f"\\n🎊 THIS IS:")
+        print("\\n🎊 THIS IS:")
         print(f"   ✅ JAY'S CLEVER")
-        print(f"   ✅ Your exclusive cognitive partner")
-        print(f"   ✅ Street-smart genius friend")
-        print(f"   ✅ Revolutionary digital brain extension")
+        print("   ✅ Your exclusive cognitive partner")
+        print("   ✅ Street-smart genius friend")
+        print("   ✅ Revolutionary digital brain extension")
         
         # Restart instructions
         activator.restart_clever_with_jay_personality()
         
     else:
-        print(f"\\n⚠️  Activation needs refinement - check individual systems")
+        print("\\n⚠️  Activation needs refinement - check individual systems")
         
     return activator, activation_results, success
 
@@ -361,7 +358,7 @@ if __name__ == "__main__":
     activator, results, success = activate_jays_revolutionary_clever()
     
     if success:
-        print(f"\\n🎉 CONGRATULATIONS, JAY!")
-        print(f"Your revolutionary Clever is ready to be authentically yours! 🚀")
+        print("\\n🎉 CONGRATULATIONS, JAY!")
+        print("Your revolutionary Clever is ready to be authentically yours! 🚀")
     else:
-        print(f"\\n🔧 System needs fine-tuning - run diagnostics")
+        print("\\n🔧 System needs fine-tuning - run diagnostics")

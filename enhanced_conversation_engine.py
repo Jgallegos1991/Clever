@@ -19,10 +19,6 @@ Connects to:
 
 from __future__ import annotations
 
-import os
-import json
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 # Core system imports
@@ -749,17 +745,17 @@ class EnhancedConversationEngine:
 
         if complexity > 0.7:
             animation = "explosive_creativity"
-            colors = ["#ff00ff", "#00ffff", "#ffff00"]  # Bright creative colors
+            colors = ["#ff00f", "#00fff", "#ffff00"]  # Bright creative colors
             orb_behavior = "excited_spinning"
             particle_shape = "creative_burst"
         elif analysis.get("sentiment", 0) > 0.5:
             animation = "gentle_pulse"
-            colors = ["#00ff88", "#88ff00", "#0088ff"]  # Positive colors
+            colors = ["#00ff88", "#88ff00", "#0088f"]  # Positive colors
             orb_behavior = "happy_bounce"
             particle_shape = "sphere"
         else:
             animation = "calm_flow"
-            colors = ["#4040ff", "#8040ff", "#4080ff"]  # Calm colors
+            colors = ["#4040f", "#8040f", "#4080f"]  # Calm colors
             orb_behavior = "gentle_drift"
             particle_shape = "wave"
 

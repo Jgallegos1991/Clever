@@ -21,7 +21,6 @@ import psutil
 import sqlite3
 import config
 from datetime import datetime
-from typing import Dict, List, Any
 from typing import cast
 from debug_config import get_debugger, performance_monitor
 from database import DatabaseManager
@@ -171,7 +170,6 @@ class SystemHealthMonitor:
             }
 
             # Check if database exists
-            import os
 
             if not os.path.exists(db_path):
                 health_data["status"] = "error"

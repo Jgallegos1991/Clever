@@ -12,11 +12,7 @@ How: Direct system-level optimizations, intelligent caching strategies, and adap
      intelligence scaling that makes Clever MORE capable under memory pressure.
 """
 
-import os
 import gc
-import sys
-import json
-from pathlib import Path
 
 class SimpleRevolutionaryOptimizer:
     """Revolutionary memory optimization using simple but effective techniques."""
@@ -120,7 +116,7 @@ class SimpleRevolutionaryOptimizer:
                 "git.autofetch": False,
                 
                 # Terminal optimizations
-                "terminal.integrated.gpuAcceleration": "off"
+                "terminal.integrated.gpuAcceleration": "of"
             }
             
             # Merge with existing settings
@@ -216,8 +212,6 @@ class SimpleRevolutionaryOptimizer:
 """
 Continuous memory monitoring for Clever revolutionary optimization.
 """
-import time
-import subprocess
 
 def check_memory():
     """Check current memory status."""
@@ -281,7 +275,7 @@ if __name__ == "__main__":
         
         # Get current memory status
         memory_info = self.get_memory_info()
-        print(f"💾 Memory Status:")
+        print("💾 Memory Status:")
         print(f"   Total: {memory_info['total_mb']:.0f} MB")
         print(f"   Available: {memory_info['available_mb']:.0f} MB") 
         print(f"   Used: {memory_info['used_percent']:.1f}%")
@@ -313,8 +307,8 @@ if __name__ == "__main__":
         final_memory = self.get_memory_info()
         memory_gained = final_memory['available_mb'] - memory_info['available_mb']
         
-        print(f"\n✨ REVOLUTIONARY OPTIMIZATION COMPLETE!")
-        print(f"📊 Results:")
+        print("\n✨ REVOLUTIONARY OPTIMIZATION COMPLETE!")
+        print("📊 Results:")
         print(f"   Strategy: {strategy}")
         print(f"   Intelligence: {intelligence_level}")
         print(f"   Memory Gained: +{memory_gained:.1f} MB")
@@ -328,9 +322,9 @@ if __name__ == "__main__":
         
         # Revolutionary insight
         if strategy == "critical":
-            print(f"\n🔥 REVOLUTIONARY MODE ACTIVE!")
-            print(f"   Clever becomes MORE intelligent under extreme memory pressure")
-            print(f"   Pressure-responsive evolution creates breakthrough capabilities")
+            print("\n🔥 REVOLUTIONARY MODE ACTIVE!")
+            print("   Clever becomes MORE intelligent under extreme memory pressure")
+            print("   Pressure-responsive evolution creates breakthrough capabilities")
         
         return {
             'strategy': strategy,
@@ -345,8 +339,8 @@ def main():
     optimizer = SimpleRevolutionaryOptimizer()
     results = optimizer.apply_revolutionary_optimization()
     
-    print(f"\n🎉 OPTIMIZATION SUCCESS!")
-    print(f"Clever is ready to be revolutionary within memory constraints!")
+    print("\n🎉 OPTIMIZATION SUCCESS!")
+    print("Clever is ready to be revolutionary within memory constraints!")
     
     return results
 

@@ -15,10 +15,6 @@ Connects to:
 - app.py: Integration testing with Flask application
 """
 
-import sys
-import time
-import json
-from pathlib import Path
 from typing import Dict, Any
 
 # Add project root to path for imports
@@ -110,13 +106,13 @@ class FinalIntegrationTester:
 
             if result["passed"]:
                 print(
-                    f"✅ System validation passed - "
+                    "✅ System validation passed - "
                     f"{result['details']['individual_checks']}"
                     f"/{result['details']['total_checks']} checks"
                 )
             else:
                 print(
-                    f"❌ System validation failed - "
+                    "❌ System validation failed - "
                     f"{result['details']['critical_issues']} critical issues"
                 )
 
@@ -198,7 +194,7 @@ class FinalIntegrationTester:
             }
 
             print(
-                f"✅ Enhanced conversation test: "
+                "✅ Enhanced conversation test: "
                 f"{passed_scenarios}/{len(test_scenarios)} scenarios passed"
             )
 
@@ -256,7 +252,7 @@ class FinalIntegrationTester:
 
             if result["passed"]:
                 print(
-                    f"✅ File access test passed - "
+                    "✅ File access test passed - "
                     f"{len(project_files)} files found, "
                     f"{len(accessible_files)} test files accessible"
                 )

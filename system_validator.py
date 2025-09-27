@@ -31,11 +31,8 @@ Connects to:
 
 from __future__ import annotations
 
-from typing import Dict, List, Any
-import socket
 from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
 
 import config
 import user_config
@@ -251,7 +248,7 @@ class SystemValidator:
                 check_name="Single User Config",
                 passed=True,
                 details=(
-                    f"System properly configured for single user: "
+                    "System properly configured for single user: "
                     f"{user_config.USER_NAME}"
                 ),
                 severity="info",
@@ -370,7 +367,7 @@ class SystemValidator:
                 check_name="Clever Persona",
                 passed=True,
                 details=(
-                    f"Clever persona fully functional with "
+                    "Clever persona fully functional with "
                     f"{len(persona_engine.modes)} modes available"
                 ),
                 severity="info",
@@ -487,7 +484,7 @@ class SystemValidator:
                 check_name="NLP Capabilities",
                 passed=True,
                 details=(
-                    f"NLP processor fully functional - extracted "
+                    "NLP processor fully functional - extracted "
                     f"{len(result.get('keywords', []))} keywords, "
                     f"sentiment: {result.get('sentiment')}"
                 ),
@@ -579,7 +576,7 @@ class SystemValidator:
                     check_name="Documentation Standards",
                     passed=False,
                     details=(
-                        f"Files missing proper documentation: " f"{undocumented_files}"
+                        "Files missing proper documentation: " f"{undocumented_files}"
                     ),
                     severity="warning",
                 )
@@ -611,7 +608,6 @@ class SystemValidator:
                     details="psutil not available; skipping performance checks (offline minimal)",
                     severity="info",
                 )
-            import time
 
             # Check memory usage
             process = psutil.Process()

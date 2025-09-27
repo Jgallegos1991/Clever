@@ -13,8 +13,6 @@ Connects to:
     - persona.py: Integration with chat-based shape commands
 """
 
-import json
-import time
 from shape_generator import get_shape_generator
 
 # Try to import requests for API testing
@@ -86,7 +84,7 @@ def test_api_endpoints():
         print(f"   ❌ Connection Error: {e}")
     
     # Test shape generation
-    print(f"\n🔮 Testing /api/generate_shape...")
+    print("\n🔮 Testing /api/generate_shape...")
     test_requests = [
         {"shape": "hexagon", "size": 120},
         {"shape": "spiral", "type": "fibonacci", "turns": 3},
@@ -127,7 +125,7 @@ def showcase_mathematical_beauty():
     # Koch snowflake fractal
     print("\n❄️ Koch Snowflake Fractal")
     fractal = shape_gen.create_shape("fractal", iterations=3, size=80)
-    print(f"   Infinite perimeter, finite area paradox")
+    print("   Infinite perimeter, finite area paradox")
     print(f"   Fractal dimension: {fractal.properties['fractal_dimension']:.4f}")
     print(f"   Generated with {len(fractal.points)} recursive points")
 

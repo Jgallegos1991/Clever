@@ -20,7 +20,6 @@ Connects to:
     - evolution_engine.py: Academic learning progression and knowledge retention
 """
 
-from typing import Dict, List, Any, Set, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
 import re
@@ -146,7 +145,7 @@ class ComprehensiveAcademicEngine:
             
             # Geometry
             'geometry': {
-                'keywords': ['triangle', 'circle', 'polygon', 'angle', 'perimeter', 'area', 'volume', 'congruent', 'similar', 'theorem', 'proof'],
+                'keywords': ['triangle', 'circle', 'polygon', 'angle', 'perimeter', 'area', 'volume', 'congruent', 'similar', 'theorem', 'proo'],
                 'concepts': {
                     'pythagorean_theorem': AcademicConcept(
                         name="Pythagorean Theorem",
@@ -764,15 +763,15 @@ if __name__ == "__main__":
     
     # Display knowledge statistics
     stats = engine.get_domain_statistics()
-    print(f"\n📊 KNOWLEDGE BASE STATISTICS:")
+    print("\n📊 KNOWLEDGE BASE STATISTICS:")
     total_concepts = sum(stats.values())
     print(f"   📖 Total Concepts: {total_concepts}")
     for domain, count in stats.items():
         print(f"   • {domain.title()}: {count} concepts")
     
-    print(f"\n🎉 Academic knowledge engine ready!")
+    print("\n🎉 Academic knowledge engine ready!")
     print(f"   ✅ Comprehensive coverage across {len(stats)} major domains")
     print(f"   ✅ {total_concepts} detailed academic concepts")
-    print(f"   ✅ Cross-domain relationship mapping")
-    print(f"   ✅ Educational response generation")
-    print(f"\n🧠 Clever now has university-level academic intelligence!")
+    print("   ✅ Cross-domain relationship mapping")
+    print("   ✅ Educational response generation")
+    print("\n🧠 Clever now has university-level academic intelligence!")

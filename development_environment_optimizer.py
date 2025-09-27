@@ -31,11 +31,7 @@ Connects to:
     - system monitoring: Real-time memory pressure detection and response
 """
 
-import json
 import psutil
-import time
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
 @dataclass
@@ -53,7 +49,7 @@ class MemoryProfile:
 class OptimizationSettings:
     """Optimized settings for development environment."""
     vscode_memory_limit_mb: int
-    pylance_type_checking: str  # 'off', 'basic', 'strict'
+    pylance_type_checking: str  # 'of', 'basic', 'strict'
     copilot_suggestions: bool
     clever_processing_mode: str  # 'minimal', 'conservative', 'standard'
     file_watching_enabled: bool
@@ -87,7 +83,7 @@ class DevelopmentEnvironmentOptimizer:
         self.optimization_profiles = {
             'critical': OptimizationSettings(
                 vscode_memory_limit_mb=200,
-                pylance_type_checking='off',
+                pylance_type_checking='of',
                 copilot_suggestions=False,
                 clever_processing_mode='minimal',
                 file_watching_enabled=False,
@@ -468,7 +464,6 @@ def get_development_environment_optimizer():
 
 if __name__ == "__main__":
     # CLI interface for manual optimization
-    import sys
     
     optimizer = get_development_environment_optimizer()
     

@@ -11,8 +11,6 @@ Connects to:
     - evolution_engine.py: Advanced learning and growth tracking
     - database.py: Persistent memory storage and retrieval
 """
-import hashlib
-from typing import Dict, List, Any, Tuple
 from datetime import datetime
 from collections import defaultdict, deque
 import logging

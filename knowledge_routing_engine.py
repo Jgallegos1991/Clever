@@ -51,13 +51,7 @@ Critical Dependencies:
     - Database schema: Extended schema for knowledge graphs and routing optimization
 """
 
-import json
-import time
-import hashlib
-import threading
 from dataclasses import dataclass, asdict
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Set, Tuple, Union
 from collections import defaultdict, deque
 from enum import Enum
 import logging

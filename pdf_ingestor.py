@@ -17,10 +17,6 @@ Connects to:
         - `watch_and_ingest()` -> `EnhancedSyncHandler`: This class uses `EnhancedFileIngestor` to process files when changes are detected by the watcher.
 """
 
-import os
-import hashlib
-from pathlib import Path
-from typing import List, Dict, Tuple
 import logging
  
 
@@ -35,7 +31,7 @@ try:
     PDF_SUPPORT = True
 except ImportError:
     PDF_SUPPORT = False
-    print("📚 PDF support not available. Install with: pip install pypdf")
+    print("📚 PDF support not available. Install with: pip install pypd")
     import PyPDF2
     PDF_SUPPORT = True
 except ImportError:
@@ -180,7 +176,7 @@ class EnhancedFileIngestor:
     def _extract_pdf_content(self, file_path: str) -> Tuple[str, Dict]:
         """Extract text content from PDF file."""
         content = ""
-        metadata = {"type": "pdf", "pages": 0}
+        metadata = {"type": "pd", "pages": 0}
         
         with open(file_path, 'rb') as file:
             pdf_reader = PyPDF2.PdfReader(file)
@@ -279,7 +275,6 @@ def watch_and_ingest():
     """Monitor directories and trigger ingestion on changes."""
     from sync_watcher import SyncEventHandler
     from watchdog.observers import Observer
-    import time
     
     print("👁️  Starting enhanced file watcher...")
     
@@ -322,7 +317,6 @@ def watch_and_ingest():
 
 
 if __name__ == "__main__":
-    import sys
     
     if len(sys.argv) > 1 and sys.argv[1] == "watch":
         watch_and_ingest()

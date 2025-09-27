@@ -19,16 +19,11 @@ Clever AI Backup System
 Comprehensive backup and restoration for all Clever components
 """
 
-import os
 import sqlite3
 import config
-import shutil
-import json
 import datetime
 import tarfile
-from pathlib import Path
 from database import DatabaseManager
-from typing import Dict, List, Any, Optional
 
 
 class CleverBackupSystem:

@@ -13,7 +13,6 @@ Connects to:
 """
 
 import re
-from pathlib import Path
 
 
 def fix_app_py():
@@ -79,13 +78,13 @@ def fix_app_py():
     # Fix complex f-strings
     content = re.sub(
         r'f\'Enhanced conversation processing - approach: \{conversation_result\.get\("approach"\)\}, mood: \{conversation_result\.get\("mood"\)\}\'',
-        "f'Enhanced conversation processing - '\n                        f'approach: {conversation_result.get(\"approach\")}, '\n                        f'mood: {conversation_result.get(\"mood\")}'",
+        "'Enhanced conversation processing - '\n                        f'approach: {conversation_result.get(\"approach\")}, '\n                        f'mood: {conversation_result.get(\"mood\")}'",
         content,
     )
 
     content = re.sub(
         r'f"Enhanced conversation engine failed, falling back: \{conv_error\}"',
-        'f"Enhanced conversation engine failed, "\n                        f"falling back: {conv_error}"',
+        '"Enhanced conversation engine failed, "\n                        f"falling back: {conv_error}"',
         content,
     )
 

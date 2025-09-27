@@ -12,13 +12,6 @@ How: Real-time memory monitoring with immediate intervention when memory pressur
      Applies progressive optimization strategies to keep system stable.
 """
 
-import os
-import sys
-import time
-import json
-import subprocess
-import threading
-from pathlib import Path
 
 class EmergencyMemoryStabilizer:
     """
@@ -65,14 +58,14 @@ class EmergencyMemoryStabilizer:
         
         # 2. Kill unnecessary browser processes
         try:
-            subprocess.run(['pkill', '-f', 'chrome.*renderer'], check=False)
+            subprocess.run(['pkill', '-', 'chrome.*renderer'], check=False)
             cleanup_actions.append("Killed Chrome renderers")
         except Exception:
             pass
         
         # 3. Restart Pylance (lightweight restart)
         try:
-            subprocess.run(['pkill', '-f', 'pylance'], check=False)
+            subprocess.run(['pkill', '-', 'pylance'], check=False)
             cleanup_actions.append("Restarted Pylance")
         except Exception:
             pass

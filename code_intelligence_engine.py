@@ -52,11 +52,6 @@ import ast
 import tokenize
 import inspect
 import re
-import json
-import time
-import hashlib
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple, Set, Union
 from dataclasses import dataclass, asdict
 from enum import Enum
 
@@ -64,7 +59,7 @@ from enum import Enum
 LANGUAGE_PATTERNS = {
     'python': {
         'extensions': ['.py', '.pyw', '.pyi'],
-        'keywords': ['def', 'class', 'import', 'from', 'if', 'elif', 'else', 'for', 'while', 'try', 'except'],
+        'keywords': ['de', 'class', 'import', 'from', 'i', 'eli', 'else', 'for', 'while', 'try', 'except'],
         'patterns': [r'def\s+\w+\s*\(', r'class\s+\w+', r'import\s+\w+', r'from\s+\w+\s+import']
     },
     'javascript': {
@@ -89,7 +84,7 @@ LANGUAGE_PATTERNS = {
     },
     'c': {
         'extensions': ['.c', '.h'],
-        'keywords': ['#include', 'struct', 'typedef', 'extern'],
+        'keywords': ['#include', 'struct', 'typede', 'extern'],
         'patterns': [r'#include\s*[<"]', r'struct\s+\w+', r'int\s+main\s*\(']
     },
     'rust': {
@@ -119,7 +114,7 @@ LANGUAGE_PATTERNS = {
     },
     'bash': {
         'extensions': ['.sh', '.bash'],
-        'keywords': ['#!/bin/bash', 'if', 'then', 'else', 'fi', 'for', 'while', 'function'],
+        'keywords': ['#!/bin/bash', 'i', 'then', 'else', 'fi', 'for', 'while', 'function'],
         'patterns': [r'#!/bin/bash', r'if\s*\[', r'for\s+\w+\s+in']
     },
     'json': {
@@ -1102,7 +1097,7 @@ class CodeIntelligenceEngine:
         """Generate Python function with Clever's documentation standards."""
         param_str = ', '.join([f"{p.get('name', 'arg')}: {p.get('type', 'Any')}" for p in parameters])
         
-        code = f'''def {name}({param_str}) -> {return_type}:
+        code = '''def {name}({param_str}) -> {return_type}:
     """
     {description}
     
@@ -1117,7 +1112,7 @@ class CodeIntelligenceEngine:
             param_desc = param.get('description', 'Function parameter')
             code += f'\n        {param_name}: {param_desc}'
         
-        code += f'''
+        code += '''
         
     Returns:
         {return_type}: Function result
@@ -1132,7 +1127,7 @@ class CodeIntelligenceEngine:
         """Generate JavaScript function with JSDoc documentation."""
         param_str = ', '.join([p.get('name', 'arg') for p in parameters])
         
-        code = f'''/**
+        code = '''/**
  * {description}
  * 
 '''
@@ -1143,7 +1138,7 @@ class CodeIntelligenceEngine:
             param_desc = param.get('description', 'Function parameter')
             code += f' * @param {{{param_type}}} {param_name} - {param_desc}\n'
         
-        code += f''' * @returns {{{return_type}}} Function result
+        code += ''' * @returns {{{return_type}}} Function result
  */
 function {name}({param_str}) {{
     // TODO: Implement function logic

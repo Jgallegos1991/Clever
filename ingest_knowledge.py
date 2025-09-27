@@ -19,11 +19,6 @@ Connects to:
 """
 
 import argparse
-import hashlib
-import os
-import time
-from pathlib import Path
-from typing import List
 
 from database import DatabaseManager
 import config
@@ -149,7 +144,7 @@ def main():
     
     args = parser.parse_args()
     
-    print(f"🧠 Clever Knowledge Ingestion Utility")
+    print("🧠 Clever Knowledge Ingestion Utility")
     print(f"📁 Processing directory: {args.directory.absolute()}")
     
     # Create ingestor
@@ -176,7 +171,7 @@ def main():
     if stats['inserted'] + stats['updated'] > 0:
         print(f"\n🎉 Knowledge base updated! Clever now has access to {stats['inserted'] + stats['updated']} new/updated files.")
     else:
-        print(f"\n✨ Knowledge base is up to date!")
+        print("\n✨ Knowledge base is up to date!")
         
     return 0
 

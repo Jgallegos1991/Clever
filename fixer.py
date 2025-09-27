@@ -16,8 +16,6 @@ Connects to:
     - debug_config.py: Logs repair operations and results
     - Various system files: Applies targeted fixes to maintain system health
 """
-from typing import Tuple, List
-from pathlib import Path
 
 # NOTE: Minimal, idempotent edits directly to project files.
 
@@ -100,7 +98,6 @@ def _repair_dependencies() -> Tuple[bool, str]:
     """
     Check and reinstall missing Python packages using requirements.txt.
     """
-    import subprocess
 
     try:
         result = subprocess.run(
@@ -119,7 +116,6 @@ def _validate_config_files() -> Tuple[bool, str]:
     Validate and auto-correct config.py and user_config.py for required keys and values.
     """
     import importlib.util
-    import sys
 
     required_keys = ["DB_PATH", "DEBUG"]
     config_files = ["config.py", "user_config.py"]
@@ -172,7 +168,6 @@ def _cleanup_logs() -> Tuple[bool, str]:
     """
     Archive or clean up old log files in logs/.
     """
-    import shutil
     from datetime import datetime
 
     log_dir = Path("logs")
@@ -196,7 +191,6 @@ def _run_code_cleaner(mode: str) -> Tuple[bool, str]:
     Returns:
         Tuple[bool, str]: Success flag and status message
     """
-    import subprocess
 
     script = "auto_code_cleaner_v2.py"
     arg_map = {

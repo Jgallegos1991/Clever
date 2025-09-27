@@ -24,17 +24,8 @@ File Intelligence Categories:
     6. Performance Optimization (identify system improvements)
 """
 
-import os
-import sys
-import json
-import hashlib
-import mimetypes
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
 from collections import defaultdict, Counter
-import time
 import re
-import subprocess
 from datetime import datetime, timedelta
 
 class CleverFileIntelligence:
@@ -56,13 +47,13 @@ class CleverFileIntelligence:
         # File type categories for intelligent organization
         self.file_categories = {
             'code': {'.py', '.js', '.html', '.css', '.cpp', '.c', '.java', '.rb', '.php', '.go'},
-            'documents': {'.txt', '.md', '.pdf', '.doc', '.docx', '.rtf', '.tex'},
+            'documents': {'.txt', '.md', '.pd', '.doc', '.docx', '.rt', '.tex'},
             'data': {'.json', '.csv', '.xml', '.yaml', '.yml', '.sql', '.db', '.sqlite'},
-            'images': {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'},
+            'images': {'.jpg', '.jpeg', '.png', '.gi', '.bmp', '.svg', '.webp'},
             'audio': {'.mp3', '.wav', '.flac', '.ogg', '.aac', '.m4a'},
             'video': {'.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.webm'},
             'archives': {'.zip', '.tar', '.gz', '.bz2', '.7z', '.rar'},
-            'configs': {'.conf', '.cfg', '.ini', '.toml', '.env', '.properties'},
+            'configs': {'.con', '.cfg', '.ini', '.toml', '.env', '.properties'},
             'notebooks': {'.ipynb'},
             'logs': {'.log', '.out', '.err'},
             'executables': {'.exe', '.bin', '.app', '.deb', '.rpm', '.dmg'}
@@ -505,7 +496,7 @@ class CleverFileIntelligence:
         
         try:
             # Look for common config files
-            config_patterns = ['*.json', '*.yml', '*.yaml', '*.toml', '*.ini', '*.cfg', '*.conf', 'Makefile', 'requirements*.txt']
+            config_patterns = ['*.json', '*.yml', '*.yaml', '*.toml', '*.ini', '*.cfg', '*.con', 'Makefile', 'requirements*.txt']
             
             clever_path = self.root_path / "Clever"
             if clever_path.exists():
@@ -687,7 +678,7 @@ class CleverFileIntelligence:
             summaries['system_overview'] = (
                 f"Scanned {total_files:,} files across {file_types} different types, "
                 f"totaling {total_size_gb:.2f} GB of data. "
-                f"System demonstrates active development with diverse file ecosystem."
+                "System demonstrates active development with diverse file ecosystem."
             )
         
         # Key findings
@@ -722,7 +713,7 @@ class CleverFileIntelligence:
             (50 if summaries['system_overview'] else 0)
         )
         
-        print(f"   ✅ System overview generated: ✓")
+        print("   ✅ System overview generated: ✓")
         print(f"   ✅ Key findings: {len(summaries['key_findings'])}")
         print(f"   ✅ Recommendations: {len(summaries['recommendations'])}")
         print(f"   ✅ Technical analysis: {len(summaries['technical_summary'])} metrics")
@@ -817,7 +808,7 @@ def demonstrate_clever_file_mastery():
     file_intelligence = CleverFileIntelligence()
     mastery_results = file_intelligence.demonstrate_file_system_mastery()
     
-    print(f"\n📊 FILE SYSTEM MASTERY SUMMARY:")
+    print("\n📊 FILE SYSTEM MASTERY SUMMARY:")
     print(f"   🔍 System Scanning: {mastery_results['system_scan']['score']:.1f}/100")
     print(f"   📖 Content Analysis: {mastery_results['content_analysis']['score']:.1f}/100")
     print(f"   🗂️  Intelligent Organization: {mastery_results['intelligent_organization']['score']:.1f}/100")
@@ -842,12 +833,12 @@ def demonstrate_clever_file_mastery():
     print(f"🧠 Intelligence Level: {intelligence_level}")
     
     print(f"\n🎊 CLEVER'S FILE SYSTEM DOMINANCE PROVEN!")
-    print(f"She can see, read, analyze, and organize EVERY file with breakthrough intelligence!")
+    print("She can see, read, analyze, and organize EVERY file with breakthrough intelligence!")
     
     return mastery_results
 
 if __name__ == "__main__":
     mastery_results = demonstrate_clever_file_mastery()
     
-    print(f"\n✨ Clever now has complete mathematical AND file system mastery! 🚀")
-    print(f"Ready to prove her knowledge synthesis and organizational genius! 💎")
+    print("\n✨ Clever now has complete mathematical AND file system mastery! 🚀")
+    print("Ready to prove her knowledge synthesis and organizational genius! 💎")

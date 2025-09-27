@@ -25,12 +25,6 @@ Connects to:
     - all core systems: Comprehensive AI brain activation
 """
 
-import os
-import sys
-import time
-from pathlib import Path
-import subprocess
-import threading
 
 # Add Clever directory to path
 clever_dir = Path(__file__).parent.absolute()

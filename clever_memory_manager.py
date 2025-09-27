@@ -27,13 +27,6 @@ Connects to:
     - debug_config.py: Performance monitoring and debugging integration
 """
 
-import os
-import sys
-import time
-import json
-import subprocess
-import threading
-from pathlib import Path
 from datetime import datetime, timedelta
 
 class CleverMemoryManager:
@@ -92,7 +85,7 @@ class CleverMemoryManager:
             processes = {}
             
             # Get VS Code processes
-            result = subprocess.run(['pgrep', '-f', 'code'], capture_output=True, text=True)
+            result = subprocess.run(['pgrep', '-', 'code'], capture_output=True, text=True)
             if result.stdout:
                 pids = result.stdout.strip().split('\n')
                 vscode_memory = 0
@@ -108,7 +101,7 @@ class CleverMemoryManager:
                 processes['vscode'] = vscode_memory
             
             # Get Python processes
-            result = subprocess.run(['pgrep', '-f', 'python'], capture_output=True, text=True)
+            result = subprocess.run(['pgrep', '-', 'python'], capture_output=True, text=True)
             if result.stdout:
                 pids = result.stdout.strip().split('\n')
                 python_memory = 0
@@ -213,7 +206,7 @@ class CleverMemoryManager:
         
         # 5. Restart heavy browser processes
         try:
-            subprocess.run(['pkill', '-f', 'chrome.*renderer'], check=False)
+            subprocess.run(['pkill', '-', 'chrome.*renderer'], check=False)
             actions.append("Chrome renderers restarted")
         except Exception:
             pass
@@ -242,11 +235,11 @@ class CleverMemoryManager:
         # 7. Kill non-essential processes
         try:
             # Kill Pylance processes to force restart
-            subprocess.run(['pkill', '-f', 'pylance'], check=False)
+            subprocess.run(['pkill', '-', 'pylance'], check=False)
             actions.append("Pylance restarted")
             
             # Kill unnecessary Python processes (except Flask)
-            result = subprocess.run(['pgrep', '-f', 'python'], capture_output=True, text=True)
+            result = subprocess.run(['pgrep', '-', 'python'], capture_output=True, text=True)
             if result.stdout:
                 pids = result.stdout.strip().split('\n')
                 for pid in pids:

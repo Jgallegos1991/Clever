@@ -14,9 +14,6 @@ Connects to:
 Comprehensive test suite runner that includes UI tooltip tests
 """
 
-import sys
-import os
-import json
 from datetime import datetime
 
 # Add the project root to the Python path
@@ -114,7 +111,6 @@ def run_pytest_tests():
     How: Executes `python -m pytest tests -q`, captures output, returns structured status.
     """
     print("🧪 Checking for pytest tests...")
-    import subprocess
     try:
         result = subprocess.run(
             ['python', '-m', 'pytest', 'tests/', '-q'],

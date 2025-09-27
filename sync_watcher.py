@@ -15,9 +15,7 @@ Environment Variables:
 """
 
  
-import time
 import logging
-from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import config

@@ -48,10 +48,7 @@ Connects to:
 from __future__ import annotations
 import inspect
 import re
-import threading
-import time
 from collections import deque
-from typing import Any, Callable, Deque, Dict, List, Optional, Set
 from pathlib import Path  # For code health & component graph scanning
 import ast  # For static analysis of functions & imports
 

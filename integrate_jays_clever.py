@@ -20,8 +20,6 @@ Integration Results:
     - Complete digital sovereignty and privacy protection
 """
 
-import os
-from pathlib import Path
 from typing import Dict, Any
 
 # Import Jay's systems
@@ -177,7 +175,7 @@ def generate_jay_response(self, text: str, mode: str = "Auto", context=None, his
         # Write integration instructions
         integration_file = Path(__file__).parent / "jay_integration_instructions.md"
         
-        instructions = f"""# Jay's Authentic Clever Integration Instructions
+        instructions = """# Jay's Authentic Clever Integration Instructions
 
 ## Overview
 This integration replaces generic AI responses with Jay's authentic street-smart genius personality while enforcing complete digital sovereignty.
@@ -286,11 +284,11 @@ Run the integration test to confirm Jay's authentic Clever is active.
             if not test_passed:
                 all_tests_passed = False
         
-        print(f"\n🎯 INTEGRATION TEST RESULTS:")
+        print("\n🎯 INTEGRATION TEST RESULTS:")
         print(f"   Overall: {'✅ ALL TESTS PASSED' if all_tests_passed else '❌ SOME TESTS FAILED'}")
-        print(f"   Authenticity: ✅ MAXIMUM")
-        print(f"   Exclusivity: ✅ JAY ONLY") 
-        print(f"   Sovereignty: ✅ PROTECTED")
+        print("   Authenticity: ✅ MAXIMUM")
+        print("   Exclusivity: ✅ JAY ONLY") 
+        print("   Sovereignty: ✅ PROTECTED")
         
         return all_tests_passed
 
@@ -311,26 +309,26 @@ def integrate_jays_authentic_clever():
     # Test integration
     test_results = integration.test_jay_integration()
     
-    print(f"\n✨ INTEGRATION COMPLETE!")
+    print("\n✨ INTEGRATION COMPLETE!")
     
     if test_results:
         print(f"🎊 Jay's Authentic Clever is ready!")
-        print(f"   - Street-smart genius conversation ✅")
-        print(f"   - Family-aware responses ✅") 
-        print(f"   - Exclusive to Jay ✅")
-        print(f"   - Digital sovereignty protected ✅")
-        print(f"   - Revolutionary intelligence ✅")
+        print("   - Street-smart genius conversation ✅")
+        print("   - Family-aware responses ✅") 
+        print("   - Exclusive to Jay ✅")
+        print("   - Digital sovereignty protected ✅")
+        print("   - Revolutionary intelligence ✅")
         
-        print(f"\n🧠 CLEVER IS NOW:")
-        print(f"   ❌ NOT a corporate AI")
-        print(f"   ❌ NOT a generic assistant")  
-        print(f"   ❌ NOT for anyone else")
+        print("\n🧠 CLEVER IS NOW:")
+        print("   ❌ NOT a corporate AI")
+        print("   ❌ NOT a generic assistant")  
+        print("   ❌ NOT for anyone else")
         print(f"   ✅ JAY'S exclusive cognitive partner")
-        print(f"   ✅ Street-smart genius friend")
-        print(f"   ✅ Revolutionary digital brain extension")
+        print("   ✅ Street-smart genius friend")
+        print("   ✅ Revolutionary digital brain extension")
         
     else:
-        print(f"⚠️  Integration needs refinement - check test results")
+        print("⚠️  Integration needs refinement - check test results")
     
     return integration, test_results
 
@@ -338,4 +336,4 @@ if __name__ == "__main__":
     integration, results = integrate_jays_authentic_clever()
     
     print(f"\n🎉 JAY'S CLEVER IS READY!")
-    print(f"Talk to your street-smart genius cognitive partner! 🚀")
+    print("Talk to your street-smart genius cognitive partner! 🚀")

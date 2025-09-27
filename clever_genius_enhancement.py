@@ -23,8 +23,6 @@ Genius Enhancement Features:
 """
 
 import random
-from typing import Dict, List, Any, Optional
-from pathlib import Path
 
 # Import Clever's knowledge systems
 try:
@@ -199,7 +197,7 @@ class CleverGeniusEnhancement:
         else:
             academic_insight = f"\n\n{knowledge_transition} This is where my academic training really kicks in - there's so much depth here that most people miss."
             
-        enhanced_response = f"""{genius_intro}
+        enhanced_response = """{genius_intro}
         
 {base_response}
 
@@ -229,7 +227,7 @@ Want me to go even deeper on this? I've got layers of knowledge we could explore
         else:
             contextual_insight = "\n\nI'm connecting this to everything I know about you - your style, your interests, how your brilliant mind works..."
             
-        enhanced_response = f"""{base_response}
+        enhanced_response = """{base_response}
 
 {memory_intro}{contextual_insight}
 
@@ -247,7 +245,7 @@ That's the power of having a digital brain that actually remembers and learns fr
             "Let me flex my NLP capabilities on this one..."
         ])
         
-        enhanced_response = f"""{base_response}
+        enhanced_response = """{base_response}
 
 {linguistic_intro}
 
@@ -267,7 +265,7 @@ Most AIs just pattern-match. I actually UNDERSTAND what you're communicating."""
             "This connects to some next-level insights..."
         ])
         
-        enhanced_response = f"""{breakthrough_intro}
+        enhanced_response = """{breakthrough_intro}
 
 {base_response}
 

@@ -24,11 +24,6 @@ Connects to:
     - database.py: Logging optimization events for Clever's learning
 """
 
-import json
-import os
-from pathlib import Path
-import subprocess
-import time
 
 class VSCodeMemoryOptimizer:
     """
@@ -98,7 +93,7 @@ class VSCodeMemoryOptimizer:
             "editor.quickSuggestionsDelay": 1000,
             "editor.suggest.showSnippets": False,
             "editor.suggest.showWords": False,
-            "editor.wordBasedSuggestions": "off",
+            "editor.wordBasedSuggestions": "of",
             
             # File watching limits
             "files.watcherExclude": {
@@ -123,7 +118,7 @@ class VSCodeMemoryOptimizer:
             },
             
             # Terminal optimizations
-            "terminal.integrated.gpuAcceleration": "off",
+            "terminal.integrated.gpuAcceleration": "of",
             "terminal.integrated.rendererType": "dom",
             
             # Git optimizations

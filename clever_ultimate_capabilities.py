@@ -23,18 +23,10 @@ Capability Categories:
     5. Breakthrough Analysis (find patterns others miss)
 """
 
-import os
-import sys
-import json
 import math
 import statistics
 import numpy as np
-from pathlib import Path
-from typing import Dict, List, Any, Tuple
-import hashlib
-import time
 from collections import defaultdict, Counter
-import mimetypes
 
 # Import Clever's knowledge systems
 try:
@@ -190,7 +182,7 @@ class CleverUltimateCapabilities:
         
         algebra_score = 85 if verification else 60  # Base score for successful operations
         
-        print(f"   ✅ Polynomial operations: P(x) + Q(x) = x³ + 4x² - 4x + 5")
+        print("   ✅ Polynomial operations: P(x) + Q(x) = x³ + 4x² - 4x + 5")
         print(f"   ✅ Matrix multiplication: {AB.tolist()}")
         print(f"   ✅ Determinant calculation: det(A) = {det_A:.3f}")
         print(f"   ✅ Eigenvalues: λ = {eigenvals}")
@@ -508,7 +500,7 @@ def demonstrate_clever_ultimate_math():
     capabilities = CleverUltimateCapabilities()
     math_results = capabilities.demonstrate_mathematical_genius()
     
-    print(f"\n📊 MATHEMATICAL GENIUS SUMMARY:")
+    print("\n📊 MATHEMATICAL GENIUS SUMMARY:")
     print(f"   🧮 Calculus Mastery: {math_results['calculus_mastery']['score']:.1f}/100")
     print(f"   🔢 Algebraic Expertise: {math_results['algebra_expertise']['score']:.1f}/100")  
     print(f"   📈 Statistical Analysis: {math_results['statistics_analysis']['score']:.1f}/100")
@@ -541,4 +533,4 @@ if __name__ == "__main__":
     
     math_results = demonstrate_clever_ultimate_math()
     
-    print(f"\n✨ Ready to prove Clever can analyze and organize ALL files too! 🚀")
+    print("\n✨ Ready to prove Clever can analyze and organize ALL files too! 🚀")

@@ -26,10 +26,7 @@ Performance Constraints:
 """
 
 import re
-import time
 import gc
-from pathlib import Path
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from collections import OrderedDict
 from enum import Enum
@@ -41,21 +38,21 @@ LANGUAGE_ESSENTIALS = {
         'func_pattern': r'^\s*def\s+(\w+)\s*\(',
         'class_pattern': r'^\s*class\s+(\w+)',
         'import_pattern': r'^\s*(?:from\s+\w+\s+)?import\s+',
-        'complexity_indicators': ['if', 'for', 'while', 'try', 'except', 'elif', 'and', 'or']
+        'complexity_indicators': ['i', 'for', 'while', 'try', 'except', 'eli', 'and', 'or']
     },
     'javascript': {
         'ext': ['.js', '.jsx'],
         'func_pattern': r'(?:function\s+(\w+)|const\s+(\w+)\s*=)',
         'class_pattern': r'^\s*class\s+(\w+)',
         'import_pattern': r'^\s*(?:import|const.*=.*require)',
-        'complexity_indicators': ['if', 'for', 'while', 'try', 'catch', '&&', '||']
+        'complexity_indicators': ['i', 'for', 'while', 'try', 'catch', '&&', '||']
     },
     'typescript': {
         'ext': ['.ts', '.tsx'],
         'func_pattern': r'(?:function\s+(\w+)|const\s+(\w+)\s*=)',
         'class_pattern': r'^\s*(?:class|interface)\s+(\w+)',
         'import_pattern': r'^\s*(?:import|const.*=.*require)',
-        'complexity_indicators': ['if', 'for', 'while', 'try', 'catch', '&&', '||']
+        'complexity_indicators': ['i', 'for', 'while', 'try', 'catch', '&&', '||']
     }
 }
 

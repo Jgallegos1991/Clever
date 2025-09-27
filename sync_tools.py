@@ -16,8 +16,6 @@ Connects to:
 
 from __future__ import annotations
 
-import subprocess
-from typing import Tuple
 
 import config
 

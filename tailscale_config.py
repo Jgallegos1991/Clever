@@ -110,7 +110,7 @@ def create_remote_access_info():
     if not tailscale_ip:
         return False
     
-    info_content = f"""# Clever Remote Access via Tailscale
+    info_content = """# Clever Remote Access via Tailscale
 
 ## 🧠 Access Your Digital Brain Extension Remotely
 
@@ -133,7 +133,7 @@ def create_remote_access_info():
     for device in status.get('devices', []):
         info_content += f"- **{device['hostname']}**: {device['ip']} ({device['os']}) - {device['status']}\n"
     
-    info_content += f"""
+    info_content += """
 
 ### Security Notes:
 - ✅ **Private Network**: Only accessible within your Tailscale network

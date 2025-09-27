@@ -11,8 +11,6 @@ Connects to:
     - file-inventory.json: Source data for conversion (if exists)
     - Makefile: Typically called by make file-inventory command
 """
-import json
-import os
 from collections import defaultdict
 
 

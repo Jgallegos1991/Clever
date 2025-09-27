@@ -48,18 +48,10 @@ Critical Dependencies:
 
 import ast
 import inspect
-import json
 import logging
-import os
-import shutil
 import tempfile
 import textwrap
-import time
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Set
-import subprocess
-import hashlib
 
 # Clever core modules
 from database import DatabaseManager
@@ -534,7 +526,7 @@ class SelfEvolutionEngine:
     def _generate_algorithm_evolution(self, target_file: str, insight: LearningInsight) -> CodeEvolution:
         """Generate an algorithm improvement evolution."""
         # Placeholder for algorithm enhancement
-        code_changes = f"""
+        code_changes = """
     # Algorithm enhancement based on document insight
     def _enhanced_analysis_method(self, input_data):
         '''Enhanced analysis method derived from document insights.'''
@@ -557,7 +549,7 @@ class SelfEvolutionEngine:
     
     def _generate_integration_evolution(self, target_file: str, insight: LearningInsight) -> CodeEvolution:
         """Generate an integration-based evolution."""
-        code_changes = f"""
+        code_changes = """
     # Integration enhancement based on cross-document analysis
     def _enhanced_integration_method(self):
         '''Enhanced integration derived from document connections.'''
@@ -586,7 +578,7 @@ class SelfEvolutionEngine:
     
     def _generate_enhancement_evolution(self, target_file: str, insight: LearningInsight) -> CodeEvolution:
         """Generate a general enhancement evolution."""
-        code_changes = f"""
+        code_changes = """
     # General enhancement based on document analysis
     def _enhanced_capability(self, context):
         '''Enhanced capability derived from document insights.'''

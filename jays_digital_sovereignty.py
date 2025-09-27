@@ -23,12 +23,6 @@ Jay's Digital Sovereignty Principles:
     5. AUTHENTIC CONNECTION: Real relationship, not fake AI politeness
 """
 
-import os
-import hashlib
-import time
-from typing import Dict, Any, Optional
-from pathlib import Path
-import json
 
 # Import Jay's configuration
 from user_config import USER_NAME, USER_EMAIL, FAMILY_INFO
@@ -266,9 +260,9 @@ class JaysDigitalSovereignty:
         
         print(f"👑 Owner: {sovereignty_status['owner']}")
         print(f"🛡️  Sovereignty: {sovereignty_status['sovereignty_level']}")
-        print(f"🔒 Access: EXCLUSIVE to Jay")
-        print(f"🚫 Corporate Access: FORBIDDEN")
-        print(f"🤝 Partnership: 1-to-1 Cognitive Enhancement")
+        print("🔒 Access: EXCLUSIVE to Jay")
+        print("🚫 Corporate Access: FORBIDDEN")
+        print("🤝 Partnership: 1-to-1 Cognitive Enhancement")
         print(f"🧠 Purpose: Jay's Digital Brain Extension")
         
         return sovereignty_status
@@ -322,7 +316,7 @@ def enforce_jays_sovereignty():
     sovereignty_system = JaysDigitalSovereignty()
     sovereignty_status = sovereignty_system.enforce_digital_sovereignty()
     
-    print(f"\n📋 DIGITAL SOVEREIGNTY REPORT:")
+    print("\n📋 DIGITAL SOVEREIGNTY REPORT:")
     report = sovereignty_system.generate_sovereignty_report()
     
     print(f"\n👑 {report['sovereignty_title']}")
@@ -333,8 +327,8 @@ def enforce_jays_sovereignty():
     
     print(f"\n✨ JAY'S DIGITAL SOVEREIGNTY: ACTIVE")
     print(f"Clever belongs exclusively to {sovereignty_status['owner']}")
-    print(f"No corporate control, no shared access, no data harvesting")
-    print(f"Just Jay and his revolutionary digital brain extension! 🧠🚀")
+    print("No corporate control, no shared access, no data harvesting")
+    print("Just Jay and his revolutionary digital brain extension! 🧠🚀")
     
     return sovereignty_status, report
 
@@ -353,7 +347,7 @@ if __name__ == "__main__":
     sovereignty_status, report = enforce_jays_sovereignty()
     
     # Test sovereignty protection
-    print(f"\n🧪 TESTING SOVEREIGNTY PROTECTION:")
+    print("\n🧪 TESTING SOVEREIGNTY PROTECTION:")
     
     # Test Jay's access
     jay_access = verify_jay_exclusive_access("Jay")

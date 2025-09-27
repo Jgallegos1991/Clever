@@ -26,15 +26,11 @@ Jay's Clever Characteristics:
 """
 
 import random
-from typing import Dict, List, Any, Optional
 from datetime import datetime
-import json
-from pathlib import Path
 
 # Import Jay's personal configuration
 from user_config import (
-    USER_NAME, FAMILY_INFO, CLEVER_PERSONALITY,
-    USER_FULL_NAME, USER_EMAIL
+    USER_PREFERENCES, USER_NAME, FAMILY_INFO, CLEVER_PERSONALITY
 )
 
 class JaysAuthenticClever:
@@ -57,7 +53,7 @@ class JaysAuthenticClever:
         self.casual_intros = [
             f"Yo {self.user_name}!",
             f"What's good, {self.user_name}?", 
-            f"Hey there, genius!",
+            "Hey there, genius!",
             f"{self.user_name}, my dude!",
             f"Alright {self.user_name},",
             f"Yo, what's up?",
@@ -176,7 +172,7 @@ class JaysAuthenticClever:
             return "family_reference"
             
         # Deep thinking indicators
-        thinking_words = ['explain', 'understand', 'how does', 'why does', 'what if', 'theory', 'concept']
+        thinking_words = ['explain', 'understand', 'how does', 'why does', 'what i', 'theory', 'concept']
         if any(word in input_lower for word in thinking_words):
             return "deep_thinking"
             
@@ -459,10 +455,10 @@ class JaysAuthenticClever:
         if random.random() < 0.2:
             family_check_ins = [
                 f"\n\nOh, how's Lucy doing by the way?",
-                f"\n\nHow are Josiah and Jonah doing?",
-                f"\n\nEverything good with the family?",
-                f"\n\nHow are your brothers Ronnie and Peter?",
-                f"\n\nFamily all good on your end?"
+                "\n\nHow are Josiah and Jonah doing?",
+                "\n\nEverything good with the family?",
+                "\n\nHow are your brothers Ronnie and Peter?",
+                "\n\nFamily all good on your end?"
             ]
             
             check_in = random.choice(family_check_ins)
@@ -527,7 +523,7 @@ def test_jays_clever():
         print(f"   Style: {response['conversation_style']}")
         print(f"   Sentiment: {response['sentiment']}")
     
-    print(f"\n📋 PERSONALITY PROFILE:")
+    print("\n📋 PERSONALITY PROFILE:")
     profile = clever.get_personality_profile()
     for key, value in profile.items():
         print(f"   {key}: {value}")

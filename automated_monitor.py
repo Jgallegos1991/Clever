@@ -18,11 +18,8 @@ Connects to:
 
 from __future__ import annotations
 
-import threading
-import time
 import schedule
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
 from dataclasses import dataclass
 
 # Core system imports

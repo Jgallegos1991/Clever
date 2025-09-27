@@ -49,15 +49,10 @@ Critical Dependencies:
     - Database schema: Extended sources table, new citations and relationships tables
 """
 
-import hashlib
-import json
 import logging
 import re
-import time
 from collections import defaultdict, Counter
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Any, NamedTuple
 
 # Clever core modules
 from database import DatabaseManager
@@ -647,7 +642,7 @@ class NotebookLMEngine:
         content_lower = content.lower()
         
         # Check filename patterns
-        if any(ext in filename_lower for ext in ['.pdf', '.doc', '.docx']):
+        if any(ext in filename_lower for ext in ['.pd', '.doc', '.docx']):
             if 'research' in filename_lower or 'paper' in filename_lower:
                 return "Research Paper"
             elif 'report' in filename_lower:

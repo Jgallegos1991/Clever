@@ -19,10 +19,8 @@ Connects to:
 
 from __future__ import annotations
 
-import threading
 from functools import lru_cache
 from types import SimpleNamespace
-from typing import List, Iterable
 import spacy  # Required dependency - no fallbacks
 from textblob import TextBlob  # Required dependency - no fallbacks
 from spacy.language import Language

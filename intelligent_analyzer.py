@@ -27,13 +27,9 @@ Connects to:
 from __future__ import annotations
 import ast
 import re
-import threading
-import time
 import statistics
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 # Enhanced problem detection categories
 PROBLEM_CATEGORIES = {

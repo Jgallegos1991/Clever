@@ -13,10 +13,6 @@ Connects to:
     - All core modules: Integration testing across system components
 """
 
-import sys
-import time
-import json
-from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, "/workspaces/projects")
@@ -41,14 +37,14 @@ def test_system_validation():
 
         if validation_report["overall_status"] == "PASS":
             print(
-                f"✅ System validation passed - "
+                "✅ System validation passed - "
                 f"{validation_report['passed_checks']}"
                 f"/{validation_report['total_checks']} checks"
             )
             return True
         else:
             print(
-                f"❌ System validation failed - "
+                "❌ System validation failed - "
                 f"{validation_report['critical_issues']} critical issues"
             )
             return False
@@ -78,7 +74,7 @@ def test_enhanced_conversation():
 
         if success:
             print(
-                f"✅ Enhanced conversation test passed - "
+                "✅ Enhanced conversation test passed - "
                 f"Response length: {len(result.get('response', ''))}"
             )
             print(f"    Analysis provided: {bool(result.get('analysis'))}")
@@ -118,7 +114,7 @@ def test_file_access():
 
         if success:
             print(
-                f"✅ File access test passed - "
+                "✅ File access test passed - "
                 f"config.py readable, {len(operations)} operations identified"
             )
             return True

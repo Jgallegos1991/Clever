@@ -23,11 +23,7 @@ Connects to:
     - digital sovereignty: Complete privacy protection
 """
 
-import os
-import sys
-import socket
-from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any
 
 # Add Clever directory to path  
 clever_dir = Path(__file__).parent.absolute()
@@ -121,8 +117,8 @@ class OfflineSovereigntyEnforcer:
     def _check_local_ai(self) -> bool:
         """Verify AI processing is local-only"""
         try:
-            from persona import PersonaEngine
-            # Check that persona engine doesn't import external AI libraries
+            # Check that persona engine doesn't import external AI libraries  
+            import persona
             return True  # PersonaEngine is local
         except:
             pass
@@ -131,8 +127,8 @@ class OfflineSovereigntyEnforcer:
     def _check_local_nlp(self) -> bool:
         """Verify NLP uses local libraries only"""
         try:
-            from nlp_processor import AdvancedNLPProcessor
             # spaCy, NLTK, TextBlob are all local processing
+            import nlp_processor
             return True
         except:
             pass
@@ -164,8 +160,8 @@ class OfflineSovereigntyEnforcer:
     def _check_local_memory(self) -> bool:
         """Verify memory system uses local storage only"""
         try:
-            from memory_engine import AdvancedMemoryEngine
             # Memory uses local SQLite database
+            import memory_engine
             return True
         except:
             pass
@@ -174,8 +170,8 @@ class OfflineSovereigntyEnforcer:
     def _check_local_evolution(self) -> bool:
         """Verify evolution engine uses local data only"""
         try:
-            from evolution_engine import get_evolution_engine
             # Evolution tracks local interactions and growth
+            import evolution_engine
             return True
         except:
             pass
@@ -246,7 +242,7 @@ class OfflineSovereigntyEnforcer:
         How: Comprehensive analysis of all offline systems and protections
         """
         
-        report = f"""
+        report = """
 🔒 CLEVER OFFLINE SOVEREIGNTY STATUS REPORT
 ═══════════════════════════════════════════════════════════════════════
 Generated: {sys.version}

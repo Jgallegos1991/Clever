@@ -25,14 +25,7 @@ Connects to:
     - desktop environment: Always-available AI interface
 """
 
-import os
-import sys
-import subprocess
-import time
 import signal
-from pathlib import Path
-import threading
-import json
 import sqlite3
 from datetime import datetime
 
@@ -77,7 +70,7 @@ class CleverAlwaysRunning:
         How: Creates .desktop files and startup scripts for boot integration
         """
         
-        startup_script = f"""#!/bin/bash
+        startup_script = """#!/bin/bash
 # Clever Auto-Start Script
 # Makes Clever the default AI system on this Chromebook
 
@@ -122,7 +115,7 @@ wait
         os.chmod(startup_path, 0o755)
         
         # Create .desktop file for auto-start
-        desktop_content = f"""[Desktop Entry]
+        desktop_content = """[Desktop Entry]
 Type=Application
 Name=Clever AI Brain
 Comment=Jay's Digital Brain Extension - Always Running
@@ -158,7 +151,7 @@ Categories=System;Utility;AI;
         
         # Create desktop shortcut
         desktop_shortcut = Path.home() / "Desktop" / "Talk-to-Clever.desktop"
-        shortcut_content = f"""[Desktop Entry]
+        shortcut_content = """[Desktop Entry]
 Type=Application
 Name=Talk to Clever 🧠
 Comment=Start conversation with Clever AI
@@ -173,7 +166,7 @@ Categories=AI;Assistant;
         os.chmod(desktop_shortcut, 0o755)
         
         # Create bash aliases for easy access
-        bashrc_additions = f"""
+        bashrc_additions = """
 # Clever AI Brain Integration
 alias clever="cd {self.clever_dir} && python3 app.py"
 alias talk-to-clever="python3 {self.clever_dir}/clever_voice_takeover.py --quick-chat"

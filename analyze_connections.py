@@ -7,12 +7,8 @@ Where: Scans all files for "Connects to:" sections and validates actual imports/
 How: Parse docstrings, check imports, verify function calls, report invalid connections
 """
 
-import os
 import re
 import ast
-import sys
-from pathlib import Path
-from typing import Dict, List, Set, Tuple, Optional
 
 def find_connects_to_references(file_path: str) -> List[Tuple[int, str, List[str]]]:
     """Find all 'Connects to:' blocks in a file and extract referenced modules/functions.

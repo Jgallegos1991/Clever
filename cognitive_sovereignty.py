@@ -46,15 +46,9 @@ Critical Dependencies:
 """
 
 import ast
-import json
 import logging
 import gc
-import shutil
-import subprocess
-import time
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 from database import DatabaseManager
 from notebooklm_engine import get_notebooklm_engine
@@ -823,7 +817,7 @@ class CognitiveSovereigntyEngine:
             logger.info("Enabling system monitoring...")
             
             # Create monitoring script
-            monitoring_script = f'''#!/bin/bash
+            monitoring_script = '''#!/bin/bash
 # Clever System Monitoring Script
 
 LOG_DIR="{self.clever_root}/logs"

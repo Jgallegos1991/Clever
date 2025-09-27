@@ -2,8 +2,6 @@
 """
 Continuous memory monitoring for Clever revolutionary optimization.
 """
-import time
-import subprocess
 
 def check_memory():
     """Check current memory status."""

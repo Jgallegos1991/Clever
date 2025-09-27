@@ -12,10 +12,7 @@ Usage:
     python3 auto_code_cleaner_v2.py [--fix]
 """
 
-import os
 import re
-import sys
-from pathlib import Path
 import ast
 
 PYTHON_FILE_PATTERN = re.compile(r".*\.py$")

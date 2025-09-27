@@ -13,10 +13,7 @@ Connects to:
     - None: This is a standalone utility script.
 """
 
-import os
 import re
-import sys
-from pathlib import Path
 
 PYTHON_FILE_PATTERN = re.compile(r".*\.py$")
 SQL_PATTERN = re.compile(
