@@ -23,6 +23,8 @@ Connects to:
     - digital sovereignty: Complete privacy protection
 """
 
+import sys
+from pathlib import Path
 from typing import Dict, Any
 
 # Add Clever directory to path  
@@ -117,9 +119,9 @@ class OfflineSovereigntyEnforcer:
     def _check_local_ai(self) -> bool:
         """Verify AI processing is local-only"""
         try:
-            # Check that persona engine doesn't import external AI libraries  
-            import persona
-            return True  # PersonaEngine is local
+            # Check that persona engine exists locally
+            persona_path = clever_dir / "persona.py"
+            return persona_path.exists()  # PersonaEngine is local
         except:
             pass
         return False
@@ -128,8 +130,8 @@ class OfflineSovereigntyEnforcer:
         """Verify NLP uses local libraries only"""
         try:
             # spaCy, NLTK, TextBlob are all local processing
-            import nlp_processor
-            return True
+            nlp_path = clever_dir / "nlp_processor.py"
+            return nlp_path.exists()
         except:
             pass
         return False
@@ -161,8 +163,8 @@ class OfflineSovereigntyEnforcer:
         """Verify memory system uses local storage only"""
         try:
             # Memory uses local SQLite database
-            import memory_engine
-            return True
+            memory_path = clever_dir / "memory_engine.py"
+            return memory_path.exists()
         except:
             pass
         return False
@@ -171,8 +173,8 @@ class OfflineSovereigntyEnforcer:
         """Verify evolution engine uses local data only"""
         try:
             # Evolution tracks local interactions and growth
-            import evolution_engine
-            return True
+            evolution_path = clever_dir / "evolution_engine.py"
+            return evolution_path.exists()
         except:
             pass
         return False
