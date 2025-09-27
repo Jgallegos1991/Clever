@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """
 clever_always_running.py - Makes Clever Always Running as the Chromebook's AI Brain
@@ -209,7 +210,7 @@ echo "🧠 Clever AI Brain is ready! Type 'clever' or 'talk-to-clever' to start.
             self.processes['main'] = clever_process
             self.status["services_running"].append("main_app")
             print("✅ Main Clever application started")
-        except Exception as _e:
+        except Exception:
             print(f"❌ Failed to start main app: {e}")
         
         # Start voice system
@@ -221,7 +222,7 @@ echo "🧠 Clever AI Brain is ready! Type 'clever' or 'talk-to-clever' to start.
             self.status["services_running"].append("voice_system")
             self.status["voice_ready"] = True
             print("✅ Voice system activated")
-        except Exception as _e:
+        except Exception:
             print(f"❌ Failed to start voice system: {e}")
         
         # Give services time to start
@@ -291,7 +292,7 @@ echo "🧠 Clever AI Brain is ready! Type 'clever' or 'talk-to-clever' to start.
                 print("\n🛑 Stopping Clever monitoring...")
                 self.running = False
                 break
-            except Exception as _e:
+            except Exception:
                 print(f"❌ Monitor error: {e}")
                 time.sleep(5)
     
@@ -303,7 +304,7 @@ echo "🧠 Clever AI Brain is ready! Type 'clever' or 'talk-to-clever' to start.
             ], cwd=str(self.clever_dir))
             self.processes['main'] = process
             print("✅ Main app restarted")
-        except Exception as _e:
+        except Exception:
             print(f"❌ Failed to restart main app: {e}")
     
     def restart_voice_system(self):
@@ -314,7 +315,7 @@ echo "🧠 Clever AI Brain is ready! Type 'clever' or 'talk-to-clever' to start.
             ], cwd=str(self.clever_dir))
             self.processes['voice'] = process
             print("✅ Voice system restarted")
-        except Exception as _e:
+        except Exception:
             print(f"❌ Failed to restart voice system: {e}")
     
     def get_status(self):
@@ -396,7 +397,7 @@ def main():
         
     except KeyboardInterrupt:
         clever.shutdown()
-    except Exception as _e:
+    except Exception:
         print(f"❌ Fatal error: {e}")
         clever.shutdown()
         sys.exit(1)

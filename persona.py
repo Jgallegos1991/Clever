@@ -1,3 +1,4 @@
+import time
 """Persona Engine - Clever's Digital Brain Extension & Cognitive Partnership System.
 
 This module implements the core personality and response generation for Clever AI.
@@ -85,13 +86,12 @@ Connects to (merged fine-grained + summary):
     - background_cognition.py (planned):
         - Idle computational knowledge accrual
 """
-from __future__ import annotations
 import logging
 import random
 import re
 from collections import deque
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional, List
 
 from debug_config import get_debugger
 from memory_engine import get_memory_engine, MemoryContext
@@ -107,7 +107,6 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 debugger = get_debugger()
-
 
 class PersonaResponse(SimpleNamespace):
     """
@@ -127,7 +126,6 @@ class PersonaResponse(SimpleNamespace):
         self.proactive_suggestions = proactive_suggestions or []
         self.particle_command = particle_command
         self.context = context or {}
-
 
 class PersonaEngine:
     """
@@ -208,7 +206,7 @@ class PersonaEngine:
             self.memory_available = True
             self.personality_traits['memory_enhanced'] = True
             debugger.info('persona_engine', 'Advanced memory system connected successfully')
-        except Exception as _e:
+        except Exception as e:
             debugger.warning('persona_engine', f'Memory system unavailable: {e}')
             self.memory_available = False
         
@@ -316,7 +314,7 @@ class PersonaEngine:
             jay_response = jay_clever.generate_jay_response(text, mode, jay_context)
             return jay_clever.create_persona_response(jay_response)
             
-        except Exception as _e:
+        except Exception as e:
             # Fallback to ensure Clever always responds to Jay
             print(f"⚠️  Jay's Clever fallback: {e}")
             pass
@@ -386,7 +384,7 @@ class PersonaEngine:
                     importance_score=self._calculate_importance(text, keywords, entities)
                 )
                 
-            except Exception as _e:
+            except Exception as e:
                 debugger.warning('persona_engine', f'Memory processing failed: {e}')
         
         # Enhanced context with memory
@@ -407,14 +405,14 @@ class PersonaEngine:
                 enhanced_context['document_response'] = document_response
                 document_citations = getattr(document_response, 'citations', [])
                 enhanced_context['document_citations'] = document_citations
-        except Exception as _e:
+        except Exception as e:
             debugger.warning('persona_engine', f'Document query handling failed: {e}')
         
         # Detect file search intent before mode routing
         file_search_result = None
         try:
             file_search_result = self._maybe_handle_file_search(text)
-        except Exception as _e:
+        except Exception as e:
             debugger.warning('persona_engine', f'File search intent handling failed: {e}')
 
         # Route to appropriate mode handler (skip typical generation if we produced a file search answer)
@@ -458,7 +456,7 @@ class PersonaEngine:
                 memory_context.response_text = response_text
                 self.memory_engine.store_interaction(memory_context)
                 debugger.info('persona_engine', 'Interaction stored in memory successfully')
-            except Exception as _e:
+            except Exception as e:
                 debugger.warning('persona_engine', f'Failed to store interaction: {e}')
         
         # Performance logging
@@ -822,7 +820,7 @@ class PersonaEngine:
                 best_result = semantic_results[0]
                 return f"From {best_result['filename']}: {best_result['excerpt']}"
                 
-        except Exception as _e:
+        except Exception as e:
             debugger.warning('persona_engine', f'Knowledge retrieval failed: {e}')
             
         return None
@@ -898,7 +896,7 @@ class PersonaEngine:
             results.sort(key=lambda x: x['relevance_score'], reverse=True)
             return results
             
-        except Exception as _e:
+        except Exception as e:
             debugger.warning('persona_engine', f'Semantic knowledge search failed: {e}')
             return []
 
@@ -1188,7 +1186,7 @@ class PersonaEngine:
                 # Log the enhanced analysis for evolution
                 debugger.info('persona.shape_analysis', f'Shape: {detected_shape}, Confidence: {shape_confidence:.2f}, Complexity: {complexity_score:.2f}')
                 
-            except Exception as _e:
+            except Exception as e:
                 # Enhanced fallback with error context
                 context['requested_shape'] = detected_shape
                 debugger.error('persona', f'Shape generation error for {detected_shape}: {str(e)}')
@@ -1321,8 +1319,6 @@ class PersonaEngine:
                 response += f" Oh yeah, and remember when you were talkin' about '{memory_snippet[:60]}...'? That still on your mind?"
         
         return f"{genius_prefix}{response}"
-
-
 
     def _creative_style(self, text: str, keywords: List[str], context: Dict[str, Any], history: List[Dict[str, Any]]) -> str:
         """
@@ -1581,7 +1577,7 @@ class PersonaEngine:
             
             return response
             
-        except Exception as _e:
+        except Exception as e:
             debugger.error('persona.academic_response', f'Academic response failed: {e}')
             return None
 
@@ -1621,7 +1617,7 @@ class PersonaEngine:
         except ImportError:
             # NotebookLM engine not available - that's fine
             return None
-        except Exception as _e:
+        except Exception as e:
             debugger.warning('persona_engine', f'Document query error: {e}')
             return None
     
@@ -1772,7 +1768,6 @@ class PersonaEngine:
         """Analyze E=mc² implications."""
         # Placeholder for actual E=mc^2 calculations
         return {"energy_joules": 1.0, "mass_kg": 1.1e-17}
-
 
 # Global instance for app.py
 persona_engine = PersonaEngine()

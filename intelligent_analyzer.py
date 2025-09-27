@@ -1,3 +1,4 @@
+import time
 """
 Intelligent Code Architecture Analyzer & Enhancement Engine
 
@@ -150,7 +151,7 @@ class IntelligentAnalyzer:
                     'high_severity_count': len([r for r in results['analysis_results'] if r.severity == 'HIGH'])
                 })
                 
-            except Exception as _e:
+            except Exception:
                 results['error'] = f"Analysis failed: {str(e)}"
                 
             return results
@@ -199,7 +200,7 @@ class IntelligentAnalyzer:
             # Architecture analysis
             results.extend(self._analyze_architecture_file(file_path, content, tree))
             
-        except Exception as _e:
+        except Exception:
             results.append(AnalysisResult(
                 node_id=str(file_path),
                 category='ARCHITECTURAL',

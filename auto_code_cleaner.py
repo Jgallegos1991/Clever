@@ -25,7 +25,6 @@ INDENT_ERROR_PATTERN = re.compile(r"^\s+[^\s].*")
 
 REPORT = []
 
-
 def scan_file(path: Path, fix: bool = False):
     with path.open("r", encoding="utf-8", errors="ignore") as f:
         lines = f.readlines()
@@ -59,7 +58,6 @@ def scan_file(path: Path, fix: bool = False):
         with path.open("w", encoding="utf-8") as f:
             f.writelines(new_lines)
 
-
 def main():
     fix = "--fix" in sys.argv
     root = Path(os.getcwd())
@@ -74,7 +72,6 @@ def main():
         print("\nFixes applied where possible.")
     else:
         print("\nRun with --fix to apply fixes.")
-
 
 if __name__ == "__main__":
     main()

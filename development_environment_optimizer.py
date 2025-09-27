@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """
 development_environment_optimizer.py - Chromebook Development Environment Memory Optimizer
@@ -437,7 +438,7 @@ class DevelopmentEnvironmentOptimizer:
             except KeyboardInterrupt:
                 print("\n👋 Memory monitoring stopped")
                 break
-            except Exception as _e:
+            except Exception:
                 print(f"❌ Monitoring error: {e}")
                 time.sleep(check_interval)
 

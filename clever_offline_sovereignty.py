@@ -65,7 +65,7 @@ class OfflineSovereigntyEnforcer:
             from utils import offline_guard
             offline_guard.enable()
             print("✅ Network guard: ACTIVE (External connections blocked)")
-        except Exception as _e:
+        except Exception:
             print(f"⚠️  Network guard warning: {e}")
             
         # Validate offline components

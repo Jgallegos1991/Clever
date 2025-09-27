@@ -23,7 +23,6 @@ from datetime import datetime
 from typing import Dict, Any
 from debug_config import get_debugger
 
-
 class CleverTestSuite:
     """Lightweight, reliable smoke tests.
     
@@ -59,7 +58,7 @@ class CleverTestSuite:
                 passed_tests += res.get('passed', 0)
                 if res.get('status') != 'passed':
                     overall_status = 'failed'
-            except Exception as _e:
+            except Exception:
                 self.debugger.error('test_suite', f'Category {name} failed', {'error': str(e)})
                 self.test_results[name] = {'status': 'error', 'error': str(e), 'total': 0, 'passed': 0, 'failed': 1}
                 overall_status = 'failed'
@@ -92,7 +91,7 @@ class CleverTestSuite:
             with sqlite3.connect('clever.db') as con2:
                 con2.execute('SELECT 1')
             tests.append({'name': 'database_connection', 'status': 'passed'})
-        except Exception as _e:
+        except Exception:
             tests.append({'name': 'database_connection', 'status': 'failed', 'error': str(e)})
 
         # Knowledge base shim: init + log + read
@@ -103,7 +102,7 @@ class CleverTestSuite:
             recent = get_recent_interactions(limit=1)
             ok = bool(recent and isinstance(recent, list))
             tests.append({'name': 'knowledge_base_basic', 'status': 'passed' if ok else 'failed'})
-        except Exception as _e:
+        except Exception:
             tests.append({'name': 'knowledge_base_basic', 'status': 'failed', 'error': str(e)})
 
         passed = sum(1 for t in tests if t['status'] == 'passed')

@@ -48,7 +48,7 @@ class FileIngestor:
                         unchanged += 1
                     else:
                         failed += 1
-                except Exception as _e:
+                except Exception:
                     print(f"Error ingesting {file_path}: {e}")
                     failed += 1
         print(
@@ -121,7 +121,7 @@ class FileIngestor:
                         analysis = nlp_processor.process_text(content)
                         entities = analysis.get('entities', [])
                         keywords = analysis.get('keywords', [])
-                    except Exception as _e:
+                    except Exception:
                         print(f"NLP analysis failed for {filename}: {e}")
 
             if not content.strip():
@@ -152,12 +152,12 @@ class FileIngestor:
                         'keywords': keywords,
                         'content_chars': len(content)
                     })
-                except Exception as _e:
+                except Exception:
                     print(f"Evolution logging failed for {filename}: {e}")
 
             print(f"{status}: {filename} (id={id_})")
             return status
-        except Exception as _e:
+        except Exception:
             print(f"Ingestion failed for {file_path}: {e}")
             return "failed"
     
@@ -173,7 +173,7 @@ class FileIngestor:
                     txt = page.extract_text() or ''
                     if txt.strip():
                         content.append(f"\n--- Page {i+1} ---\n{txt}")
-        except Exception as _e:
+        except Exception:
             print(f"PDF read error {pdf_path}: {e}")
             return "", entities, keywords
         merged = self.clean_pdf_text(''.join(content))
@@ -184,7 +184,7 @@ class FileIngestor:
                     ad = vars(analysis)
                     entities = ad.get('entities', [])
                     keywords = ad.get('keywords', [])
-            except Exception as _e:
+            except Exception:
                 print(f"NLP analysis failed for PDF: {e}")
         return merged, entities, keywords
     

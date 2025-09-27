@@ -254,7 +254,7 @@ class UltimateCleverIntegration:
             print("   ✅ Symbiotic environment created")
             return True
             
-        except Exception as _e:
+        except Exception:
             print(f"   ⚠️  Symbiosis creation failed: {e}")
             return False
     

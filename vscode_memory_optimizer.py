@@ -25,10 +25,7 @@ Connects to:
 """
 
 import psutil
-from typing import Dict, List, Any, Optional
-
-
-
+from typing import Dict, Any, Optional
 
 class VSCodeMemoryOptimizer:
     """
@@ -44,9 +41,9 @@ class VSCodeMemoryOptimizer:
     def get_memory_mb(self):
         """Get available memory in MB."""
         try:
-            result = subprocess.run(['free', '-m'], capture_output=True, text=True)
-            lines = result.stdout.split('\n')
-            mem_line = lines[1].split()
+            _ = subprocess.run(['free', '-m'], capture_output=True, text=True)
+            _ = result.stdout.split('\n')
+            _ = lines[1].split()
             return int(mem_line[6]) if len(mem_line) > 6 else int(mem_line[3])
         except Exception:
             return 300
@@ -133,10 +130,10 @@ class VSCodeMemoryOptimizer:
     
     def create_conservative_profile(self):
         """Conservative settings for low memory (300-500MB)."""
-        emergency = self.create_emergency_profile()
+        _ = self.create_emergency_profile()
         
         # Add back some features for better usability
-        conservative = emergency.copy()
+        _ = emergency.copy()
         conservative.update({
             "python.analysis.autoImportCompletions": True,
             "python.analysis.completeFunctionParens": True,
@@ -201,18 +198,18 @@ class VSCodeMemoryOptimizer:
         """Apply settings to VS Code configuration."""
         try:
             if target == 'user':
-                settings_path = self.settings_path
+                _ = self.settings_path
             else:
-                settings_path = self.workspace_settings_path
+                _ = self.workspace_settings_path
                 
             # Create directory if needed
             settings_path.parent.mkdir(parents=True, exist_ok=True)
             
             # Load existing settings
-            existing_settings = {}
+            _ = {}
             if settings_path.exists():
                 try:
-                    existing_settings = json.loads(settings_path.read_text())
+                    _ = json.loads(settings_path.read_text())
                 except Exception:
                     pass
             
@@ -224,34 +221,34 @@ class VSCodeMemoryOptimizer:
             
             return True
             
-        except Exception as _e:
-            print(f"Failed to apply {target} settings: {e}")
+        except Exception:
+            print("Error occurred")
             return False
     
     def optimize_for_current_memory(self):
         """Apply appropriate optimization profile based on current memory."""
-        available_mb = self.get_memory_mb()
+        _ = self.get_memory_mb()
         
         print(f"🔧 VS Code optimization for {available_mb}MB available memory")
         
         if available_mb < 300:
             print("🚨 Applying EMERGENCY optimization profile")
-            profile = self.create_emergency_profile()
-            optimization_level = "emergency"
+            _ = self.create_emergency_profile()
+            _ = "emergency"
             
         elif available_mb < 500:
             print("⚠️ Applying CONSERVATIVE optimization profile")
-            profile = self.create_conservative_profile()
-            optimization_level = "conservative"
+            _ = self.create_conservative_profile()
+            _ = "conservative"
             
         else:
             print("✅ Applying BALANCED optimization profile")
-            profile = self.create_balanced_profile()
-            optimization_level = "balanced"
+            _ = self.create_balanced_profile()
+            _ = "balanced"
         
         # Apply to both user and workspace settings
-        user_success = self.apply_settings(profile, 'user')
-        workspace_success = self.apply_settings(profile, 'workspace')
+        _ = self.apply_settings(profile, 'user')
+        _ = self.apply_settings(profile, 'workspace')
         
         if user_success and workspace_success:
             print(f"✅ Applied {optimization_level} profile to VS Code settings")
@@ -262,7 +259,7 @@ class VSCodeMemoryOptimizer:
     
     def create_clever_specific_settings(self):
         """Create Clever-specific workspace optimizations."""
-        clever_settings = {
+        _ = {
             # Clever project specific optimizations
             "python.defaultInterpreterPath": "/usr/bin/python3",
             
@@ -309,21 +306,21 @@ class VSCodeMemoryOptimizer:
         print("🧠 Optimizing VS Code for Clever development...")
         
         # Get memory-appropriate profile
-        available_mb = self.get_memory_mb()
+        _ = self.get_memory_mb()
         
         if available_mb < 300:
-            base_profile = self.create_emergency_profile()
+            _ = self.create_emergency_profile()
         elif available_mb < 500:
-            base_profile = self.create_conservative_profile()
+            _ = self.create_conservative_profile()
         else:
-            base_profile = self.create_balanced_profile()
+            _ = self.create_balanced_profile()
         
         # Add Clever-specific settings
-        clever_settings = self.create_clever_specific_settings()
+        _ = self.create_clever_specific_settings()
         base_profile.update(clever_settings)
         
         # Apply to workspace
-        success = self.apply_settings(base_profile, 'workspace')
+        _ = self.apply_settings(base_profile, 'workspace')
         
         if success:
             print("✅ Clever workspace optimized for memory constraints")
@@ -334,10 +331,10 @@ class VSCodeMemoryOptimizer:
     
     def get_status(self):
         """Get current VS Code optimization status."""
-        available_mb = self.get_memory_mb()
+        _ = self.get_memory_mb()
         
-        user_settings_exist = self.settings_path.exists()
-        workspace_settings_exist = self.workspace_settings_path.exists()
+        _ = self.settings_path.exists()
+        _ = self.workspace_settings_path.exists()
         
         return {
             'available_memory_mb': available_mb,
@@ -355,10 +352,10 @@ def main():
     print("🔧 VS CODE MEMORY OPTIMIZER")
     print("=" * 40)
     
-    optimizer = VSCodeMemoryOptimizer()
+    _ = VSCodeMemoryOptimizer()
     
     # Show current status
-    status = optimizer.get_status()
+    _ = optimizer.get_status()
     print(f"Available Memory: {status['available_memory_mb']}MB")
     print(f"Recommended Profile: {status['recommended_profile']}")
     

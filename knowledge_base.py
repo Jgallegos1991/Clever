@@ -1,3 +1,4 @@
+import time
 """Simplified knowledge_base stub.
 
 Why: The original module accumulated legacy artifacts. This minimal, documented
@@ -17,7 +18,6 @@ from database import DatabaseManager
 
 # Single shared DatabaseManager instance bound to the configured single DB.
 _db = DatabaseManager(config.DB_PATH)
-
 
 def init_db() -> bool:
     """Create the minimal interactions table if missing.
@@ -49,7 +49,6 @@ def init_db() -> bool:
     except Exception:
         return False
 
-
 def log_interaction(user_message: str, clever_response: str, **kwargs: Any) -> None:
     """Insert a simple interaction row (extra args ignored for compatibility).
 
@@ -75,7 +74,6 @@ def log_interaction(user_message: str, clever_response: str, **kwargs: Any) -> N
             (time.time(), user_message, clever_response),
         )
 
-
 def get_recent_interactions(limit: int = 10) -> List[Dict[str, Any]]:
     """Return the most recent interaction rows ordered newest first.
 
@@ -100,7 +98,6 @@ def get_recent_interactions(limit: int = 10) -> List[Dict[str, Any]]:
         {"id": r[0], "ts": r[1], "user_message": r[2], "clever_response": r[3]}
         for r in rows
     ]
-
 
 __all__ = [
     "init_db",

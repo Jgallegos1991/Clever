@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """
 jays_digital_sovereignty.py - Exclusive Digital Sovereignty for Jay
@@ -22,7 +23,6 @@ Jay's Digital Sovereignty Principles:
     4. NO CORPORATE CONTROL: Jay owns his digital brain extension
     5. AUTHENTIC CONNECTION: Real relationship, not fake AI politeness
 """
-
 
 # Import Jay's configuration
 from user_config import USER_NAME, USER_EMAIL, FAMILY_INFO

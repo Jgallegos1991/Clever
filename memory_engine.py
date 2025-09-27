@@ -1,3 +1,5 @@
+import time
+import hashlib
 """
 Advanced Memory Engine for Clever AI
 
@@ -26,14 +28,13 @@ import json
 from datetime import datetime
 from collections import defaultdict, Counter
 from dataclasses import dataclass
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any, Optional, List
+import config
 
 from database import DatabaseManager
 from debug_config import get_debugger
 
-
 debugger = get_debugger()
-
 
 @dataclass
 class MemoryContext:
@@ -59,7 +60,6 @@ class MemoryContext:
         if self.context_links is None:
             self.context_links = []
 
-
 @dataclass  
 class MemoryNode:
     """
@@ -84,7 +84,6 @@ class MemoryNode:
             self.related_nodes = []
         if self.tags is None:
             self.tags = []
-
 
 class AdvancedMemoryEngine:
     """
@@ -139,7 +138,7 @@ class AdvancedMemoryEngine:
                 else:
                     con.commit()
                     return []
-        except Exception as _e:
+        except Exception as e:
             debugger.error('memory_engine', f'Database query failed: {e}')
             raise
     
@@ -233,7 +232,7 @@ class AdvancedMemoryEngine:
                 
                 debugger.info('memory_engine', 'Memory database schema initialized successfully')
                 
-            except Exception as _e:
+            except Exception as e:
                 debugger.error('memory_engine', f'Failed to initialize memory schema: {e}')
                 raise
     
@@ -278,7 +277,7 @@ class AdvancedMemoryEngine:
                 debugger.info('memory_engine', f'Stored interaction with ID: {context_id}')
                 return context_id
                 
-            except Exception as _e:
+            except Exception as e:
                 debugger.error('memory_engine', f'Failed to store interaction: {e}')
                 raise
     
@@ -560,7 +559,7 @@ class AdvancedMemoryEngine:
             
             debugger.info('memory_engine', f'Loaded {len(self.preference_model)} preferences')
             
-        except Exception as _e:
+        except Exception as e:
             debugger.warning('memory_engine', f'Could not load preferences: {e}')
             self.preference_model = {}
     
@@ -623,7 +622,7 @@ class AdvancedMemoryEngine:
             
             return sorted_memories[:max_results]
             
-        except Exception as _e:
+        except Exception as e:
             debugger.error('memory_engine', f'Failed to retrieve contextual memory: {e}')
             return []
     
@@ -651,7 +650,7 @@ class AdvancedMemoryEngine:
                 'timestamp': row[4]
             } for row in history]
             
-        except Exception as _e:
+        except Exception as e:
             debugger.error('memory_engine', f'Failed to retrieve conversation history: {e}')
             return []
     
@@ -694,7 +693,7 @@ class AdvancedMemoryEngine:
                 predictions['suggested_mode'] = best_mode
                 predictions['confidence'] = min(0.9, mode_scores[best_mode])
             
-        except Exception as _e:
+        except Exception as e:
             debugger.error('memory_engine', f'Failed to predict preferences: {e}')
         
         return predictions
@@ -759,15 +758,13 @@ class AdvancedMemoryEngine:
             
             return stats
             
-        except Exception as _e:
+        except Exception as e:
             debugger.error('memory_engine', f'Failed to get memory stats: {e}')
             return {'error': str(e)}
-
 
 # Global memory engine instance  
 _memory_engine = None
 _memory_lock = threading.Lock()
-
 
 def get_memory_engine() -> AdvancedMemoryEngine:
     """
@@ -791,7 +788,6 @@ def get_memory_engine() -> AdvancedMemoryEngine:
             debugger.info('memory_engine', 'Global memory engine created')
         
         return _memory_engine
-
 
 def reset_memory_engine():
     """

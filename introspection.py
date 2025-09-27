@@ -1,3 +1,4 @@
+import time
 """
 introspection.py - Runtime Introspection Utilities for Clever's Cognitive Partnership System
 
@@ -45,11 +46,13 @@ Connects to:
     - config.py: Configuration system integration for runtime settings
     - All Python modules: Documentation standard validation and reasoning metadata extraction
 """
-from __future__ import annotations
 import ast  # For static analysis of functions & imports
 import re
+import threading
+import inspect
 from collections import deque
 from pathlib import Path  # For code health & component graph scanning
+from typing import Dict, List, Any, Optional, Deque, Set, Callable
 
 # Regular expression to extract Why/Where/How sections from docstrings (case-insensitive)
 _SECTION_RE = re.compile(r"^(why|where|how)\s*:\s*(.*)$", re.IGNORECASE)
@@ -71,7 +74,6 @@ _doc_meta_cache: Dict[int, Dict[str, str]] = {}
 # This can be tuned; kept internal to avoid config sprawl. Typical fast render
 # under light load should be < 25ms; we set 40ms as initial heuristic.
 RENDER_SLOW_THRESHOLD_MS = 40.0
-
 
 def extract_doc_meta(obj: Any) -> Dict[str, str]:
     """Extract Why / Where / How sections from a callable or object docstring.
@@ -110,7 +112,6 @@ def extract_doc_meta(obj: Any) -> Dict[str, str]:
     _doc_meta_cache[oid] = meta
     return meta
 
-
 def record_render(template: str, route: str, duration_ms: float, context_size: int) -> None:
     """Record a template render event.
 
@@ -136,12 +137,10 @@ def record_render(template: str, route: str, duration_ms: float, context_size: i
             "context_size": context_size,
         })
 
-
 def get_recent_renders() -> List[Dict[str, Any]]:
     """Return a list of recent render events (newest last)."""
     with _registry_lock:
         return list(_render_events)
-
 
 def set_last_error(info: Dict[str, Any]) -> None:
     """Store the last captured error for introspection."""
@@ -149,12 +148,10 @@ def set_last_error(info: Dict[str, Any]) -> None:
     with _registry_lock:
         _last_error = info
 
-
 def get_last_error() -> Optional[Dict[str, Any]]:
     """Return last captured error dictionary or None."""
     with _registry_lock:
         return _last_error
-
 
 def build_endpoints_snapshot(app) -> List[Dict[str, Any]]:
     """Collect metadata for all Flask endpoints (rules + Why/Where/How).
@@ -183,7 +180,6 @@ def build_endpoints_snapshot(app) -> List[Dict[str, Any]]:
     snapshot.sort(key=lambda r: r["rule"])
     return snapshot
 
-
 def detect_git_version() -> Optional[str]:
     """Attempt to read a short git commit hash (best-effort, offline safe)."""
     try:
@@ -193,9 +189,7 @@ def detect_git_version() -> Optional[str]:
     except Exception:
         return None
 
-
 _GIT_HASH = detect_git_version()
-
 
 def _compute_warnings(endpoints: List[Dict[str, Any]]) -> List[str]:
     """Compute drift warnings for endpoints missing reasoning sections.
@@ -212,7 +206,6 @@ def _compute_warnings(endpoints: List[Dict[str, Any]]) -> List[str]:
         if missing:
             warnings.append(f"Endpoint {ep.get('rule')} missing: {', '.join(missing)}")
     return warnings
-
 
 def _extract_connects_to(obj: Any) -> List[str]:
     """Parse 'Connects to:' lines from a docstring to derive graph edges.
@@ -257,7 +250,6 @@ def _extract_connects_to(obj: Any) -> List[str]:
             seen.add(c)
             ordered.append(c)
     return ordered
-
 
 def _build_reasoning_graph(endpoints: List[Dict[str, Any]], app) -> Dict[str, Any]:
     """Build a lightweight reasoning graph from endpoint docstrings.
@@ -323,7 +315,6 @@ def _build_reasoning_graph(endpoints: List[Dict[str, Any]], app) -> Dict[str, An
         'generated_at': time.time(),  # Why: unify timestamp key naming for frontend consumption; Where: referenced by graph legend overlay; How: epoch seconds float
     }
 
-
 def _build_concept_graph() -> Optional[Dict[str, Any]]:
     """Attempt to build an evolution concept graph (best-effort).
 
@@ -360,7 +351,6 @@ def _build_concept_graph() -> Optional[Dict[str, Any]]:
         }
     except Exception:
         return None
-
 
 def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -> Dict[str, Any]:
     """Assemble full runtime introspection state with enhanced intelligent analysis.
@@ -419,11 +409,11 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
     # Code health + component graph (best-effort; never raise to caller)
     try:
         code_health = _scan_code_health()
-    except Exception as _e:  # noqa: BLE001
+    except Exception as e:
         code_health = {"error": f"code health scan failed: {e}"}
     try:
         component_graph = _build_component_graph()
-    except Exception as _e:  # noqa: BLE001
+    except Exception as e:
         component_graph = {"error": f"component graph failed: {e}"}
     # JSON safety pass (convert sets recursively)
     def _json_safe(obj):  # Why: Prevent Flask jsonify errors on non-serializable containers
@@ -461,7 +451,7 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
         try:
             from intelligent_analyzer import get_intelligent_analysis  # type: ignore
             intelligent_analysis = get_intelligent_analysis()
-        except Exception as _e:  # noqa: BLE001 broad purposely
+        except Exception as e:  # noqa: BLE001 broad purposely
             intelligent_analysis = {
                 'error': f'Intelligent analysis unavailable: {str(e)}',
                 'generated_at': time.time()
@@ -487,7 +477,6 @@ def runtime_state(app, persona_engine=None, include_intelligent_analysis=True) -
         "ui_component_validation": validate_ui_components(),
     }
 
-
 def traced_render(app, template: str, route: str, render_func: Callable, **context):
     """Wrapper that records template render timing and delegates to Flask renderer.
 
@@ -503,7 +492,6 @@ def traced_render(app, template: str, route: str, render_func: Callable, **conte
     duration_ms = (time.perf_counter() - start) * 1000.0
     record_render(template, route=route, duration_ms=duration_ms, context_size=len(context))
     return rv
-
 
 def register_error_handler(app):
     """Install a global error handler capturing exceptions for introspection."""
@@ -600,7 +588,6 @@ def _scan_code_health(max_files: int = 400) -> Dict[str, Any]:
         "generated_ts": time.time(),
     }
 
-
 def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[str, Any]:
     """Build lightweight intra-project import dependency graph.
 
@@ -653,7 +640,6 @@ def _build_component_graph(max_nodes: int = 300, max_edges: int = 800) -> Dict[s
         "generated_ts": time.time(),
     }
 
-
 def validate_ui_components() -> Dict[str, Any]:
     """
     Validate UI component integrity and catch CSS/HTML/JS mismatches
@@ -695,7 +681,6 @@ def validate_ui_components() -> Dict[str, Any]:
         validation_results["issues"] = issues_found
         
     return validation_results
-
 
 def _validate_particle_system() -> Dict[str, Any]:
     """
@@ -750,19 +735,16 @@ def _validate_particle_system() -> Dict[str, Any]:
             
         return result
         
-    except Exception as _e:
+    except Exception as e:
         return {"status": "error", "message": f"Validation failed: {str(e)}"}
-
 
 def _validate_chat_interface() -> Dict[str, Any]:
     """Validate chat interface component integrity"""
     return {"status": "healthy", "message": "Chat interface validation not implemented yet"}
 
-
 def _validate_input_controls() -> Dict[str, Any]:  
     """Validate input controls component integrity"""
     return {"status": "healthy", "message": "Input controls validation not implemented yet"}
-
 
 def _validate_z_index_hierarchy() -> Dict[str, Any]:
     """
@@ -795,9 +777,8 @@ def _validate_z_index_hierarchy() -> Dict[str, Any]:
             "conflicts": _detect_z_index_conflicts(hierarchy)
         }
         
-    except Exception as _e:
+    except Exception as e:
         return {"status": "error", "message": f"Z-index validation failed: {str(e)}"}
-
 
 def _detect_z_index_conflicts(hierarchy: Dict[str, int]) -> List[str]:
     """Detect potential z-index conflicts"""

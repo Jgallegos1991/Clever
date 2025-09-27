@@ -22,7 +22,6 @@ from __future__ import annotations
 from typing import Any, Dict
 from datetime import datetime
 
-
 class CleverConversationEngine:  # pragma: no cover - intentional stub
     """Deprecated legacy engine placeholder.
 
@@ -70,7 +69,6 @@ class CleverConversationEngine:  # pragma: no cover - intentional stub
             "particle_intensity": 0.0,
             "ui_state": "deprecated",
         }
-
 
 def deprecated_engine_warning() -> str:  # pragma: no cover
     """Provide guidance string about deprecation.

@@ -13,7 +13,6 @@ Connects to:
 """
 from collections import defaultdict
 
-
 def load_inventory(json_path):
     """
     Load the file inventory from JSON
@@ -24,7 +23,6 @@ def load_inventory(json_path):
     """
     with open(json_path, "r") as f:
         return json.load(f)
-
 
 def group_by_language(files):
     """
@@ -39,7 +37,6 @@ def group_by_language(files):
         lang = file_data.get("lang", "unknown")
         by_lang[lang].append(file_data)
     return dict(by_lang)
-
 
 def group_by_directory(files):
     """
@@ -58,7 +55,6 @@ def group_by_directory(files):
             top_dir = "."  # root files
         by_dir[top_dir].append(file_data)
     return dict(by_dir)
-
 
 def calculate_stats(files):
     """
@@ -87,7 +83,6 @@ def calculate_stats(files):
         "lang_loc": dict(lang_loc),
     }
 
-
 def format_number(num):
     """
     Format numbers with commas for readability
@@ -97,7 +92,6 @@ def format_number(num):
     How: Uses Python string formatting with commas
     """
     return f"{num:,}"
-
 
 def create_markdown(files, output_path):
     """
@@ -257,7 +251,6 @@ def create_markdown(files, output_path):
         f"Processed {stats['total_files']} files with {format_number(stats['total_loc'])} total lines of code"
     )
 
-
 def main():
     """
     Main entry point for inventory conversion script
@@ -278,7 +271,6 @@ def main():
 
     print(f"Creating markdown file at {output_path}...")
     create_markdown(files, output_path)
-
 
 if __name__ == "__main__":
     main()

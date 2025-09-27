@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """
 Clever Sync Watcher - Monitors sync directories for changes and triggers ingestion
@@ -95,7 +96,7 @@ class SyncEventHandler(FileSystemEventHandler):
                 logger.info(f"Ingestion {status} for {file_path}")
             else:
                 logger.info(f"No ingestion needed for {file_path} (status: {status})")
-        except Exception as _e:
+        except Exception:
             logger.error(f"Error during ingestion of {file_path}: {e}")
 
 def main():

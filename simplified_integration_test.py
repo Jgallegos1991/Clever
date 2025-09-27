@@ -13,7 +13,6 @@ Connects to:
     - All core modules: Integration testing across system components
 """
 
-
 # Add project root to path
 sys.path.insert(0, "/workspaces/projects")
 
@@ -23,10 +22,9 @@ try:
     from debug_config import get_debugger
 
     print("✅ All enhanced modules imported successfully")
-except ImportError as _e:
+except ImportError:
     print(f"❌ Import error: {e}")
     sys.exit(1)
-
 
 def test_system_validation():
     """Test comprehensive system validation"""
@@ -49,10 +47,9 @@ def test_system_validation():
             )
             return False
 
-    except Exception as _e:
+    except Exception:
         print(f"❌ Validation test failed: {e}")
         return False
-
 
 def test_enhanced_conversation():
     """Test enhanced conversation capabilities"""
@@ -84,10 +81,9 @@ def test_enhanced_conversation():
             print("❌ Enhanced conversation test failed - insufficient response")
             return False
 
-    except Exception as _e:
+    except Exception:
         print(f"❌ Conversation test failed: {e}")
         return False
-
 
 def test_file_access():
     """Test file access capability"""
@@ -122,10 +118,9 @@ def test_file_access():
             print("❌ File access test failed")
             return False
 
-    except Exception as _e:
+    except Exception:
         print(f"❌ File access test failed: {e}")
         return False
-
 
 def test_conversation_with_file_analysis():
     """Test conversation with file analysis capability"""
@@ -152,10 +147,9 @@ def test_conversation_with_file_analysis():
             print("❌ File analysis conversation test failed")
             return False
 
-    except Exception as _e:
+    except Exception:
         print(f"❌ File analysis test failed: {e}")
         return False
-
 
 def main():
     """Run simplified integration test"""
@@ -180,7 +174,7 @@ def main():
             results.append((test_name, result))
             if result:
                 passed += 1
-        except Exception as _e:
+        except Exception:
             print(f"❌ {test_name} failed with exception: {e}")
             results.append((test_name, False))
 
@@ -201,7 +195,6 @@ def main():
     else:
         print(f"\n⚠️ {total - passed} tests failed ({passed}/{total} passed)")
         return 1
-
 
 if __name__ == "__main__":
     exit_code = main()

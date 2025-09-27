@@ -19,7 +19,6 @@ Connects to:
 
 # NOTE: Minimal, idempotent edits directly to project files.
 
-
 def list_operations() -> List[str]:
     """
     Return list of available self-repair operations for Clever AI system.
@@ -48,7 +47,6 @@ def list_operations() -> List[str]:
         "check_database_integrity",
         "cleanup_logs",
     ]
-
 
 def apply(op: str) -> Tuple[bool, str]:
     """
@@ -93,7 +91,6 @@ def apply(op: str) -> Tuple[bool, str]:
         return _cleanup_logs()
     return False, "unknown operation"
 
-
 def _repair_dependencies() -> Tuple[bool, str]:
     """
     Check and reinstall missing Python packages using requirements.txt.
@@ -107,9 +104,8 @@ def _repair_dependencies() -> Tuple[bool, str]:
             return True, "Dependencies repaired."
         else:
             return False, f"Dependency repair failed: {result.stderr.strip()}"
-    except Exception as _e:
+    except Exception:
         return False, f"Dependency repair error: {e}"
-
 
 def _validate_config_files() -> Tuple[bool, str]:
     """
@@ -134,12 +130,11 @@ def _validate_config_files() -> Tuple[bool, str]:
                     for k in missing:
                         f.write(f"\n{k} = None  # Auto-added by fixer\n")
                 fixed.append(f"{fname}: added {missing}")
-        except Exception as _e:
+        except Exception:
             fixed.append(f"{fname}: error {e}")
     if fixed:
         return True, ", ".join(fixed)
     return True, "Config files validated."
-
 
 def _check_database_integrity() -> Tuple[bool, str]:
     """Validate clever.db integrity; restore from backup if corrupted.
@@ -160,9 +155,8 @@ def _check_database_integrity() -> Tuple[bool, str]:
             Path(db_path).write_bytes(backup.read_bytes())
             return True, "Database restored from backup."
         return False, f"Database integrity failed: {result[0] if result else 'Unknown error'}"
-    except Exception as _e:
+    except Exception:
         return False, f"Database integrity error: {e}"
-
 
 def _cleanup_logs() -> Tuple[bool, str]:
     """
@@ -181,7 +175,6 @@ def _cleanup_logs() -> Tuple[bool, str]:
     for f in log_files:
         shutil.move(str(f), str(archive_dir / f.name))
     return True, f"Archived {len(log_files)} log files."
-
 
 def _run_code_cleaner(mode: str) -> Tuple[bool, str]:
     """
@@ -208,9 +201,8 @@ def _run_code_cleaner(mode: str) -> Tuple[bool, str]:
             return True, f"{mode} completed: {result.stdout.strip()}"
         else:
             return False, f"{mode} failed: {result.stderr.strip()}"
-    except Exception as _e:
+    except Exception:
         return False, f"{mode} error: {e}"
-
 
 def _ensure_service_worker_present() -> Tuple[bool, str]:
     sw = Path("static/sw.js")
@@ -221,7 +213,6 @@ def _ensure_service_worker_present() -> Tuple[bool, str]:
     )
     return True, "created"
 
-
 def _ensure_citations_chip() -> Tuple[bool, str]:
     # Already implemented in static/app.js; report present
     p = Path("static/app.js")
@@ -231,13 +222,11 @@ def _ensure_citations_chip() -> Tuple[bool, str]:
         "ok: citation chips enabled" if "citations" in txt else "not found in app.js",
     )
 
-
 def _enable_autoswitch_mode() -> Tuple[bool, str]:
     # Backend infers mode now; confirm presence
     p = Path("app.py")
     ok = p.exists() and ("def _infer_mode" in p.read_text(encoding="utf-8"))
     return ok, "autoswitch active" if ok else "infer_mode not found"
-
 
 def _brighten_scene_constants() -> Tuple[bool, str]:
     p = Path("static/scene.js")
@@ -249,7 +238,6 @@ def _brighten_scene_constants() -> Tuple[bool, str]:
         # Adjust nothing; we already use energy-based glow
         return True, "already bright"
     return True, "no-op"
-
 
 def _boost_particle_count() -> Tuple[bool, str]:
     p = Path("static/scene.js")

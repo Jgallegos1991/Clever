@@ -39,7 +39,6 @@ _STOPWORDS = set(
 """.split()
 )
 
-
 def _normalize_token(token: str) -> str:
     """
     Normalize token for consistent keyword extraction.
@@ -51,7 +50,6 @@ def _normalize_token(token: str) -> str:
     """
     token = token.strip().lower()
     return "".join(ch for ch in token if ch.isalnum() or ch in ("-", "_"))
-
 
 def _top_tokens(tokens: Iterable[str], k: int = 8) -> List[str]:
     """
@@ -76,7 +74,6 @@ def _top_tokens(tokens: Iterable[str], k: int = 8) -> List[str]:
 
     token_counts = Counter(normalized_tokens)
     return [token for token, _ in token_counts.most_common(k)]
-
 
 def _load_spacy() -> Language:
     """
@@ -107,7 +104,6 @@ def _load_spacy() -> Language:
             _NLP.add_pipe("sentencizer")
 
         return _NLP
-
 
 def _keywords_spacy(doc) -> List[str]:
     """
@@ -151,7 +147,6 @@ def _keywords_spacy(doc) -> List[str]:
 
     return deduped[:10]
 
-
 def _sentiment(text: str) -> float:
     """
     Analyze sentiment using TextBlob at full capability.
@@ -172,7 +167,6 @@ def _sentiment(text: str) -> float:
     # Full potential operation - no fallbacks
     blob = TextBlob(text)
     return float(blob.sentiment.polarity)
-
 
 class UnifiedNLPProcessor:
     """
@@ -270,7 +264,6 @@ class UnifiedNLPProcessor:
         How: Returns the loaded spaCy Language model instance.
         """
         return self._ensure_nlp()
-
 
 # Singleton export for application use - full potential operation
 nlp_processor = UnifiedNLPProcessor()

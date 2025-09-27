@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """
 memory_optimized_code_intelligence.py - Memory-Efficient Code Intelligence for Clever
@@ -210,7 +211,7 @@ class MemoryOptimizedCodeIntelligence:
             self.total_analyzed_files += 1
             return analysis
             
-        except Exception as _e:
+        except Exception:
             print(f"Lightweight analysis failed for {file_path}: {e}")
             return None
     

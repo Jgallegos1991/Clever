@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """
 cognitive_sovereignty.py - Clever's Comprehensive Self-Evolution and System Control Engine
@@ -55,7 +56,6 @@ from notebooklm_engine import get_notebooklm_engine
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class CognitiveSovereigntyMetrics:
     """Metrics for tracking Clever's cognitive sovereignty evolution."""
@@ -66,7 +66,6 @@ class CognitiveSovereigntyMetrics:
     learning_sources_integrated: List[str]
     evolution_confidence: float
     sovereignty_level: str  # 'basic', 'intermediate', 'advanced', 'sovereign'
-
 
 class CognitiveSovereigntyEngine:
     """
@@ -260,7 +259,7 @@ class CognitiveSovereigntyEngine:
                 logger.warning("Enhanced NLP dictionary not available")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate English dictionary: {e}")
             return False
     
@@ -297,7 +296,7 @@ class CognitiveSovereigntyEngine:
                 logger.warning("Academic knowledge engine not available")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate academic knowledge: {e}")
             return False
     
@@ -336,8 +335,8 @@ class CognitiveSovereigntyEngine:
                             'system_knowledge'
                         )
                         
-                except Exception as _e:
-                    logger.warning(f"Failed to query system specs for '{query}': {e}")
+                except Exception:
+                    logger.warning(f"Failed to query system specs for '{query}': {_e}")
             
             if specifications_found > 0:
                 logger.info(f"System specifications integrated: {specifications_found} specifications found")
@@ -346,7 +345,7 @@ class CognitiveSovereigntyEngine:
                 logger.warning("No system specifications found in documents")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate system specifications: {e}")
             return False
     
@@ -436,7 +435,7 @@ class CognitiveSovereigntyEngine:
                 logger.warning("Memory-optimized code intelligence not available")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate system awareness: {e}")
             return False
     
@@ -468,11 +467,11 @@ class CognitiveSovereigntyEngine:
                 logger.info(f"NotebookLM capabilities integrated: {capabilities}")
                 return True
                 
-            except Exception as _e:
-                logger.warning(f"NotebookLM engine test failed: {e}")
+            except Exception:
+                logger.warning(f"NotebookLM engine test failed: {_e}")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate NotebookLM capabilities: {e}")
             return False
     
@@ -505,7 +504,7 @@ class CognitiveSovereigntyEngine:
                 logger.warning("No particle system files found")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate particle systems: {e}")
             return False
     
@@ -541,8 +540,8 @@ class CognitiveSovereigntyEngine:
                     except SyntaxError:
                         pass  # Skip files with syntax errors
                         
-                except Exception as _e:
-                    logger.warning(f"Failed to analyze {file_path}: {e}")
+                except Exception:
+                    logger.warning(f"Failed to analyze {file_path}: {_e}")
             
             # Store code understanding metrics
             self._store_sovereignty_metric(
@@ -555,7 +554,7 @@ class CognitiveSovereigntyEngine:
             logger.info(f"Code understanding integrated: {code_metrics}")
             return True
             
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate code understanding: {e}")
             return False
 
@@ -601,7 +600,7 @@ class CognitiveSovereigntyEngine:
                 logger.warning(f"Code intelligence enhancement failed: {enhancement_result.get('error')}")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate code intelligence: {e}")
             return False
 
@@ -651,7 +650,7 @@ class CognitiveSovereigntyEngine:
                 logger.warning(f"Programming expertise integration failed: {academic_integration.get('error')}")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate programming expertise: {e}")
             return False
     
@@ -732,7 +731,7 @@ class CognitiveSovereigntyEngine:
             logger.info("File management capabilities enabled")
             return True
             
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to enable file management: {e}")
             return False
     
@@ -768,11 +767,11 @@ class CognitiveSovereigntyEngine:
                 logger.info(f"System aliases created: {list(clever_aliases.keys())}")
                 return True
                 
-            except Exception as _e:
+            except Exception:
                 logger.error(f"Failed to create aliases: {e}")
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to enable alias creation: {e}")
             return False
     
@@ -798,7 +797,7 @@ class CognitiveSovereigntyEngine:
                 logger.info("Admin permissions confirmed")
                 return True
                 
-            except Exception as _e:
+            except Exception:
                 self._record_system_operation(
                     'admin_permissions',
                     'Permission test',
@@ -807,7 +806,7 @@ class CognitiveSovereigntyEngine:
                 )
                 return False
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to enable admin permissions: {e}")
             return False
     
@@ -848,7 +847,7 @@ ps aux | grep -E "(flask|python.*app.py)" | grep -v grep >> "$LOG_DIR/clever_pro
             logger.info("System monitoring enabled")
             return True
             
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to enable system monitoring: {e}")
             return False
     
@@ -874,7 +873,7 @@ ps aux | grep -E "(flask|python.*app.py)" | grep -v grep >> "$LOG_DIR/clever_pro
             logger.info("Full device control enabled")
             return True
             
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to enable device control: {e}")
             return False
     
@@ -913,7 +912,7 @@ ps aux | grep -E "(flask|python.*app.py)" | grep -v grep >> "$LOG_DIR/clever_pro
             
             return False
             
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to evolve unlimited connections: {e}")
             return False
     
@@ -1014,7 +1013,7 @@ ps aux | grep -E "(flask|python.*app.py)" | grep -v grep >> "$LOG_DIR/clever_pro
             logger.info(f"Connection enhancement applied to {notebooklm_file}")
             return True
             
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to apply connection enhancement: {e}")
             return False
     
@@ -1093,7 +1092,7 @@ ps aux | grep -E "(flask|python.*app.py)" | grep -v grep >> "$LOG_DIR/clever_pro
         try:
             # This will be called during initialization to load everything
             self.integrate_comprehensive_knowledge()
-        except Exception as _e:
+        except Exception:
             logger.error(f"Failed to integrate knowledge sources: {e}")
 
     def modify_own_code(self, enhancement_request: str, target_file: Optional[str] = None) -> Dict[str, Any]:
@@ -1193,14 +1192,13 @@ ps aux | grep -E "(flask|python.*app.py)" | grep -v grep >> "$LOG_DIR/clever_pro
                     'suggestion': 'Please specify target_file parameter'
                 }
                 
-        except Exception as _e:
+        except Exception:
             logger.error(f"Self-modification error: {e}")
             return {
                 'success': False,
                 'error': f'Self-modification system error: {str(e)}',
                 'enhancement_requested': enhancement_request
             }
-
 
 # Singleton instance for easy access
 _sovereignty_engine = None

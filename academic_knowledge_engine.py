@@ -22,7 +22,7 @@ Connects to:
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import re
 
 class AcademicDomain(Enum):
@@ -703,7 +703,6 @@ class ComprehensiveAcademicEngine:
             
         return stats
 
-
 # Global instance for efficient reuse
 _academic_engine = None
 
@@ -719,7 +718,6 @@ def get_academic_engine() -> ComprehensiveAcademicEngine:
     if _academic_engine is None:
         _academic_engine = ComprehensiveAcademicEngine()
     return _academic_engine
-
 
 if __name__ == "__main__":
     """Test the comprehensive academic knowledge system."""

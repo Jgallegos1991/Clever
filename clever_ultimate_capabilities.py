@@ -65,14 +65,14 @@ class CleverUltimateCapabilities:
             try:
                 self.academic_engine = get_academic_engine()
                 print("✅ Academic Knowledge Engine: LOADED")
-            except Exception as _e:
+            except Exception:
                 print(f"⚠️  Academic Engine: {e}")
                 
         if MEMORY_AVAILABLE:
             try:
                 self.memory_engine = get_memory_engine()
                 print("✅ Memory Engine: LOADED")
-            except Exception as _e:
+            except Exception:
                 print(f"⚠️  Memory Engine: {e}")
     
     def demonstrate_mathematical_genius(self) -> Dict[str, Any]:

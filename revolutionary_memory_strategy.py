@@ -268,7 +268,7 @@ class RevolutionaryMemoryManager:
             print("   🤝 VS Code symbiosis optimized")
             return True
             
-        except Exception as _e:
+        except Exception:
             print(f"   ⚠️  VS Code optimization failed: {e}")
             return False
     
@@ -281,7 +281,7 @@ class RevolutionaryMemoryManager:
                     mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
                     self.memory_mapped_files[str(file_path)] = mm
                     print(f"   📁 Memory mapped: {file_path.name}")
-        except Exception as _e:
+        except Exception:
             print(f"   ⚠️  Memory mapping failed for {file_path}: {e}")
     
     def _revolutionary_cleanup(self):

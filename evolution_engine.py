@@ -1,3 +1,4 @@
+import time
 """
 Simple Evolution Engine for Clever AI
 
@@ -27,7 +28,6 @@ Connects to:
         - `check_evolution_engine()` -> `get_evolution_engine()`: The health monitor accesses this engine to check its status and report on learning progress.
 """
 from datetime import datetime
-
 
 class SimpleEvolutionEngine:
     """
@@ -149,10 +149,8 @@ class SimpleEvolutionEngine:
         self.interactions = []
         self.session_start = time.time()
 
-
 # Global evolution engine instance
 _evolution_engine = None
-
 
 def get_evolution_engine() -> SimpleEvolutionEngine:
     """
@@ -170,7 +168,6 @@ def get_evolution_engine() -> SimpleEvolutionEngine:
     if _evolution_engine is None:
         _evolution_engine = SimpleEvolutionEngine()
     return _evolution_engine
-
 
 def reset_evolution_engine():
     """

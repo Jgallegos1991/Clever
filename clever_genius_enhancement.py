@@ -102,7 +102,7 @@ class CleverGeniusEnhancement:
             try:
                 self.academic_engine = get_academic_engine()
                 print("✅ Academic Knowledge Engine: LOADED")
-            except Exception as _e:
+            except Exception:
                 print(f"⚠️  Academic Engine error: {e}")
                 
         # Memory Engine
@@ -110,7 +110,7 @@ class CleverGeniusEnhancement:
             try:
                 self.memory_engine = get_memory_engine()
                 print("✅ Memory Engine: LOADED")
-            except Exception as _e:
+            except Exception:
                 print(f"⚠️  Memory Engine error: {e}")
                 
         # Enhanced NLP
@@ -118,7 +118,7 @@ class CleverGeniusEnhancement:
             try:
                 self.enhanced_nlp = EnhancedNLPDictionary()
                 print("✅ Enhanced NLP Dictionary: LOADED")
-            except Exception as _e:
+            except Exception:
                 print(f"⚠️  Enhanced NLP error: {e}")
                 
     def enhance_response_with_genius_knowledge(

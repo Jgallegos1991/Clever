@@ -22,7 +22,7 @@ def check_memory():
         
         return available_mb, total_mb
         
-    except Exception as _e:
+    except Exception:
         print(f"Memory check failed: {e}")
         return 800, 2700
 

@@ -24,7 +24,6 @@ from typing import cast
 from debug_config import get_debugger, performance_monitor
 from database import DatabaseManager
 
-
 class SystemHealthMonitor:
     """Monitors system health and component status with intelligent alerting.
 
@@ -150,7 +149,7 @@ class SystemHealthMonitor:
 
             return health_data
 
-        except Exception as _e:
+        except Exception:
             # Provide structured error context for downstream analysis
             self.debugger.error(
                 "health_monitor", "Failed to check system resources", {"error": str(e)}
@@ -226,7 +225,7 @@ class SystemHealthMonitor:
             self.health_checks["database"] = health_data
             return health_data
 
-        except Exception as _e:
+        except Exception:
             self.debugger.error(
                 "health_monitor", "Database health check failed", {"error": str(e)}
             )
@@ -258,7 +257,7 @@ class SystemHealthMonitor:
                     "version": getattr(spacy, "__version__", "unknown"),
                     "model": "en_core_web_sm",
                 }
-            except Exception as _e:
+            except Exception:
                 health_data["components"]["spacy"] = {
                     "status": "error",
                     "error": str(e),
@@ -277,7 +276,7 @@ class SystemHealthMonitor:
                     "status": "healthy",
                     "test_score": test_sentiment["compound"],
                 }
-            except Exception as _e:
+            except Exception:
                 health_data["components"]["vader"] = {
                     "status": "error",
                     "error": str(e),
@@ -297,7 +296,7 @@ class SystemHealthMonitor:
                     "status": "healthy",
                     "test_polarity": test_sentiment,
                 }
-            except Exception as _e:
+            except Exception:
                 health_data["components"]["textblob"] = {
                     "status": "error",
                     "error": str(e),
@@ -307,7 +306,7 @@ class SystemHealthMonitor:
             self.health_checks["nlp_components"] = health_data
             return health_data
 
-        except Exception as _e:
+        except Exception:
             self.debugger.error(
                 "health_monitor", "NLP component check failed", {"error": str(e)}
             )
@@ -359,7 +358,7 @@ class SystemHealthMonitor:
             self.health_checks["evolution_engine"] = health_data
             return health_data
 
-        except Exception as _e:
+        except Exception:
             self.debugger.error(
                 "health_monitor", "Evolution engine check failed", {"error": str(e)}
             )
@@ -395,7 +394,7 @@ class SystemHealthMonitor:
                 elif result.get("status") == "warning" and overall_status != "error":
                     overall_status = "warning"
 
-            except Exception as _e:
+            except Exception:
                 full_report["checks"][check_name] = {"status": "error", "error": str(e)}
                 overall_status = "error"
                 self.debugger.error(
@@ -433,10 +432,8 @@ class SystemHealthMonitor:
             "alert_count": len(self.alerts),
         }
 
-
 # Global health monitor
 _health_monitor = None
-
 
 def get_health_monitor() -> SystemHealthMonitor:
     """Get global health monitor instance"""

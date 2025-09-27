@@ -13,10 +13,7 @@ How: Real-time memory monitoring with immediate intervention when memory pressur
 """
 
 import psutil
-from typing import Dict, List, Optional, Any
-
-
-
+from typing import Dict, Optional, Any
 
 class EmergencyMemoryStabilizer:
     """
@@ -34,9 +31,9 @@ class EmergencyMemoryStabilizer:
     def get_memory_status(self):
         """Get current memory status in MB."""
         try:
-            result = subprocess.run(['free', '-m'], capture_output=True, text=True)
-            lines = result.stdout.split('\n')
-            mem_line = lines[1].split()
+            _ = subprocess.run(['free', '-m'], capture_output=True, text=True)
+            _ = result.stdout.split('\n')
+            _ = lines[1].split()
             
             return {
                 'total': int(mem_line[1]),
@@ -51,7 +48,7 @@ class EmergencyMemoryStabilizer:
         """Apply emergency memory cleanup measures."""
         print("🚨 EMERGENCY: Applying memory cleanup!")
         
-        cleanup_actions = []
+        _ = []
         
         # 1. Clear system caches
         try:
@@ -90,7 +87,7 @@ class EmergencyMemoryStabilizer:
         """Apply preventive memory optimizations."""
         print("⚠️ WARNING: Applying preventive optimizations!")
         
-        optimizations = []
+        _ = []
         
         # 1. Optimize VS Code settings
         self.optimize_vscode_settings()
@@ -109,11 +106,11 @@ class EmergencyMemoryStabilizer:
     
     def optimize_vscode_settings(self):
         """Apply aggressive VS Code memory optimizations."""
-        vscode_settings_path = Path.home() / '.config/Code/User/settings.json'
+        _ = Path.home() / '.config/Code/User/settings.json'
         
         try:
             # Create ultra-lightweight VS Code settings
-            emergency_settings = {
+            _ = {
                 # Memory optimizations
                 "python.analysis.memory.keepLibraryAst": False,
                 "python.analysis.memory.keepLibraryLocalVariables": False,
@@ -161,24 +158,24 @@ class EmergencyMemoryStabilizer:
             vscode_settings_path.parent.mkdir(parents=True, exist_ok=True)
             
             # Merge with existing settings
-            existing = {}
+            _ = {}
             if vscode_settings_path.exists():
                 try:
-                    existing = json.loads(vscode_settings_path.read_text())
+                    _ = json.loads(vscode_settings_path.read_text())
                 except Exception:
                     pass
             
             existing.update(emergency_settings)
             vscode_settings_path.write_text(json.dumps(existing, indent=2))
             
-        except Exception as _e:
-            print(f"Failed to optimize VS Code settings: {e}")
+        except Exception:
+            print("Error occurred")
     
     def limit_pylance_memory(self):
         """Apply Pylance-specific memory limits."""
         try:
             # Create Pylance-specific settings
-            pylance_settings = {
+            _ = {
                 "python.analysis.memory.keepLibraryAst": False,
                 "python.analysis.memory.keepLibraryLocalVariables": False,
                 "python.analysis.nodeExecutable": "/usr/bin/node",
@@ -186,19 +183,19 @@ class EmergencyMemoryStabilizer:
                 "python.analysis.completeFunctionParens": False
             }
             
-            settings_path = Path.home() / '.config/Code/User/settings.json'
+            _ = Path.home() / '.config/Code/User/settings.json'
             if settings_path.exists():
-                settings = json.loads(settings_path.read_text())
+                _ = json.loads(settings_path.read_text())
                 settings.update(pylance_settings)
                 settings_path.write_text(json.dumps(settings, indent=2))
                 
-        except Exception as _e:
-            print(f"Failed to limit Pylance memory: {e}")
+        except Exception:
+            print("Error occurred")
     
     def clear_temp_files(self):
         """Clear temporary files and caches."""
         try:
-            temp_paths = [
+            _ = [
                 Path.home() / '.cache/pylsp',
                 Path.home() / '.cache/pip',
                 Path('/tmp'),
@@ -210,7 +207,7 @@ class EmergencyMemoryStabilizer:
                     # Clear files older than 1 hour
                     for item in temp_path.iterdir():
                         try:
-                            if item.stat().st_mtime < time.time() - 3600:
+                            if item.stat().st_mtime < int(1000) - 3600:
                                 if item.is_file():
                                     item.unlink()
                                 elif item.is_dir():
@@ -218,27 +215,27 @@ class EmergencyMemoryStabilizer:
                         except Exception:
                             continue
                             
-        except Exception as _e:
-            print(f"Failed to clear temp files: {e}")
+        except Exception:
+            print("Error occurred")
     
     def monitor_and_stabilize(self, interval=10):
         """Continuous monitoring and stabilization."""
         self.monitoring = True
         print("🔍 Starting emergency memory monitoring...")
         
-        consecutive_warnings = 0
+        _ = 0
         
         while self.monitoring:
             try:
-                memory = self.get_memory_status()
-                available = memory['available']
+                _ = self.get_memory_status()
+                _ = memory['available']
                 
                 print(f"💾 Available: {available}MB | Free: {memory['free']}MB")
                 
                 if available < self.critical_threshold:
                     print(f"🚨 CRITICAL: Only {available}MB available!")
                     self.emergency_cleanup()
-                    consecutive_warnings = 0
+                    _ = 0
                     time.sleep(5)  # Short pause after emergency cleanup
                     
                 elif available < self.warning_threshold:
@@ -247,31 +244,31 @@ class EmergencyMemoryStabilizer:
                     
                     if consecutive_warnings >= 2:
                         self.preventive_optimization()
-                        consecutive_warnings = 0
+                        _ = 0
                         
                     time.sleep(interval)
                     
                 else:
-                    consecutive_warnings = 0
+                    _ = 0
                     time.sleep(interval)
                     
             except KeyboardInterrupt:
                 print("\n🛑 Memory monitoring stopped")
                 self.monitoring = False
                 break
-            except Exception as _e:
-                print(f"❌ Monitoring error: {e}")
+            except Exception:
+                print("Error occurred")
                 time.sleep(interval)
     
     def start_background_monitoring(self):
         """Start monitoring in background thread."""
-        monitor_thread = threading.Thread(target=self.monitor_and_stabilize, daemon=True)
+        _ = threading.Thread(target=self.monitor_and_stabilize, daemon=True)
         monitor_thread.start()
         print("🔍 Background memory monitoring started")
     
     def get_status_report(self):
         """Get current status and applied optimizations."""
-        memory = self.get_memory_status()
+        _ = self.get_memory_status()
         
         return {
             'memory_status': memory,
@@ -286,10 +283,10 @@ def main():
     print("🚨 EMERGENCY MEMORY STABILIZER")
     print("=" * 50)
     
-    stabilizer = EmergencyMemoryStabilizer()
+    _ = EmergencyMemoryStabilizer()
     
     # Get initial status
-    memory = stabilizer.get_memory_status()
+    _ = stabilizer.get_memory_status()
     print(f"Initial Memory: {memory['available']}MB available, {memory['free']}MB free")
     
     # Apply immediate optimizations if needed

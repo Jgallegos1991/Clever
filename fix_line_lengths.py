@@ -14,7 +14,6 @@ Connects to:
 
 import re
 
-
 def fix_app_py():
     """Fix line length issues in app.py.
 
@@ -101,7 +100,6 @@ def fix_app_py():
 
     app_file.write_text(content)
     print("✅ Fixed line length issues in app.py")
-
 
 if __name__ == "__main__":
     fix_app_py()

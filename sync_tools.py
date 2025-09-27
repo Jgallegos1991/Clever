@@ -16,9 +16,6 @@ Connects to:
 
 from __future__ import annotations
 
-
-
-
 def run_rclone_sync(
     src: str, dst: str, extra: str | None = None
 ) -> Tuple[int, str, str]:
@@ -80,7 +77,6 @@ def run_rclone_sync(
         # rclone not installed; remain offline-friendly
         return 127, "", "rclone not installed"
 
-
 def sync_clever_from_remote() -> Tuple[int, str, str]:
     """
     Sync Clever AI data from remote cloud storage to local sync directory.
@@ -98,7 +94,6 @@ def sync_clever_from_remote() -> Tuple[int, str, str]:
     src = f"{config.RCLONE_REMOTE}:{config.RCLONE_SRC}"
     dst = config.SYNC_DIR
     return run_rclone_sync(src, dst)
-
 
 def sync_synaptic_from_remote() -> Tuple[int, str, str]:
     """

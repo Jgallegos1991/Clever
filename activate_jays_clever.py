@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """
 activate_jays_clever.py - Final Activation of Jay's Revolutionary Clever
@@ -74,7 +75,7 @@ try:
     _JAYS_CLEVER_INTEGRATION = JaysCleverIntegration()
     _JAYS_AUTHENTIC_CLEVER_AVAILABLE = True
     print("✅ Jay's Authentic Clever: ACTIVATED")
-except ImportError as _e:
+except ImportError:
     _JAYS_CLEVER_INTEGRATION = None
     _JAYS_AUTHENTIC_CLEVER_AVAILABLE = False
     print(f"⚠️  Jay's Authentic Clever import failed: {e}")
@@ -127,7 +128,7 @@ except ImportError as _e:
             try:
                 jay_response = _JAYS_CLEVER_INTEGRATION.generate_jay_response(text, mode, jay_context)
                 return _JAYS_CLEVER_INTEGRATION.create_persona_response(jay_response)
-            except Exception as _e:
+            except Exception:
                 print(f"⚠️  Jay's Clever error: {e}")
                 # Fallback to ensure Clever always responds to Jay
                 pass

@@ -30,7 +30,6 @@ from debug_config import get_debugger
 
 logger = get_debugger()
 
-
 class ConversationContext:
     """
     Enhanced conversation context with full system access
@@ -94,7 +93,7 @@ class ConversationContext:
             evo_engine = get_evolution_engine()
             capabilities["learning"] = evo_engine is not None
 
-        except Exception as _e:
+        except Exception:
             logger.warning("conversation_engine", f"Capability discovery error: {e}")
 
         return capabilities
@@ -138,7 +137,6 @@ class ConversationContext:
             self.current_focus = "analytical"
         else:
             self.current_focus = "general"
-
 
 class EnhancedConversationEngine:
     """
@@ -581,12 +579,12 @@ class EnhancedConversationEngine:
                                 results["file_analysis"][str(file_path)] = (
                                     self._analyze_file_content(content)
                                 )
-                        except Exception as _e:
+                        except Exception:
                             logger.warning(
                                 "conversation_engine", f"File read error: {e}"
                             )
 
-        except Exception as _e:
+        except Exception:
             logger.warning("conversation_engine", f"File processing error: {e}")
             results["error"] = str(e)
 
@@ -611,7 +609,7 @@ class EnhancedConversationEngine:
                 ".csv",
             ]:
                 return file_path.read_text(encoding="utf-8", errors="ignore")
-        except Exception as _e:
+        except Exception:
             logger.warning("conversation_engine", f"Safe file read error: {e}")
         return None
 
@@ -702,7 +700,7 @@ class EnhancedConversationEngine:
                         }
                     )
 
-        except Exception as _e:
+        except Exception:
             logger.warning("conversation_engine", f"Memory retrieval error: {e}")
             memory_results["error"] = str(e)
 
@@ -878,7 +876,7 @@ class EnhancedConversationEngine:
 
                 evo_engine.log_interaction(interaction_data)
 
-        except Exception as _e:
+        except Exception:
             logger.warning("conversation_engine", f"Learning integration error: {e}")
 
     def _process_text_file(self, file_path: Path) -> Dict[str, Any]:
@@ -986,10 +984,8 @@ class EnhancedConversationEngine:
             "type": "csv",
         }
 
-
 # Global enhanced conversation engine
 _conversation_engine = None
-
 
 def get_conversation_engine() -> EnhancedConversationEngine:
     """

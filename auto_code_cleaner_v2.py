@@ -24,7 +24,6 @@ EXCLUDE_DIRS = {"venv", ".venv", "site-packages", "__pycache__"}
 
 REPORT = []
 
-
 def is_in_function_or_class(node):
     while node:
         if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
@@ -32,12 +31,10 @@ def is_in_function_or_class(node):
         node = getattr(node, "parent", None)
     return False
 
-
 def attach_parents(tree):
     for node in ast.walk(tree):
         for child in ast.iter_child_nodes(node):
             child.parent = node
-
 
 def scan_file(path: Path, fix: bool = False):
     with path.open("r", encoding="utf-8", errors="ignore") as f:
@@ -79,12 +76,11 @@ def scan_file(path: Path, fix: bool = False):
                             f"{path}: Indentation error in function '{node.name}' at line {stmt.lineno}"
                         )
                         changed = True
-    except Exception as _e:
+    except Exception:
         REPORT.append(f"{path}: AST parse error: {e}")
     if changed and fix:
         with path.open("w", encoding="utf-8") as f:
             f.writelines(new_lines)
-
 
 def main():
     fix = "--fix" in sys.argv
@@ -102,7 +98,6 @@ def main():
         print("\nFixes applied where possible.")
     else:
         print("\nRun with --fix to apply fixes.")
-
 
 if __name__ == "__main__":
     main()

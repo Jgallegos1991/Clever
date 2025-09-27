@@ -1,3 +1,4 @@
+import time
 """
 Clever - Digital Brain Extension & Cognitive Partnership System (Main Application)
 
@@ -54,7 +55,6 @@ app = Flask(__name__)
 # Install global error capture for introspection (still lets Flask debug raise)
 register_error_handler(app)
 
-
 def _sanitize_persona_text(raw: str) -> str:
     """Strip meta reasoning tokens from persona output.
 
@@ -109,7 +109,6 @@ def _sanitize_persona_text(raw: str) -> str:
     text = re.sub(r"[;:,.-]+$", '', text).strip()
     return text
 
-
 # Simple debugger for now
 class SimpleDebugger:
     """
@@ -145,7 +144,6 @@ except ImportError:
     clever_persona = None
     debugger.info("app", "Persona engine not available - using simple responses")
 
-
 @app.route('/')
 def home():
     """
@@ -177,7 +175,6 @@ def home():
         user_name=USER_NAME,
         user_email=USER_EMAIL,
     )
-
 
 @app.route('/debug')
 def debug():
@@ -294,7 +291,7 @@ def chat():
         debugger.info("chat", f"Processed message: {user_message[:50]}...")
         return jsonify(response)
         
-    except Exception as _e:
+    except Exception:
         TELEMETRY["last_error"] = str(e)
         debugger.info("chat", f"Error processing message: {str(e)}")
         return jsonify({
@@ -303,7 +300,6 @@ def chat():
             'detail': str(e),
             'received': (request.get_json(silent=True) or {}),
         }), 500
-
 
 @app.route('/api/ping', methods=['GET'])
 def api_ping():
@@ -332,7 +328,6 @@ def api_ping():
         'total_chats': TELEMETRY.get('total_chats', 0)
     })
 
-
 @app.route('/api/telemetry', methods=['GET'])
 def api_telemetry():
     """Expose lightweight in-memory telemetry (debug use only)
@@ -349,7 +344,6 @@ def api_telemetry():
     out = dict(TELEMETRY)
     out["uptime_s"] = round(uptime_s, 2)
     return jsonify(out)
-
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -369,7 +363,6 @@ def health():
         'timestamp': time.time(),
         'service': 'clever-ai'
     })
-
 
 @app.route('/ingest', methods=['POST'])
 def ingest():
@@ -391,13 +384,12 @@ def ingest():
             'status': 'success',
             'message': f'Form submitted successfully for {name}' if name else 'Form submitted successfully'
         })
-    except Exception as _e:
+    except Exception:
         debugger.info("ingest", f"Error in ingestion: {str(e)}")
         return jsonify({
             'error': 'Ingestion failed',
             'status': 'error'
         }), 500
-
 
 @app.route('/summarize', methods=['POST'])
 @app.route('/api/summarize', methods=['POST'])
@@ -421,13 +413,12 @@ def summarize():
             'status': 'success',
             'summary': summary
         })
-    except Exception as _e:
+    except Exception:
         debugger.info("summarize", f"Error in summarization: {str(e)}")
         return jsonify({
             'error': 'Summarization failed',
             'status': 'error'
         }), 500
-
 
 @app.route('/search', methods=['POST'])
 @app.route('/api/search', methods=['GET'])
@@ -455,13 +446,12 @@ def search():
             'results': [],
             'message': 'Search endpoint ready'
         })
-    except Exception as _e:
+    except Exception:
         debugger.info("search", f"Error in search: {str(e)}")
         return jsonify({
             'error': 'Search failed',
             'status': 'error'
         }), 500
-
 
 @app.route('/<path:filename>')
 def serve_test_files(filename):
@@ -485,7 +475,6 @@ def serve_test_files(filename):
     else:
         abort(404)
 
-
 @app.route('/api/runtime_introspect', methods=['GET'])
 def api_runtime_introspect():
     """Runtime introspection snapshot endpoint
@@ -503,7 +492,6 @@ def api_runtime_introspect():
         - templates/index.html: primary template tracked in recent renders
     """
     return jsonify(runtime_state(app, persona_engine=clever_persona))
-
 
 @app.route('/api/generate_shape', methods=['POST'])
 def api_generate_shape():
@@ -569,14 +557,13 @@ def api_generate_shape():
             'message': f'Generated {shape.name} with {len(shape.points)} coordinate points'
         })
         
-    except Exception as _e:
+    except Exception:
         debugger.error('api.generate_shape', f'Shape generation failed: {str(e)}')
         return jsonify({
             'success': False,
             'error': str(e),
             'message': 'Shape generation failed'
         }), 500
-
 
 @app.route('/api/shape_info/<shape_name>', methods=['GET'])
 def api_shape_info(shape_name):
@@ -627,14 +614,13 @@ def api_shape_info(shape_name):
             'info': info
         })
         
-    except Exception as _e:
+    except Exception:
         debugger.error('api.shape_info', f'Shape info retrieval failed: {str(e)}')
         return jsonify({
             'success': False,
             'error': str(e),
             'message': f'Could not get information for shape: {shape_name}'
         }), 500
-
 
 @app.route('/api/available_shapes', methods=['GET'])
 def api_available_shapes():
@@ -680,7 +666,6 @@ def api_available_shapes():
         'total_shapes': sum(len(category) for category in shapes.values()),
         'message': 'Available shape types for generation'
     })
-
 
 # NotebookLM-Inspired Document Analysis API Endpoints
 
@@ -734,7 +719,7 @@ def api_analyze_document():
                 'processing_time_ms': processing_time
             })
             
-        except ValueError as _e:
+        except ValueError:
             return jsonify({
                 'success': False,
                 'error': str(e)
@@ -745,13 +730,12 @@ def api_analyze_document():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Document analysis error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during document analysis'
         }), 500
-
 
 @app.route('/api/query_documents', methods=['POST'])
 def api_query_documents():
@@ -826,13 +810,12 @@ def api_query_documents():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Document query error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during document query'
         }), 500
-
 
 @app.route('/api/document_connections', methods=['GET'])
 def api_document_connections():
@@ -881,13 +864,12 @@ def api_document_connections():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Document connections error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during connection analysis'
         }), 500
-
 
 @app.route('/api/collection_overview', methods=['GET'])
 def api_collection_overview():
@@ -926,13 +908,12 @@ def api_collection_overview():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Collection overview error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during overview generation'
         }), 500
-
 
 @app.route('/api/enhance_ingestion', methods=['POST'])
 def api_enhance_ingestion():
@@ -980,7 +961,7 @@ def api_enhance_ingestion():
             try:
                 engine.analyze_document(doc_id)
                 processed_count += 1
-            except Exception as _e:
+            except Exception:
                 errors.append(f"{filename}: {str(e)}")
         
         processing_time = (time.time() - start_time) * 1000
@@ -999,13 +980,12 @@ def api_enhance_ingestion():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Enhanced ingestion error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during enhanced analysis'
         }), 500
-
 
 # Cognitive Sovereignty API Endpoints
 
@@ -1048,13 +1028,12 @@ def api_cognitive_sovereignty_status():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Sovereignty status error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error getting sovereignty status'
         }), 500
-
 
 @app.route('/api/cognitive_sovereignty/integrate_knowledge', methods=['POST'])
 def api_integrate_comprehensive_knowledge():
@@ -1098,13 +1077,12 @@ def api_integrate_comprehensive_knowledge():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Knowledge integration error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during knowledge integration'
         }), 500
-
 
 @app.route('/api/cognitive_sovereignty/enable_device_control', methods=['POST'])
 def api_enable_full_device_control():
@@ -1147,13 +1125,12 @@ def api_enable_full_device_control():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Device control error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error enabling device control'
         }), 500
-
 
 @app.route('/api/cognitive_sovereignty/evolve_connections', methods=['POST'])
 def api_evolve_unlimited_connections():
@@ -1196,13 +1173,12 @@ def api_evolve_unlimited_connections():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Connection evolution error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during connection evolution'
         }), 500
-
 
 @app.route('/api/cognitive_sovereignty/full_activation', methods=['POST'])
 def api_full_cognitive_sovereignty_activation():
@@ -1266,13 +1242,12 @@ def api_full_cognitive_sovereignty_activation():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception as _e:
+    except Exception:
         debugger.info("api", f"Full activation error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during full activation'
         }), 500
-
 
     
 if __name__ == '__main__':

@@ -23,6 +23,7 @@ Connects to:
     - health_monitor.py: `check_database_health()` reads `config.DB_PATH` to locate and check the database file.
 """
 
+import os
 from pathlib import Path
 
 # Import user configuration explicitly to avoid star-import issues (F403/F405)
@@ -30,7 +31,6 @@ import user_config as _user_config
 
 # Base directories
 ROOT_DIR = Path(__file__).resolve().parent
-
 
 def _load_dotenv(path: Path):
     """
@@ -66,7 +66,6 @@ def _load_dotenv(path: Path):
             os.environ.setdefault(k, v)
     except Exception:
         pass
-
 
 _load_dotenv(ROOT_DIR / ".env")
 
@@ -105,7 +104,6 @@ AUTO_RCLONE_SCHEDULE = os.environ.get("AUTO_RCLONE_SCHEDULE", "false").lower() i
 }
 RCLONE_INTERVAL_MINUTES = int(os.environ.get("RCLONE_INTERVAL_MINUTES", "60"))
 
-
 def _split_paths(val: str) -> list[str]:
     """
     Split comma-separated path string into list of cleaned paths.
@@ -114,7 +112,6 @@ def _split_paths(val: str) -> list[str]:
     How: Splits on comma, strips whitespace, and filters out empty strings to return clean list of path strings.
     """
     return [p.strip() for p in val.split(",") if p.strip()]
-
 
 HOME_DIR = str(Path.home())
 DEFAULT_EXTRA = [HOME_DIR, "/mnt/chromeos/MyFiles", "/mnt/chromeos/GoogleDrive/MyDrive"]

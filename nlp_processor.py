@@ -44,7 +44,7 @@ Design Principles:
 
 import re
 from collections import Counter
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, Any, Optional, List
 
 # Enhanced English dictionary integration for comprehensive vocabulary understanding
 try:
@@ -80,11 +80,9 @@ try:  # NLTK VADER (already in requirements)
 except (ImportError, ModuleNotFoundError, LookupError):  # pragma: no cover
     _VADER_AVAILABLE = False
 
-
 def _safe_lower(text: str) -> str:
     """Internal helper to guard against non-string input."""
     return text.lower() if isinstance(text, str) else ""
-
 
 class SimpleNLPProcessor:
     """
@@ -225,7 +223,7 @@ class SimpleNLPProcessor:
             try:
                 academic_engine = get_academic_engine()
                 academic_analysis = academic_engine.analyze_academic_content(text)
-            except Exception as _e:
+            except Exception as e:
                 print(f"⚠️ Academic analysis failed: {e}")
                 academic_analysis = {
                     'detected_concepts': [],
@@ -323,7 +321,7 @@ class SimpleNLPProcessor:
                         else:
                             misspelled += 1
                             
-            except Exception as _e:
+            except Exception as e:
                 # Fallback to enhanced core vocabulary if dictionary fails
                 print(f"⚠️ Dictionary lookup failed: {e}")
                 misspelled, dictionary_hits = self._fallback_typo_detection(tokens)
@@ -723,7 +721,6 @@ class SimpleNLPProcessor:
             'mathematical_keywords': list(mathematical_keywords)
         }
 
-
 class AdvancedNLPProcessor(SimpleNLPProcessor):
     """Advanced (still offline) NLP processor.
 
@@ -808,7 +805,7 @@ class AdvancedNLPProcessor(SimpleNLPProcessor):
                 if score <= -0.25:
                     return "negative"
                 return "neutral"
-        except Exception:
+        except Exception as e:
             pass  # Silent fallback
 
         # TextBlob second — add attribute guards to appease static analysis
@@ -1010,7 +1007,6 @@ class AdvancedNLPProcessor(SimpleNLPProcessor):
             count -= 1
         return max(1, count)
 
-
 def get_nlp_processor() -> SimpleNLPProcessor:
     """Factory returning the most capable available processor.
 
@@ -1023,7 +1019,6 @@ def get_nlp_processor() -> SimpleNLPProcessor:
         return AdvancedNLPProcessor()
     except (ImportError, ModuleNotFoundError, OSError):  # Safety net – never break core flow
         return SimpleNLPProcessor()
-
 
 # Global processor instance - wrapped in try-except to ensure module always loads
 try:

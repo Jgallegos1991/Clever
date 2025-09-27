@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 """
 Enhanced Dictionary Integration for Clever's NLP System
 
@@ -63,7 +64,7 @@ class EnglishDictionary:
                     word_set = pickle.load(f)
                     print(f"📚 Loaded cached English dictionary: {len(word_set):,} words")
                     return word_set
-            except Exception as _e:
+            except Exception as e:
                 print(f"⚠️ Cache load failed: {e}")
         
         # Load from NLTK and cache for future use
@@ -111,13 +112,13 @@ class EnglishDictionary:
                 with open(self.cache_path, 'wb') as f:
                     pickle.dump(word_set, f)
                 print("💾 Cached dictionary for faster future loading")
-            except Exception as _e:
+            except Exception as e:
                 print(f"⚠️ Could not cache dictionary: {e}")
             
             print(f"✅ Loaded complete English dictionary: {len(word_set):,} words")
             return word_set
             
-        except Exception as _e:
+        except Exception as e:
             print(f"❌ Failed to load NLTK dictionary: {e}")
             print("🔄 Falling back to enhanced core vocabulary...")
             
@@ -215,7 +216,6 @@ class EnglishDictionary:
             'sample_words': list(sorted(self._word_set))[:10] if self._word_set else []
         }
 
-
 # Global instance for efficient reuse
 _english_dict = None
 
@@ -231,7 +231,6 @@ def get_english_dictionary() -> EnglishDictionary:
     if _english_dict is None:
         _english_dict = EnglishDictionary()
     return _english_dict
-
 
 if __name__ == "__main__":
     """Test the enhanced dictionary system."""

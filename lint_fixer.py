@@ -141,7 +141,7 @@ def process_file(file_path: Path) -> bool:
             print(f"✓ Clean: {file_path}")
             return False
             
-    except Exception as _e:
+    except Exception:
         print(f"❌ Error processing {file_path}: {e}")
         return False
 

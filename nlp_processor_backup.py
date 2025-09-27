@@ -31,7 +31,6 @@ _NLP = None
 _NLP_LOCK = threading.Lock()
 _SPACY_MODEL_NAME = "en_core_web_sm"  # pinned in requirements, but we still guard
 
-
 def _load_spacy() -> Language:
     """
     Load spaCy model for full NLP processing capability.
@@ -62,7 +61,6 @@ def _load_spacy() -> Language:
 
         return _NLP
 
-
 # ---- Keyword extraction --------------------------------------------------------------------------
 
 _STOPWORDS = set(
@@ -71,11 +69,9 @@ _STOPWORDS = set(
     """.split()
 )
 
-
 def _normalize_token(t: str) -> str:
     t = t.strip().lower()
     return "".join(ch for ch in t if ch.isalnum() or ch in ("-", "_"))
-
 
 def _top_tokens(tokens: Iterable[str], k: int = 8) -> List[str]:
     from collections import Counter
@@ -103,7 +99,6 @@ def _top_tokens(tokens: Iterable[str], k: int = 8) -> List[str]:
         if len(merged) >= k:
             break
     return merged
-
 
 def _keywords_spacy(doc) -> List[str]:
     # Prefer entities and noun chunks (ideas ≈ “things”) with minimal work.
@@ -139,7 +134,6 @@ def _keywords_spacy(doc) -> List[str]:
             deduped.append(k)
     return deduped[:10]
 
-
 def _keywords_fallback(text: str) -> List[str]:
     # No spaCy? No problem — cheap regex + frequency.
     import re
@@ -148,9 +142,7 @@ def _keywords_fallback(text: str) -> List[str]:
     toks = [t for t in toks if len(t) > 2 and t not in _STOPWORDS]
     return _top_tokens(toks, k=8)
 
-
 # ---- Sentiment -----------------------------------------------------------------------------------
-
 
 def _sentiment(text: str) -> float:
     """
@@ -172,7 +164,6 @@ def _sentiment(text: str) -> float:
     # Full potential operation - no fallbacks
     blob = TextBlob(text)
     return float(blob.sentiment.polarity)
-
 
 class UnifiedNLPProcessor:
     """
@@ -258,7 +249,6 @@ class UnifiedNLPProcessor:
         How: Returns the loaded spaCy Language model instance.
         """
         return self._ensure_nlp()
-
 
 # Singleton export for application use - full potential operation
 nlp_processor = UnifiedNLPProcessor()

@@ -12,7 +12,6 @@ How: Configures Tailscale networking, starts Flask with proper binding, and prov
      connection information for accessing Clever from remote devices.
 """
 
-
 # Add Clever directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -71,7 +70,7 @@ def start_clever_remote():
     except KeyboardInterrupt:
         print("\n👋 Clever shutting down gracefully...")
         return True
-    except Exception as _e:
+    except Exception:
         print(f"❌ Error starting Clever: {e}")
         return False
 

@@ -1,10 +1,10 @@
+import time
 """
 System Validator and Auto-Corrector for Clever AI
 
 Why: Ensures continuous adherence to all Unbreakable Rules and instructions
 by monitoring system state, detecting deviations, and automatically correcting
 issues to maintain peak performance and perfect instruction compliance.
-
 
 Where: Used by app.py, persona.py, and all core modules for continuous
 validation and self-correction of system integrity and rule compliance.
@@ -40,7 +40,6 @@ from debug_config import get_debugger
 
 logger = get_debugger()
 
-
 @dataclass
 class ValidationResult:
     """Container for validation check results
@@ -61,12 +60,9 @@ class ValidationResult:
     auto_corrected: bool = False
     correction_details: str = ""
 
-
 class SystemValidator:
     """
     Comprehensive system validator ensuring perfect adherence to all rules.
-
-
 
     Why: Maintains system integrity by continuously validating against
     Unbreakable Rules and automatically correcting any deviations to ensure
@@ -76,8 +72,6 @@ class SystemValidator:
     ensuring consistent peak performance across all interactions.
     How: Implements validation matrix covering offline operation, single-user
     mode, database integrity, and documentation standards with auto-correction.
-
-
 
     Connects to:
         - utils/offline_guard.py: Validates and enforces offline-only operation.
@@ -133,7 +127,7 @@ class SystemValidator:
                     )
                 if result.severity == "critical" and not result.passed:
                     critical_issues += 1
-            except Exception as _e:
+            except Exception:
                 logger.error(
                     "system_validator",
                     f"Validation check failed: {check.__name__}: {e}",
@@ -165,7 +159,6 @@ class SystemValidator:
             f'{report["passed_checks"]}/{report["total_checks"]} passed',
         )
         return report
-
 
     def _validate_offline_enforcement(self) -> ValidationResult:
         """Validate Rule #1: Strictly Offline Operation"""
@@ -211,7 +204,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="Offline Enforcement",
                 passed=False,
@@ -253,7 +246,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="Single User Config",
                 passed=False,
@@ -278,7 +271,7 @@ class SystemValidator:
                 details=(f"Single database properly configured: {expected_db.name}"),
                 severity="info",
             )
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="Single Database",
                 passed=False,
@@ -318,7 +311,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="Jay Personalization",
                 passed=False,
@@ -372,7 +365,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="Clever Persona",
                 passed=False,
@@ -427,7 +420,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="File Structure Compliance",
                 passed=False,
@@ -490,7 +483,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="NLP Capabilities",
                 passed=False,
@@ -521,7 +514,7 @@ class SystemValidator:
 
             try:
                 evo_engine.log_interaction(test_interaction)
-            except Exception as _e:
+            except Exception:
                 return ValidationResult(
                     check_name="Evolution Engine Access",
                     passed=False,
@@ -538,7 +531,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="Evolution Engine Access",
                 passed=False,
@@ -587,7 +580,7 @@ class SystemValidator:
                 severity="info",
             )
 
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="Documentation Standards",
                 passed=False,
@@ -655,7 +648,7 @@ class SystemValidator:
                 details=("Performance monitoring unavailable (psutil not installed)"),
                 severity="info",
             )
-        except Exception as _e:
+        except Exception:
             return ValidationResult(
                 check_name="Performance Optimization",
                 passed=False,
@@ -695,12 +688,9 @@ class SystemValidator:
 
         return recommendations
 
-
 # Global validator instance
 
-
 _system_validator = None
-
 
 def get_system_validator() -> SystemValidator:
     """
@@ -723,7 +713,6 @@ def get_system_validator() -> SystemValidator:
         _system_validator = SystemValidator()
     return _system_validator
 
-
 def validate_system_startup() -> Dict[str, Any]:
     """
     Run system validation during startup
@@ -737,7 +726,6 @@ def validate_system_startup() -> Dict[str, Any]:
     """
     validator = get_system_validator()
     return validator.run_full_validation()
-
 
 if __name__ == "__main__":
     # Run standalone validation

@@ -48,7 +48,7 @@ def get_tailscale_ip():
             return ips[0].strip() if ips else None
     except FileNotFoundError:
         print("Tailscale not found - install with: curl -fsSL https://tailscale.com/install.sh | sh")
-    except Exception as _e:
+    except Exception:
         print(f"Error getting Tailscale IP: {e}")
     return None
 
@@ -85,7 +85,7 @@ def get_tailscale_status():
                 'devices': devices,
                 'network_ready': True
             }
-    except Exception as _e:
+    except Exception:
         print(f"Error getting Tailscale status: {e}")
     
     return {

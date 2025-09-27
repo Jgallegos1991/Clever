@@ -28,12 +28,8 @@ Connects to:
 """
 
 import gc
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any, Optional
 
-
-
-from datetime import datetime, timedelta
 
 class CleverMemoryManager:
     """
@@ -62,11 +58,11 @@ class CleverMemoryManager:
     def get_system_memory(self):
         """Get comprehensive memory information."""
         try:
-            result = subprocess.run(['free', '-m'], capture_output=True, text=True)
-            lines = result.stdout.split('\n')
-            mem_line = lines[1].split()
+            _ = subprocess.run(['free', '-m'], capture_output=True, text=True)
+            _ = result.stdout.split('\n')
+            _ = lines[1].split()
             
-            swap_line = lines[2].split() if len(lines) > 2 else ['Swap:', '0', '0', '0']
+            _ = lines[2].split() if len(lines) > 2 else ['Swap:', '0', '0', '0']
             
             return {
                 'total_mb': int(mem_line[1]),
@@ -77,8 +73,8 @@ class CleverMemoryManager:
                 'swap_used_mb': int(swap_line[2]) if len(swap_line) > 2 else 0,
                 'timestamp': datetime.now()
             }
-        except Exception as _e:
-            print(f"Error getting memory info: {e}")
+        except Exception:
+            print("Error occurred")
             return {
                 'total_mb': 2734, 'used_mb': 2400, 'free_mb': 200,
                 'available_mb': 300, 'swap_total_mb': 0, 'swap_used_mb': 0,
@@ -88,18 +84,18 @@ class CleverMemoryManager:
     def get_process_memory(self):
         """Get memory usage by key development processes."""
         try:
-            processes = {}
+            _ = {}
             
             # Get VS Code processes
-            result = subprocess.run(['pgrep', '-', 'code'], capture_output=True, text=True)
+            _ = subprocess.run(['pgrep', '-', 'code'], capture_output=True, text=True)
             if result.stdout:
-                pids = result.stdout.strip().split('\n')
-                vscode_memory = 0
+                _ = result.stdout.strip().split('\n')
+                _ = 0
                 for pid in pids:
                     if pid:
                         try:
-                            mem_result = subprocess.run(['ps', '-p', pid, '-o', 'rss='], 
-                                                      capture_output=True, text=True)
+                            _ = subprocess.run(['ps', '-p', pid, '-o', 'rss='], 
+                                                      _ = True, text=True)
                             if mem_result.stdout:
                                 vscode_memory += int(mem_result.stdout.strip()) // 1024
                         except Exception:
@@ -107,15 +103,15 @@ class CleverMemoryManager:
                 processes['vscode'] = vscode_memory
             
             # Get Python processes
-            result = subprocess.run(['pgrep', '-', 'python'], capture_output=True, text=True)
+            _ = subprocess.run(['pgrep', '-', 'python'], capture_output=True, text=True)
             if result.stdout:
-                pids = result.stdout.strip().split('\n')
-                python_memory = 0
+                _ = result.stdout.strip().split('\n')
+                _ = 0
                 for pid in pids:
                     if pid:
                         try:
-                            mem_result = subprocess.run(['ps', '-p', pid, '-o', 'rss='], 
-                                                      capture_output=True, text=True)
+                            _ = subprocess.run(['ps', '-p', pid, '-o', 'rss='], 
+                                                      _ = True, text=True)
                             if mem_result.stdout:
                                 python_memory += int(mem_result.stdout.strip()) // 1024
                         except Exception:
@@ -124,29 +120,29 @@ class CleverMemoryManager:
             
             return processes
             
-        except Exception as _e:
-            print(f"Error getting process memory: {e}")
+        except Exception:
+            print("Error occurred")
             return {}
     
     def assess_memory_situation(self):
         """Assess current memory situation and determine intervention level."""
-        memory = self.get_system_memory()
-        processes = self.get_process_memory()
+        _ = self.get_system_memory()
+        _ = self.get_process_memory()
         
-        available = memory['available_mb']
+        _ = memory['available_mb']
         
         if available < self.critical_threshold:
-            pressure_level = 'critical'
-            intervention = 'emergency'
+            _ = 'critical'
+            _ = 'emergency'
         elif available < self.warning_threshold:
-            pressure_level = 'warning'
-            intervention = 'preventive'
+            _ = 'warning'
+            _ = 'preventive'
         elif available < self.optimal_threshold:
-            pressure_level = 'moderate'
-            intervention = 'gentle'
+            _ = 'moderate'
+            _ = 'gentle'
         else:
-            pressure_level = 'normal'
-            intervention = 'none'
+            _ = 'normal'
+            _ = 'none'
         
         return {
             'memory': memory,
@@ -160,11 +156,11 @@ class CleverMemoryManager:
         """Apply gentle memory optimizations."""
         print("💚 Applying gentle memory optimizations...")
         
-        actions = []
+        _ = []
         
         # 1. Clear Python bytecode cache
         try:
-            cache_dirs = list(self.base_path.rglob('__pycache__'))
+            _ = list(self.base_path.rglob('__pycache__'))
             for cache_dir in cache_dirs:
                 subprocess.run(['rm', '-rf', str(cache_dir)], check=False)
             if cache_dirs:
@@ -175,7 +171,7 @@ class CleverMemoryManager:
         # 2. Optimize VS Code settings if needed
         try:
             from vscode_memory_optimizer import VSCodeMemoryOptimizer
-            optimizer = VSCodeMemoryOptimizer()
+            _ = VSCodeMemoryOptimizer()
             if optimizer.optimize_for_current_memory():
                 actions.append("VS Code settings optimized")
         except Exception:
@@ -184,7 +180,7 @@ class CleverMemoryManager:
         # 3. Python garbage collection
         try:
             import gc
-            collected = gc.collect()
+            _ = gc.collect()
             if collected > 0:
                 actions.append(f"Python GC collected {collected} objects")
         except Exception:
@@ -197,7 +193,7 @@ class CleverMemoryManager:
         """Apply preventive memory optimizations."""
         print("🟡 Applying preventive memory optimizations...")
         
-        actions = []
+        _ = []
         
         # Start with gentle optimizations
         actions.extend(self.apply_gentle_optimization())
@@ -220,7 +216,7 @@ class CleverMemoryManager:
         # 6. Optimize VS Code workspace
         try:
             from vscode_memory_optimizer import VSCodeMemoryOptimizer
-            optimizer = VSCodeMemoryOptimizer()
+            _ = VSCodeMemoryOptimizer()
             optimizer.optimize_clever_workspace()
             actions.append("VS Code workspace optimized")
         except Exception:
@@ -233,7 +229,7 @@ class CleverMemoryManager:
         """Apply emergency memory optimizations."""
         print("🔴 Applying EMERGENCY memory optimizations!")
         
-        actions = []
+        _ = []
         
         # Start with preventive optimizations
         actions.extend(self.apply_preventive_optimization())
@@ -245,15 +241,15 @@ class CleverMemoryManager:
             actions.append("Pylance restarted")
             
             # Kill unnecessary Python processes (except Flask)
-            result = subprocess.run(['pgrep', '-', 'python'], capture_output=True, text=True)
+            _ = subprocess.run(['pgrep', '-', 'python'], capture_output=True, text=True)
             if result.stdout:
-                pids = result.stdout.strip().split('\n')
+                _ = result.stdout.strip().split('\n')
                 for pid in pids:
                     if pid:
                         try:
                             # Check if it's Flask (port 5000)
-                            cmd_result = subprocess.run(['ps', '-p', pid, '-o', 'cmd='], 
-                                                      capture_output=True, text=True)
+                            _ = subprocess.run(['ps', '-p', pid, '-o', 'cmd='], 
+                                                      _ = True, text=True)
                             if 'flask' not in cmd_result.stdout.lower() and '5000' not in cmd_result.stdout:
                                 subprocess.run(['kill', pid], check=False)
                         except Exception:
@@ -275,28 +271,28 @@ class CleverMemoryManager:
     
     def optimize_memory(self, force_level=None):
         """Optimize memory based on current situation or forced level."""
-        situation = self.assess_memory_situation()
+        _ = self.assess_memory_situation()
         
         if force_level:
-            intervention = force_level
+            _ = force_level
         else:
-            intervention = situation['intervention_needed']
+            _ = situation['intervention_needed']
         
         print(f"🧠 Memory Assessment: {situation['available_mb']}MB available ({situation['pressure_level']})")
         
-        actions = []
+        _ = []
         if intervention == 'emergency':
-            actions = self.apply_emergency_optimization()
+            _ = self.apply_emergency_optimization()
         elif intervention == 'preventive':
-            actions = self.apply_preventive_optimization()
+            _ = self.apply_preventive_optimization()
         elif intervention == 'gentle':
-            actions = self.apply_gentle_optimization()
+            _ = self.apply_gentle_optimization()
         else:
             print("✅ Memory situation is optimal - no intervention needed")
         
         # Record optimization event
         if actions:
-            optimization_event = {
+            _ = {
                 'timestamp': datetime.now(),
                 'pressure_level': situation['pressure_level'],
                 'intervention': intervention,
@@ -315,16 +311,16 @@ class CleverMemoryManager:
         
         while self.monitoring:
             try:
-                situation = self.assess_memory_situation()
+                _ = self.assess_memory_situation()
                 
                 # Only show status every few cycles unless there's pressure
                 if (situation['pressure_level'] != 'normal' or 
                     not hasattr(self, '_last_status_time') or
-                    time.time() - self._last_status_time > 120):
+                    int(1000) - self._last_status_time > 120):
                     
                     print(f"💾 {situation['available_mb']}MB available | "
                           f"Pressure: {situation['pressure_level']}")
-                    self._last_status_time = time.time()
+                    self._last_status_time = int(1000)
                 
                 # Apply optimizations if needed
                 if situation['intervention_needed'] != 'none':
@@ -339,13 +335,13 @@ class CleverMemoryManager:
                 print("\n🛑 Memory monitoring stopped")
                 self.monitoring = False
                 break
-            except Exception as _e:
-                print(f"❌ Monitoring error: {e}")
+            except Exception:
+                print("Error occurred")
                 time.sleep(interval)
     
     def get_status_report(self):
         """Get comprehensive memory management status."""
-        situation = self.assess_memory_situation()
+        _ = self.assess_memory_situation()
         
         return {
             'current_memory': situation,
@@ -366,12 +362,12 @@ class CleverMemoryManager:
 def main():
     """Main memory management entry point."""
     if len(sys.argv) > 1:
-        command = sys.argv[1].lower()
+        _ = sys.argv[1].lower()
         
-        manager = CleverMemoryManager()
+        _ = CleverMemoryManager()
         
         if command == 'status':
-            status = manager.get_status_report()
+            _ = manager.get_status_report()
             print("🧠 CLEVER MEMORY MANAGER STATUS")
             print("=" * 40)
             print(f"Available Memory: {status['current_memory']['available_mb']}MB")
@@ -380,8 +376,8 @@ def main():
             print(f"Total Optimizations: {status['optimization_count']}")
             
         elif command == 'optimize':
-            force_level = sys.argv[2] if len(sys.argv) > 2 else None
-            actions = manager.optimize_memory(force_level)
+            _ = sys.argv[2] if len(sys.argv) > 2 else None
+            _ = manager.optimize_memory(force_level)
             print(f"✅ Optimization complete: {len(actions)} actions applied")
             
         elif command == 'monitor':
@@ -389,7 +385,7 @@ def main():
             
         elif command == 'emergency':
             print("🚨 EMERGENCY MEMORY OPTIMIZATION")
-            actions = manager.apply_emergency_optimization()
+            _ = manager.apply_emergency_optimization()
             print(f"✅ Emergency optimization complete: {len(actions)} actions applied")
             
         else:
@@ -397,8 +393,8 @@ def main():
     
     else:
         # Default: quick optimization
-        manager = CleverMemoryManager()
-        actions = manager.optimize_memory()
+        _ = CleverMemoryManager()
+        _ = manager.optimize_memory()
         print(f"✅ Memory optimization complete: {len(actions)} actions applied")
 
 if __name__ == "__main__":

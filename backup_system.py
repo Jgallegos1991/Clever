@@ -24,7 +24,6 @@ import datetime
 import tarfile
 from database import DatabaseManager
 
-
 class CleverBackupSystem:
     """
     Complete backup system for Clever AI with comprehensive data protection
@@ -338,7 +337,6 @@ class CleverBackupSystem:
                 backup_path.unlink()
                 print(f"🗑️ Removed old backup: {backup['filename']}")
 
-
 def main():
     """Main backup execution"""
     print("🌟 Clever AI Backup System")
@@ -360,7 +358,6 @@ def main():
     print(f"📊 DB snapshot: {db_snapshot}")
 
     return archive_path
-
 
 if __name__ == "__main__":
     main()

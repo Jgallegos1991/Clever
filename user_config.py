@@ -44,7 +44,6 @@ CLEVER_PERSONALITY = {
     "check_in_frequency": "often"  # How often to ask about family
 }
 
-
 # Tailscale Network Configuration
 TAILSCALE_ENABLED = False  # Disabled for local-only isolation
 TAILSCALE_HOSTNAME = "clever-ai-jay"

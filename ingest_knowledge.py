@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """Knowledge Ingestion Utility for Clever's Learning System
 
@@ -62,7 +63,7 @@ class KnowledgeIngestor:
             # Read file content
             try:
                 content = file_path.read_text(encoding='utf-8', errors='ignore')
-            except Exception as _e:
+            except Exception:
                 debugger.warning('knowledge_ingestor', f'Failed to read {file_path}: {e}')
                 return 'failed'
                 
@@ -89,7 +90,7 @@ class KnowledgeIngestor:
             debugger.info('knowledge_ingestor', f'Processed {file_path.name}: {status}')
             return status
             
-        except Exception as _e:
+        except Exception:
             debugger.error('knowledge_ingestor', f'Failed to process {file_path}: {e}')
             return 'failed'
             

@@ -1,3 +1,4 @@
+import time
 #!/usr/bin/env python3
 """
 Final Integration Test for Comprehensive System Enhancement
@@ -25,7 +26,6 @@ from system_validator import SystemValidator, validate_system_startup
 from enhanced_conversation_engine import EnhancedConversationEngine
 from automated_monitor import AutomatedMonitor
 from debug_config import get_debugger
-
 
 class FinalIntegrationTester:
     """
@@ -63,7 +63,7 @@ class FinalIntegrationTester:
             print("✅ Enhanced test environment setup successful")
             return True
 
-        except Exception as _e:
+        except Exception:
             print(f"❌ Test environment setup failed: {e}")
             return False
 
@@ -117,7 +117,7 @@ class FinalIntegrationTester:
 
             return result
 
-        except Exception as _e:
+        except Exception:
             return {"test": "system_validation", "passed": False, "error": str(e)}
 
     def test_enhanced_conversation(self) -> Dict[str, Any]:
@@ -199,7 +199,7 @@ class FinalIntegrationTester:
 
             return result
 
-        except Exception as _e:
+        except Exception:
             return {"test": "enhanced_conversation", "passed": False, "error": str(e)}
 
     def test_file_access_capability(self) -> Dict[str, Any]:
@@ -260,7 +260,7 @@ class FinalIntegrationTester:
 
             return result
 
-        except Exception as _e:
+        except Exception:
             return {"test": "file_access", "passed": False, "error": str(e)}
 
     def test_automated_monitoring(self) -> Dict[str, Any]:
@@ -313,7 +313,7 @@ class FinalIntegrationTester:
 
             return result
 
-        except Exception as _e:
+        except Exception:
             return {"test": "automated_monitoring", "passed": False, "error": str(e)}
 
     def test_integration_workflow(self) -> Dict[str, Any]:
@@ -385,7 +385,7 @@ class FinalIntegrationTester:
 
             return result
 
-        except Exception as _e:
+        except Exception:
             return {"test": "integration_workflow", "passed": False, "error": str(e)}
 
     def run_comprehensive_test(self) -> Dict[str, Any]:
@@ -424,7 +424,7 @@ class FinalIntegrationTester:
                 results.append(result)
                 if result.get("passed", False):
                     passed_tests += 1
-            except Exception as _e:
+            except Exception:
                 results.append(
                     {"test": test_func.__name__, "passed": False, "error": str(e)}
                 )
@@ -486,7 +486,6 @@ class FinalIntegrationTester:
 
         return final_report
 
-
 def main():
     """
     Main entry point for final integration testing
@@ -504,13 +503,12 @@ def main():
         with open(results_file, "w") as f:
             json.dump(results, f, indent=2)
         print(f"\n📄 Test results saved to: {results_file}")
-    except Exception as _e:
+    except Exception:
         print(f"Warning: Could not save results to file: {e}")
 
     # Exit with appropriate code
     exit_code = 0 if results["overall_status"] == "PASSED" else 1
     sys.exit(exit_code)
-
 
 if __name__ == "__main__":
     main()

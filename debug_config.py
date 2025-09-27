@@ -1,3 +1,5 @@
+import os
+import time
 """
 Simple Debug Configuration for Clever AI
 
@@ -16,8 +18,7 @@ Connects to:
 """
 from collections import defaultdict, deque
 from datetime import datetime
-from typing import Dict, Any, Optional, List
-
+from typing import Dict, Any, Optional
 
 class SimpleDebugger:
     """
@@ -189,7 +190,6 @@ class SimpleDebugger:
             'total_performance_measurements': sum(len(d) for d in self.performance_data.values())
         }
 
-
 # Simple performance monitor decorator
 def performance_monitor(component: str):
     """
@@ -208,7 +208,7 @@ def performance_monitor(component: str):
                 debugger = get_debugger()
                 debugger.track_performance(component, func.__name__, duration)
                 return result
-            except Exception as _e:
+            except Exception as e:
                 duration = time.time() - start_time
                 debugger = get_debugger()
                 debugger.error(component, f"Error in {func.__name__}: {str(e)}")
@@ -216,7 +216,6 @@ def performance_monitor(component: str):
                 raise
         return wrapper
     return decorator
-
 
 # Global debugger instance
 _debugger = None
@@ -248,7 +247,6 @@ class PerformanceRegistry:
 # Global registry instance
 performance_monitor_registry = PerformanceRegistry()
 
-
 def get_debugger() -> SimpleDebugger:
     """
     Get global debugger instance
@@ -265,7 +263,6 @@ def get_debugger() -> SimpleDebugger:
     if _debugger is None:
         _debugger = SimpleDebugger()
     return _debugger
-
 
 def reset_debugger():
     """

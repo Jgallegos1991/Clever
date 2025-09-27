@@ -23,7 +23,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 class ErrorRecoverySystem:  # pragma: no cover - intentional stub
     """Hard deprecation placeholder.
 
@@ -46,7 +45,6 @@ class ErrorRecoverySystem:  # pragma: no cover - intentional stub
             "for the archived reference implementation."
         )
 
-
 def get_error_recovery() -> ErrorRecoverySystem:  # pragma: no cover
     """Return the deprecated system stub (always raises when constructed).
 
@@ -54,6 +52,5 @@ def get_error_recovery() -> ErrorRecoverySystem:  # pragma: no cover
         ErrorRecoverySystem: The stub class; instantiation raises immediately.
     """
     return ErrorRecoverySystem()  # Will raise
-
 
 __all__ = ["ErrorRecoverySystem", "get_error_recovery"]

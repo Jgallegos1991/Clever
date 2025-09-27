@@ -22,7 +22,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 def upgrade_configurations() -> None:
     """
     Upgrade configuration settings to latest version
@@ -61,10 +60,9 @@ def upgrade_configurations() -> None:
         # - Update config files
         logger.info("Configuration upgrade completed successfully")
         
-    except Exception as _e:
+    except Exception:
         logger.error(f"Error during configuration upgrade: {e}")
         # Don't raise the exception to avoid blocking app startup
-
 
 def finalize_configurations() -> None:
     """
@@ -98,10 +96,9 @@ def finalize_configurations() -> None:
         # - Initialize configuration-dependent components
         logger.info("Configuration finalization completed successfully")
         
-    except Exception as _e:
+    except Exception:
         logger.error(f"Error during configuration finalization: {e}")
         # Don't raise the exception to avoid blocking app startup
-
 
 def classify_intent(text: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
@@ -167,7 +164,6 @@ def classify_intent(text: str, context: Optional[Dict[str, Any]] = None) -> Dict
         "word_count": len(text.split())
     }
 
-
 def extract_entities(text: str) -> Dict[str, Any]:
     """
     Extract entities from text using pattern matching
@@ -207,7 +203,6 @@ def extract_entities(text: str) -> Dict[str, Any]:
     entities = {k: v for k, v in entities.items() if v}
     
     return entities
-
 
 def build_context(text: str, history: Optional[list] = None, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """

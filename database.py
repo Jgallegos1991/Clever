@@ -40,7 +40,6 @@ import threading
 from dataclasses import dataclass
 from pathlib import Path
 
-
 @dataclass
 class Source:
     id: int
@@ -49,7 +48,6 @@ class Source:
     content: str | None = None
     size: int | None = None
     modified_ts: float | None = None
-
 
 class DatabaseManager:
     def __init__(self, db_path: str | Path):
@@ -346,10 +344,11 @@ CREATE TABLE IF NOT EXISTS sources (
         except Exception:
             pass
 
+# Import config for database path
+import config
 
 # Shared instance
 db_manager = DatabaseManager(config.DB_PATH)
-
 
 # --- Compatibility shim ---
 def add_conversation(
