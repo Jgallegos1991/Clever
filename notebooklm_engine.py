@@ -49,10 +49,13 @@ Critical Dependencies:
     - Database schema: Extended sources table, new citations and relationships tables
 """
 
+import json
 import logging
 import re
+import time
 from collections import defaultdict, Counter
 from dataclasses import dataclass
+from typing import NamedTuple, Dict, List, Optional, Any, Set, Tuple
 
 # Clever core modules
 from database import DatabaseManager

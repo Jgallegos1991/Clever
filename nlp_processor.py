@@ -44,6 +44,7 @@ Design Principles:
 
 import re
 from collections import Counter
+from typing import Dict, List, Any, Optional, Tuple
 
 # Enhanced English dictionary integration for comprehensive vocabulary understanding
 try:

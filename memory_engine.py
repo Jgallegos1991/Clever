@@ -21,9 +21,14 @@ Connects to:
     - config.py: The `get_memory_engine()` factory function uses `config.DB_PATH` to initialize the `DatabaseManager`.
     - debug_config.py: `get_debugger()` is used for logging throughout the module.
 """
+import threading
+import json
+import hashlib
+import time
 from datetime import datetime
 from collections import defaultdict, Counter
 from dataclasses import dataclass
+from typing import Dict, List, Any, Optional
 
 from database import DatabaseManager
 from debug_config import get_debugger
