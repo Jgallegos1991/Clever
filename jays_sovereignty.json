@@ -9,7 +9,7 @@
   "shared_usage": "NEVER",
   "privacy_level": "TOTAL",
   "created_timestamp": 1758915945.1054237,
-  "last_sovereignty_check": 1758921411.6213694,
+  "last_sovereignty_check": 1758949096.0942605,
   "authorized_family": [
     "mom",
     "brothers",
@@ -24,5 +24,5 @@
     "sovereignty_response": "ACCESS_DENIED",
     "protection_level": "MAXIMUM"
   },
-  "last_jay_access": 1758921411.62137
+  "last_jay_access": 1758949096.0942616
 }
