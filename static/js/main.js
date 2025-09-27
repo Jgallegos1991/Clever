@@ -42,6 +42,68 @@ let holographicChamber = null;
 let isProcessingMessage = false;
 let cognitiveMaintenanceInterval = null;
 let lastInteractionTime = Date.now(); // Shared interaction timestamp for cognitive state management
+let messagePersistenceEnabled = false; // Toggle for keeping messages visible longer
+
+/**
+ * Toggle Message Persistence
+ * 
+ * Why: Allow user control over message visibility for better reading experience
+ * Where: Toggled via keyboard shortcut or can be called programmatically
+ * How: Modifies chat bubble behavior to keep messages visible longer
+ */
+function toggleMessagePersistence() {
+    messagePersistenceEnabled = !messagePersistenceEnabled;
+    const status = messagePersistenceEnabled ? 'enabled' : 'disabled';
+    console.log(`💬 Message persistence ${status}`);
+    showSystemMessage(`Message persistence ${status} - messages will ${messagePersistenceEnabled ? 'stay visible longer' : 'fade normally'}`);
+    
+    // Update chat config if available
+    if (window.CHAT_CONFIG) {
+        window.CHAT_CONFIG.PERSISTENCE_MODE = messagePersistenceEnabled;
+    }
+}
+
+/**
+ * Process Clever's Interface Commands
+ * 
+ * Why: Allow Clever to control her own interface features and settings
+ * Where: Called when Clever sends interface control commands in her responses
+ * How: Processes command objects and executes the requested interface actions
+ * 
+ * @param {object} command - Interface command from Clever
+ */
+function processCleverInterfaceCommand(command) {
+    if (!command || typeof command !== 'object') return;
+    
+    console.log('🎛️ Processing Clever interface command:', command);
+    
+    switch (command.type) {
+        case 'toggle_persistence':
+            toggleMessagePersistence();
+            if (command.notify && !messagePersistenceEnabled) {
+                // Don't show duplicate notification if toggle already showed one
+                console.log('🤖 Clever toggled message persistence');
+            }
+            break;
+            
+        case 'clear_chat':
+            if (typeof window.clearChatMessages === 'function') {
+                window.clearChatMessages();
+                console.log('🤖 Clever cleared the chat');
+            }
+            break;
+            
+        case 'set_cognitive_mode':
+            if (command.mode && holographicChamber && typeof holographicChamber.setMode === 'function') {
+                holographicChamber.setMode(command.mode);
+                console.log(`🤖 Clever set cognitive mode to: ${command.mode}`);
+            }
+            break;
+            
+        default:
+            console.warn('🤖 Unknown Clever interface command:', command.type);
+    }
+}
 
 // Timing constants for chat bubble lifecycle management
 /*
@@ -360,6 +422,11 @@ async function handleMessageSubmit() {
             }
         }
         
+        // Process interface commands from Clever
+        if (data.frontend_command) {
+            processCleverInterfaceCommand(data.frontend_command);
+        }
+        
         // Display Clever's response
         if (data.response) {
             displayMessage(data.response, 'clever');
@@ -617,9 +684,24 @@ function initializeKeyboardShortcuts() {
                 console.log('🧠 Returned to idle cognitive mode');
             }
         }
+        
+        // Ctrl+Shift+M: Toggle message persistence
+        if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+            e.preventDefault();
+            toggleMessagePersistence();
+        }
+        
+        // Ctrl+Shift+C: Clear all chat messages
+        if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+            e.preventDefault();
+            if (typeof window.clearChatMessages === 'function') {
+                window.clearChatMessages();
+                showSystemMessage('Chat cleared - ready for fresh conversation');
+            }
+        }
     });
     
-    console.log('⌨️ Keyboard shortcuts initialized (Ctrl+Shift+S, O, I)');
+    console.log('⌨️ Keyboard shortcuts initialized (Ctrl+Shift+S, O, I, M, C)');
 }
 
 // Main initialization handled above via DOMContentLoaded event listener

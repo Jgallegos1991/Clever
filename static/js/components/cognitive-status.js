@@ -27,10 +27,11 @@ console.log('🧠 Cognitive Status component loading...');
  *     - static/css/style.css: Uses .cognitive-status styling
  */
 function createCognitiveStatusOverlay() {
-    // Create status container
+    // Create status container (hidden by default for better mobile experience)
     const statusOverlay = document.createElement('div');
     statusOverlay.id = 'cognitive-status';
     statusOverlay.className = 'cognitive-status';
+    statusOverlay.style.display = 'none'; // Hidden by default
     statusOverlay.innerHTML = `
         <div class="status-header">
             <span class="status-icon">🧠</span>
@@ -62,10 +63,13 @@ function createCognitiveStatusOverlay() {
     
     document.body.appendChild(statusOverlay);
     
+    // Add toggle functionality
+    setupCognitiveStatusToggle();
+    
     // Start updating the status
     startStatusUpdates();
     
-    console.log('✅ Cognitive status overlay created');
+    console.log('✅ Cognitive status overlay created (hidden by default for mobile)');
 }
 
 /**

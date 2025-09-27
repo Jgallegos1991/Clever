@@ -26,9 +26,45 @@ Connects to:
 */
 const CHAT_CONFIG = {
     FADE_IN_MS: 500,
-    VISIBLE_MS: 8000,
-    FADE_OUT_MS: 1000
+    BASE_VISIBLE_MS: 5000,  // Minimum display time (increased from 3000)
+    READING_SPEED_WPM: 180, // Slightly slower reading speed for better comprehension
+    FADE_OUT_MS: 1000,
+    PERSISTENCE_MODE: false, // When true, messages stay visible much longer
+    PERSISTENCE_MULTIPLIER: 4 // Multiply display time when in persistence mode
 };
+
+// Make config globally accessible for main.js toggle
+window.CHAT_CONFIG = CHAT_CONFIG;
+
+/**
+ * Calculate Display Duration
+ * 
+ * Why: Dynamic message display time based on text length for comfortable reading
+ * Where: Called by createChatBubble() to determine how long to show each message
+ * How: Calculates reading time based on word count and adds buffer time
+ * 
+ * @param {string} text - Message content to analyze
+ * @returns {number} Display duration in milliseconds
+ */
+function calculateDisplayDuration(text) {
+    const wordCount = text.trim().split(/\s+/).length;
+    const readingTimeMs = (wordCount / CHAT_CONFIG.READING_SPEED_WPM) * 60 * 1000;
+    
+    // Ensure minimum display time and add comfortable buffer
+    let displayDuration = Math.max(
+        CHAT_CONFIG.BASE_VISIBLE_MS,
+        readingTimeMs + 3000 // Add 3 seconds buffer for processing and reflection
+    );
+    
+    // Apply persistence multiplier if enabled
+    if (CHAT_CONFIG.PERSISTENCE_MODE) {
+        displayDuration *= CHAT_CONFIG.PERSISTENCE_MULTIPLIER;
+        console.log(`💬 Persistence mode: extending to ${Math.round(displayDuration/1000)}s`);
+    }
+    
+    console.log(`💬 Message: ${wordCount} words, ${Math.round(displayDuration/1000)}s display time`);
+    return displayDuration;
+}
 
 /**
  * Create Chat Bubble
@@ -81,17 +117,26 @@ function createChatBubble(text, sender = 'system') {
     // Auto-scroll to bottom
     chatLog.scrollTop = chatLog.scrollHeight;
     
-    // Schedule auto-hide
-    setTimeout(() => {
-        if (messageDiv.parentNode) {
-            messageDiv.classList.add('fade-out');
-            setTimeout(() => {
-                if (messageDiv.parentNode) {
-                    messageDiv.remove();
-                }
-            }, CHAT_CONFIG.FADE_OUT_MS);
-        }
-    }, CHAT_CONFIG.VISIBLE_MS);
+    // Calculate display duration based on message length
+    const displayDuration = calculateDisplayDuration(text);
+    
+    // Schedule auto-hide with length-based timing (skip if persistence mode with very long messages)
+    const shouldAutoHide = !CHAT_CONFIG.PERSISTENCE_MODE || displayDuration < 30000; // Don't auto-hide if > 30s in persistence mode
+    
+    if (shouldAutoHide) {
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.classList.add('fade-out');
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, CHAT_CONFIG.FADE_OUT_MS);
+            }
+        }, displayDuration);
+    } else {
+        console.log(`💬 Message will persist indefinitely (${Math.round(displayDuration/1000)}s calculated)`);
+    }
     
     console.log(`💬 Chat bubble created: ${sender} - ${text.substring(0, 50)}...`);
 }

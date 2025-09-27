@@ -2,7 +2,7 @@
 """
 tailscale_config.py - Tailscale Configuration for Remote Clever Access
 
-Why: Enables secure remote access to Clever's digital brain extension from any device
+Why: Enables secure remote access to Clever's digital brain extension     info_file = Path(__file__).parent / \"REMOTE_ACCESS_INFO.md\"\n    info_file.write_text(info_content)\n    \n    print(f\"✅ Remote access info created: {info_file}\")\n    print(f\"🌐 Clever accessible at: http://{tailscale_ip}:5001\")any device
      on Jay's Tailscale network, maintaining privacy and cognitive partnership continuity
      across locations and devices.
 
@@ -24,6 +24,8 @@ Connects to:
     - debug_config.py: Remote session logging and monitoring
 """
 
+import subprocess
+import sys
 from pathlib import Path
 
 def get_tailscale_ip():
@@ -48,7 +50,7 @@ def get_tailscale_ip():
             return ips[0].strip() if ips else None
     except FileNotFoundError:
         print("Tailscale not found - install with: curl -fsSL https://tailscale.com/install.sh | sh")
-    except Exception:
+    except Exception as e:
         print(f"Error getting Tailscale IP: {e}")
     return None
 
@@ -85,7 +87,7 @@ def get_tailscale_status():
                 'devices': devices,
                 'network_ready': True
             }
-    except Exception:
+    except Exception as e:
         print(f"Error getting Tailscale status: {e}")
     
     return {
@@ -108,22 +110,23 @@ def create_remote_access_info():
     if not tailscale_ip:
         return False
     
-    info_content = """# Clever Remote Access via Tailscale
+    info_content = f"""# Clever Remote Access via Tailscale
 
 ## 🧠 Access Your Digital Brain Extension Remotely
 
 ### Primary Access URL:
-**http://{tailscale_ip}:5000**
+**http://{tailscale_ip}:5001**
 
 ### From Your Other Devices:
-- **Chromebook**: Open browser → http://{tailscale_ip}:5000
-- **Samsung Phone**: Browser → http://{tailscale_ip}:5000  
-- **Any Tailscale Device**: http://{tailscale_ip}:5000
+- **Chromebook**: Open browser → http://{tailscale_ip}:5001
+- **Samsung Phone**: Browser → http://{tailscale_ip}:5001  
+- **Any Tailscale Device**: http://{tailscale_ip}:5001
 
 ### API Endpoints for Advanced Usage:
-- **Chat**: POST http://{tailscale_ip}:5000/api/chat
-- **Document Analysis**: POST http://{tailscale_ip}:5000/api/query_documents
-- **Cognitive Sovereignty**: GET http://{tailscale_ip}:5000/api/cognitive_sovereignty/status
+- **Chat**: POST http://{tailscale_ip}:5001/api/chat
+- **Document Analysis**: POST http://{tailscale_ip}:5001/api/query_documents
+- **Cognitive Sovereignty**: GET http://{tailscale_ip}:5001/api/cognitive_sovereignty/status
+- **Network Status**: GET http://{tailscale_ip}:5001/api/network-status
 
 ### Connected Devices in Your Network:
 """
@@ -142,24 +145,24 @@ def create_remote_access_info():
 ### Quick Commands:
 ```bash
 # Check Clever is running
-curl http://{tailscale_ip}:5000
+curl http://{tailscale_ip}:5001
 
 # Quick chat test  
-curl -X POST http://{tailscale_ip}:5000/api/chat \\
+curl -X POST http://{tailscale_ip}:5001/api/chat \\
   -H "Content-Type: application/json" \\
   -d '{{"message": "Hello Clever!"}}' 
 
-# Check cognitive sovereignty status
-curl http://{tailscale_ip}:5000/api/cognitive_sovereignty/status
+# Check network status
+curl http://{tailscale_ip}:5001/api/network-status
 ```
 
 ### Mobile Bookmarks:
 Create these bookmarks on your phone/tablet for instant Clever access:
-- **Clever Home**: http://{tailscale_ip}:5000
-- **Clever Chat**: http://{tailscale_ip}:5000 (same interface)
+- **Clever Home**: http://{tailscale_ip}:5001
+- **Clever Chat**: http://{tailscale_ip}:5001 (same interface)
 
 ---
-*Generated: {Path(__file__).stat().st_mtime}*
+*Generated: {Path(__file__).stat().st_mtime if Path(__file__).exists() else 'now'}*
 *Tailscale IP: {tailscale_ip}*
 *Network Status: {'Connected' if status['connected'] else 'Disconnected'}*
 """
@@ -194,7 +197,7 @@ def configure_flask_for_tailscale():
     return {
         'success': True,
         'host': tailscale_ip,
-        'port': 5000,
+        'port': 5001,
         'debug': False,  # Security: disable debug in remote access
         'threaded': True,
         'tailscale_ip': tailscale_ip,
@@ -221,7 +224,7 @@ if __name__ == "__main__":
     # Create access info
     if create_remote_access_info():
         print("\n🎉 Clever is ready for remote access!")
-        print(f"🔗 Access URL: http://{tailscale_ip}:5000")
+        print(f"🔗 Access URL: http://{tailscale_ip}:5001")
     else:
         print("\n❌ Failed to create remote access configuration")
         sys.exit(1)

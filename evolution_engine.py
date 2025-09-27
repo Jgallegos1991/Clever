@@ -28,6 +28,7 @@ Connects to:
         - `check_evolution_engine()` -> `get_evolution_engine()`: The health monitor accesses this engine to check its status and report on learning progress.
 """
 from datetime import datetime
+from typing import Dict, Any, List
 
 class SimpleEvolutionEngine:
     """

@@ -45,7 +45,7 @@ CLEVER_PERSONALITY = {
 }
 
 # Tailscale Network Configuration
-TAILSCALE_ENABLED = False  # Disabled for local-only isolation
+TAILSCALE_ENABLED = True  # Enable for remote access via secure Tailscale network
 TAILSCALE_HOSTNAME = "clever-ai-jay"
 TAILSCALE_SSH_ENABLED = True
 
@@ -61,6 +61,17 @@ TRUSTED_EMAIL_DOMAINS = ["gmail.com"]
 # Development and Debug Settings
 DEBUG_MODE = False
 VERBOSE_LOGGING = True
+
+# Combined User Preferences (for backward compatibility)
+USER_PREFERENCES = {
+    "name": USER_NAME,
+    "email": USER_EMAIL,
+    "full_name": USER_FULL_NAME,
+    "family": FAMILY_INFO,
+    "personality": CLEVER_PERSONALITY,
+    "debug_mode": DEBUG_MODE,
+    "verbose_logging": VERBOSE_LOGGING
+}
 
 # Remote Access Architecture Notes:
 # - Tailscale provides secure tunnel without exposing to public internet

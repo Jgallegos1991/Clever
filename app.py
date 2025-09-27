@@ -43,9 +43,17 @@ Connects to:
 import re
 from flask import Flask, request, jsonify, render_template
 from database import db_manager
-from user_config import USER_NAME, USER_EMAIL
+from user_config import USER_NAME, USER_EMAIL, TAILSCALE_ENABLED, TAILSCALE_HOSTNAME
 from utils import offline_guard  # Enforce offline constraints
 from introspection import traced_render, runtime_state, register_error_handler  # Runtime introspection utilities
+
+# Tailscale configuration (imported conditionally)
+try:
+    from tailscale_config import get_tailscale_ip, get_tailscale_status, create_remote_access_info
+    TAILSCALE_AVAILABLE = True
+except ImportError:
+    TAILSCALE_AVAILABLE = False
+    # debugger not available yet - will log after initialization
 
 # Enforce offline operation immediately (Unbreakable Rule #1)
 offline_guard.enable()
@@ -124,6 +132,57 @@ class SimpleDebugger:
     
     
 debugger = SimpleDebugger()
+
+# Log Tailscale availability now that debugger is initialized
+if not TAILSCALE_AVAILABLE:
+    debugger.info("tailscale", "Tailscale module not available - install tailscale_config.py")
+
+# Import evolution engine at startup to avoid dynamic import issues
+try:
+    from evolution_engine import get_evolution_engine
+    EVOLUTION_ENGINE_AVAILABLE = True
+    debugger.info("app", "Evolution engine loaded successfully")
+except ImportError as e:
+    EVOLUTION_ENGINE_AVAILABLE = False
+    debugger.info("app", f"Evolution engine not available: {e}")
+
+def configure_network():
+    """
+    Configure network settings based on Tailscale availability and user preferences.
+    
+    Why: Enables secure remote access while maintaining digital sovereignty
+    Where: Called during app startup to determine network binding
+    How: Detects Tailscale IP and configures Flask accordingly
+    
+    Returns:
+        tuple: (host, port, network_info) for Flask app configuration
+    """
+    host = '127.0.0.1'  # Default to localhost only
+    port = 5001  # Use 5001 to avoid conflicts
+    network_info = {'mode': 'localhost_only', 'tailscale': False}
+    
+    if TAILSCALE_ENABLED and TAILSCALE_AVAILABLE:
+        debugger.info("network", "Tailscale enabled - checking network status...")
+        tailscale_ip = get_tailscale_ip()
+        
+        if tailscale_ip:
+            host = tailscale_ip
+            network_info = {
+                'mode': 'tailscale_network',
+                'tailscale': True,
+                'tailscale_ip': tailscale_ip,
+                'hostname': TAILSCALE_HOSTNAME
+            }
+            debugger.info("network", f"Binding to Tailscale IP: {tailscale_ip}")
+        else:
+            debugger.info("network", "Tailscale IP not available - falling back to localhost")
+    else:
+        debugger.info("network", "Tailscale disabled - using localhost only")
+    
+    return host, port, network_info
+
+# Configure network settings
+NETWORK_HOST, NETWORK_PORT, NETWORK_INFO = configure_network()
 
 # In-memory telemetry (server-side)
 TELEMETRY = {
@@ -249,16 +308,18 @@ def chat():
                 debugger.info("app.chat", "No context found on persona response")
             
             # Log interaction for evolution engine
-            try:
-                from evolution_engine import get_evolution_engine
-                evo = get_evolution_engine()
-                evo.log_interaction({
-                    "user_input": user_message,
-                    "active_mode": persona_response.mode,
-                    "sentiment": persona_response.sentiment,
-                    "action_taken": "respond"
-                })
-            except ImportError:
+            if EVOLUTION_ENGINE_AVAILABLE:
+                try:
+                    evo = get_evolution_engine()
+                    evo.log_interaction({
+                        "user_input": user_message,
+                        "active_mode": persona_response.mode,
+                        "sentiment": persona_response.sentiment,
+                        "action_taken": "respond"
+                    })
+                except Exception as evo_error:
+                    debugger.info("chat", f"Evolution engine error: {evo_error}")
+            else:
                 debugger.info("chat", "Evolution engine not available")
         else:
             # Fallback response
@@ -291,7 +352,7 @@ def chat():
         debugger.info("chat", f"Processed message: {user_message[:50]}...")
         return jsonify(response)
         
-    except Exception:
+    except Exception as e:
         TELEMETRY["last_error"] = str(e)
         debugger.info("chat", f"Error processing message: {str(e)}")
         return jsonify({
@@ -384,7 +445,7 @@ def ingest():
             'status': 'success',
             'message': f'Form submitted successfully for {name}' if name else 'Form submitted successfully'
         })
-    except Exception:
+    except Exception as e:
         debugger.info("ingest", f"Error in ingestion: {str(e)}")
         return jsonify({
             'error': 'Ingestion failed',
@@ -413,7 +474,7 @@ def summarize():
             'status': 'success',
             'summary': summary
         })
-    except Exception:
+    except Exception as e:
         debugger.info("summarize", f"Error in summarization: {str(e)}")
         return jsonify({
             'error': 'Summarization failed',
@@ -446,7 +507,7 @@ def search():
             'results': [],
             'message': 'Search endpoint ready'
         })
-    except Exception:
+    except Exception as e:
         debugger.info("search", f"Error in search: {str(e)}")
         return jsonify({
             'error': 'Search failed',
@@ -557,7 +618,7 @@ def api_generate_shape():
             'message': f'Generated {shape.name} with {len(shape.points)} coordinate points'
         })
         
-    except Exception:
+    except Exception as e:
         debugger.error('api.generate_shape', f'Shape generation failed: {str(e)}')
         return jsonify({
             'success': False,
@@ -614,7 +675,7 @@ def api_shape_info(shape_name):
             'info': info
         })
         
-    except Exception:
+    except Exception as e:
         debugger.error('api.shape_info', f'Shape info retrieval failed: {str(e)}')
         return jsonify({
             'success': False,
@@ -719,10 +780,10 @@ def api_analyze_document():
                 'processing_time_ms': processing_time
             })
             
-        except ValueError:
+        except ValueError as ve:
             return jsonify({
                 'success': False,
-                'error': str(e)
+                'error': str(ve)
             }), 404
             
     except ImportError:
@@ -730,7 +791,7 @@ def api_analyze_document():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Document analysis error: {str(e)}")
         return jsonify({
             'success': False,
@@ -810,7 +871,7 @@ def api_query_documents():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Document query error: {str(e)}")
         return jsonify({
             'success': False,
@@ -864,7 +925,7 @@ def api_document_connections():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Document connections error: {str(e)}")
         return jsonify({
             'success': False,
@@ -908,7 +969,7 @@ def api_collection_overview():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Collection overview error: {str(e)}")
         return jsonify({
             'success': False,
@@ -961,7 +1022,7 @@ def api_enhance_ingestion():
             try:
                 engine.analyze_document(doc_id)
                 processed_count += 1
-            except Exception:
+            except Exception as e:
                 errors.append(f"{filename}: {str(e)}")
         
         processing_time = (time.time() - start_time) * 1000
@@ -980,7 +1041,7 @@ def api_enhance_ingestion():
             'success': False,
             'error': 'NotebookLM engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Enhanced ingestion error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1028,7 +1089,7 @@ def api_cognitive_sovereignty_status():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Sovereignty status error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1077,7 +1138,7 @@ def api_integrate_comprehensive_knowledge():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Knowledge integration error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1125,7 +1186,7 @@ def api_enable_full_device_control():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Device control error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1173,7 +1234,7 @@ def api_evolve_unlimited_connections():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Connection evolution error: {str(e)}")
         return jsonify({
             'success': False,
@@ -1242,14 +1303,143 @@ def api_full_cognitive_sovereignty_activation():
             'success': False,
             'error': 'Cognitive sovereignty engine not available'
         }), 500
-    except Exception:
+    except Exception as e:
         debugger.info("api", f"Full activation error: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Internal server error during full activation'
         }), 500
 
+@app.route('/api/network-status')
+def network_status():
+    """
+    Network status endpoint for Tailscale and connectivity information.
+    
+    Why: Provides visibility into network configuration for remote access
+    Where: Used by frontend to show connection status and available devices
+    How: Returns current network config and Tailscale device status
+    
+    Returns:
+        json: Network configuration and Tailscale status
+    """
+    status = {
+        'network_mode': NETWORK_INFO['mode'],
+        'tailscale_enabled': TAILSCALE_ENABLED,
+        'tailscale_available': TAILSCALE_AVAILABLE,
+        'current_host': NETWORK_HOST,
+        'current_port': NETWORK_PORT
+    }
+    
+    if TAILSCALE_ENABLED and TAILSCALE_AVAILABLE:
+        try:
+            tailscale_status = get_tailscale_status()
+            status.update({
+                'tailscale_connected': tailscale_status['connected'],
+                'tailscale_devices': tailscale_status['devices'],
+                'network_ready': tailscale_status['network_ready']
+            })
+            
+            if NETWORK_INFO.get('tailscale_ip'):
+                status['tailscale_ip'] = NETWORK_INFO['tailscale_ip']
+                status['hostname'] = NETWORK_INFO.get('hostname', 'clever-ai-jay')
+                
+        except Exception as e:
+            debugger.info("network", f"Error getting Tailscale status: {e}")
+            status['tailscale_error'] = str(e)
+    
+    return jsonify(status)
+
+@app.route('/api/interface-control', methods=['POST'])
+def interface_control():
+    """
+    Interface control endpoint for Clever to manage her own UI features.
+    
+    Why: Allows Clever to control message persistence, clear chat, and explain features
+    Where: Called by frontend when Clever wants to adjust her interface
+    How: Processes control commands and returns appropriate responses
+    
+    Returns:
+        json: Control response with success status and any messages
+    """
+    try:
+        data = request.get_json() or {}
+        action = data.get('action', '').lower()
+        
+        response = {
+            'success': False,
+            'action': action,
+            'message': '',
+            'frontend_command': None
+        }
+        
+        if action == 'toggle_message_persistence':
+            response.update({
+                'success': True,
+                'message': 'I\'ve toggled message persistence for you! Messages will now stay visible longer so you can read them comfortably.',
+                'frontend_command': {
+                    'type': 'toggle_persistence',
+                    'notify': True
+                }
+            })
+            
+        elif action == 'clear_chat':
+            response.update({
+                'success': True,
+                'message': 'All cleared! Ready for a fresh conversation.',
+                'frontend_command': {
+                    'type': 'clear_chat',
+                    'notify': False
+                }
+            })
+            
+        elif action == 'explain_features':
+            features_explanation = (
+                "Hey! I can control my own interface now. Here's what I can do for you:\n\n"
+                "💬 **Message Control:**\n"
+                "- Make my messages stay visible longer when I'm explaining complex stuff\n"
+                "- Clear our chat history for a fresh start\n\n"
+                "🎮 **Just ask me:**\n"
+                "- 'Keep your messages longer' - I'll enable persistence mode\n"
+                "- 'Clear the chat' - I'll wipe our conversation clean\n"
+                "- 'Explain your features' - I'll tell you what I can do\n\n"
+                "No need for keyboard shortcuts - I've got full control over my own interface!"
+            )
+            response.update({
+                'success': True,
+                'message': features_explanation,
+                'frontend_command': None
+            })
+            
+        else:
+            response['message'] = f'Unknown interface action: {action}'
+            
+        return jsonify(response)
+        
+    except Exception as e:
+        debugger.info("api", f"Interface control error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to process interface control command'
+        }), 500
+
     
 if __name__ == '__main__':
     debugger.info("app", "Clever AI starting...")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    debugger.info("network", f"Network mode: {NETWORK_INFO['mode']}")
+    debugger.info("network", f"Binding to {NETWORK_HOST}:{NETWORK_PORT}")
+    
+    if NETWORK_INFO.get('tailscale'):
+        debugger.info("network", f"Tailscale hostname: {NETWORK_INFO.get('hostname')}")
+        debugger.info("network", "Remote access available via Tailscale network")
+        
+        # Create access info file for remote connections
+        if TAILSCALE_AVAILABLE:
+            try:
+                create_remote_access_info()
+                debugger.info("network", "Remote access info file created")
+            except Exception as e:
+                debugger.info("network", f"Could not create access info: {e}")
+    else:
+        debugger.info("network", "Local access only - Tailscale disabled")
+    
+    app.run(debug=True, host=NETWORK_HOST, port=NETWORK_PORT)

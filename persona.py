@@ -489,6 +489,72 @@ class PersonaEngine:
         resp.debug_metrics = debug_metrics  # type: ignore[attr-defined]
         return resp
 
+    # ---------------- Interface Control Detection -----------------
+    def _detect_interface_control(self, text_lower: str, context: Dict[str, Any]) -> Optional[str]:
+        """Detect interface control requests and generate appropriate responses.
+
+        Why: Allow Clever to control her own interface features when users request them
+        Where: Called early in _auto_style to intercept interface control requests  
+        How: Pattern matching on user input to detect control intentions
+
+        Returns:
+            str: Response text with embedded frontend command, or None if no control detected
+        """
+        
+        # Message persistence control
+        persistence_patterns = [
+            'keep your messages longer', 'make messages stay longer', 'message persistence',
+            'don\'t fade messages', 'keep messages visible', 'longer message time',
+            'messages disappear too fast', 'can\'t read messages', 'messages fade too quick'
+        ]
+        
+        clear_patterns = [
+            'clear the chat', 'clear messages', 'clear conversation', 'wipe chat',
+            'start fresh', 'new conversation', 'clear history', 'delete messages'
+        ]
+        
+        features_patterns = [
+            'what can you control', 'explain your features', 'what interface features',
+            'how do you control', 'what can you do with interface', 'your capabilities'
+        ]
+        
+        # Check for persistence toggle request
+        if any(pattern in text_lower for pattern in persistence_patterns):
+            context['frontend_command'] = {
+                'type': 'toggle_persistence',
+                'notify': True
+            }
+            return ("Got it! I'm toggling message persistence for you. My messages will now "
+                   "stay visible longer so you can read them without rushing. Perfect for when "
+                   "I'm explaining complex stuff or giving detailed responses!")
+        
+        # Check for clear chat request  
+        if any(pattern in text_lower for pattern in clear_patterns):
+            context['frontend_command'] = {
+                'type': 'clear_chat',
+                'notify': False
+            }
+            return ("All cleared! Starting fresh with a clean conversation. "
+                   "Ready to dive into whatever's on your mind.")
+        
+        # Check for features explanation request
+        if any(pattern in text_lower for pattern in features_patterns):
+            context['frontend_command'] = {
+                'type': 'explain_features'
+            }
+            return ("Hey! I can control my own interface now. Here's what I can do:\\n\\n"
+                   "🔧 **Message Control:**\\n"
+                   "• Toggle message persistence - makes my responses stay visible longer\\n"
+                   "• Clear our chat history for a fresh start\\n"
+                   "• Adjust my cognitive modes and particle displays\\n\\n"
+                   "🗣️ **Just ask me naturally:**\\n"
+                   "• 'Keep your messages longer' → I'll enable persistence mode\\n"
+                   "• 'Clear the chat' → I'll wipe our conversation clean\\n"
+                   "• 'What can you control?' → I'll explain my features\\n\\n"
+                   "No need for keyboard shortcuts - I've got full control over my interface!")
+        
+        return None
+
     # ---------------- File search intent handling -----------------
     def _maybe_handle_file_search(self, user_text: str) -> Optional[str]:
         """Detect and respond to file search intent.
@@ -918,6 +984,11 @@ class PersonaEngine:
         
         # Actually process the input text to understand what the user is asking
         text_lower = text.lower().strip()
+        
+        # Check for interface control requests
+        interface_command = self._detect_interface_control(text_lower, context)
+        if interface_command:
+            return interface_command
         
         # Enhanced mathematical shape detection using advanced NLP analysis
         shape_analysis = analysis.get('detected_shapes', [])

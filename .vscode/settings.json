@@ -7,9 +7,9 @@
     "**/logs/**": true,
     "**/perf_history.jsonl": true
   },
-  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": false,
-  "python.analysis.indexing": false,
+  "python.analysis.indexing": true,
   "python.analysis.packageIndexDepths": [
     {
       "name": "",
@@ -58,7 +58,7 @@
   "breadcrumbs.enabled": false,
   "editor.hover.delay": 500,
   "editor.quickSuggestionsDelay": 300,
-  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "python.defaultInterpreterPath": "/home/jgallegos1991/Clever/.venv/bin/python3",
   "files.associations": {
     "*.py": "python",
     "Makefile": "makefile",

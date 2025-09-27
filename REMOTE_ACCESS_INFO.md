@@ -3,22 +3,23 @@
 ## 🧠 Access Your Digital Brain Extension Remotely
 
 ### Primary Access URL:
-**http://100.124.203.114:5000**
+**http://100.124.203.114:5001**
 
 ### From Your Other Devices:
-- **Chromebook**: Open browser → http://100.124.203.114:5000
-- **Samsung Phone**: Browser → http://100.124.203.114:5000  
-- **Any Tailscale Device**: http://100.124.203.114:5000
+- **Chromebook**: Open browser → http://100.124.203.114:5001
+- **Samsung Phone**: Browser → http://100.124.203.114:5001  
+- **Any Tailscale Device**: http://100.124.203.114:5001
 
 ### API Endpoints for Advanced Usage:
-- **Chat**: POST http://100.124.203.114:5000/api/chat
-- **Document Analysis**: POST http://100.124.203.114:5000/api/query_documents
-- **Cognitive Sovereignty**: GET http://100.124.203.114:5000/api/cognitive_sovereignty/status
+- **Chat**: POST http://100.124.203.114:5001/api/chat
+- **Document Analysis**: POST http://100.124.203.114:5001/api/query_documents
+- **Cognitive Sovereignty**: GET http://100.124.203.114:5001/api/cognitive_sovereignty/status
+- **Network Status**: GET http://100.124.203.114:5001/api/network-status
 
 ### Connected Devices in Your Network:
 - **penguin**: 100.124.203.114 (linux) - -
 - **chromeos-google-dedede**: 100.98.119.50 (android) - offline
-- **samsung-sm-a125u**: 100.72.156.1 (android) - offline
+- **samsung-sm-a125u**: 100.72.156.1 (android) - idle,
 
 
 ### Security Notes:
@@ -30,23 +31,23 @@
 ### Quick Commands:
 ```bash
 # Check Clever is running
-curl http://100.124.203.114:5000
+curl http://{tailscale_ip}:5001
 
 # Quick chat test  
-curl -X POST http://100.124.203.114:5000/api/chat \
+curl -X POST http://{tailscale_ip}:5001/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"message": "Hello Clever!"}' 
+  -d '{{"message": "Hello Clever!"}}' 
 
-# Check cognitive sovereignty status
-curl http://100.124.203.114:5000/api/cognitive_sovereignty/status
+# Check network status
+curl http://{tailscale_ip}:5001/api/network-status
 ```
 
 ### Mobile Bookmarks:
 Create these bookmarks on your phone/tablet for instant Clever access:
-- **Clever Home**: http://100.124.203.114:5000
-- **Clever Chat**: http://100.124.203.114:5000 (same interface)
+- **Clever Home**: http://{tailscale_ip}:5001
+- **Clever Chat**: http://{tailscale_ip}:5001 (same interface)
 
 ---
-*Generated: 1758897945.1022882*
-*Tailscale IP: 100.124.203.114*
-*Network Status: Connected*
+*Generated: {Path(__file__).stat().st_mtime if Path(__file__).exists() else 'now'}*
+*Tailscale IP: {tailscale_ip}*
+*Network Status: {'Connected' if status['connected'] else 'Disconnected'}*
