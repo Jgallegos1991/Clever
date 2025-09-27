@@ -23,8 +23,6 @@ Connects to:
     - digital sovereignty: Complete privacy protection
 """
 
-import sys
-from pathlib import Path
 from typing import Dict, Any
 
 # Add Clever directory to path  
