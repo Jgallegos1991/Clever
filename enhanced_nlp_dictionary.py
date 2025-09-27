@@ -18,7 +18,10 @@ Connects to:
     - evolution_engine.py: Advanced language learning and cognitive development
 """
 
+import os
 import pickle
+from pathlib import Path
+from typing import Optional, Set
 
 class EnglishDictionary:
     """
