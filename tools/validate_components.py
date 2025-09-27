@@ -242,7 +242,7 @@ def print_validation_results(results: Dict[str, Any]) -> None:
     Where: Called by main CLI interface
     How: Formats results with colors and clear issue descriptions
     """
-    print(f"\n🔍 Clever Component Validation Results")
+    print("\n🔍 Clever Component Validation Results")
     print(f"{'=' * 50}")
     
     overall_status = results.get("overall_status", "unknown")
@@ -252,7 +252,7 @@ def print_validation_results(results: Dict[str, Any]) -> None:
     if overall_status == "issues_detected":
         print(f"🚨 Issues found in: {', '.join(results.get('issues', []))}")
     
-    print(f"\n📊 Component Details:")
+    print("\n📊 Component Details:")
     print(f"{'-' * 30}")
     
     for component, result in results.items():

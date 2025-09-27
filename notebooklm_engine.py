@@ -60,7 +60,6 @@ from typing import NamedTuple, Dict, List, Optional, Any, Set, Tuple
 # Clever core modules
 from database import DatabaseManager
 from nlp_processor import get_nlp_processor
-import config
 
 # Optional advanced features
 try:

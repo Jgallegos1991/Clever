@@ -370,4 +370,4 @@ if __name__ == "__main__":
         )
         print(f"🧠 Enhanced: {enhanced[:200]}..." if len(enhanced) > 200 else f"🧠 Enhanced: {enhanced}")
     
-    print(f"\n✨ Clever's genius enhancement is ready to make her WAY smarter! 🚀")
+    print("\n✨ Clever's genius enhancement is ready to make her WAY smarter! 🚀")

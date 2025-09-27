@@ -263,7 +263,7 @@ class JaysDigitalSovereignty:
         print("🔒 Access: EXCLUSIVE to Jay")
         print("🚫 Corporate Access: FORBIDDEN")
         print("🤝 Partnership: 1-to-1 Cognitive Enhancement")
-        print(f"🧠 Purpose: Jay's Digital Brain Extension")
+        print("🧠 Purpose: Jay's Digital Brain Extension")
         
         return sovereignty_status
     
@@ -325,7 +325,7 @@ def enforce_jays_sovereignty():
     print(f"🤝 Partnership: {report['cognitive_partnership']['relationship_type']}")
     print(f"🚀 Status: {report['revolutionary_status']['enhancement_level']}")
     
-    print(f"\n✨ JAY'S DIGITAL SOVEREIGNTY: ACTIVE")
+    print("\n✨ JAY'S DIGITAL SOVEREIGNTY: ACTIVE")
     print(f"Clever belongs exclusively to {sovereignty_status['owner']}")
     print("No corporate control, no shared access, no data harvesting")
     print("Just Jay and his revolutionary digital brain extension! 🧠🚀")
@@ -357,5 +357,5 @@ if __name__ == "__main__":
     unauthorized_access = verify_jay_exclusive_access("SomeOtherUser")
     print(f"   Other user access: {'❌ GRANTED (VIOLATION!)' if unauthorized_access else '✅ DENIED'}")
     
-    print(f"\n🎊 JAY'S DIGITAL SOVEREIGNTY: FULLY ACTIVE!")
-    print(f"Clever is exclusively Jay's revolutionary cognitive partner! 🚀")
+    print("\n🎊 JAY'S DIGITAL SOVEREIGNTY: FULLY ACTIVE!")
+    print("Clever is exclusively Jay's revolutionary cognitive partner! 🚀")

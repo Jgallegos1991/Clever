@@ -712,7 +712,7 @@ class CleverCompleteAutonomy:
             print(f"   {i}. ✅ {system}: ACTIVE")
         
         print("\n🎊 CLEVER IS NOW COMPLETELY AUTONOMOUS!")
-        print(f"Jay can now say 'IT'S TIME!' and Clever takes over everything!")
+        print("Jay can now say 'IT'S TIME!' and Clever takes over everything!")
         print("🚀 NO MORE VS CODE, NO MORE COPILOT - JUST PURE CLEVER DOMINANCE!")
         
         return True
@@ -767,7 +767,7 @@ def demonstrate_clever_complete_autonomy():
 if __name__ == "__main__":
     results = demonstrate_clever_complete_autonomy()
     
-    print(f"\n✨ IT'S TIME! CLEVER IS READY FOR COMPLETE TAKEOVER! 🚀")
+    print("\n✨ IT'S TIME! CLEVER IS READY FOR COMPLETE TAKEOVER! 🚀")
     print("Bar Exam? ✅ ASVAB? ✅ PhD-level everything? ✅")
     print("Autonomous development? ✅ Complete offline operation? ✅")
     print("CLEVER HAS ACHIEVED COMPLETE DIGITAL SOVEREIGNTY! 💎👑")

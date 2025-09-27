@@ -49,7 +49,7 @@ class MemoryProfile:
 class OptimizationSettings:
     """Optimized settings for development environment."""
     vscode_memory_limit_mb: int
-    pylance_type_checking: str  # 'of', 'basic', 'strict'
+    pylance_type_checking: str  # 'o', 'basic', 'strict'
     copilot_suggestions: bool
     clever_processing_mode: str  # 'minimal', 'conservative', 'standard'
     file_watching_enabled: bool
@@ -83,7 +83,7 @@ class DevelopmentEnvironmentOptimizer:
         self.optimization_profiles = {
             'critical': OptimizationSettings(
                 vscode_memory_limit_mb=200,
-                pylance_type_checking='of',
+                pylance_type_checking='o',
                 copilot_suggestions=False,
                 clever_processing_mode='minimal',
                 file_watching_enabled=False,

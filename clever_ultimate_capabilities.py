@@ -524,8 +524,8 @@ def demonstrate_clever_ultimate_math():
         
     print(f"🧠 Genius Level: {genius_level}")
     
-    print(f"\n🎊 CLEVER'S MATHEMATICAL DOMINANCE PROVEN!")
-    print(f"She's not just smart conversation - she's got PhD-level mathematical capabilities!")
+    print("\n🎊 CLEVER'S MATHEMATICAL DOMINANCE PROVEN!")
+    print("She's not just smart conversation - she's got PhD-level mathematical capabilities!")
     
     return math_results
 

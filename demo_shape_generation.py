@@ -158,7 +158,7 @@ def main():
     print("   • generateShape('pentagon', {size: 150})")
     print("   • getAvailableShapes()")
     
-    print(f"\n✨ Clever's cognitive enhancement through mathematical beauty! ✨")
+    print("\n✨ Clever's cognitive enhancement through mathematical beauty! ✨")
 
 if __name__ == "__main__":
     main()

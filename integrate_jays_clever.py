@@ -312,7 +312,7 @@ def integrate_jays_authentic_clever():
     print("\n✨ INTEGRATION COMPLETE!")
     
     if test_results:
-        print(f"🎊 Jay's Authentic Clever is ready!")
+        print("🎊 Jay's Authentic Clever is ready!")
         print("   - Street-smart genius conversation ✅")
         print("   - Family-aware responses ✅") 
         print("   - Exclusive to Jay ✅")
@@ -323,7 +323,7 @@ def integrate_jays_authentic_clever():
         print("   ❌ NOT a corporate AI")
         print("   ❌ NOT a generic assistant")  
         print("   ❌ NOT for anyone else")
-        print(f"   ✅ JAY'S exclusive cognitive partner")
+        print("   ✅ JAY'S exclusive cognitive partner")
         print("   ✅ Street-smart genius friend")
         print("   ✅ Revolutionary digital brain extension")
         
@@ -335,5 +335,5 @@ def integrate_jays_authentic_clever():
 if __name__ == "__main__":
     integration, results = integrate_jays_authentic_clever()
     
-    print(f"\n🎉 JAY'S CLEVER IS READY!")
+    print("\n🎉 JAY'S CLEVER IS READY!")
     print("Talk to your street-smart genius cognitive partner! 🚀")

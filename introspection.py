@@ -49,11 +49,8 @@ from __future__ import annotations
 import ast  # For static analysis of functions & imports
 import inspect
 import re
-import threading
-import time
 from collections import deque
 from pathlib import Path  # For code health & component graph scanning
-from typing import Dict, List, Any, Optional, Deque
 
 # Regular expression to extract Why/Where/How sections from docstrings (case-insensitive)
 _SECTION_RE = re.compile(r"^(why|where|how)\s*:\s*(.*)$", re.IGNORECASE)

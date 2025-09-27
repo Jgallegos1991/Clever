@@ -101,7 +101,7 @@ def main(argv: list[str]) -> int:
         else:
             failures.append(f"{f}: missing {', '.join(missing)}")
 
-    coverage = compliant / total if total else 1.0
+    _coverage = compliant / total if total else 1.0
 
     # Why: Simpler static string; removed unused f-string placeholder for lint cleanliness
     print("Docstring Enforcement Report")

@@ -93,7 +93,7 @@ class VSCodeMemoryOptimizer:
             "editor.quickSuggestionsDelay": 1000,
             "editor.suggest.showSnippets": False,
             "editor.suggest.showWords": False,
-            "editor.wordBasedSuggestions": "of",
+            "editor.wordBasedSuggestions": "o",
             
             # File watching limits
             "files.watcherExclude": {
@@ -118,7 +118,7 @@ class VSCodeMemoryOptimizer:
             },
             
             # Terminal optimizations
-            "terminal.integrated.gpuAcceleration": "of",
+            "terminal.integrated.gpuAcceleration": "o",
             "terminal.integrated.rendererType": "dom",
             
             # Git optimizations

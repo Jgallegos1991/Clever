@@ -50,7 +50,7 @@ def remove_unused_imports(content: str, filename: str) -> str:
     """
     
     lines = content.split('\n')
-    filtered_lines = []
+    _filtered_lines = []
     
     # Common unused imports to remove (but be selective)
     unused_patterns = [

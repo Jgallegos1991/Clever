@@ -346,7 +346,7 @@ def activate_clever_revolution():
     for insight in report['revolutionary_insights']:
         print(f"   🔹 {insight}")
     
-    print(f"\n🎯 WHAT'S NEXT:")
+    print("\n🎯 WHAT'S NEXT:")
     print(f"   {report['next_evolution_threshold']}")
     
     print("\n✨ CLEVER IS NOW REVOLUTIONARY!")

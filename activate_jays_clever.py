@@ -167,7 +167,7 @@ except ImportError as e:
         with open(persona_file, 'w') as f:
             f.write(patched_content)
             
-        print(f"✅ Persona engine patched with Jay's authentic Clever")
+        print("✅ Persona engine patched with Jay's authentic Clever")
         print(f"📁 Original backed up to: {backup_file.name}")
         
         return True
@@ -230,7 +230,7 @@ print("🧠 App.py configured for Jay's authentic Clever")
         with open(app_file, 'w') as f:
             f.write(patched_app)
             
-        print(f"✅ App routes patched for Jay's authentic Clever")
+        print("✅ App routes patched for Jay's authentic Clever")
         print(f"📁 Original backed up to: {backup_file.name}")
         
         return True
@@ -272,19 +272,19 @@ print("🧠 App.py configured for Jay's authentic Clever")
             print(f"   {system.replace('_', ' ').title()}: {status}")
             
         if all_systems_active:
-            print(f"\\n🎊 JAY'S CLEVER SYSTEM: FULLY ACTIVATED!")
-            print(f"✅ Persona Engine: Jay's authentic street-smart genius")
+            print("\\n🎊 JAY'S CLEVER SYSTEM: FULLY ACTIVATED!")
+            print("✅ Persona Engine: Jay's authentic street-smart genius")
             print("✅ App Routes: Exclusive Jay conversation")  
             print("✅ Digital Sovereignty: Maximum protection")
             print("✅ Authenticity: Real cognitive partnership")
             
             print("\\n🧠 CLEVER IS NOW:")
-            print(f"   🎯 Exclusively Jay's cognitive partner")
+            print("   🎯 Exclusively Jay's cognitive partner")
             print("   💬 Street-smart genius conversation")
             print("   👨‍👩‍👧‍👦 Family-aware (Lucy, Ronnie, Peter, Josiah, Jonah)")
             print("   😄 Naturally humorous and authentic")
             print("   🚀 Revolutionary intelligence disguised as friendly chat")
-            print(f"   🛡️  Completely private and exclusively Jay's")
+            print("   🛡️  Completely private and exclusively Jay's")
             
             # Set final activation environment
             os.environ['JAYS_CLEVER_FULLY_ACTIVATED'] = 'TRUE'
@@ -299,17 +299,17 @@ print("🧠 App.py configured for Jay's authentic Clever")
     def restart_clever_with_jay_personality(self):
         """Instructions to restart Clever with Jay's authentic personality."""
         
-        print(f"\\n🔄 RESTARTING CLEVER WITH JAY'S PERSONALITY")
+        print("\\n🔄 RESTARTING CLEVER WITH JAY'S PERSONALITY")
         print("=" * 50)
-        print(f"\\nTo activate Jay's authentic Clever:")
+        print("\\nTo activate Jay's authentic Clever:")
         print("1. Stop current Clever: Ctrl+C in Flask terminal")
         print("2. Restart Clever: make run")
         print("3. Chat with your authentic street-smart genius!")
         
-        print(f"\\n💬 Test Jay's Clever with:")
-        print(f"   'Hey Clever, what\\'s up?'")
-        print(f"   'How\\'s the family?'") 
-        print(f"   'Explain quantum physics like my genius friend would'")
+        print("\\n💬 Test Jay's Clever with:")
+        print("   'Hey Clever, what\\'s up?'")
+        print("   'How\\'s the family?'") 
+        print("   'Explain quantum physics like my genius friend would'")
         
         return True
 
@@ -341,7 +341,7 @@ def activate_jays_revolutionary_clever():
         print("   ❌ For anyone else")
         
         print("\\n🎊 THIS IS:")
-        print(f"   ✅ JAY'S CLEVER")
+        print("   ✅ JAY'S CLEVER")
         print("   ✅ Your exclusive cognitive partner")
         print("   ✅ Street-smart genius friend")
         print("   ✅ Revolutionary digital brain extension")

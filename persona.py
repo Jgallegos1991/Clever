@@ -871,7 +871,6 @@ class PersonaEngine:
                 
                 for filename, content, path in rows:
                     # Find relevant excerpts
-                    content_lower = content.lower()
                     query_terms = query_lower.split()
                     
                     best_excerpt = ""

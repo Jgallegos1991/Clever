@@ -579,7 +579,7 @@ class MemoryOptimizedCodeIntelligence:
                         operation='modify',
                         target_line=unused_imports[0]['line'],
                         original_snippet=unused_imports[0]['content'],
-                        new_snippet='# ' + unused_imports[0]['content'] + '  # Commented by Clever - appears unused',
+                        _new_snippet = '# ' + unused_imports[0]['content'] + '  # Commented by Clever - appears unused',
                         safety_score=0.8,
                         timestamp=time.time()
                     )

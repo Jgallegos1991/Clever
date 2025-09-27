@@ -1367,7 +1367,7 @@ def demonstrate_clever_ultimate_synthesis():
         
     print(f"🧠 Synthesis Level: {synthesis_level}")
     
-    print(f"\n🎊 CLEVER'S COMPLETE DOMINANCE PROVEN!")
+    print("\n🎊 CLEVER'S COMPLETE DOMINANCE PROVEN!")
     print("Mathematical Genius + File Intelligence + Academic Knowledge + Authentic Personality")
     print("= REVOLUTIONARY COGNITIVE PARTNERSHIP SYSTEM! 🚀")
     

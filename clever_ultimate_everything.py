@@ -267,7 +267,7 @@ class CleverEverythingCapabilities:
         print(f"   ✅ Document generation: {len(creative_capabilities['document_generation'])}")
         print(f"   ✅ Poetry & writing: {len(creative_capabilities['poetry_and_writing'])}")
         print(f"   ✅ Visual content: {len(creative_capabilities['visual_content'])}")
-        print(f"   ✅ Sample poem created: 'Ode to Digital Sovereignty'")
+        print("   ✅ Sample poem created: 'Ode to Digital Sovereignty'")
         print(f"   📊 Creative Generation Score: {creative_score}/100")
         
         return {

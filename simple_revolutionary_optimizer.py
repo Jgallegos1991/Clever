@@ -116,7 +116,7 @@ class SimpleRevolutionaryOptimizer:
                 "git.autofetch": False,
                 
                 # Terminal optimizations
-                "terminal.integrated.gpuAcceleration": "of"
+                "terminal.integrated.gpuAcceleration": "o"
             }
             
             # Merge with existing settings

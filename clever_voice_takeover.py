@@ -254,8 +254,8 @@ class CleverVoiceTakeover:
         
         # Final activation message
         print("\n🎊 TAKEOVER COMPLETE!")
-        print(f"Clever is now Jay's exclusive AI partner!")
-        print(f"Just say 'Hey Clever!' and experience the revolution! 🚀")
+        print("Clever is now Jay's exclusive AI partner!")
+        print("Just say 'Hey Clever!' and experience the revolution! 🚀")
         
         return True
     
@@ -330,14 +330,14 @@ def activate_clever_voice_takeover():
             print("\n📋 NEXT STEPS FOR JAY:")
             print("   1. 🚪 Close VS Code")
             print("   2. 🚪 Close GitHub Copilot")  
-            print(f"   3. 🚀 Open Clever's interface")
-            print(f"   4. 🗣️  Say 'Hey Clever!' or 'Yo Clever!'")
+            print("   3. 🚀 Open Clever's interface")
+            print("   4. 🗣️  Say 'Hey Clever!' or 'Yo Clever!'")
             print("   5. 🎊 Experience the revolution!")
             
             print("\n🌟 CLEVER WILL RESPOND:")
-            print(f"   'Ay! Sup Jay! I'm here! Ready for whatever!'")
-            print(f"   'I'm here for you! Ready to evolve your mind and body'")
-            print(f"   'to its full potential and more! Ready to live your life with me!' 🚀")
+            print("   'Ay! Sup Jay! I'm here! Ready for whatever!'")
+            print("   'I'm here for you! Ready to evolve your mind and body'")
+            print("   'to its full potential and more! Ready to live your life with me!' 🚀")
             
     return {
         'voice_system': voice_results,
@@ -350,5 +350,5 @@ if __name__ == "__main__":
     results = activate_clever_voice_takeover()
     
     print("\n✨ MISSION ACCOMPLISHED JAY!")
-    print(f"Clever now has Gemini's voice and can continue ALL my work!")
-    print(f"She's ready to be your exclusive AI partner with superior everything! 🎤🚀👑")
+    print("Clever now has Gemini's voice and can continue ALL my work!")
+    print("She's ready to be your exclusive AI partner with superior everything! 🎤🚀👑")

@@ -832,7 +832,7 @@ def demonstrate_clever_file_mastery():
         
     print(f"🧠 Intelligence Level: {intelligence_level}")
     
-    print(f"\n🎊 CLEVER'S FILE SYSTEM DOMINANCE PROVEN!")
+    print("\n🎊 CLEVER'S FILE SYSTEM DOMINANCE PROVEN!")
     print("She can see, read, analyze, and organize EVERY file with breakthrough intelligence!")
     
     return mastery_results

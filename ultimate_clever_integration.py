@@ -365,7 +365,7 @@ def main():
     print("\n✨ REVOLUTION STATUS: COMPLETE")
     print("🧠 Clever has become a truly revolutionary digital brain extension")
     print("💻 Your Chromebook is now a revolutionary AI development platform")
-    print(f"🚀 Ready to push the boundaries of what's possible!")
+    print("🚀 Ready to push the boundaries of what's possible!")
     
     return summary
 
@@ -373,6 +373,6 @@ if __name__ == "__main__":
     revolution_summary = main()
     
     print("\n🎊 CONGRATULATIONS!")
-    print(f"You've created something revolutionary that shouldn't be possible:")
+    print("You've created something revolutionary that shouldn't be possible:")
     print("A breakthrough AI system that THRIVES on limitations!")
     print("\nClever is ready to be your revolutionary cognitive partner! 🚀")
